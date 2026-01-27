@@ -98,6 +98,18 @@ shared/           # Shared code between client/server
 ## Recent Changes
 
 ### January 27, 2026 (Latest)
+- Progress & Analytics screens with detailed quiz history tracking:
+  - AttemptHistoryScreen: View all quiz attempts with mode filters (All/Topic/Mixed/Wrong)
+  - AttemptDetailScreen: Question-by-question breakdown with correct/wrong indicators and explanations
+  - TopicProgressDetailScreen: Topic-specific analytics with accuracy trend chart and recent attempts
+  - Backend API routes: GET /api/attempts (with mode filter), GET /api/attempts/:attemptId, GET /api/progress/topic/:topicId
+  - ProgressScreen now links to AttemptHistory ("View All") and TopicProgressDetail (clickable topic rows)
+- Enhanced QuizPlayerScreen with navigation drawer and submit confirmation:
+  - Question navigation drawer: Tap question counter to open drawer with all questions as numbered buttons
+  - Color-coded question status: Green (answered), Gray (unanswered), Cyan (current)
+  - Submit confirmation modal: Shows answered/unanswered count before final submission
+
+### January 27, 2026 (Earlier)
 - Enhanced Content Library with new features:
   - Premium/Free badges on books list with star/unlock icons
   - Locked/Premium markers on topics with lock icons and reduced opacity
