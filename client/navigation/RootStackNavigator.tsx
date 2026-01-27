@@ -21,6 +21,7 @@ import QuizResultsScreen from "@/screens/QuizResultsScreen";
 import QuizSettingsScreen from "@/screens/QuizSettingsScreen";
 import SubscriptionScreen from "@/screens/SubscriptionScreen";
 import BookmarksScreen from "@/screens/BookmarksScreen";
+import RecentActivityScreen from "@/screens/RecentActivityScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -40,6 +41,7 @@ export type RootStackParamList = {
   QuizSettings: undefined;
   Subscription: undefined;
   Bookmarks: undefined;
+  RecentActivity: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -121,6 +123,14 @@ export default function RootStackNavigator() {
             component={BookmarksScreen}
             options={{
               headerTitle: "Bookmarks",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="RecentActivity"
+            component={RecentActivityScreen}
+            options={{
+              headerTitle: "Recent Activity",
               presentation: "card",
             }}
           />

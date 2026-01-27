@@ -68,6 +68,13 @@ export default function ProfileScreen() {
       onPress: () => navigation.navigate("Bookmarks"),
     },
     {
+      id: "recent-activity",
+      title: "Recent Activity",
+      subtitle: "Continue where you left off",
+      icon: "clock" as const,
+      onPress: () => navigation.navigate("RecentActivity"),
+    },
+    {
       id: "notifications",
       title: "Notifications",
       subtitle: "Manage alerts and reminders",
