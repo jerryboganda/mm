@@ -22,6 +22,9 @@ import QuizSettingsScreen from "@/screens/QuizSettingsScreen";
 import SubscriptionScreen from "@/screens/SubscriptionScreen";
 import BookmarksScreen from "@/screens/BookmarksScreen";
 import RecentActivityScreen from "@/screens/RecentActivityScreen";
+import AttemptHistoryScreen from "@/screens/AttemptHistoryScreen";
+import AttemptDetailScreen from "@/screens/AttemptDetailScreen";
+import TopicProgressDetailScreen from "@/screens/TopicProgressDetailScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -42,6 +45,9 @@ export type RootStackParamList = {
   Subscription: undefined;
   Bookmarks: undefined;
   RecentActivity: undefined;
+  AttemptHistory: undefined;
+  AttemptDetail: { attemptId: string };
+  TopicProgressDetail: { topicId: string; topicTitle: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -131,6 +137,30 @@ export default function RootStackNavigator() {
             component={RecentActivityScreen}
             options={{
               headerTitle: "Recent Activity",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="AttemptHistory"
+            component={AttemptHistoryScreen}
+            options={{
+              headerTitle: "Quiz History",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="AttemptDetail"
+            component={AttemptDetailScreen}
+            options={{
+              headerTitle: "Attempt Details",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="TopicProgressDetail"
+            component={TopicProgressDetailScreen}
+            options={{
+              headerTitle: "Topic Progress",
               presentation: "card",
             }}
           />

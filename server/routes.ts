@@ -803,6 +803,173 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Attempt History with filters
+  app.get("/api/attempts", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const { mode, topicId, startDate, endDate } = req.query;
+      const attempts = await storage.getQuizAttempts(req.userId!);
+      
+      let filteredAttempts = attempts;
+      
+      if (mode && mode !== "all") {
+        filteredAttempts = filteredAttempts.filter(a => a.mode === mode);
+      }
+      
+      if (topicId) {
+        filteredAttempts = filteredAttempts.filter(a => a.topicId === topicId);
+      }
+      
+      if (startDate) {
+        const start = new Date(startDate as string);
+        filteredAttempts = filteredAttempts.filter(a => new Date(a.createdAt) >= start);
+      }
+      
+      if (endDate) {
+        const end = new Date(endDate as string);
+        end.setHours(23, 59, 59, 999);
+        filteredAttempts = filteredAttempts.filter(a => new Date(a.createdAt) <= end);
+      }
+      
+      const attemptsWithDetails = await Promise.all(
+        filteredAttempts.map(async (a) => {
+          let topicTitle = undefined;
+          if (a.topicId) {
+            const topic = await storage.getTopic(a.topicId);
+            topicTitle = topic?.title;
+          }
+          return {
+            id: a.id,
+            date: a.createdAt.toISOString(),
+            score: a.score,
+            totalQuestions: a.totalQuestions,
+            correctCount: a.correctCount,
+            wrongCount: a.wrongCount,
+            timeTaken: a.timeTaken,
+            mode: a.mode,
+            topicId: a.topicId,
+            topicTitle,
+          };
+        })
+      );
+      
+      res.json(attemptsWithDetails);
+    } catch (error) {
+      console.error("Get attempts error:", error);
+      res.status(500).json({ message: "Failed to get attempts" });
+    }
+  });
+
+  // Single Attempt Detail
+  app.get("/api/attempts/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const { attemptId } = req.params;
+      const attempt = await storage.getQuizAttempt(attemptId);
+      
+      if (!attempt || attempt.userId !== req.userId) {
+        return res.status(404).json({ message: "Attempt not found" });
+      }
+      
+      let topicTitle = undefined;
+      if (attempt.topicId) {
+        const topic = await storage.getTopic(attempt.topicId);
+        topicTitle = topic?.title;
+      }
+
+      const answersData = attempt.answers as Record<string, { selected: string; correct: string; isCorrect: boolean }>;
+      const questionIds = Object.keys(answersData);
+      
+      const questionsWithDetails = await Promise.all(
+        questionIds.map(async (qId) => {
+          const mcq = await storage.getMCQ(qId);
+          const answerInfo = answersData[qId];
+          return {
+            id: qId,
+            question: mcq?.question || "Question not found",
+            options: mcq?.options || [],
+            selectedAnswer: answerInfo.selected,
+            correctAnswer: answerInfo.correct,
+            isCorrect: answerInfo.isCorrect,
+            explanation: mcq?.explanation || "",
+          };
+        })
+      );
+      
+      res.json({
+        id: attempt.id,
+        date: attempt.createdAt.toISOString(),
+        score: attempt.score,
+        totalQuestions: attempt.totalQuestions,
+        correctCount: attempt.correctCount,
+        wrongCount: attempt.wrongCount,
+        timeTaken: attempt.timeTaken,
+        mode: attempt.mode,
+        topicId: attempt.topicId,
+        topicTitle,
+        questions: questionsWithDetails,
+      });
+    } catch (error) {
+      console.error("Get attempt detail error:", error);
+      res.status(500).json({ message: "Failed to get attempt detail" });
+    }
+  });
+
+  // Topic Progress Detail
+  app.get("/api/progress/topic/:topicId", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const { topicId } = req.params;
+      const topic = await storage.getTopic(topicId);
+      
+      if (!topic) {
+        return res.status(404).json({ message: "Topic not found" });
+      }
+      
+      const chapter = await storage.getChapter(topic.chapterId);
+      const attempts = await storage.getQuizAttempts(req.userId!);
+      const topicAttempts = attempts.filter(a => a.topicId === topicId);
+      
+      const accuracyTrend = topicAttempts.map(a => ({
+        date: a.createdAt.toISOString(),
+        score: a.score,
+      }));
+      
+      const avgScore = topicAttempts.length > 0 
+        ? Math.round(topicAttempts.reduce((sum, a) => sum + a.score, 0) / topicAttempts.length)
+        : 0;
+      
+      const bestScore = topicAttempts.length > 0
+        ? Math.max(...topicAttempts.map(a => a.score))
+        : 0;
+      
+      const lastAttempt = topicAttempts.length > 0
+        ? topicAttempts[0].createdAt.toISOString()
+        : null;
+      
+      const recentAttempts = topicAttempts.slice(0, 10).map(a => ({
+        id: a.id,
+        date: a.createdAt.toISOString(),
+        score: a.score,
+        correctCount: a.correctCount,
+        wrongCount: a.wrongCount,
+        totalQuestions: a.totalQuestions,
+      }));
+      
+      res.json({
+        topicId,
+        topicTitle: topic.title,
+        chapterTitle: chapter?.title || "",
+        totalAttempts: topicAttempts.length,
+        averageScore: avgScore,
+        bestScore,
+        lastAttempt,
+        accuracyTrend,
+        recentAttempts,
+      });
+    } catch (error) {
+      console.error("Get topic progress error:", error);
+      res.status(500).json({ message: "Failed to get topic progress" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
