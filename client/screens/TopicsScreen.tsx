@@ -25,6 +25,8 @@ interface Topic {
   description: string;
   isCompleted: boolean;
   isBookmarked: boolean;
+  isLocked: boolean;
+  isPremium: boolean;
   order: number;
 }
 
@@ -51,12 +53,20 @@ export default function TopicsScreen() {
     <GlassCard
       title={item.title}
       subtitle={item.description}
-      onPress={() => navigation.navigate("TopicReader", { 
-        topicId: item.id, 
-        topicTitle: item.title 
-      })}
+      onPress={() => {
+        if (!item.isLocked) {
+          navigation.navigate("TopicReader", { 
+            topicId: item.id, 
+            topicTitle: item.title 
+          });
+        }
+      }}
       icon={
-        item.isCompleted ? (
+        item.isLocked ? (
+          <View style={styles.lockedIcon}>
+            <Feather name="lock" size={18} color={Colors.dark.textMuted} />
+          </View>
+        ) : item.isCompleted ? (
           <View style={styles.completedIcon}>
             <Feather name="check" size={20} color="#fff" />
           </View>
@@ -65,12 +75,19 @@ export default function TopicsScreen() {
         )
       }
       rightElement={
-        item.isBookmarked ? (
-          <Feather name="bookmark" size={20} color={Colors.dark.primary} />
-        ) : null
+        <View style={styles.rightElements}>
+          {item.isPremium && (
+            <View style={styles.premiumBadge}>
+              <Feather name="star" size={10} color="#fbbf24" />
+            </View>
+          )}
+          {item.isBookmarked && (
+            <Feather name="bookmark" size={20} color={Colors.dark.primary} />
+          )}
+        </View>
       }
       testID={`card-topic-${item.id}`}
-      style={{ marginBottom: Spacing.md }}
+      style={[styles.topicCard, item.isLocked && styles.lockedCard]}
     />
   );
 
@@ -139,6 +156,35 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.dark.success,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  lockedIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.dark.glass,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: Colors.dark.glassBorder,
+  },
+  topicCard: {
+    marginBottom: Spacing.md,
+  },
+  lockedCard: {
+    opacity: 0.6,
+  },
+  rightElements: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
+  premiumBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "rgba(251,191,36,0.15)",
     alignItems: "center",
     justifyContent: "center",
   },
