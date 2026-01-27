@@ -21,6 +21,8 @@ import debounce from "lodash.debounce";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { ThemedText } from "@/components/ThemedText";
+import { getApiUrl } from "@/lib/query-client";
+import { useAuth } from "@/lib/auth-context";
 import { Colors, Spacing, BorderRadius, Typography } from "@/constants/theme";
 import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 
@@ -101,6 +103,7 @@ export default function SearchScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<NavigationProp>();
+  const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -117,6 +120,21 @@ export default function SearchScreen() {
 
   const { data: results, isLoading, isFetching } = useQuery<SearchResult[]>({
     queryKey: ["/api/search", debouncedQuery, activeFilter],
+    queryFn: async () => {
+      if (debouncedQuery.length < 2) return [];
+      const url = new URL(`/api/search`, getApiUrl());
+      url.searchParams.set("query", debouncedQuery);
+      url.searchParams.set("filter", activeFilter);
+      
+      const res = await fetch(url.toString(), {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (!res.ok) throw new Error("Search failed");
+      return res.json();
+    },
     enabled: debouncedQuery.length >= 2,
   });
 
