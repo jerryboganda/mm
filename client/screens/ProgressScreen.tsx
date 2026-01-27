@@ -1,8 +1,10 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View, ScrollView, RefreshControl } from "react-native";
+import { StyleSheet, View, ScrollView, RefreshControl, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 import { Feather } from "@expo/vector-icons";
 
@@ -14,6 +16,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
+
+type ProgressScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 interface ProgressData {
   totalAttempts: number;
@@ -39,6 +44,7 @@ export default function ProgressScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
+  const navigation = useNavigation<ProgressScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
   const { data: progress, isLoading, refetch } = useQuery<ProgressData>({
@@ -140,9 +146,20 @@ export default function ProgressScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>TOPIC ACCURACY</ThemedText>
+          <View style={styles.sectionHeader}>
+            <ThemedText style={styles.sectionLabel}>TOPIC ACCURACY</ThemedText>
+          </View>
           {progress.topicProgress.map((topic) => (
-            <View key={topic.id} style={styles.topicRow}>
+            <Pressable
+              key={topic.id}
+              onPress={() =>
+                navigation.navigate("TopicProgressDetail", {
+                  topicId: topic.id,
+                  topicTitle: topic.title,
+                })
+              }
+              style={styles.topicRow}
+            >
               <View style={styles.topicInfo}>
                 <ThemedText style={styles.topicTitle}>{topic.title}</ThemedText>
                 <ThemedText style={styles.topicAttempts}>
@@ -158,16 +175,28 @@ export default function ProgressScreen() {
                 <ThemedText style={styles.topicAccuracy}>
                   {topic.accuracy}%
                 </ThemedText>
+                <Feather
+                  name="chevron-right"
+                  size={16}
+                  color={Colors.dark.textMuted}
+                  style={{ marginLeft: Spacing.sm }}
+                />
               </View>
-            </View>
+            </Pressable>
           ))}
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>RECENT ATTEMPTS</ThemedText>
+          <View style={styles.sectionHeader}>
+            <ThemedText style={styles.sectionLabel}>RECENT ATTEMPTS</ThemedText>
+            <Pressable onPress={() => navigation.navigate("AttemptHistory")}>
+              <ThemedText style={styles.viewAllText}>View All</ThemedText>
+            </Pressable>
+          </View>
           {progress.recentAttempts.map((attempt) => (
             <GlassCard
               key={attempt.id}
+              onPress={() => navigation.navigate("AttemptDetail", { attemptId: attempt.id })}
               style={styles.attemptCard}
             >
               <View style={styles.attemptHeader}>
@@ -238,12 +267,22 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Spacing["2xl"],
   },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.lg,
+  },
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
     letterSpacing: 1.5,
     color: Colors.dark.textMuted,
-    marginBottom: Spacing.lg,
+  },
+  viewAllText: {
+    fontSize: 13,
+    color: Colors.dark.primary,
+    fontWeight: "500",
   },
   topicRow: {
     marginBottom: Spacing.lg,
