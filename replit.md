@@ -14,9 +14,13 @@ Preferred communication style: Simple, everyday language.
 
 - **Framework**: React Native with Expo SDK 54, using the new architecture
 - **Navigation**: React Navigation v7 with bottom tabs and native stacks
-  - Root stack navigator for authentication and modal screens
-  - Bottom tab navigator with 4 main tabs: Learn, Practice, Progress, Profile
-  - Nested stack navigators for each tab section
+  - Root stack navigator for authentication, onboarding, and modal screens
+  - Bottom tab navigator with 5 main tabs: Home, Library, Quiz, Progress, Profile
+  - HomeStackNavigator: Dashboard, Notifications, TopicReader
+  - LearnStackNavigator: Library browsing (books → chapters → topics)
+  - PracticeStackNavigator: Quiz modes and quiz player
+  - ProgressStackNavigator: Analytics and progress tracking
+  - ProfileStackNavigator: User profile and settings
 - **State Management**: TanStack React Query for server state, React Context for auth state
 - **Styling**: Custom design system with dark glassmorphism theme, using Expo Linear Gradient and Blur effects
 - **Animation**: React Native Reanimated for smooth micro-interactions
@@ -94,6 +98,14 @@ shared/           # Shared code between client/server
 ## Recent Changes
 
 ### January 27, 2026 (Latest)
+- Implemented Main App Shell / Navigation with 5 tabs
+  - Updated MainTabNavigator to 5 tabs: Home, Library, Quiz, Progress, Profile
+  - Created HomeStackNavigator with Dashboard, Notifications, and TopicReader screens
+  - Home Dashboard: Personalized greeting, notification bell, stat cards (Topics Read, Quizzes Done, Avg. Score, Study Streak), Continue Learning card, Recommended Topics section
+  - NotificationsScreen: Professor announcements with type icons, read/unread status, pull-to-refresh
+- Added EmailVerificationScreen with resend functionality
+  - Backend route `/api/auth/resend-verification` for re-sending verification emails
+  - 60-second cooldown between resend attempts
 - Added complete Onboarding & Entry flow
   - Splash Screen: Uses expo-splash-screen with app logo during initialization
   - Welcome Screen: Entry point with "Get Started" and "I already have an account" buttons
