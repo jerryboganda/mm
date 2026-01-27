@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View, ScrollView, Pressable, Image } from "react-native";
+import { StyleSheet, View, ScrollView, Pressable } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -11,6 +12,7 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
+import { ImageViewer } from "@/components/ImageViewer";
 import { apiRequest, queryClient } from "@/lib/query-client";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -40,6 +42,7 @@ export default function TopicReaderScreen() {
   const navigation = useNavigation();
   const route = useRoute<TopicReaderRouteProp>();
   const { topicId, topicTitle } = route.params;
+  const [viewerImage, setViewerImage] = useState<string | null>(null);
 
   const { data: topic, isLoading } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
@@ -81,13 +84,23 @@ export default function TopicReaderScreen() {
         );
       case "image":
         return (
-          <View key={block.id} style={styles.imageContainer}>
+          <Pressable
+            key={block.id}
+            style={styles.imageContainer}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setViewerImage(block.content);
+            }}
+          >
             <Image
               source={{ uri: block.content }}
               style={styles.image}
-              resizeMode="cover"
+              contentFit="cover"
             />
-          </View>
+            <View style={styles.imageOverlay}>
+              <Feather name="maximize-2" size={16} color="#fff" />
+            </View>
+          </Pressable>
         );
       case "note":
         return (
@@ -200,6 +213,12 @@ export default function TopicReaderScreen() {
           </Pressable>
         ) : null}
       </View>
+
+      <ImageViewer
+        visible={viewerImage !== null}
+        imageUri={viewerImage || ""}
+        onClose={() => setViewerImage(null)}
+      />
     </BackgroundGradient>
   );
 }
@@ -243,6 +262,17 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 200,
+  },
+  imageOverlay: {
+    position: "absolute",
+    bottom: Spacing.sm,
+    right: Spacing.sm,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   noteContainer: {
     flexDirection: "row",

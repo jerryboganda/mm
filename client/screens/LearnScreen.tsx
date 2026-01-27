@@ -26,6 +26,7 @@ interface Book {
   chaptersCount: number;
   progress: number;
   imageUrl?: string;
+  isPremium?: boolean;
 }
 
 export default function LearnScreen() {
@@ -52,6 +53,18 @@ export default function LearnScreen() {
       onPress={() => navigation.navigate("Chapters", { bookId: item.id, bookTitle: item.title })}
       icon={
         <Feather name="book-open" size={24} color={Colors.dark.primary} />
+      }
+      rightElement={
+        <View style={[styles.badge, item.isPremium ? styles.premiumBadge : styles.freeBadge]}>
+          <Feather 
+            name={item.isPremium ? "star" : "unlock"} 
+            size={10} 
+            color={item.isPremium ? "#fbbf24" : Colors.dark.success} 
+          />
+          <ThemedText style={[styles.badgeText, item.isPremium ? styles.premiumText : styles.freeText]}>
+            {item.isPremium ? "Premium" : "Free"}
+          </ThemedText>
+        </View>
       }
       testID={`card-book-${item.id}`}
       style={{ marginBottom: Spacing.md }}
@@ -162,5 +175,29 @@ const styles = StyleSheet.create({
   errorText: {
     color: Colors.dark.textSecondary,
     marginTop: Spacing.md,
+  },
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 12,
+  },
+  premiumBadge: {
+    backgroundColor: "rgba(251,191,36,0.15)",
+  },
+  freeBadge: {
+    backgroundColor: "rgba(34,197,94,0.15)",
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "600",
+    marginLeft: 4,
+  },
+  premiumText: {
+    color: "#fbbf24",
+  },
+  freeText: {
+    color: Colors.dark.success,
   },
 });
