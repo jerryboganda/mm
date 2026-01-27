@@ -94,6 +94,12 @@ shared/           # Shared code between client/server
 ## Recent Changes
 
 ### January 27, 2026 (Latest)
+- Added complete Onboarding & Entry flow
+  - Splash Screen: Uses expo-splash-screen with app logo during initialization
+  - Welcome Screen: Entry point with "Get Started" and "I already have an account" buttons
+  - Onboarding Carousel: 4-slide carousel explaining Learn, Practice, Track Progress, and Bookmark features
+  - Permissions Prompt Screen: Requests notification permissions with rationale and benefits
+  - Onboarding state persisted in AsyncStorage to only show once per device
 - Implemented Forgot Password feature with email-based reset flow using Resend
   - Added ForgotPasswordScreen and ResetPasswordScreen
   - Backend API routes for password reset token generation and validation
