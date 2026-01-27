@@ -373,6 +373,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Topic not found" });
       }
 
+      // Record this topic view for recent activity tracking
+      await storage.recordTopicView(req.userId!, topicId);
+
       const blocks = await storage.getContentBlocksByTopic(topicId);
       const progress = await storage.getTopicProgress(req.userId!, topicId);
       const isBookmarked = await storage.isBookmarked(req.userId!, topicId);
@@ -454,6 +457,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get bookmarks error:", error);
       res.status(500).json({ message: "Failed to get bookmarks" });
+    }
+  });
+
+  // Recent Activity API
+  app.get("/api/recent-activity", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const recentActivities = await storage.getRecentActivity(req.userId!, limit);
+      
+      // Enrich with topic/chapter/book details
+      const activitiesWithDetails = await Promise.all(
+        recentActivities.map(async (activity) => {
+          const topic = await storage.getTopic(activity.topicId);
+          if (!topic) return null;
+
+          const chapter = await storage.getChapter(topic.chapterId);
+          if (!chapter) return null;
+
+          const book = await storage.getBook(chapter.bookId);
+          if (!book) return null;
+
+          return {
+            id: activity.id,
+            topicId: topic.id,
+            topicTitle: topic.title,
+            chapterTitle: chapter.title,
+            bookTitle: book.title,
+            viewedAt: activity.viewedAt.toISOString(),
+          };
+        })
+      );
+
+      res.json(activitiesWithDetails.filter(Boolean));
+    } catch (error) {
+      console.error("Get recent activity error:", error);
+      res.status(500).json({ message: "Failed to get recent activity" });
     }
   });
 

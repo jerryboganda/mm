@@ -236,6 +236,30 @@ export const passwordResetTokensRelations = relations(passwordResetTokens, ({ on
   }),
 }));
 
+export const recentActivity = pgTable("recent_activity", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  topicId: varchar("topic_id")
+    .notNull()
+    .references(() => topics.id, { onDelete: "cascade" }),
+  viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+});
+
+export const recentActivityRelations = relations(recentActivity, ({ one }) => ({
+  user: one(users, {
+    fields: [recentActivity.userId],
+    references: [users.id],
+  }),
+  topic: one(topics, {
+    fields: [recentActivity.topicId],
+    references: [topics.id],
+  }),
+}));
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -273,3 +297,4 @@ export type UserProgress = typeof userProgress.$inferSelect;
 export type Bookmark = typeof bookmarks.$inferSelect;
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type RecentActivity = typeof recentActivity.$inferSelect;

@@ -9,6 +9,7 @@ import {
   bookmarks,
   quizAttempts,
   passwordResetTokens,
+  recentActivity,
   type User,
   type InsertUser,
   type Book,
@@ -20,6 +21,7 @@ import {
   type Bookmark,
   type QuizAttempt,
   type PasswordResetToken,
+  type RecentActivity,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, avg, gt } from "drizzle-orm";
@@ -63,6 +65,9 @@ export interface IStorage {
   getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
   markTokenUsed(tokenId: string): Promise<void>;
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
+  
+  recordTopicView(userId: string, topicId: string): Promise<void>;
+  getRecentActivity(userId: string, limit?: number): Promise<RecentActivity[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -313,6 +318,34 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ password: hashedPassword })
       .where(eq(users.id, userId));
+  }
+
+  async recordTopicView(userId: string, topicId: string): Promise<void> {
+    // Check if there's an existing view for this topic by this user
+    const [existing] = await db
+      .select()
+      .from(recentActivity)
+      .where(and(eq(recentActivity.userId, userId), eq(recentActivity.topicId, topicId)));
+
+    if (existing) {
+      // Update the viewedAt timestamp
+      await db
+        .update(recentActivity)
+        .set({ viewedAt: new Date() })
+        .where(eq(recentActivity.id, existing.id));
+    } else {
+      // Create a new record
+      await db.insert(recentActivity).values({ userId, topicId });
+    }
+  }
+
+  async getRecentActivity(userId: string, limit: number = 20): Promise<RecentActivity[]> {
+    return await db
+      .select()
+      .from(recentActivity)
+      .where(eq(recentActivity.userId, userId))
+      .orderBy(desc(recentActivity.viewedAt))
+      .limit(limit);
   }
 }
 
