@@ -93,7 +93,24 @@ shared/           # Shared code between client/server
 
 ## Recent Changes
 
-### January 27, 2026
+### January 27, 2026 (Latest)
+- Implemented Forgot Password feature with email-based reset flow using Resend
+  - Added ForgotPasswordScreen and ResetPasswordScreen
+  - Backend API routes for password reset token generation and validation
+  - Database table: password_reset_tokens for secure token storage
+  - In dev mode, reset links are logged to console when RESEND_API_KEY not set
+- Added RevenueCat subscription integration for in-app purchases
+  - PurchasesProvider context wraps app for subscription state management
+  - SubscriptionScreen handles real RevenueCat packages or fallback plans
+  - Supports restore purchases functionality
+  - Environment variables: EXPO_PUBLIC_REVENUECAT_API_KEY_IOS, EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID, EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID
+- Fixed Wrong Questions quiz mode to properly track answers chronologically
+  - Questions now tracked by latest answer - correctly answered questions removed from wrong pool
+  - Quiz submission now passes mode and topicId for accurate attempt logging
+  - Query invalidation when wrong questions are corrected
+- Fixed Colors import issues across auth screens for consistent theming
+
+### January 27, 2026 (Earlier)
 - Fixed API communication between Expo web app (port 8081) and Express backend (port 5000)
 - CORS configuration now allows Authorization header for authenticated API requests
 - API URL construction preserves :5000 port suffix for proper Replit dev domain routing
