@@ -25,6 +25,10 @@ import RecentActivityScreen from "@/screens/RecentActivityScreen";
 import AttemptHistoryScreen from "@/screens/AttemptHistoryScreen";
 import AttemptDetailScreen from "@/screens/AttemptDetailScreen";
 import TopicProgressDetailScreen from "@/screens/TopicProgressDetailScreen";
+import PaywallScreen from "@/screens/PaywallScreen";
+import PurchaseSuccessScreen from "@/screens/PurchaseSuccessScreen";
+import PurchaseFailedScreen from "@/screens/PurchaseFailedScreen";
+import RestorePurchasesScreen from "@/screens/RestorePurchasesScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -48,6 +52,10 @@ export type RootStackParamList = {
   AttemptHistory: undefined;
   AttemptDetail: { attemptId: string };
   TopicProgressDetail: { topicId: string; topicTitle: string };
+  Paywall: undefined;
+  PurchaseSuccess: undefined;
+  PurchaseFailed: { errorMessage?: string };
+  RestorePurchases: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -161,6 +169,39 @@ export default function RootStackNavigator() {
             component={TopicProgressDetailScreen}
             options={{
               headerTitle: "Topic Progress",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="Paywall"
+            component={PaywallScreen}
+            options={{
+              headerTitle: "",
+              presentation: "modal",
+            }}
+          />
+          <Stack.Screen
+            name="PurchaseSuccess"
+            component={PurchaseSuccessScreen}
+            options={{
+              headerShown: false,
+              presentation: "fullScreenModal",
+              gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen
+            name="PurchaseFailed"
+            component={PurchaseFailedScreen}
+            options={{
+              headerShown: false,
+              presentation: "fullScreenModal",
+            }}
+          />
+          <Stack.Screen
+            name="RestorePurchases"
+            component={RestorePurchasesScreen}
+            options={{
+              headerTitle: "Restore Purchases",
               presentation: "card",
             }}
           />
