@@ -5,6 +5,7 @@ import { BlurView } from "expo-blur";
 import { Platform, StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
+import HomeStackNavigator from "@/navigation/HomeStackNavigator";
 import LearnStackNavigator from "@/navigation/LearnStackNavigator";
 import PracticeStackNavigator from "@/navigation/PracticeStackNavigator";
 import ProgressStackNavigator from "@/navigation/ProgressStackNavigator";
@@ -12,8 +13,9 @@ import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
 import { Colors } from "@/constants/theme";
 
 export type MainTabParamList = {
-  LearnTab: undefined;
-  PracticeTab: undefined;
+  HomeTab: undefined;
+  LibraryTab: undefined;
+  QuizTab: undefined;
   ProgressTab: undefined;
   ProfileTab: undefined;
 };
@@ -23,7 +25,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 export default function MainTabNavigator() {
   return (
     <Tab.Navigator
-      initialRouteName="LearnTab"
+      initialRouteName="HomeTab"
       screenOptions={{
         tabBarActiveTintColor: Colors.dark.primary,
         tabBarInactiveTintColor: Colors.dark.tabIconDefault,
@@ -72,20 +74,30 @@ export default function MainTabNavigator() {
       }}
     >
       <Tab.Screen
-        name="LearnTab"
+        name="HomeTab"
+        component={HomeStackNavigator}
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="LibraryTab"
         component={LearnStackNavigator}
         options={{
-          title: "Learn",
+          title: "Library",
           tabBarIcon: ({ color, size }) => (
             <Feather name="book-open" size={size} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="PracticeTab"
+        name="QuizTab"
         component={PracticeStackNavigator}
         options={{
-          title: "Practice",
+          title: "Quiz",
           tabBarIcon: ({ color, size }) => (
             <Feather name="edit-3" size={size} color={color} />
           ),
