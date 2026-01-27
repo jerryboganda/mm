@@ -24,7 +24,7 @@ export default function HomeStackNavigator() {
         name="Dashboard"
         component={HomeScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="Maternal Mind" showLogo />,
+          headerTitle: () => <HeaderTitle title="Maternal Mind" />,
         }}
       />
       <Stack.Screen
