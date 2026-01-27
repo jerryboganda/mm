@@ -11,7 +11,7 @@ import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { getApiUrl } from "@/lib/query-client";
-import { Colors, Spacing } from "@/constants/theme";
+import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Feather } from "@expo/vector-icons";
 
@@ -80,7 +80,7 @@ export default function ForgotPasswordScreen() {
         >
           <View style={styles.successContainer}>
             <View style={styles.successIcon}>
-              <Feather name="mail" size={48} color={Colors.primary} />
+              <Feather name="mail" size={48} color={Colors.dark.primary} />
             </View>
             <ThemedText type="h2" style={styles.successTitle}>
               Check Your Email
@@ -189,12 +189,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   title: {
-    color: Colors.text.primary,
+    color: Colors.dark.text,
     marginBottom: Spacing.sm,
     textAlign: "center",
   },
   subtitle: {
-    color: Colors.text.secondary,
+    color: Colors.dark.textSecondary,
     textAlign: "center",
     fontSize: 15,
     lineHeight: 22,
@@ -212,11 +212,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    color: Colors.text.secondary,
+    color: Colors.dark.textSecondary,
     fontSize: 14,
   },
   linkText: {
-    color: Colors.primary,
+    color: Colors.dark.primary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -228,18 +228,18 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: Colors.glass.background,
+    backgroundColor: Colors.dark.glass,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: Spacing.xl,
   },
   successTitle: {
-    color: Colors.text.primary,
+    color: Colors.dark.text,
     marginBottom: Spacing.md,
     textAlign: "center",
   },
   successMessage: {
-    color: Colors.text.secondary,
+    color: Colors.dark.textSecondary,
     textAlign: "center",
     fontSize: 15,
     lineHeight: 24,
