@@ -482,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/quiz/submit", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const { quizId, answers } = req.body;
+      const { quizId, answers, mode, topicId } = req.body;
       const answerEntries = Object.entries(answers as Record<string, string>);
       
       let correctCount = 0;
@@ -508,8 +508,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const attempt = await storage.createQuizAttempt({
         userId: req.userId!,
-        topicId: null,
-        mode: "mixed",
+        topicId: topicId || null,
+        mode: mode || "mixed",
         score,
         totalQuestions,
         correctCount,
