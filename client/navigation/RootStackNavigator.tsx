@@ -7,6 +7,8 @@ import { ActivityIndicator, View, StyleSheet } from "react-native";
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import LoginScreen from "@/screens/LoginScreen";
 import RegisterScreen from "@/screens/RegisterScreen";
+import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
+import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import QuizTopicSelectScreen from "@/screens/QuizTopicSelectScreen";
 import QuizPlayerScreen from "@/screens/QuizPlayerScreen";
@@ -20,6 +22,8 @@ export type RootStackParamList = {
   Main: undefined;
   Login: undefined;
   Register: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: { token?: string };
   TopicReader: { topicId: string; topicTitle: string };
   QuizTopicSelect: undefined;
   QuizPlayer: { mode: "topic" | "mixed" | "wrong"; topicId?: string };
@@ -121,6 +125,22 @@ export default function RootStackNavigator() {
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ResetPassword"
+            component={ResetPasswordScreen}
             options={{
               headerTitle: "",
               headerTransparent: true,

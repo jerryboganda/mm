@@ -8,6 +8,7 @@ import {
   userProgress,
   bookmarks,
   quizAttempts,
+  passwordResetTokens,
   type User,
   type InsertUser,
   type Book,
@@ -18,9 +19,11 @@ import {
   type UserProgress,
   type Bookmark,
   type QuizAttempt,
+  type PasswordResetToken,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, avg } from "drizzle-orm";
+import { eq, and, desc, sql, count, avg, gt } from "drizzle-orm";
+import crypto from "crypto";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -55,6 +58,11 @@ export interface IStorage {
   getQuizAttempts(userId: string): Promise<QuizAttempt[]>;
   getQuizStats(userId: string): Promise<{ totalAttempts: number; averageScore: number; wrongQuestionsCount: number }>;
   getWrongQuestions(userId: string): Promise<MCQ[]>;
+  
+  createPasswordResetToken(userId: string): Promise<string>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markTokenUsed(tokenId: string): Promise<void>;
+  updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -250,6 +258,47 @@ export class DatabaseStorage implements IStorage {
 
     const allMcqs = await db.select().from(mcqs).where(eq(mcqs.isPublished, true));
     return allMcqs.filter(m => wrongIds.has(m.id));
+  }
+
+  async createPasswordResetToken(userId: string): Promise<string> {
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+    
+    await db.insert(passwordResetTokens).values({
+      userId,
+      token,
+      expiresAt,
+    });
+    
+    return token;
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(
+        and(
+          eq(passwordResetTokens.token, token),
+          eq(passwordResetTokens.used, false),
+          gt(passwordResetTokens.expiresAt, new Date())
+        )
+      );
+    return resetToken || undefined;
+  }
+
+  async markTokenUsed(tokenId: string): Promise<void> {
+    await db
+      .update(passwordResetTokens)
+      .set({ used: true })
+      .where(eq(passwordResetTokens.id, tokenId));
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 }
 

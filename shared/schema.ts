@@ -216,6 +216,26 @@ export const quizAttemptsRelations = relations(quizAttempts, ({ one }) => ({
   }),
 }));
 
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  used: boolean("used").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [passwordResetTokens.userId],
+    references: [users.id],
+  }),
+}));
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -233,6 +253,15 @@ export const registerSchema = z.object({
   password: z.string().min(6),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Book = typeof books.$inferSelect;
@@ -243,3 +272,4 @@ export type MCQ = typeof mcqs.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
 export type Bookmark = typeof bookmarks.$inferSelect;
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
