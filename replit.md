@@ -98,6 +98,17 @@ shared/           # Shared code between client/server
 ## Recent Changes
 
 ### January 27, 2026 (Latest)
+- Enhanced Content Library with new features:
+  - Premium/Free badges on books list with star/unlock icons
+  - Locked/Premium markers on topics with lock icons and reduced opacity
+  - Full-screen Image Viewer with pinch-to-zoom, pan gestures, and double-tap zoom
+  - TopicReader images are now tappable to open in full-screen viewer
+  - Search Screen with debounced input and filter chips (All/Books/Chapters/Topics)
+  - Search button in Library header for quick access
+  - Backend search API at `/api/search` for content search across books, chapters, and topics
+  - LearnStackNavigator now includes TopicReader and Search screens
+
+### January 27, 2026 (Earlier)
 - Implemented Main App Shell / Navigation with 5 tabs
   - Updated MainTabNavigator to 5 tabs: Home, Library, Quiz, Progress, Profile
   - Created HomeStackNavigator with Dashboard, Notifications, and TopicReader screens
