@@ -2,9 +2,13 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useAuth } from "@/lib/auth";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 
 import MainTabNavigator from "@/navigation/MainTabNavigator";
+import WelcomeScreen from "@/screens/WelcomeScreen";
+import OnboardingScreen from "@/screens/OnboardingScreen";
+import PermissionsPromptScreen from "@/screens/PermissionsPromptScreen";
 import LoginScreen from "@/screens/LoginScreen";
 import RegisterScreen from "@/screens/RegisterScreen";
 import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
@@ -19,6 +23,9 @@ import BookmarksScreen from "@/screens/BookmarksScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
+  Welcome: undefined;
+  Onboarding: undefined;
+  PermissionsPrompt: undefined;
   Main: undefined;
   Login: undefined;
   Register: undefined;
@@ -37,9 +44,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { hasCompletedOnboarding, isLoading: onboardingLoading } = useOnboarding();
 
-  if (isLoading) {
+  if (authLoading || onboardingLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.dark.primary} />
@@ -115,7 +123,7 @@ export default function RootStackNavigator() {
             }}
           />
         </>
-      ) : (
+      ) : hasCompletedOnboarding ? (
         <>
           <Stack.Screen
             name="Login"
@@ -141,6 +149,37 @@ export default function RootStackNavigator() {
           <Stack.Screen
             name="ResetPassword"
             component={ResetPasswordScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="Welcome"
+            component={WelcomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Onboarding"
+            component={OnboardingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="PermissionsPrompt"
+            component={PermissionsPromptScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
             options={{
               headerTitle: "",
               headerTransparent: true,
