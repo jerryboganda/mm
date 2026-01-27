@@ -1,0 +1,228 @@
+Maternal Mind —- OB-GYN Learning Platform — Complete Feature Set (A–Z) 📱🖥️🗄️🔐
+A) Users & Authentication (Mobile + API)
+User-facing (Mobile)
+Sign up (name, email, password)
+Login
+Logout
+Session continuity (user stays logged in via refresh token flow)
+Backend (API)
+JWT access token + refresh token
+Refresh token rotation
+Session revocation on logout
+Password hashing (bcrypt)
+Protected endpoints (Bearer token)
+Profile endpoint (e.g., /auth/profile confirmed in your verification)
+
+
+B) Admin Authentication + Roles (Planned Next / Mission 07)
+(Not implemented yet, but part of the defined platform features)
+
+Separate admin login (/admin/auth/login)
+
+Role-based access control (RBAC)
+
+Roles: SuperAdmin, ContentManager, Support
+
+Permissions system
+
+content:read/write/publish
+mcq:read/write/import
+subscriptions:read/override
+audit:read
+
+
+C) Content Library (Professor’s Book → App)
+Admin-side (CMS)
+Create & manage:
+
+Books
+Chapters
+Topics
+Content blocks
+
+Publish/unpublish workflow
+
+Ordering control
+
+chapter order
+topic order
+block order
+Mobile-side (Learning)
+Browse:
+
+books → chapters → topics
+
+View topic content as structured blocks:
+
+text blocks
+images (optional)
+notes/quotes (optional)
+
+Search content (planned/part of contract)
+
+
+D) MCQ System (Learning Engine)
+Admin (Authoring)
+Create/edit MCQs:
+
+question statement
+multiple options
+correct option
+explanation
+difficulty (easy/medium/hard)
+tagging (topics/tags)
+
+Bulk import MCQs (CSV/Excel)
+
+Import report:
+
+success rows
+failed rows + reasons
+Mobile (Practice)
+MCQ modes:
+
+topic-wise quiz
+mixed quiz
+wrong-only retry
+
+Quiz player:
+
+timed or untimed mode (configurable)
+next/previous navigation (configurable)
+
+Results:
+
+score
+correct vs wrong count
+explanations shown per question
+
+Review:
+
+revisit mistakes
+redo wrong questions
+
+
+E) Attempts, Progress & Analytics
+Mobile
+Attempt history
+
+Progress dashboard:
+
+accuracy per topic
+total attempts
+improvement trend (planned)
+
+Continue learning:
+
+resume last topic
+Backend
+Quiz attempt storage:
+
+attempt header (score, mode, topic)
+attempt answers (selected option, correctness, time spent)
+
+Wrong question tracking (to power wrong-only mode)
+
+
+F) Bookmarks & Personalization
+Bookmark topics / important sections
+Resume last activity
+Saved progress synced via user account
+
+
+G) Subscription, Payments & Monetization (Defined Feature Set)
+Business model
+Professor’s book content + MCQs served via subscription
+Premium content is accessible only with entitlement = active
+Payment flow (Feature level)
+Plans management (monthly/quarterly/yearly as needed)
+Purchase event logging
+Server-side entitlement (backend is source of truth)
+Restore purchases
+Receipt verification endpoint (planned in contract)
+
+Note: Store-compliant method is in-app purchase for iOS/Android; web gateways can be added depending on policy and region.
+
+
+H) Security & Compliance (Platform Level)
+App security
+Token storage in secure storage (Keychain/Keystore)
+No secrets in app build
+Optional certificate pinning (advanced)
+Backend security
+Encrypted password storage (bcrypt)
+Refresh token hashing + rotation
+Role/permission enforcement for admin
+Audit logs for admin activity
+Rate limiting (auth + sensitive endpoints)
+Input validation on all DTOs
+CORS configuration
+Logs & monitoring readiness
+
+
+I) Admin Audit Logs (Planned Next / Mission 07)
+Track admin actions like:
+
+create/update/delete topic
+publish/unpublish content
+import MCQs
+override entitlement
+
+Search/filter audit log entries
+
+Store metadata (entity id, before/after snapshots optional)
+
+
+J) Infrastructure & DevOps (Already Implemented)
+Local environment (Completed)
+Docker Compose stack
+
+Postgres DB
+API container
+PgAdmin container
+
+API DB connectivity verified via /db/ping
+
+.env.example created
+
+README.md updated with commands
+Deployment (planned)
+Staging environment (develop branch)
+Production environment (main branch)
+Backup/restore runbook
+
+
+K) Documentation (Already Created)
+docs/MISSIONS.md (SDLC mission plan)
+docs/openapi_v1.yaml (API contract)
+docs/DB_ERD_MIGRATIONS.md (DB design + migration plan)
+README.md operational instructions
+
+
+L) App Modules Summary (Quick list) ✅
+Mobile (Flutter)
+Auth module
+Content browsing + reader
+MCQ engine
+Results + explanations
+Progress dashboard
+Bookmarks
+Subscription/paywall module
+Settings/profile
+Admin Panel (Next.js)
+Admin login
+CMS content management
+MCQ authoring + import
+Subscriber management
+Audit log viewer
+API (NestJS)
+Auth (done ✅)
+Admin auth + RBAC (next)
+Content endpoints (planned)
+MCQ endpoints (planned)
+Attempts/progress endpoints (planned)
+Billing entitlements endpoints (planned)
+Audit endpoints (planned)
+
+
+
