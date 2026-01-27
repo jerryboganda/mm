@@ -457,6 +457,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search API
+  app.get("/api/search", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const query = (req.query.query as string || "").toLowerCase().trim();
+      const filter = req.query.filter as string || "all";
+
+      if (query.length < 2) {
+        return res.json([]);
+      }
+
+      const results: {
+        id: string;
+        type: "book" | "chapter" | "topic";
+        title: string;
+        subtitle: string;
+        bookId?: string;
+        bookTitle?: string;
+        chapterId?: string;
+        chapterTitle?: string;
+      }[] = [];
+
+      const booksData = await storage.getBooks();
+
+      for (const book of booksData) {
+        // Search books
+        if (filter === "all" || filter === "books") {
+          if (book.title.toLowerCase().includes(query) || 
+              (book.description && book.description.toLowerCase().includes(query))) {
+            results.push({
+              id: book.id,
+              type: "book",
+              title: book.title,
+              subtitle: book.description || "Book",
+            });
+          }
+        }
+
+        const chaptersData = await storage.getChaptersByBook(book.id);
+
+        for (const chapter of chaptersData) {
+          // Search chapters
+          if (filter === "all" || filter === "chapters") {
+            if (chapter.title.toLowerCase().includes(query) ||
+                (chapter.description && chapter.description.toLowerCase().includes(query))) {
+              results.push({
+                id: chapter.id,
+                type: "chapter",
+                title: chapter.title,
+                subtitle: book.title,
+                bookId: book.id,
+                bookTitle: book.title,
+              });
+            }
+          }
+
+          // Search topics
+          if (filter === "all" || filter === "topics") {
+            const topicsData = await storage.getTopicsByChapter(chapter.id);
+            for (const topic of topicsData) {
+              if (topic.title.toLowerCase().includes(query) ||
+                  (topic.description && topic.description.toLowerCase().includes(query))) {
+                results.push({
+                  id: topic.id,
+                  type: "topic",
+                  title: topic.title,
+                  subtitle: `${book.title} > ${chapter.title}`,
+                  bookId: book.id,
+                  bookTitle: book.title,
+                  chapterId: chapter.id,
+                  chapterTitle: chapter.title,
+                });
+              }
+            }
+          }
+        }
+      }
+
+      // Limit results
+      res.json(results.slice(0, 50));
+    } catch (error) {
+      console.error("Search error:", error);
+      res.status(500).json({ message: "Search failed" });
+    }
+  });
+
   app.get("/api/quiz/stats", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const stats = await storage.getQuizStats(req.userId!);
