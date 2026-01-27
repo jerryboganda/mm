@@ -1,0 +1,145 @@
+
+
+Maternal Mind Design System (v1.0)
+1. Design Philosophy
+Core Concept: "Secure Precision." The interface combines the cleanliness of medical software with the engagement of modern consumer apps.
+Visual Style: Dark-themed Glassmorphism. Heavy use of semi-transparent layers, background blurs, and glowing accents to establish depth and hierarchy.
+Atmosphere: Calm, focused, and professional.
+
+
+2. Foundations
+2.1 Color Palette
+The palette uses a deep slate teal background with a vibrant cyan primary action color.
+
+Primary Colors
+
+Neon Cyan (Primary): #11a4d4 – Used for primary buttons, active states, and glows.
+Deep Teal (Primary Dark): #0c7fa6 or #0e8cb5 – Used for hover states and borders.
+
+Neutral / Backgrounds
+
+Void Dark (Background): #101d22 – The main application background.
+Surface Dark: #152228 – Used for input fields and lower-level surfaces.
+Glass White: rgba(255, 255, 255, 0.05) to 0.1 – Used for card backgrounds.
+
+Semantic / Status Colors
+
+Success (Green): Tailwind bg-green-500 (e.g., Hospital Status).
+Info (Blue/Sky): Tailwind bg-blue-500, bg-sky-400.
+Warning (Yellow): Tailwind bg-yellow-500.
+Purple (Science/Research): Tailwind text-purple-400, bg-purple-500.
+2.2 Typography
+Typeface: Inter (Google Fonts).
+
+Weights Used:
+
+Light (300): Large headers (e.g., "Verify Identity", "Institutional Access").
+
+Regular (400): Body text.
+
+Medium (500) / SemiBold (600): Button text, Card titles.
+
+Bold (700): Emphasized states (e.g., "Initialized").
+
+Styling Rules:
+
+Headings: Often tracking-tight for a modern, compact look.
+
+Labels/Subtitles: Uppercase with tracking-widest (or tracking-[0.2em]) for technical precision.
+2.3 Iconography
+Library: Material Symbols Outlined (Google Fonts).
+
+Style: Minimalist line icons.
+
+Usage:
+
+Navigational elements (Back arrows).
+
+Input field indicators (Lock, Email, Eye).
+
+Card identifiers (Hexagon, Circle, Grid).
+
+Effect: Icons often carry a drop shadow or glow effect when active.
+
+
+3. UI Components
+3.1 Glass Cards (The Core Container)
+The "Glass Card" is the primary container for list items and content.
+
+Background: bg-white/5 (inactive) to bg-glass-gradient (active).
+Border: Thin, semi-transparent border border-white/10 or border-white/5.
+Blur: backdrop-filter: blur(12px) or backdrop-blur-sm.
+Hover Effect: On hover, the background lightens to white/10 and borders may glow or change color.
+Active State: The border becomes Primary Cyan (#11a4d4) and the card emits a pulse or glow shadow.
+3.2 Buttons
+Primary Button:
+
+Background: #11a4d4 (Primary).
+
+Shape: rounded-lg.
+
+Shadow: "Neon Glow" – shadow-[0_0_20px_rgba(17,164,212,0.4)].
+
+Content: Text + Icon (Right arrow) with a slide animation on hover.
+
+Secondary/Ghost Button:
+
+Transparent background, often just text or an icon.
+
+Used for "Resend Code" or "Forgot Password" links.
+
+Keypad Button:
+
+Large touch targets (h-14), transparent with hover bg-white/5.
+3.3 Input Fields (HUD Style)
+Standard Inputs (Login):
+
+Background: rgba(255, 255, 255, 0.03) (Glass input).
+
+Border: 1px solid rgba(255, 255, 255, 0.1).
+
+Focus State: Border turns Primary Cyan with a glow shadow.
+
+floating Labels: Labels float up to the top bezel upon focus.
+
+OTP/PIN Inputs:
+
+Individual boxes (w-11 h-14 or w-12 h-16).
+
+Font: Monospace (font-mono) for "code" aesthetics.
+
+Active Box: Primary border + animate-pulse caret.
+3.4 Navigation
+Header: Minimalist. Often contains a circular "Back" button (rounded-full, bg-white/5) and a progress indicator or logo mark.
+Progress Steps:
+Inactive: bg-primary/30 or bg-white/10.
+Active: Solid bg-primary with a glow shadow.
+
+
+4. Effects & Animation
+4.1 Lighting & Glows
+The system relies heavily on CSS box-shadow to create lighting effects rather than flat colors.
+
+Glow Gradient: radial-gradient(circle at center, rgba(17, 164, 212, 0.15) 0%, rgba(16, 29, 34, 0) 70%).
+Ambient Background Orbs: Large, blurred circles (blur-[120px], blur-[150px]) placed fixed in corners to give the dark background color depth.
+4.2 Textures
+Mesh: A radial gradient overlay used on verification screens.
+Noise: A subtle bg-noise image overlay used to add film grain texture, mixing with mix-blend-overlay.
+Grid: A subtle dot grid (radial-gradient) in the background of success screens.
+4.3 Motion
+Entrance: animate-[fadeIn_0.5s_ease-out] for main content.
+Pulse: animate-pulse used on active borders and loading skeletons.
+Hover: transition-all duration-300 is the standard for smoothing hover states on cards and buttons.
+
+
+5. Technical Specs (Tailwind CSS)
+Border Radius:
+
+Cards: rounded-xl or rounded-2xl.
+
+Buttons/Inputs: rounded-lg.
+
+Spacing Scale: Standard Tailwind 4px grid (e.g., gap-4 = 16px, p-6 = 24px).
+
+Dark Mode Config: class="dark" is enabled on the <html> tag, enforcing the dark theme variables.
+
