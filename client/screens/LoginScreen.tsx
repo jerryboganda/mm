@@ -107,7 +107,10 @@ export default function LoginScreen() {
             error={errors.password}
           />
 
-          <Pressable style={styles.forgotPassword}>
+          <Pressable 
+            style={styles.forgotPassword}
+            onPress={() => navigation.navigate("ForgotPassword")}
+          >
             <ThemedText style={styles.forgotPasswordText}>
               Forgot Password?
             </ThemedText>

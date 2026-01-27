@@ -2,9 +2,12 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "node:http";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { Resend } from "resend";
 import { storage } from "./storage";
-import { loginSchema, registerSchema } from "@shared/schema";
+import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "@shared/schema";
 import { z } from "zod";
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const JWT_SECRET = process.env.SESSION_SECRET || "maternal-mind-secret-key";
 const JWT_EXPIRES_IN = "7d";
@@ -113,6 +116,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const data = forgotPasswordSchema.parse(req.body);
+      
+      const user = await storage.getUserByEmail(data.email);
+      if (!user) {
+        // Return success even if user not found to prevent email enumeration
+        return res.json({ message: "If an account exists with this email, a reset link has been sent." });
+      }
+
+      const token = await storage.createPasswordResetToken(user.id);
+      
+      // Get the app domain for the reset link
+      const appDomain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(",")[0] || "localhost:5000";
+      const resetLink = `https://${appDomain}/reset-password?token=${token}`;
+
+      if (resend) {
+        try {
+          await resend.emails.send({
+            from: "Maternal Mind <noreply@maternalmind.app>",
+            to: user.email,
+            subject: "Reset Your Password - Maternal Mind",
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #11a4d4;">Reset Your Password</h1>
+                <p>Hello ${user.name},</p>
+                <p>You requested to reset your password for Maternal Mind. Click the button below to set a new password:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${resetLink}" style="background: #11a4d4; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Reset Password</a>
+                </div>
+                <p style="color: #666; font-size: 14px;">This link will expire in 1 hour. If you didn't request this, please ignore this email.</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #999; font-size: 12px;">Maternal Mind - OB-GYN Education Platform</p>
+              </div>
+            `,
+          });
+        } catch (emailError) {
+          console.error("Email send error:", emailError);
+          // Still return success to prevent email enumeration
+        }
+      } else {
+        // Development mode - log the reset link
+        console.log(`[DEV] Password reset link for ${user.email}: ${resetLink}`);
+      }
+
+      res.json({ message: "If an account exists with this email, a reset link has been sent." });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Failed to process request" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const data = resetPasswordSchema.parse(req.body);
+      
+      const resetToken = await storage.getPasswordResetToken(data.token);
+      if (!resetToken) {
+        return res.status(400).json({ message: "Invalid or expired reset link" });
+      }
+
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+      await storage.markTokenUsed(resetToken.id);
+
+      res.json({ message: "Password reset successfully" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Failed to reset password" });
     }
   });
 
