@@ -49,13 +49,19 @@ export default function QuizPlayerScreen() {
   });
 
   const submitMutation = useMutation({
-    mutationFn: async (data: { quizId: string; answers: Record<string, string> }) => {
+    mutationFn: async (data: { 
+      quizId: string; 
+      answers: Record<string, string>;
+      mode: string;
+      topicId?: string;
+    }) => {
       const response = await apiRequest("POST", "/api/quiz/submit", data);
       return response.json();
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/quiz/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/quiz/start", "wrong"] });
       navigation.replace("QuizResults", { resultId: result.id });
     },
   });
@@ -129,7 +135,12 @@ export default function QuizPlayerScreen() {
   const handleSubmit = () => {
     if (!quizData) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    submitMutation.mutate({ quizId: quizData.quizId, answers });
+    submitMutation.mutate({ 
+      quizId: quizData.quizId, 
+      answers,
+      mode,
+      topicId,
+    });
   };
 
   const formatTime = (seconds: number) => {

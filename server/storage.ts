@@ -243,21 +243,35 @@ export class DatabaseStorage implements IStorage {
 
   async getWrongQuestions(userId: string): Promise<MCQ[]> {
     const attempts = await this.getQuizAttempts(userId);
-    const wrongIds = new Set<string>();
-
-    for (const attempt of attempts) {
+    
+    // Sort attempts by date (oldest first) to process in chronological order
+    const sortedAttempts = [...attempts].sort((a, b) => 
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    
+    // Track the latest result for each question
+    // Process from oldest to newest so latest answer overwrites
+    const questionStatus = new Map<string, boolean>();
+    
+    for (const attempt of sortedAttempts) {
       const answers = attempt.answers as Record<string, { selected: string; correct: string; isCorrect: boolean }>;
       for (const [mcqId, answer] of Object.entries(answers)) {
-        if (!answer.isCorrect) {
-          wrongIds.add(mcqId);
-        }
+        questionStatus.set(mcqId, answer.isCorrect);
+      }
+    }
+    
+    // Get only questions that are still marked as wrong (not corrected in later attempts)
+    const wrongIds: string[] = [];
+    for (const [mcqId, isCorrect] of questionStatus.entries()) {
+      if (!isCorrect) {
+        wrongIds.push(mcqId);
       }
     }
 
-    if (wrongIds.size === 0) return [];
+    if (wrongIds.length === 0) return [];
 
     const allMcqs = await db.select().from(mcqs).where(eq(mcqs.isPublished, true));
-    return allMcqs.filter(m => wrongIds.has(m.id));
+    return allMcqs.filter(m => wrongIds.includes(m.id));
   }
 
   async createPasswordResetToken(userId: string): Promise<string> {
