@@ -13,6 +13,7 @@ import LoginScreen from "@/screens/LoginScreen";
 import RegisterScreen from "@/screens/RegisterScreen";
 import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
 import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
+import EmailVerificationScreen from "@/screens/EmailVerificationScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import QuizTopicSelectScreen from "@/screens/QuizTopicSelectScreen";
 import QuizPlayerScreen from "@/screens/QuizPlayerScreen";
@@ -31,6 +32,7 @@ export type RootStackParamList = {
   Register: undefined;
   ForgotPassword: undefined;
   ResetPassword: { token?: string };
+  EmailVerification: { email: string };
   TopicReader: { topicId: string; topicTitle: string };
   QuizTopicSelect: undefined;
   QuizPlayer: { mode: "topic" | "mixed" | "wrong"; topicId?: string };
@@ -154,6 +156,14 @@ export default function RootStackNavigator() {
               headerTransparent: true,
             }}
           />
+          <Stack.Screen
+            name="EmailVerification"
+            component={EmailVerificationScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
         </>
       ) : (
         <>
@@ -180,6 +190,14 @@ export default function RootStackNavigator() {
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="EmailVerification"
+            component={EmailVerificationScreen}
             options={{
               headerTitle: "",
               headerTransparent: true,

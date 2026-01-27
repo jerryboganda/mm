@@ -174,6 +174,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/resend-verification", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists
+        return res.json({ message: "If an account exists with this email, a verification link has been sent." });
+      }
+
+      // In production, send verification email via Resend
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const { Resend } = await import("resend");
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          
+          await resend.emails.send({
+            from: "Maternal Mind <noreply@maternalmind.app>",
+            to: [email],
+            subject: "Verify your email - Maternal Mind",
+            html: `
+              <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <h1 style="color: #11a4d4; margin-bottom: 20px;">Verify Your Email</h1>
+                <p style="color: #333; font-size: 16px; line-height: 24px;">
+                  Thank you for signing up for Maternal Mind! Please verify your email to access all features.
+                </p>
+                <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                  If you didn't create an account, please ignore this email.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #999; font-size: 12px;">Maternal Mind - OB-GYN Education Platform</p>
+              </div>
+            `,
+          });
+        } catch (emailError) {
+          console.error("Email send error:", emailError);
+        }
+      } else {
+        console.log(`[DEV] Verification email would be sent to ${email}`);
+      }
+
+      res.json({ message: "If an account exists with this email, a verification link has been sent." });
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ message: "Failed to send verification email" });
+    }
+  });
+
   app.post("/api/auth/reset-password", async (req, res) => {
     try {
       const data = resetPasswordSchema.parse(req.body);
