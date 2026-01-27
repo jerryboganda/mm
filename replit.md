@@ -98,6 +98,17 @@ shared/           # Shared code between client/server
 ## Recent Changes
 
 ### January 27, 2026 (Latest)
+- Complete Subscription & Paywall System with 5 dedicated screens:
+  - PaywallScreen: Premium benefits explanation with crown gradient header and 6 feature cards
+  - PurchaseSuccessScreen: Animated confirmation with gradient check icon and unlocked features list
+  - PurchaseFailedScreen: Error handling with troubleshooting tips, retry, and contact support options
+  - RestorePurchasesScreen: Multi-state flow (idle/restoring/success/not_found/error) with animations
+  - CheckoutProcessingScreen: Loading state during purchase with step indicators
+  - SubscriptionScreen updated to navigate to success/failed screens after purchase
+  - Navigation updated with modal/fullScreenModal presentation modes for paywall screens
+  - RevenueCat integration handles both real packages and fallback plans on web
+
+### January 27, 2026 (Earlier)
 - Progress & Analytics screens with detailed quiz history tracking:
   - AttemptHistoryScreen: View all quiz attempts with mode filters (All/Topic/Mixed/Wrong)
   - AttemptDetailScreen: Question-by-question breakdown with correct/wrong indicators and explanations
