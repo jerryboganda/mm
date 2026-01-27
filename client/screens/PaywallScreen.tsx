@@ -1,0 +1,281 @@
+import React from "react";
+import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Feather } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import * as Haptics from "expo-haptics";
+
+import { BackgroundGradient } from "@/components/BackgroundGradient";
+import { GlassCard } from "@/components/GlassCard";
+import { PrimaryButton } from "@/components/PrimaryButton";
+import { ThemedText } from "@/components/ThemedText";
+import { usePurchases } from "@/lib/purchases";
+import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
+
+type PaywallScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+const { width: screenWidth } = Dimensions.get("window");
+
+const premiumBenefits = [
+  {
+    icon: "book-open" as const,
+    title: "Complete Textbook Access",
+    description: "Unlock all OB-GYN chapters and topics with in-depth explanations",
+  },
+  {
+    icon: "check-circle" as const,
+    title: "Unlimited MCQ Practice",
+    description: "Practice with thousands of questions across all difficulty levels",
+  },
+  {
+    icon: "trending-up" as const,
+    title: "Advanced Progress Tracking",
+    description: "Detailed analytics and accuracy trends to guide your study",
+  },
+  {
+    icon: "bookmark" as const,
+    title: "Bookmarks & Notes",
+    description: "Save important topics and add personal notes for quick reference",
+  },
+  {
+    icon: "zap" as const,
+    title: "Wrong Questions Review",
+    description: "Focus on your weak areas with smart question retry mode",
+  },
+  {
+    icon: "headphones" as const,
+    title: "Priority Support",
+    description: "Get faster responses from our support team when you need help",
+  },
+];
+
+export default function PaywallScreen() {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<PaywallScreenNavigationProp>();
+  const { isSubscribed } = usePurchases();
+
+  const handleContinue = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    navigation.navigate("Subscription");
+  };
+
+  const handleRestore = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate("RestorePurchases");
+  };
+
+  if (isSubscribed) {
+    return (
+      <BackgroundGradient>
+        <View style={[styles.subscribedContainer, { paddingTop: insets.top + 60 }]}>
+          <View style={styles.successIcon}>
+            <Feather name="check-circle" size={64} color={Colors.dark.success} />
+          </View>
+          <ThemedText type="h2" style={styles.successTitle}>
+            You're Premium!
+          </ThemedText>
+          <ThemedText style={styles.successSubtitle}>
+            Enjoy unlimited access to all Maternal Mind features.
+          </ThemedText>
+          <PrimaryButton
+            title="Continue Learning"
+            onPress={() => navigation.goBack()}
+            style={styles.continueButton}
+          />
+        </View>
+      </BackgroundGradient>
+    );
+  }
+
+  return (
+    <BackgroundGradient>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: insets.top + Spacing.xl,
+            paddingBottom: insets.bottom + Spacing["3xl"],
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <View style={styles.crownContainer}>
+            <LinearGradient
+              colors={["#FFD700", "#FFA500"]}
+              style={styles.crownGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Feather name="award" size={40} color="#fff" />
+            </LinearGradient>
+          </View>
+          <ThemedText type="h1" style={styles.title}>
+            Go Premium
+          </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            Unlock the full power of Maternal Mind and accelerate your medical education
+          </ThemedText>
+        </View>
+
+        <View style={styles.benefitsSection}>
+          <ThemedText style={styles.sectionLabel}>PREMIUM BENEFITS</ThemedText>
+          {premiumBenefits.map((benefit, index) => (
+            <GlassCard key={index} style={styles.benefitCard}>
+              <View style={styles.benefitIcon}>
+                <LinearGradient
+                  colors={[Colors.dark.primary, Colors.dark.primaryDark]}
+                  style={StyleSheet.absoluteFill}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                />
+                <Feather name={benefit.icon} size={20} color="#fff" />
+              </View>
+              <View style={styles.benefitContent}>
+                <ThemedText type="h4" style={styles.benefitTitle}>
+                  {benefit.title}
+                </ThemedText>
+                <ThemedText style={styles.benefitDescription}>
+                  {benefit.description}
+                </ThemedText>
+              </View>
+            </GlassCard>
+          ))}
+        </View>
+
+        <View style={styles.ctaSection}>
+          <PrimaryButton
+            title="View Plans"
+            onPress={handleContinue}
+            icon="arrow-right"
+            style={styles.ctaButton}
+            testID="button-view-plans"
+          />
+
+          <View style={styles.restoreRow}>
+            <ThemedText style={styles.restoreLabel}>Already a subscriber?</ThemedText>
+            <ThemedText style={styles.restoreLink} onPress={handleRestore}>
+              Restore Purchases
+            </ThemedText>
+          </View>
+        </View>
+      </ScrollView>
+    </BackgroundGradient>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: Spacing.lg,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: Spacing["2xl"],
+  },
+  crownContainer: {
+    marginBottom: Spacing.xl,
+  },
+  crownGradient: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: Spacing.sm,
+  },
+  subtitle: {
+    textAlign: "center",
+    color: Colors.dark.textSecondary,
+    paddingHorizontal: Spacing.lg,
+    lineHeight: 22,
+  },
+  benefitsSection: {
+    marginBottom: Spacing["2xl"],
+  },
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    letterSpacing: 1.5,
+    color: Colors.dark.textMuted,
+    marginBottom: Spacing.lg,
+  },
+  benefitCard: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
+  },
+  benefitIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    marginRight: Spacing.md,
+  },
+  benefitContent: {
+    flex: 1,
+  },
+  benefitTitle: {
+    marginBottom: Spacing.xs,
+    fontSize: 15,
+  },
+  benefitDescription: {
+    fontSize: 13,
+    color: Colors.dark.textSecondary,
+    lineHeight: 18,
+  },
+  ctaSection: {
+    marginTop: Spacing.lg,
+  },
+  ctaButton: {
+    marginBottom: Spacing.xl,
+  },
+  restoreRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  restoreLabel: {
+    fontSize: 13,
+    color: Colors.dark.textSecondary,
+    marginRight: Spacing.xs,
+  },
+  restoreLink: {
+    fontSize: 13,
+    color: Colors.dark.primary,
+    fontWeight: "600",
+  },
+  subscribedContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: Spacing.xl,
+  },
+  successIcon: {
+    marginBottom: Spacing.xl,
+  },
+  successTitle: {
+    textAlign: "center",
+    marginBottom: Spacing.md,
+  },
+  successSubtitle: {
+    textAlign: "center",
+    color: Colors.dark.textSecondary,
+    marginBottom: Spacing["2xl"],
+  },
+  continueButton: {
+    width: "100%",
+  },
+});

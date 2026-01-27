@@ -3,6 +3,7 @@ import { StyleSheet, View, ScrollView, Pressable, ActivityIndicator, Platform } 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { PurchasesPackage } from "react-native-purchases";
@@ -12,6 +13,9 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { usePurchases } from "@/lib/purchases";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
+
+type SubscriptionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 interface FallbackPlan {
   id: string;
@@ -99,7 +103,7 @@ const getFeatures = (packageId: string): string[] => {
 export default function SubscriptionScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const navigation = useNavigation();
+  const navigation = useNavigation<SubscriptionScreenNavigationProp>();
   const { packages, loading, isSubscribed, purchase, restorePurchases } = usePurchases();
   
   const [selectedPackage, setSelectedPackage] = useState<PurchasesPackage | null>(null);
@@ -114,11 +118,18 @@ export default function SubscriptionScreen() {
     
     if (hasRevenueCatPackages && selectedPackage) {
       setPurchasing(true);
-      const success = await purchase(selectedPackage);
-      setPurchasing(false);
-      
-      if (success) {
-        navigation.goBack();
+      try {
+        const success = await purchase(selectedPackage);
+        setPurchasing(false);
+        
+        if (success) {
+          navigation.replace("PurchaseSuccess");
+        }
+      } catch (error: any) {
+        setPurchasing(false);
+        navigation.navigate("PurchaseFailed", {
+          errorMessage: error.message || "Purchase failed. Please try again.",
+        });
       }
     } else {
       setPurchasing(true);
@@ -129,11 +140,9 @@ export default function SubscriptionScreen() {
     }
   };
 
-  const handleRestore = async () => {
+  const handleRestore = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setRestoring(true);
-    await restorePurchases();
-    setRestoring(false);
+    navigation.navigate("RestorePurchases");
   };
 
   if (isSubscribed) {
