@@ -2,24 +2,24 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 
-import ProfileScreen from "@/screens/ProfileScreen";
+import ProgressScreen from "@/screens/ProgressScreen";
 
-export type ProfileStackParamList = {
-  ProfileHome: undefined;
+export type ProgressStackParamList = {
+  ProgressHome: undefined;
 };
 
-const Stack = createNativeStackNavigator<ProfileStackParamList>();
+const Stack = createNativeStackNavigator<ProgressStackParamList>();
 
-export default function ProfileStackNavigator() {
+export default function ProgressStackNavigator() {
   const screenOptions = useScreenOptions();
 
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen
-        name="ProfileHome"
-        component={ProfileScreen}
+        name="ProgressHome"
+        component={ProgressScreen}
         options={{
-          headerTitle: "Profile",
+          headerTitle: "Your Progress",
         }}
       />
     </Stack.Navigator>

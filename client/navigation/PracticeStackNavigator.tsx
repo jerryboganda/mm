@@ -2,24 +2,24 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 
-import ProfileScreen from "@/screens/ProfileScreen";
+import PracticeScreen from "@/screens/PracticeScreen";
 
-export type ProfileStackParamList = {
-  ProfileHome: undefined;
+export type PracticeStackParamList = {
+  PracticeHome: undefined;
 };
 
-const Stack = createNativeStackNavigator<ProfileStackParamList>();
+const Stack = createNativeStackNavigator<PracticeStackParamList>();
 
-export default function ProfileStackNavigator() {
+export default function PracticeStackNavigator() {
   const screenOptions = useScreenOptions();
 
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen
-        name="ProfileHome"
-        component={ProfileScreen}
+        name="PracticeHome"
+        component={PracticeScreen}
         options={{
-          headerTitle: "Profile",
+          headerTitle: "Practice",
         }}
       />
     </Stack.Navigator>

@@ -1,4 +1,16 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
+
+const TOKEN_KEY = "auth_token";
+
+async function getToken(): Promise<string | null> {
+  if (Platform.OS === "web") {
+    return localStorage.getItem(TOKEN_KEY);
+  } else {
+    return await SecureStore.getItemAsync(TOKEN_KEY);
+  }
+}
 
 /**
  * Gets the base URL for the Express API server (e.g., "http://localhost:3000")
@@ -11,6 +23,7 @@ export function getApiUrl(): string {
     throw new Error("EXPO_PUBLIC_DOMAIN is not set");
   }
 
+  // Keep the :5000 port for Replit routing to Express server
   let url = new URL(`https://${host}`);
 
   return url.href;
@@ -30,10 +43,19 @@ export async function apiRequest(
 ): Promise<Response> {
   const baseUrl = getApiUrl();
   const url = new URL(route, baseUrl);
+  const token = await getToken();
+
+  const headers: Record<string, string> = {};
+  if (data) {
+    headers["Content-Type"] = "application/json";
+  }
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -49,10 +71,27 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const baseUrl = getApiUrl();
-    const url = new URL(queryKey.join("/") as string, baseUrl);
+    const path = queryKey[0] as string;
+    const url = new URL(path, baseUrl);
+    
+    if (queryKey.length > 1) {
+      for (let i = 1; i < queryKey.length; i++) {
+        const segment = queryKey[i];
+        if (segment !== undefined && segment !== null) {
+          url.pathname = url.pathname + "/" + String(segment);
+        }
+      }
+    }
+    
+    const token = await getToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
     const res = await fetch(url, {
       credentials: "include",
+      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
