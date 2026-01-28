@@ -34,6 +34,8 @@ import SettingsScreen from "@/screens/SettingsScreen";
 import SecuritySettingsScreen from "@/screens/SecuritySettingsScreen";
 import HelpSupportScreen from "@/screens/HelpSupportScreen";
 import AboutScreen from "@/screens/AboutScreen";
+import TermsPrivacyScreen from "@/screens/TermsPrivacyScreen";
+import DisclaimerScreen from "@/screens/DisclaimerScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -66,6 +68,8 @@ export type RootStackParamList = {
   SecuritySettings: undefined;
   HelpSupport: undefined;
   About: undefined;
+  TermsPrivacy: undefined;
+  Disclaimer: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -252,6 +256,22 @@ export default function RootStackNavigator() {
             component={AboutScreen}
             options={{
               headerTitle: "About",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="TermsPrivacy"
+            component={TermsPrivacyScreen}
+            options={{
+              headerTitle: "Legal",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="Disclaimer"
+            component={DisclaimerScreen}
+            options={{
+              headerTitle: "Medical Disclaimer",
               presentation: "card",
             }}
           />
