@@ -29,6 +29,11 @@ import PaywallScreen from "@/screens/PaywallScreen";
 import PurchaseSuccessScreen from "@/screens/PurchaseSuccessScreen";
 import PurchaseFailedScreen from "@/screens/PurchaseFailedScreen";
 import RestorePurchasesScreen from "@/screens/RestorePurchasesScreen";
+import EditProfileScreen from "@/screens/EditProfileScreen";
+import SettingsScreen from "@/screens/SettingsScreen";
+import SecuritySettingsScreen from "@/screens/SecuritySettingsScreen";
+import HelpSupportScreen from "@/screens/HelpSupportScreen";
+import AboutScreen from "@/screens/AboutScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -56,6 +61,11 @@ export type RootStackParamList = {
   PurchaseSuccess: undefined;
   PurchaseFailed: { errorMessage?: string };
   RestorePurchases: undefined;
+  EditProfile: undefined;
+  Settings: undefined;
+  SecuritySettings: undefined;
+  HelpSupport: undefined;
+  About: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -202,6 +212,46 @@ export default function RootStackNavigator() {
             component={RestorePurchasesScreen}
             options={{
               headerTitle: "Restore Purchases",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfileScreen}
+            options={{
+              headerTitle: "Edit Profile",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={{
+              headerTitle: "Settings",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="SecuritySettings"
+            component={SecuritySettingsScreen}
+            options={{
+              headerTitle: "Security",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="HelpSupport"
+            component={HelpSupportScreen}
+            options={{
+              headerTitle: "Help & Support",
+              presentation: "card",
+            }}
+          />
+          <Stack.Screen
+            name="About"
+            component={AboutScreen}
+            options={{
+              headerTitle: "About",
               presentation: "card",
             }}
           />
