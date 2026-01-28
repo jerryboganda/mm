@@ -2,6 +2,8 @@ import React from "react";
 import { StyleSheet, View, ScrollView, Linking, Image, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Constants from "expo-constants";
@@ -10,31 +12,40 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const appVersion = Constants.expoConfig?.version || "1.0.0";
 const buildNumber = Constants.expoConfig?.ios?.buildNumber || "1";
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function AboutScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
+  const navigation = useNavigation<NavigationProp>();
 
   const handleOpenLink = (url: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Linking.openURL(url);
   };
 
+  const handleNavigate = (screen: keyof RootStackParamList) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate(screen as any);
+  };
+
   const legalItems = [
     {
       id: "terms",
-      title: "Terms of Service",
+      title: "Terms & Privacy",
       icon: "file-text" as const,
-      url: "https://maternalmind.app/terms",
+      screen: "TermsPrivacy" as keyof RootStackParamList,
     },
     {
-      id: "privacy",
-      title: "Privacy Policy",
-      icon: "shield" as const,
-      url: "https://maternalmind.app/privacy",
+      id: "disclaimer",
+      title: "Medical Disclaimer",
+      icon: "alert-circle" as const,
+      screen: "Disclaimer" as keyof RootStackParamList,
     },
     {
       id: "licenses",
@@ -95,14 +106,18 @@ export default function AboutScreen() {
             <GlassCard
               key={item.id}
               style={styles.legalCard}
-              onPress={() => handleOpenLink(item.url)}
+              onPress={() => item.screen ? handleNavigate(item.screen) : handleOpenLink(item.url!)}
             >
               <View style={styles.legalRow}>
                 <View style={styles.legalIcon}>
                   <Feather name={item.icon} size={18} color={Colors.dark.primary} />
                 </View>
                 <ThemedText style={styles.legalTitle}>{item.title}</ThemedText>
-                <Feather name="external-link" size={16} color={Colors.dark.textSecondary} />
+                <Feather 
+                  name={item.screen ? "chevron-right" : "external-link"} 
+                  size={16} 
+                  color={Colors.dark.textSecondary} 
+                />
               </View>
             </GlassCard>
           ))}
