@@ -7,6 +7,7 @@ import {
   Pressable,
   RefreshControl,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -16,10 +17,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/lib/auth";
 import { Colors, Spacing, BorderRadius, Typography, Shadows } from "@/constants/theme";
+import { AnimatedListItem } from "@/components/AnimatedListItem";
+import { GlassCard } from "@/components/GlassCard";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
@@ -30,6 +35,7 @@ type StatCardData = {
   value: string;
   icon: keyof typeof Feather.glyphMap;
   color: string;
+  variant: "accent" | "success" | "warning" | "purple";
 };
 
 type RecommendedTopic = {
@@ -40,17 +46,64 @@ type RecommendedTopic = {
   progress: number;
 };
 
-function StatCard({ item }: { item: StatCardData }) {
+function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
   const { theme } = useTheme();
+  const glowColor = {
+    accent: "rgba(0,212,255,0.12)",
+    success: "rgba(34,197,94,0.12)",
+    warning: "rgba(245,158,11,0.12)",
+    purple: "rgba(168,85,247,0.12)",
+  }[item.variant];
+
+  const renderBackground = () => {
+    if (Platform.OS === "web") {
+      return (
+        <View style={styles.bentoBackground}>
+          <LinearGradient
+            colors={[glowColor, "rgba(255,255,255,0.02)"]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </View>
+      );
+    }
+
+    return (
+      <BlurView intensity={18} tint="dark" style={styles.bentoBackground}>
+        <LinearGradient
+          colors={[glowColor, "rgba(255,255,255,0.02)"]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+      </BlurView>
+    );
+  };
 
   return (
-    <View style={[styles.statCard, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}>
-      <View style={[styles.statIconContainer, { backgroundColor: `${item.color}20` }]}>
-        <Feather name={item.icon} size={18} color={item.color} />
+    <AnimatedListItem index={index} delay={60}>
+      <View
+        style={[
+          styles.bentoCard,
+          { borderColor: theme.glassBorder },
+          index === 0 && styles.bentoCardWide,
+        ]}
+      >
+        {renderBackground()}
+        <View style={styles.bentoContent}>
+          <View style={styles.bentoHeader}>
+            <View style={[styles.bentoIconContainer, { backgroundColor: `${item.color}20` }]}>
+              <Feather name={item.icon} size={20} color={item.color} />
+            </View>
+          </View>
+          <View style={styles.bentoValueContainer}>
+            <Text style={[styles.bentoValue, { color: item.color }]}>{item.value}</Text>
+            <Text style={[styles.bentoLabel, { color: theme.textSecondary }]}>{item.label}</Text>
+          </View>
+        </View>
       </View>
-      <Text style={[styles.statValue, { color: theme.text }]}>{item.value}</Text>
-      <Text style={[styles.statLabel, { color: theme.textSecondary }]}>{item.label}</Text>
-    </View>
+    </AnimatedListItem>
   );
 }
 
@@ -64,10 +117,7 @@ function ContinueLearningCard({
   const { theme } = useTheme();
 
   return (
-    <Pressable
-      style={[styles.continueCard, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
-      onPress={onPress}
-    >
+    <GlassCard onPress={onPress} variant="glow" style={styles.continueCard}>
       <View style={styles.continueContent}>
         <Text style={[styles.continueLabel, { color: theme.primary }]}>CONTINUE LEARNING</Text>
         <Text style={[styles.continueTitle, { color: theme.text }]} numberOfLines={1}>
@@ -88,37 +138,38 @@ function ContinueLearningCard({
       <View style={[styles.continueArrow, { backgroundColor: theme.primary }]}>
         <Feather name="arrow-right" size={20} color="#fff" />
       </View>
-    </Pressable>
+    </GlassCard>
   );
 }
 
 function RecommendedCard({
   topic,
   onPress,
+  index,
 }: {
   topic: RecommendedTopic;
   onPress: () => void;
+  index: number;
 }) {
   const { theme } = useTheme();
 
   return (
-    <Pressable
-      style={[styles.recommendedCard, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
-      onPress={onPress}
-    >
-      <View style={styles.recommendedIcon}>
-        <Feather name="book-open" size={16} color={theme.primary} />
-      </View>
-      <View style={styles.recommendedContent}>
-        <Text style={[styles.recommendedTitle, { color: theme.text }]} numberOfLines={1}>
-          {topic.title}
-        </Text>
-        <Text style={[styles.recommendedSubtitle, { color: theme.textMuted }]} numberOfLines={1}>
-          {topic.chapterTitle}
-        </Text>
-      </View>
-      <Feather name="chevron-right" size={18} color={theme.textMuted} />
-    </Pressable>
+    <AnimatedListItem index={index} delay={80}>
+      <GlassCard onPress={onPress} style={styles.recommendedCard}>
+        <View style={styles.recommendedIcon}>
+          <Feather name="book-open" size={16} color={theme.primary} />
+        </View>
+        <View style={styles.recommendedContent}>
+          <Text style={[styles.recommendedTitle, { color: theme.text }]} numberOfLines={1}>
+            {topic.title}
+          </Text>
+          <Text style={[styles.recommendedSubtitle, { color: theme.textMuted }]} numberOfLines={1}>
+            {topic.chapterTitle}
+          </Text>
+        </View>
+        <Feather name="chevron-right" size={18} color={theme.textMuted} />
+      </GlassCard>
+    </AnimatedListItem>
   );
 }
 
@@ -149,18 +200,24 @@ export default function HomeScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     await Promise.all([refetchProgress(), refetchRecent()]);
     setRefreshing(false);
   };
 
   const handleNotifications = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     navigation.navigate("Notifications");
   };
 
   const handleTopicPress = (topic: RecommendedTopic) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     navigation.navigate("TopicReader", { topicId: topic.id, topicTitle: topic.title });
   };
 
@@ -172,6 +229,7 @@ export default function HomeScreen() {
       value: progress?.topicsCompleted?.toString() || "0",
       icon: "book",
       color: Colors.dark.primary,
+      variant: "accent",
     },
     {
       id: "quizzes",
@@ -179,6 +237,7 @@ export default function HomeScreen() {
       value: progress?.quizzesCompleted?.toString() || "0",
       icon: "check-circle",
       color: Colors.dark.success,
+      variant: "success",
     },
     {
       id: "accuracy",
@@ -186,6 +245,7 @@ export default function HomeScreen() {
       value: progress?.averageScore ? `${Math.round(progress.averageScore)}%` : "—",
       icon: "target",
       color: Colors.dark.warning,
+      variant: "warning",
     },
     {
       id: "streak",
@@ -193,6 +253,7 @@ export default function HomeScreen() {
       value: progress?.studyStreak?.toString() || "0",
       icon: "zap",
       color: Colors.dark.purple,
+      variant: "purple",
     },
   ];
 
@@ -239,37 +300,41 @@ export default function HomeScreen() {
     { type: "recommended" as const },
   ];
 
-  const renderItem = ({ item }: { item: (typeof sections)[0] }) => {
+  const renderItem = ({ item, index }: { item: (typeof sections)[0]; index: number }) => {
     switch (item.type) {
       case "header":
         return (
-          <View style={styles.headerSection}>
-            <View style={styles.greetingRow}>
-              <View>
-                <Text style={[styles.greeting, { color: theme.textSecondary }]}>{greeting},</Text>
-                <Text style={[styles.userName, { color: theme.text }]}>{firstName}</Text>
+          <AnimatedListItem index={0} delay={0}>
+            <View style={styles.headerSection}>
+              <View style={styles.greetingRow}>
+                <View>
+                  <Text style={[styles.greeting, { color: theme.textSecondary }]}>{greeting},</Text>
+                  <Text style={[styles.userName, { color: theme.text }]}>{firstName}</Text>
+                </View>
+                <Pressable
+                  style={[styles.notificationButton, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
+                  onPress={handleNotifications}
+                >
+                  <Feather name="bell" size={20} color={theme.text} />
+                  <View style={[styles.notificationBadge, { backgroundColor: theme.primary }]} />
+                </Pressable>
               </View>
-              <Pressable
-                style={[styles.notificationButton, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
-                onPress={handleNotifications}
-              >
-                <Feather name="bell" size={20} color={theme.text} />
-                <View style={[styles.notificationBadge, { backgroundColor: theme.primary }]} />
-              </Pressable>
             </View>
-          </View>
+          </AnimatedListItem>
         );
 
       case "stats":
         return (
           <View style={styles.statsSection}>
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>Your Progress</Text>
+            <AnimatedListItem index={1} delay={50}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Your Progress</Text>
+            </AnimatedListItem>
             {progressLoading ? (
               <ActivityIndicator size="small" color={theme.primary} style={{ marginTop: Spacing.lg }} />
             ) : (
-              <View style={styles.statsGrid}>
-                {stats.map((stat) => (
-                  <StatCard key={stat.id} item={stat} />
+              <View style={styles.bentoGrid}>
+                {stats.map((stat, idx) => (
+                  <BentoStatCard key={stat.id} item={stat} index={idx + 2} />
                 ))}
               </View>
             )}
@@ -278,20 +343,29 @@ export default function HomeScreen() {
 
       case "continue":
         return (
-          <View style={styles.continueSection}>
-            <ContinueLearningCard
-              topic={item.data as RecommendedTopic}
-              onPress={() => handleTopicPress(item.data as RecommendedTopic)}
-            />
-          </View>
+          <AnimatedListItem index={7} delay={60}>
+            <View style={styles.continueSection}>
+              <ContinueLearningCard
+                topic={item.data as RecommendedTopic}
+                onPress={() => handleTopicPress(item.data as RecommendedTopic)}
+              />
+            </View>
+          </AnimatedListItem>
         );
 
       case "recommended":
         return (
           <View style={styles.recommendedSection}>
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>Recommended Topics</Text>
-            {recommendedTopics.map((topic) => (
-              <RecommendedCard key={topic.id} topic={topic} onPress={() => handleTopicPress(topic)} />
+            <AnimatedListItem index={8} delay={60}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Recommended Topics</Text>
+            </AnimatedListItem>
+            {recommendedTopics.map((topic, idx) => (
+              <RecommendedCard
+                key={topic.id}
+                topic={topic}
+                onPress={() => handleTopicPress(topic)}
+                index={idx + 9}
+              />
             ))}
           </View>
         );
@@ -338,13 +412,13 @@ const styles = StyleSheet.create({
     ...Typography.body,
   },
   userName: {
-    ...Typography.h2,
+    ...Typography.h1,
     marginTop: Spacing.xs,
   },
   notificationButton: {
-    width: 44,
-    height: 44,
-    borderRadius: BorderRadius.sm,
+    width: 48,
+    height: 48,
+    borderRadius: BorderRadius.md,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
@@ -352,8 +426,8 @@ const styles = StyleSheet.create({
   },
   notificationBadge: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: 12,
+    right: 12,
     width: 8,
     height: 8,
     borderRadius: 4,
@@ -362,36 +436,55 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   sectionTitle: {
-    ...Typography.h4,
+    ...Typography.h3,
     marginBottom: Spacing.lg,
   },
-  statsGrid: {
+  bentoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     marginHorizontal: -Spacing.xs,
   },
-  statCard: {
+  bentoCard: {
     width: "48%",
     marginHorizontal: "1%",
-    marginBottom: Spacing.sm,
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
+    borderRadius: BorderRadius.xl,
     borderWidth: 1,
+    overflow: "hidden",
+    minHeight: 130,
   },
-  statIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: BorderRadius.xs,
+  bentoCardWide: {
+    width: "98%",
+    minHeight: 110,
+  },
+  bentoBackground: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  bentoContent: {
+    flex: 1,
+    padding: Spacing.cardPadding,
+    justifyContent: "space-between",
+  },
+  bentoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  bentoIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.md,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: Spacing.sm,
   },
-  statValue: {
-    ...Typography.h2,
-    marginBottom: Spacing.xs,
+  bentoValueContainer: {
+    marginTop: Spacing.sm,
   },
-  statLabel: {
+  bentoValue: {
+    ...Typography.stat,
+  },
+  bentoLabel: {
     ...Typography.caption,
+    marginTop: Spacing.xs,
   },
   continueSection: {
     marginBottom: Spacing.xl,
@@ -399,14 +492,12 @@ const styles = StyleSheet.create({
   continueCard: {
     flexDirection: "row",
     alignItems: "center",
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-    ...Shadows.glowSmall,
+    padding: 0,
   },
   continueContent: {
     flex: 1,
-    marginRight: Spacing.md,
+    padding: Spacing.lg,
+    paddingRight: 0,
   },
   continueLabel: {
     ...Typography.caption,
@@ -443,11 +534,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   continueArrow: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: BorderRadius.full,
     alignItems: "center",
     justifyContent: "center",
+    marginRight: Spacing.lg,
   },
   recommendedSection: {
     marginBottom: Spacing.xl,
@@ -456,15 +548,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
     marginBottom: Spacing.sm,
   },
   recommendedIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: BorderRadius.xs,
-    backgroundColor: "rgba(17, 164, 212, 0.1)",
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: "rgba(0, 212, 255, 0.1)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
