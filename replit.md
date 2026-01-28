@@ -97,7 +97,25 @@ shared/           # Shared code between client/server
 
 ## Recent Changes
 
-### January 27, 2026 (Latest)
+### January 28, 2026 (Latest)
+- Complete Legal & Safety Screens:
+  - TermsPrivacyScreen: Tabbed interface for Terms of Use and Privacy Policy content
+  - DisclaimerScreen: Medical disclaimer emphasizing educational purpose, not medical advice
+  - AboutScreen now links to legal screens via in-app navigation (chevron icons) and external links
+- Edge State & Error Handling Screens:
+  - OfflineScreen: Network troubleshooting tips with retry functionality
+  - ErrorScreen: Generic server error display with retry and contact support options
+  - MaintenanceScreen: Backend maintenance mode information screen
+  - SessionExpiredModal: Re-login prompt modal for expired JWT sessions
+- Network Status Integration:
+  - NetworkProvider context for app-wide offline detection using @react-native-community/netinfo
+  - AppNetworkWrapper displays OfflineScreen when offline, SessionExpiredModal when session expires
+  - useNetworkStatus hook for component-level network status access
+- Auth Context Enhancements:
+  - Added isSessionExpired state and setSessionExpired/dismissSessionExpired methods
+  - Session expiration integrates with AppNetworkWrapper for automatic modal display
+
+### January 27, 2026
 - Complete Subscription & Paywall System with 5 dedicated screens:
   - PaywallScreen: Premium benefits explanation with crown gradient header and 6 feature cards
   - PurchaseSuccessScreen: Animated confirmation with gradient check icon and unlocked features list
