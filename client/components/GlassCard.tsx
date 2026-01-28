@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Pressable, ViewStyle, View } from "react-native";
+import { StyleSheet, Pressable, ViewStyle, View, Platform } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,10 +8,11 @@ import Animated, {
   interpolateColor,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
 
 interface GlassCardProps {
   title?: string;
@@ -24,13 +25,22 @@ interface GlassCardProps {
   icon?: React.ReactNode;
   rightElement?: React.ReactNode;
   testID?: string;
+  variant?: "default" | "elevated" | "subtle" | "glow";
+  blurIntensity?: number;
 }
 
 const springConfig: WithSpringConfig = {
-  damping: 15,
-  mass: 0.3,
-  stiffness: 150,
-  overshootClamping: true,
+  damping: 12,
+  mass: 0.4,
+  stiffness: 180,
+  overshootClamping: false,
+};
+
+const springConfigBounce: WithSpringConfig = {
+  damping: 10,
+  mass: 0.4,
+  stiffness: 180,
+  overshootClamping: false,
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -46,6 +56,8 @@ export function GlassCard({
   icon,
   rightElement,
   testID,
+  variant = "default",
+  blurIntensity = 20,
 }: GlassCardProps) {
   const scale = useSharedValue(1);
   const pressed = useSharedValue(0);
@@ -60,21 +72,21 @@ export function GlassCard({
       [0, 1],
       [
         active ? Colors.dark.primary : Colors.dark.glassBorder,
-        Colors.dark.primary,
+        Colors.dark.primaryLight,
       ],
     ),
   }));
 
   const handlePressIn = () => {
-    if (!disabled) {
-      scale.value = withSpring(0.98, springConfig);
+    if (!disabled && onPress) {
+      scale.value = withSpring(0.965, springConfig);
       pressed.value = withSpring(1, springConfig);
     }
   };
 
   const handlePressOut = () => {
     if (!disabled) {
-      scale.value = withSpring(1, springConfig);
+      scale.value = withSpring(1, springConfigBounce);
       pressed.value = withSpring(0, springConfig);
     }
   };
@@ -86,6 +98,57 @@ export function GlassCard({
     }
   };
 
+  const isElevated = variant === "elevated" || variant === "glow";
+  const isGlow = variant === "glow";
+  const isSubtle = variant === "subtle";
+
+  const cardStyles = [
+    styles.card,
+    animatedStyle,
+    borderStyle,
+    active && styles.cardActive,
+    disabled && styles.cardDisabled,
+    isElevated && Shadows.cardSubtle,
+    isGlow && active && Shadows.glowSmall,
+    style,
+  ];
+
+  const renderBackground = () => {
+    if (Platform.OS === "web" || isSubtle) {
+      return (
+        <View style={styles.cardBackground}>
+          <LinearGradient
+            colors={[
+              active ? "rgba(0,212,255,0.12)" : isSubtle ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)",
+              active ? "rgba(0,212,255,0.04)" : "rgba(255,255,255,0.01)",
+            ]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </View>
+      );
+    }
+
+    return (
+      <BlurView
+        intensity={active ? blurIntensity + 10 : blurIntensity}
+        tint="dark"
+        style={styles.cardBackground}
+      >
+        <LinearGradient
+          colors={[
+            active ? "rgba(0,212,255,0.15)" : "rgba(255,255,255,0.06)",
+            active ? "rgba(0,212,255,0.05)" : "rgba(255,255,255,0.02)",
+          ]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+      </BlurView>
+    );
+  };
+
   return (
     <AnimatedPressable
       onPress={handlePress}
@@ -93,26 +156,9 @@ export function GlassCard({
       onPressOut={handlePressOut}
       disabled={disabled || !onPress}
       testID={testID}
-      style={[
-        styles.card,
-        animatedStyle,
-        borderStyle,
-        active && styles.cardActive,
-        disabled && styles.cardDisabled,
-        style,
-      ]}
+      style={cardStyles}
     >
-      <View style={styles.cardBackground}>
-        <LinearGradient
-          colors={[
-            active ? "rgba(17,164,212,0.15)" : "rgba(255,255,255,0.05)",
-            active ? "rgba(17,164,212,0.05)" : "rgba(255,255,255,0.02)",
-          ]}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      </View>
+      {renderBackground()}
       <View style={styles.content}>
         {icon ? <View style={styles.iconContainer}>{icon}</View> : null}
         <View style={styles.textContainer}>
@@ -153,18 +199,18 @@ const styles = StyleSheet.create({
     borderColor: Colors.dark.primary,
   },
   cardDisabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   content: {
     flexDirection: "row",
     alignItems: "center",
-    padding: Spacing.lg,
+    padding: Spacing.cardPadding,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.dark.glass,
+    width: 52,
+    height: 52,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.dark.glassMedium,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.lg,

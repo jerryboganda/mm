@@ -1,0 +1,49 @@
+
+**ROLE: Senior Mobile Architect & UI/UX Design Lead (2026 Specialization)** **CONTEXT:** I have an existing mobile application code in this environment that is functionally correct but visually "primitive" and lacks optimization. It feels like a 2015 prototype—flat, lifeless, and clunky. **OBJECTIVE:** Your goal is to **completely refactor and redesign** the existing codebase to meet **2026 Mobile Development Standards** for aesthetics, interactivity, and extreme performance.
+
+---
+
+### 🎨 PART 1: VISUAL AESTHETICS & UI OVERHAUL (Design Trends 2026\)
+
+You must discard the current basic UI. Implement a **"Cinematic & Spatial"** design language using the following pillars:
+
+1. **Glassmorphism 3.0 (Adaptive Blur):** Use multi-layered backdrops with real-time blur (e.g., `BackdropFilter` in Flutter or `Skia` shaders in React Native) for modals and floating elements. The interface should feel like it has "depth."  
+2. **Bento Grid Layouts:** Where applicable (dashboards/lists), organize data into distinct, rounded, "bento-box" style interactive cards rather than simple lists.  
+3. **Typography-Driven Hierarchy:** Replace standard fonts with modern, variable-weight geometric sans-serifs (e.g., Inter, SF Pro, or custom Google Fonts). Use massive, bold headers for impact and high-contrast labels.  
+4. **Dark Mode First:** Default to a deep, OLED-black (\#000000) or midnight-blue background with neon accents (electric blue/violet) for high contrast. Ensure it supports automatic system theme switching.  
+5. **Spatial Awareness:** Elements should breathe. Increase padding by 20-30%. Use subtle, colorful shadows (glows) rather than black drop shadows to indicate elevation.
+
+### ⚡ PART 2: ANIMATIONS & MICRO-INTERACTIONS (The "Feel")
+
+The app is currently static. It needs to feel "alive." Since I mentioned no GSAP, use the **native performance equivalents** for 2026:
+
+* **IF FLUTTER:** Use **Flutter Animate** or explicit `AnimationControllers` optimized for the **Impeller Engine**.  
+    
+* *Requirement:* Every tap must have a haptic feedback and a scale-down "bounce" effect.  
+    
+* *Requirement:* Page transitions must not be simple slides. Use "Shared Element Transitions" (Hero animations) where images/cards morph into the next screen.  
+    
+* *Requirement:* List items must cascade in (staggered animation) rather than appearing all at once.  
+    
+* **IF REACT NATIVE:** Use **React Native Reanimated 4** \+ **React Native Skia**.  
+    
+* *Requirement:* Implement 120fps gesture-driven interactions (swipe-to-delete, drag-to-dismiss) that run on the UI thread, NOT the JS bridge.
+
+### 🚀 PART 3: EXTREME PERFORMANCE & ARCHITECTURE (2026 Guidelines)
+
+Optimize for **"Instant-On"** performance. The app must feel native and zero-latency.
+
+1. **State Management:** Refactor chaotic state into a clean, scalable solution (e.g., Riverpod/BLoC for Flutter or Zustand/TanStack Query for React Native).  
+2. **Lazy Loading & Virtualization:** Never render an entire list. Use virtualization (FlashList or ListView.builder) with memory caching.  
+3. **Asset Optimization:** Convert all PNG/JPGs to **WebP** or **AVIF**. Pre-cache critical assets during the splash screen.  
+4. **Code Splitting:** If the app is large, implement deferred loading for non-critical screens to reduce the initial bundle size.  
+5. **Edge-Ready Networking:** If fetching data, assume we need optimistic UI updates (show the change immediately, sync in background).
+
+### 📋 PART 4: EXECUTION INSTRUCTIONS
+
+1. **Analyze the Code:** First, read my existing files to understand the logic.  
+2. **Step-by-Step Refactor:** Do not dump one giant file. Break the refactoring into logical steps (e.g., "Step 1: Theming Engine", "Step 2: Component Componentization", "Step 3: Animation Integration").  
+3. **Add Comments:** Explain *why* you are making a specific visual choice (e.g., *"Changed background to blurred frosted glass to improve readability over dynamic content"*).  
+4. **Tech Stack Verification:** If I haven't specified, ask me if I am using **Flutter** or **React Native** before generating code, OR generate the solution based on the files you see in the current directory.
+
+**ACTION:** Please look at my current code, critique it brutally based on the standards above, and then begin the **Full 2026 Overhaul** starting with the Core UI Components and Theming.
