@@ -16,10 +16,13 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isSessionExpired: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  setSessionExpired: (expired: boolean) => void;
+  dismissSessionExpired: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -54,6 +57,7 @@ async function removeToken(key: string) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -154,16 +158,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await checkAuth();
   };
 
+  const dismissSessionExpired = () => {
+    setIsSessionExpired(false);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         isLoading,
         isAuthenticated: !!user,
+        isSessionExpired,
         login,
         register,
         logout,
         refreshUser,
+        setSessionExpired: setIsSessionExpired,
+        dismissSessionExpired,
       }}
     >
       {children}

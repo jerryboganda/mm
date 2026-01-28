@@ -22,6 +22,8 @@ import RootStackNavigator from "@/navigation/RootStackNavigator";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth";
 import { PurchasesProvider } from "@/lib/purchases";
+import { NetworkProvider } from "@/lib/network";
+import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
 import { Colors } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -50,46 +52,50 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <PurchasesProvider>
-            <SafeAreaProvider>
-            <GestureHandlerRootView style={styles.root}>
-              <KeyboardProvider>
-                <NavigationContainer
-                  theme={{
-                    dark: true,
-                    colors: {
-                      primary: Colors.dark.primary,
-                      background: Colors.dark.backgroundRoot,
-                      card: Colors.dark.backgroundDefault,
-                      text: Colors.dark.text,
-                      border: Colors.dark.glassBorder,
-                      notification: Colors.dark.primary,
-                    },
-                    fonts: {
-                      regular: {
-                        fontFamily: "Inter_400Regular",
-                        fontWeight: "400",
-                      },
-                      medium: {
-                        fontFamily: "Inter_500Medium",
-                        fontWeight: "500",
-                      },
-                      bold: {
-                        fontFamily: "Inter_700Bold",
-                        fontWeight: "700",
-                      },
-                      heavy: {
-                        fontFamily: "Inter_700Bold",
-                        fontWeight: "700",
-                      },
-                    },
-                  }}
-                >
-                  <RootStackNavigator />
-                </NavigationContainer>
-                <StatusBar style="light" />
-              </KeyboardProvider>
-            </GestureHandlerRootView>
-            </SafeAreaProvider>
+            <NetworkProvider>
+              <SafeAreaProvider>
+                <GestureHandlerRootView style={styles.root}>
+                  <KeyboardProvider>
+                    <NavigationContainer
+                      theme={{
+                        dark: true,
+                        colors: {
+                          primary: Colors.dark.primary,
+                          background: Colors.dark.backgroundRoot,
+                          card: Colors.dark.backgroundDefault,
+                          text: Colors.dark.text,
+                          border: Colors.dark.glassBorder,
+                          notification: Colors.dark.primary,
+                        },
+                        fonts: {
+                          regular: {
+                            fontFamily: "Inter_400Regular",
+                            fontWeight: "400",
+                          },
+                          medium: {
+                            fontFamily: "Inter_500Medium",
+                            fontWeight: "500",
+                          },
+                          bold: {
+                            fontFamily: "Inter_700Bold",
+                            fontWeight: "700",
+                          },
+                          heavy: {
+                            fontFamily: "Inter_700Bold",
+                            fontWeight: "700",
+                          },
+                        },
+                      }}
+                    >
+                      <AppNetworkWrapper>
+                        <RootStackNavigator />
+                      </AppNetworkWrapper>
+                    </NavigationContainer>
+                    <StatusBar style="light" />
+                  </KeyboardProvider>
+                </GestureHandlerRootView>
+              </SafeAreaProvider>
+            </NetworkProvider>
           </PurchasesProvider>
         </AuthProvider>
       </QueryClientProvider>
