@@ -75,25 +75,25 @@ export default function ProfileScreen() {
       onPress: () => navigation.navigate("RecentActivity"),
     },
     {
-      id: "notifications",
-      title: "Notifications",
-      subtitle: "Manage alerts and reminders",
-      icon: "bell" as const,
-      onPress: () => {},
+      id: "settings",
+      title: "Settings",
+      subtitle: "App preferences and notifications",
+      icon: "settings" as const,
+      onPress: () => navigation.navigate("Settings"),
     },
     {
       id: "help",
       title: "Help & Support",
       subtitle: "FAQs and contact",
       icon: "help-circle" as const,
-      onPress: () => {},
+      onPress: () => navigation.navigate("HelpSupport"),
     },
     {
       id: "about",
       title: "About",
       subtitle: "Version 1.0.0",
       icon: "info" as const,
-      onPress: () => {},
+      onPress: () => navigation.navigate("About"),
     },
   ];
 
@@ -111,19 +111,29 @@ export default function ProfileScreen() {
         scrollIndicatorInsets={{ bottom: insets.bottom }}
       >
         <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
+          <Pressable
+            style={styles.avatarContainer}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.navigate("EditProfile");
+            }}
+            testID="button-edit-profile"
+          >
             <Image
               source={require("../../assets/images/default-avatar.png")}
               style={styles.avatar}
               resizeMode="cover"
             />
+            <View style={styles.editBadge}>
+              <Feather name="edit-2" size={12} color="#fff" />
+            </View>
             <View
               style={[
                 styles.statusDot,
                 { backgroundColor: subscriptionBadge.color },
               ]}
             />
-          </View>
+          </Pressable>
           <ThemedText type="h3" style={styles.userName}>
             {user?.name || "Student"}
           </ThemedText>
@@ -226,6 +236,19 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 3,
+    borderColor: Colors.dark.backgroundRoot,
+  },
+  editBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.dark.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
     borderColor: Colors.dark.backgroundRoot,
   },
   userName: {

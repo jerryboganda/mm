@@ -65,6 +65,7 @@ export interface IStorage {
   getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
   markTokenUsed(tokenId: string): Promise<void>;
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
+  updateUserProfile(userId: string, data: { name: string }): Promise<User | undefined>;
   
   recordTopicView(userId: string, topicId: string): Promise<void>;
   getRecentActivity(userId: string, limit?: number): Promise<RecentActivity[]>;
@@ -318,6 +319,15 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ password: hashedPassword })
       .where(eq(users.id, userId));
+  }
+
+  async updateUserProfile(userId: string, data: { name: string }): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ name: data.name })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
   }
 
   async recordTopicView(userId: string, topicId: string): Promise<void> {

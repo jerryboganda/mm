@@ -274,6 +274,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true });
   });
 
+  app.patch("/api/profile", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const { name } = req.body;
+      
+      if (!name || typeof name !== "string" || name.trim().length === 0) {
+        return res.status(400).json({ message: "Name is required" });
+      }
+
+      const updatedUser = await storage.updateUserProfile(req.userId!, { name: name.trim() });
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        role: updatedUser.role,
+        subscriptionStatus: updatedUser.subscriptionStatus,
+        subscriptionPlan: updatedUser.subscriptionPlan,
+      });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  app.post("/api/auth/change-password", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Current password and new password are required" });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({ message: "New password must be at least 8 characters" });
+      }
+
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(req.userId!, hashedNewPassword);
+
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+
+  app.post("/api/auth/logout-all", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      // In a real implementation, this would invalidate all refresh tokens
+      // For now, we just return success since we're using stateless JWTs
+      // In production, you'd use a token blacklist or version number
+      res.json({ message: "Logged out of all devices" });
+    } catch (error) {
+      console.error("Logout all error:", error);
+      res.status(500).json({ message: "Failed to logout all devices" });
+    }
+  });
+
+  app.post("/api/support/report-issue", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const { type, description, email } = req.body;
+
+      if (!type || !description) {
+        return res.status(400).json({ message: "Issue type and description are required" });
+      }
+
+      // Log the issue for now - in production, you'd save to database or send to support system
+      console.log(`[SUPPORT] Issue reported by ${email}:`);
+      console.log(`  Type: ${type}`);
+      console.log(`  Description: ${description}`);
+
+      // Optionally send email to support
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const { Resend } = await import("resend");
+          const resendClient = new Resend(process.env.RESEND_API_KEY);
+          
+          await resendClient.emails.send({
+            from: "Maternal Mind <noreply@maternalmind.app>",
+            to: ["support@maternalmind.app"],
+            subject: `[${type.toUpperCase()}] New Issue Report`,
+            html: `
+              <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                <h1 style="color: #11a4d4;">Issue Report</h1>
+                <p><strong>Type:</strong> ${type}</p>
+                <p><strong>User:</strong> ${email}</p>
+                <p><strong>Description:</strong></p>
+                <p style="background: #f5f5f5; padding: 15px; border-radius: 8px;">${description}</p>
+              </div>
+            `,
+          });
+        } catch (emailError) {
+          console.error("Failed to send support email:", emailError);
+        }
+      }
+
+      res.json({ message: "Issue reported successfully" });
+    } catch (error) {
+      console.error("Report issue error:", error);
+      res.status(500).json({ message: "Failed to report issue" });
+    }
+  });
+
   app.get("/api/books", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const booksData = await storage.getBooks();

@@ -18,7 +18,7 @@ interface GlassCardProps {
   subtitle?: string;
   children?: React.ReactNode;
   onPress?: () => void;
-  style?: ViewStyle;
+  style?: ViewStyle | ViewStyle[];
   active?: boolean;
   disabled?: boolean;
   icon?: React.ReactNode;
