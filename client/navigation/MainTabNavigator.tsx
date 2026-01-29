@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Platform, StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import HomeStackNavigator from "@/navigation/HomeStackNavigator";
 import LearnStackNavigator from "@/navigation/LearnStackNavigator";
@@ -23,6 +24,8 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
@@ -39,13 +42,13 @@ export default function MainTabNavigator() {
           borderTopWidth: 0,
           elevation: 0,
           height: Platform.select({
-            ios: 88,
-            android: 64,
+            ios: 49 + insets.bottom,
+            android: 56 + insets.bottom,
             web: 64,
           }),
           paddingBottom: Platform.select({
-            ios: 28,
-            android: 8,
+            ios: insets.bottom,
+            android: insets.bottom > 0 ? insets.bottom : 8,
             web: 8,
           }),
         },
@@ -57,7 +60,12 @@ export default function MainTabNavigator() {
               style={StyleSheet.absoluteFill}
             />
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: Colors.dark.backgroundRoot }]}>
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: Colors.dark.backgroundRoot },
+              ]}
+            >
               <LinearGradient
                 colors={["rgba(16,29,34,0.95)", Colors.dark.backgroundRoot]}
                 style={StyleSheet.absoluteFill}

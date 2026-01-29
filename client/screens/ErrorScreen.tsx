@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -66,14 +63,14 @@ export default function ErrorScreen({
             {title}
           </ThemedText>
 
-          <ThemedText style={styles.description}>
-            {message}
-          </ThemedText>
+          <ThemedText style={styles.description}>{message}</ThemedText>
 
           {errorCode ? (
             <GlassCard style={styles.errorCodeCard}>
               <View style={styles.errorCodeContent}>
-                <ThemedText style={styles.errorCodeLabel}>Error Code</ThemedText>
+                <ThemedText style={styles.errorCodeLabel}>
+                  Error Code
+                </ThemedText>
                 <ThemedText style={styles.errorCode}>{errorCode}</ThemedText>
               </View>
             </GlassCard>
@@ -83,7 +80,8 @@ export default function ErrorScreen({
             <View style={styles.helpContent}>
               <Feather name="info" size={20} color={Colors.dark.info} />
               <ThemedText style={styles.helpText}>
-                If this problem persists, please contact our support team with the error details above.
+                If this problem persists, please contact our support team with
+                the error details above.
               </ThemedText>
             </View>
           </GlassCard>

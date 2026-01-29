@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { apiRequest, getApiUrl, queryClient } from "@/lib/query-client";
@@ -112,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     const baseUrl = getApiUrl();
     const url = new URL("/api/auth/register", baseUrl);
-    
+
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

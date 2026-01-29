@@ -1,5 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View, FlatList, RefreshControl, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  RefreshControl,
+  Pressable,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
@@ -16,7 +22,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type AttemptHistoryScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type AttemptHistoryScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface Attempt {
   id: string;
@@ -40,8 +47,15 @@ export default function AttemptHistoryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<FilterMode>("all");
 
-  const { data: attempts, isLoading, refetch } = useQuery<Attempt[]>({
-    queryKey: ["/api/attempts", selectedFilter !== "all" ? `mode=${selectedFilter}` : ""],
+  const {
+    data: attempts,
+    isLoading,
+    refetch,
+  } = useQuery<Attempt[]>({
+    queryKey: [
+      "/api/attempts",
+      selectedFilter !== "all" ? `mode=${selectedFilter}` : "",
+    ],
   });
 
   const onRefresh = useCallback(async () => {
@@ -75,19 +89,27 @@ export default function AttemptHistoryScreen() {
 
   const getModeLabel = (mode: string) => {
     switch (mode) {
-      case "topic": return "Topic Quiz";
-      case "mixed": return "Mixed Quiz";
-      case "wrong": return "Wrong Questions";
-      default: return mode;
+      case "topic":
+        return "Topic Quiz";
+      case "mixed":
+        return "Mixed Quiz";
+      case "wrong":
+        return "Wrong Questions";
+      default:
+        return mode;
     }
   };
 
   const getModeColor = (mode: string) => {
     switch (mode) {
-      case "topic": return Colors.dark.primary;
-      case "mixed": return Colors.dark.info;
-      case "wrong": return Colors.dark.error;
-      default: return Colors.dark.textSecondary;
+      case "topic":
+        return Colors.dark.primary;
+      case "mixed":
+        return Colors.dark.info;
+      case "wrong":
+        return Colors.dark.error;
+      default:
+        return Colors.dark.textSecondary;
     }
   };
 
@@ -106,18 +128,34 @@ export default function AttemptHistoryScreen() {
 
   const renderAttempt = ({ item }: { item: Attempt }) => (
     <GlassCard
-      onPress={() => navigation.navigate("AttemptDetail", { attemptId: item.id })}
+      onPress={() =>
+        navigation.navigate("AttemptDetail", { attemptId: item.id })
+      }
       style={styles.attemptCard}
       testID={`card-attempt-${item.id}`}
     >
       <View style={styles.attemptHeader}>
-        <View style={[styles.modeBadge, { backgroundColor: `${getModeColor(item.mode)}20` }]}>
-          <ThemedText style={[styles.modeText, { color: getModeColor(item.mode) }]}>
+        <View
+          style={[
+            styles.modeBadge,
+            { backgroundColor: `${getModeColor(item.mode)}20` },
+          ]}
+        >
+          <ThemedText
+            style={[styles.modeText, { color: getModeColor(item.mode) }]}
+          >
             {getModeLabel(item.mode)}
           </ThemedText>
         </View>
-        <View style={[styles.scoreBadge, { backgroundColor: `${getScoreColor(item.score)}20` }]}>
-          <ThemedText style={[styles.scoreText, { color: getScoreColor(item.score) }]}>
+        <View
+          style={[
+            styles.scoreBadge,
+            { backgroundColor: `${getScoreColor(item.score)}20` },
+          ]}
+        >
+          <ThemedText
+            style={[styles.scoreText, { color: getScoreColor(item.score) }]}
+          >
             {item.score}%
           </ThemedText>
         </View>
@@ -140,7 +178,9 @@ export default function AttemptHistoryScreen() {
         </View>
         <View style={styles.statItem}>
           <Feather name="clock" size={14} color={Colors.dark.textSecondary} />
-          <ThemedText style={styles.statText}>{formatTime(item.timeTaken)}</ThemedText>
+          <ThemedText style={styles.statText}>
+            {formatTime(item.timeTaken)}
+          </ThemedText>
         </View>
       </View>
 
@@ -179,7 +219,9 @@ export default function AttemptHistoryScreen() {
             paddingTop: headerHeight + Spacing.xl,
             paddingBottom: insets.bottom + Spacing.xl,
           },
-          (!attempts || attempts.length === 0) && !isLoading && styles.emptyList,
+          (!attempts || attempts.length === 0) &&
+            !isLoading &&
+            styles.emptyList,
         ]}
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         refreshControl={

@@ -15,12 +15,15 @@ import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Feather } from "@expo/vector-icons";
 
-type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "ForgotPassword">;
+type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ForgotPassword"
+>;
 
 export default function ForgotPasswordScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
-  
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -44,11 +47,14 @@ export default function ForgotPasswordScreen() {
 
     try {
       const baseUrl = getApiUrl();
-      const response = await fetch(new URL("/api/auth/forgot-password", baseUrl), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        new URL("/api/auth/forgot-password", baseUrl),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        },
+      );
 
       if (response.ok) {
         setSubmitted(true);
@@ -86,7 +92,8 @@ export default function ForgotPasswordScreen() {
               Check Your Email
             </ThemedText>
             <ThemedText style={styles.successMessage}>
-              If an account exists with {email}, we've sent password reset instructions.
+              If an account exists with {email}, we've sent password reset
+              instructions.
             </ThemedText>
             <PrimaryButton
               title="Back to Sign In"

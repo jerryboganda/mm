@@ -16,7 +16,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing } from "@/constants/theme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 
-type ChaptersScreenNavigationProp = NativeStackNavigationProp<LearnStackParamList, "Chapters">;
+type ChaptersScreenNavigationProp = NativeStackNavigationProp<
+  LearnStackParamList,
+  "Chapters"
+>;
 type ChaptersScreenRouteProp = RouteProp<LearnStackParamList, "Chapters">;
 
 interface Chapter {
@@ -37,7 +40,11 @@ export default function ChaptersScreen() {
   const { bookId, bookTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: chapters, isLoading, refetch } = useQuery<Chapter[]>({
+  const {
+    data: chapters,
+    isLoading,
+    refetch,
+  } = useQuery<Chapter[]>({
     queryKey: ["/api/books", bookId, "chapters"],
   });
 
@@ -51,14 +58,14 @@ export default function ChaptersScreen() {
     <GlassCard
       title={`${item.order}. ${item.title}`}
       subtitle={`${item.topicsCount} Topics`}
-      onPress={() => navigation.navigate("Topics", { 
-        chapterId: item.id, 
-        chapterTitle: item.title,
-        bookId 
-      })}
-      icon={
-        <ThemedText style={styles.chapterNumber}>{item.order}</ThemedText>
+      onPress={() =>
+        navigation.navigate("Topics", {
+          chapterId: item.id,
+          chapterTitle: item.title,
+          bookId,
+        })
       }
+      icon={<ThemedText style={styles.chapterNumber}>{item.order}</ThemedText>}
       testID={`card-chapter-${item.id}`}
       style={{ marginBottom: Spacing.md }}
     >

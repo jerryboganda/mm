@@ -17,11 +17,16 @@ export default function QuizSettingsScreen() {
   const [timerEnabled, setTimerEnabled] = useState(true);
   const [timerMinutes, setTimerMinutes] = useState(10);
   const [questionsCount, setQuestionsCount] = useState(10);
-  const [difficulty, setDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
+  const [difficulty, setDifficulty] = useState<
+    "all" | "easy" | "medium" | "hard"
+  >("all");
 
   const timerOptions = [5, 10, 15, 20, 30];
   const questionOptions = [5, 10, 15, 20, 25];
-  const difficultyOptions: { id: "all" | "easy" | "medium" | "hard"; label: string }[] = [
+  const difficultyOptions: {
+    id: "all" | "easy" | "medium" | "hard";
+    label: string;
+  }[] = [
     { id: "all", label: "All" },
     { id: "easy", label: "Easy" },
     { id: "medium", label: "Medium" },
@@ -51,7 +56,9 @@ export default function QuizSettingsScreen() {
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
                 <Feather name="clock" size={20} color={Colors.dark.primary} />
-                <ThemedText style={styles.settingTitle}>Enable Timer</ThemedText>
+                <ThemedText style={styles.settingTitle}>
+                  Enable Timer
+                </ThemedText>
               </View>
               <Switch
                 value={timerEnabled}
@@ -93,7 +100,9 @@ export default function QuizSettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>QUESTIONS PER QUIZ</ThemedText>
+          <ThemedText style={styles.sectionLabel}>
+            QUESTIONS PER QUIZ
+          </ThemedText>
           <GlassCard style={styles.settingCard}>
             <View style={styles.optionsRow}>
               {questionOptions.map((count) => (

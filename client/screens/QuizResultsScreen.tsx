@@ -16,7 +16,10 @@ import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type QuizResultsRouteProp = RouteProp<RootStackParamList, "QuizResults">;
-type QuizResultsNavigationProp = NativeStackNavigationProp<RootStackParamList, "QuizResults">;
+type QuizResultsNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "QuizResults"
+>;
 
 interface QuestionResult {
   id: string;
@@ -76,7 +79,12 @@ export default function QuizResultsScreen() {
             />
           ) : null}
 
-          <View style={[styles.scoreCircle, isHighScore && styles.scoreCircleSuccess]}>
+          <View
+            style={[
+              styles.scoreCircle,
+              isHighScore && styles.scoreCircleSuccess,
+            ]}
+          >
             <LinearGradient
               colors={
                 isHighScore
@@ -141,7 +149,11 @@ export default function QuizResultsScreen() {
                 <View
                   style={[
                     styles.questionBadge,
-                    { backgroundColor: q.isCorrect ? Colors.dark.success : Colors.dark.error },
+                    {
+                      backgroundColor: q.isCorrect
+                        ? Colors.dark.success
+                        : Colors.dark.error,
+                    },
                   ]}
                 >
                   <Feather
@@ -150,7 +162,9 @@ export default function QuizResultsScreen() {
                     color="#fff"
                   />
                 </View>
-                <ThemedText style={styles.questionIndex}>Q{index + 1}</ThemedText>
+                <ThemedText style={styles.questionIndex}>
+                  Q{index + 1}
+                </ThemedText>
               </View>
               <ThemedText style={styles.questionText}>{q.question}</ThemedText>
               <View style={styles.answerRow}>
@@ -158,7 +172,11 @@ export default function QuizResultsScreen() {
                 <ThemedText
                   style={[
                     styles.answerValue,
-                    { color: q.isCorrect ? Colors.dark.success : Colors.dark.error },
+                    {
+                      color: q.isCorrect
+                        ? Colors.dark.success
+                        : Colors.dark.error,
+                    },
                   ]}
                 >
                   {q.selectedAnswer}
@@ -166,15 +184,21 @@ export default function QuizResultsScreen() {
               </View>
               {!q.isCorrect ? (
                 <View style={styles.answerRow}>
-                  <ThemedText style={styles.answerLabel}>Correct answer:</ThemedText>
-                  <ThemedText style={[styles.answerValue, { color: Colors.dark.success }]}>
+                  <ThemedText style={styles.answerLabel}>
+                    Correct answer:
+                  </ThemedText>
+                  <ThemedText
+                    style={[styles.answerValue, { color: Colors.dark.success }]}
+                  >
                     {q.correctAnswer}
                   </ThemedText>
                 </View>
               ) : null}
               <View style={styles.explanationBox}>
                 <Feather name="info" size={14} color={Colors.dark.primary} />
-                <ThemedText style={styles.explanationText}>{q.explanation}</ThemedText>
+                <ThemedText style={styles.explanationText}>
+                  {q.explanation}
+                </ThemedText>
               </View>
             </GlassCard>
           ))}

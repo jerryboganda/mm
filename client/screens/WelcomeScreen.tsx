@@ -12,7 +12,8 @@ import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const { width, height } = Dimensions.get("window");
 
-type WelcomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type WelcomeScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
@@ -21,13 +22,19 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Colors.dark.backgroundRoot, "#0a1518", Colors.dark.backgroundRoot]}
+        colors={[
+          Colors.dark.backgroundRoot,
+          "#0a1518",
+          Colors.dark.backgroundRoot,
+        ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      
-      <View style={[styles.content, { paddingTop: insets.top + Spacing["3xl"] }]}>
+
+      <View
+        style={[styles.content, { paddingTop: insets.top + Spacing["3xl"] }]}
+      >
         <View style={styles.logoSection}>
           <View style={styles.logoContainer}>
             <Image
@@ -47,7 +54,7 @@ export default function WelcomeScreen() {
         <View style={styles.featureList}>
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <ThemedText style={styles.featureEmoji}>{'📚'}</ThemedText>
+              <ThemedText style={styles.featureEmoji}>{"📚"}</ThemedText>
             </View>
             <View style={styles.featureText}>
               <ThemedText type="body" style={styles.featureTitle}>
@@ -61,7 +68,7 @@ export default function WelcomeScreen() {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <ThemedText style={styles.featureEmoji}>{'🎯'}</ThemedText>
+              <ThemedText style={styles.featureEmoji}>{"🎯"}</ThemedText>
             </View>
             <View style={styles.featureText}>
               <ThemedText type="body" style={styles.featureTitle}>
@@ -75,7 +82,7 @@ export default function WelcomeScreen() {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <ThemedText style={styles.featureEmoji}>{'📊'}</ThemedText>
+              <ThemedText style={styles.featureEmoji}>{"📊"}</ThemedText>
             </View>
             <View style={styles.featureText}>
               <ThemedText type="body" style={styles.featureTitle}>
@@ -89,7 +96,12 @@ export default function WelcomeScreen() {
         </View>
       </View>
 
-      <View style={[styles.buttonSection, { paddingBottom: insets.bottom + Spacing.xl }]}>
+      <View
+        style={[
+          styles.buttonSection,
+          { paddingBottom: insets.bottom + Spacing.xl },
+        ]}
+      >
         <PrimaryButton
           title="Get Started"
           onPress={() => navigation.navigate("Onboarding")}

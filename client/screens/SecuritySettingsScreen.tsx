@@ -36,8 +36,15 @@ export default function SecuritySettingsScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const changePasswordMutation = useMutation({
-    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
-      const response = await apiRequest("POST", "/api/auth/change-password", data);
+    mutationFn: async (data: {
+      currentPassword: string;
+      newPassword: string;
+    }) => {
+      const response = await apiRequest(
+        "POST",
+        "/api/auth/change-password",
+        data,
+      );
       return response.json();
     },
     onSuccess: () => {
@@ -62,7 +69,7 @@ export default function SecuritySettingsScreen() {
       Alert.alert(
         "Sessions Terminated",
         "You have been logged out of all devices.",
-        [{ text: "OK", onPress: () => logout() }]
+        [{ text: "OK", onPress: () => logout() }],
       );
     },
     onError: (error: any) => {
@@ -105,7 +112,7 @@ export default function SecuritySettingsScreen() {
           style: "destructive",
           onPress: () => logoutAllMutation.mutate(),
         },
-      ]
+      ],
     );
   };
 
@@ -172,7 +179,9 @@ export default function SecuritySettingsScreen() {
           </GlassCard>
 
           <GlassCard style={styles.inputCard}>
-            <ThemedText style={styles.inputLabel}>Confirm New Password</ThemedText>
+            <ThemedText style={styles.inputLabel}>
+              Confirm New Password
+            </ThemedText>
             <View style={styles.inputRow}>
               <TextInput
                 value={confirmPassword}
@@ -195,7 +204,11 @@ export default function SecuritySettingsScreen() {
           </GlassCard>
 
           <PrimaryButton
-            title={changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+            title={
+              changePasswordMutation.isPending
+                ? "Changing..."
+                : "Change Password"
+            }
             onPress={handleChangePassword}
             disabled={changePasswordMutation.isPending}
             style={styles.button}
@@ -204,12 +217,18 @@ export default function SecuritySettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>SESSION MANAGEMENT</ThemedText>
+          <ThemedText style={styles.sectionLabel}>
+            SESSION MANAGEMENT
+          </ThemedText>
 
           <GlassCard style={styles.sessionCard}>
             <View style={styles.sessionRow}>
               <View style={styles.sessionIcon}>
-                <Feather name="smartphone" size={20} color={Colors.dark.warning} />
+                <Feather
+                  name="smartphone"
+                  size={20}
+                  color={Colors.dark.warning}
+                />
               </View>
               <View style={styles.sessionContent}>
                 <ThemedText style={styles.sessionTitle}>
@@ -223,7 +242,11 @@ export default function SecuritySettingsScreen() {
           </GlassCard>
 
           <PrimaryButton
-            title={logoutAllMutation.isPending ? "Logging out..." : "Logout All Devices"}
+            title={
+              logoutAllMutation.isPending
+                ? "Logging out..."
+                : "Logout All Devices"
+            }
             onPress={handleLogoutAll}
             variant="ghost"
             disabled={logoutAllMutation.isPending}
@@ -235,8 +258,8 @@ export default function SecuritySettingsScreen() {
         <View style={styles.infoSection}>
           <Feather name="info" size={16} color={Colors.dark.textMuted} />
           <ThemedText style={styles.infoText}>
-            Keep your account secure by using a strong password and logging out of
-            unused devices.
+            Keep your account secure by using a strong password and logging out
+            of unused devices.
           </ThemedText>
         </View>
       </ScrollView>

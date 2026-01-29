@@ -194,7 +194,9 @@ export const quizAttempts = pgTable("quiz_attempts", {
   userId: varchar("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  topicId: varchar("topic_id").references(() => topics.id, { onDelete: "set null" }),
+  topicId: varchar("topic_id").references(() => topics.id, {
+    onDelete: "set null",
+  }),
   mode: text("mode").notNull(),
   score: integer("score").notNull(),
   totalQuestions: integer("total_questions").notNull(),
@@ -229,12 +231,15 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
-  user: one(users, {
-    fields: [passwordResetTokens.userId],
-    references: [users.id],
+export const passwordResetTokensRelations = relations(
+  passwordResetTokens,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [passwordResetTokens.userId],
+      references: [users.id],
+    }),
   }),
-}));
+);
 
 export const recentActivity = pgTable("recent_activity", {
   id: varchar("id")

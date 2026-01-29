@@ -31,7 +31,8 @@ const mockAnnouncements: Announcement[] = [
   {
     id: "1",
     title: "New Chapter Added",
-    message: "A new chapter on Gestational Diabetes has been added to the Obstetrics textbook. Check it out!",
+    message:
+      "A new chapter on Gestational Diabetes has been added to the Obstetrics textbook. Check it out!",
     type: "new_content",
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     isRead: false,
@@ -47,7 +48,8 @@ const mockAnnouncements: Announcement[] = [
   {
     id: "3",
     title: "Study Tip",
-    message: "Remember to review the Antepartum Care section before your upcoming exam. Good luck!",
+    message:
+      "Remember to review the Antepartum Care section before your upcoming exam. Good luck!",
     type: "info",
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     isRead: true,
@@ -55,7 +57,8 @@ const mockAnnouncements: Announcement[] = [
   {
     id: "4",
     title: "Exam Reminder",
-    message: "The OB-GYN module exam is scheduled for next week. Make sure to complete all practice quizzes.",
+    message:
+      "The OB-GYN module exam is scheduled for next week. Make sure to complete all practice quizzes.",
     type: "important",
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     isRead: true,
@@ -124,17 +127,27 @@ function AnnouncementCard({ item }: { item: Announcement }) {
       ]}
       onPress={handlePress}
     >
-      <View style={[styles.iconContainer, { backgroundColor: `${typeColor}20` }]}>
+      <View
+        style={[styles.iconContainer, { backgroundColor: `${typeColor}20` }]}
+      >
         <Feather name={typeIcon as any} size={20} color={typeColor} />
       </View>
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
-          <Text style={[styles.cardTitle, { color: theme.text }]} numberOfLines={1}>
+          <Text
+            style={[styles.cardTitle, { color: theme.text }]}
+            numberOfLines={1}
+          >
             {item.title}
           </Text>
-          {!item.isRead && <View style={[styles.unreadDot, { backgroundColor: typeColor }]} />}
+          {!item.isRead && (
+            <View style={[styles.unreadDot, { backgroundColor: typeColor }]} />
+          )}
         </View>
-        <Text style={[styles.cardMessage, { color: theme.textSecondary }]} numberOfLines={2}>
+        <Text
+          style={[styles.cardMessage, { color: theme.textSecondary }]}
+          numberOfLines={2}
+        >
           {item.message}
         </Text>
         <Text style={[styles.cardTime, { color: theme.textMuted }]}>
@@ -152,7 +165,11 @@ export default function NotificationsScreen() {
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const { data: announcements, isLoading, refetch } = useQuery({
+  const {
+    data: announcements,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["/api/announcements"],
     queryFn: async () => {
       return mockAnnouncements;
@@ -171,7 +188,12 @@ export default function NotificationsScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: theme.backgroundRoot }]}>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.backgroundRoot },
+        ]}
+      >
         <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
@@ -193,7 +215,8 @@ export default function NotificationsScreen() {
         unreadCount > 0 ? (
           <View style={styles.headerSection}>
             <Text style={[styles.unreadLabel, { color: theme.primary }]}>
-              {unreadCount} new {unreadCount === 1 ? "announcement" : "announcements"}
+              {unreadCount} new{" "}
+              {unreadCount === 1 ? "announcement" : "announcements"}
             </Text>
           </View>
         ) : null
@@ -201,7 +224,9 @@ export default function NotificationsScreen() {
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
           <Feather name="bell-off" size={48} color={theme.textMuted} />
-          <Text style={[styles.emptyTitle, { color: theme.text }]}>No Announcements</Text>
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>
+            No Announcements
+          </Text>
           <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
             Check back later for updates from your professors
           </Text>

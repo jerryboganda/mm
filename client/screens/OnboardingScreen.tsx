@@ -21,7 +21,8 @@ import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const { width, height } = Dimensions.get("window");
 
-type OnboardingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type OnboardingScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface OnboardingSlide {
   id: string;
@@ -92,11 +93,22 @@ export default function OnboardingScreen() {
     navigation.navigate("PermissionsPrompt");
   };
 
-  const renderSlide = ({ item, index }: { item: OnboardingSlide; index: number }) => {
+  const renderSlide = ({
+    item,
+    index,
+  }: {
+    item: OnboardingSlide;
+    index: number;
+  }) => {
     return (
       <View style={[styles.slide, { width }]}>
         <View style={styles.slideContent}>
-          <View style={[styles.iconContainer, { backgroundColor: `${item.color}20` }]}>
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: `${item.color}20` },
+            ]}
+          >
             <Feather name={item.icon} size={64} color={item.color} />
           </View>
           <ThemedText type="h2" style={styles.slideTitle}>
@@ -115,24 +127,34 @@ export default function OnboardingScreen() {
       if (viewableItems.length > 0 && viewableItems[0].index !== null) {
         setCurrentIndex(viewableItems[0].index);
       }
-    }
+    },
   ).current;
 
-  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+  const viewabilityConfig = useRef({
+    viewAreaCoveragePercentThreshold: 50,
+  }).current;
 
   const isLastSlide = currentIndex === slides.length - 1;
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Colors.dark.backgroundRoot, "#0a1518", Colors.dark.backgroundRoot]}
+        colors={[
+          Colors.dark.backgroundRoot,
+          "#0a1518",
+          Colors.dark.backgroundRoot,
+        ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
 
       <View style={[styles.header, { paddingTop: insets.top + Spacing.lg }]}>
-        <Pressable onPress={handleSkip} style={styles.skipButton} testID="button-skip">
+        <Pressable
+          onPress={handleSkip}
+          style={styles.skipButton}
+          testID="button-skip"
+        >
           <ThemedText style={styles.skipText}>Skip</ThemedText>
         </Pressable>
       </View>
@@ -149,12 +171,14 @@ export default function OnboardingScreen() {
         viewabilityConfig={viewabilityConfig}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         bounces={false}
       />
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + Spacing.xl }]}>
+      <View
+        style={[styles.footer, { paddingBottom: insets.bottom + Spacing.xl }]}
+      >
         <View style={styles.pagination}>
           {slides.map((_, index) => {
             const inputRange = [
@@ -192,7 +216,11 @@ export default function OnboardingScreen() {
           style={styles.nextButton}
           icon={
             isLastSlide ? undefined : (
-              <Feather name="arrow-right" size={20} color={Colors.dark.backgroundRoot} />
+              <Feather
+                name="arrow-right"
+                size={20}
+                color={Colors.dark.backgroundRoot}
+              />
             )
           }
           testID="button-next"

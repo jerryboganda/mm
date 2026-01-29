@@ -15,7 +15,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type QuizTopicSelectNavigationProp = NativeStackNavigationProp<RootStackParamList, "QuizTopicSelect">;
+type QuizTopicSelectNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "QuizTopicSelect"
+>;
 
 interface QuizTopic {
   id: string;
@@ -36,7 +39,10 @@ export default function QuizTopicSelectScreen() {
 
   const handleStartQuiz = () => {
     if (selectedTopicId) {
-      navigation.navigate("QuizPlayer", { mode: "topic", topicId: selectedTopicId });
+      navigation.navigate("QuizPlayer", {
+        mode: "topic",
+        topicId: selectedTopicId,
+      });
     }
   };
 
@@ -50,7 +56,11 @@ export default function QuizTopicSelectScreen() {
         <Feather
           name="file-text"
           size={24}
-          color={selectedTopicId === item.id ? Colors.dark.primary : Colors.dark.textSecondary}
+          color={
+            selectedTopicId === item.id
+              ? Colors.dark.primary
+              : Colors.dark.textSecondary
+          }
         />
       }
       testID={`card-topic-${item.id}`}
@@ -91,7 +101,9 @@ export default function QuizTopicSelectScreen() {
         ListEmptyComponent={isLoading ? renderLoading() : null}
       />
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + Spacing.lg }]}>
+      <View
+        style={[styles.footer, { paddingBottom: insets.bottom + Spacing.lg }]}
+      >
         <PrimaryButton
           title="Start Quiz"
           onPress={handleStartQuiz}

@@ -26,7 +26,7 @@ export function AppNetworkWrapper({ children }: AppNetworkWrapperProps) {
       CommonActions.reset({
         index: 0,
         routes: [{ name: "Login" as never }],
-      })
+      }),
     );
   };
 

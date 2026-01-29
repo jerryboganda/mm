@@ -27,11 +27,7 @@ export function LoadingSkeleton({
   const shimmer = useSharedValue(0);
 
   useEffect(() => {
-    shimmer.value = withRepeat(
-      withTiming(1, { duration: 1500 }),
-      -1,
-      false,
-    );
+    shimmer.value = withRepeat(withTiming(1, { duration: 1500 }), -1, false);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -52,11 +48,7 @@ export function LoadingSkeleton({
     >
       <Animated.View style={[styles.shimmer, animatedStyle]}>
         <LinearGradient
-          colors={[
-            "transparent",
-            "rgba(255,255,255,0.08)",
-            "transparent",
-          ]}
+          colors={["transparent", "rgba(255,255,255,0.08)", "transparent"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.gradient}
@@ -70,7 +62,11 @@ export function CardSkeleton() {
   return (
     <View style={styles.cardContainer}>
       <View style={styles.cardHeader}>
-        <LoadingSkeleton width={48} height={48} borderRadius={BorderRadius.md} />
+        <LoadingSkeleton
+          width={48}
+          height={48}
+          borderRadius={BorderRadius.md}
+        />
         <View style={styles.cardHeaderText}>
           <LoadingSkeleton width="70%" height={18} />
           <LoadingSkeleton width="50%" height={14} style={{ marginTop: 8 }} />

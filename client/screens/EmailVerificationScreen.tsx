@@ -18,7 +18,10 @@ type EmailVerificationScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "EmailVerification"
 >;
-type EmailVerificationScreenRouteProp = RouteProp<RootStackParamList, "EmailVerification">;
+type EmailVerificationScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "EmailVerification"
+>;
 
 export default function EmailVerificationScreen() {
   const insets = useSafeAreaInsets();
@@ -68,7 +71,11 @@ export default function EmailVerificationScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Colors.dark.backgroundRoot, "#0a1518", Colors.dark.backgroundRoot]}
+        colors={[
+          Colors.dark.backgroundRoot,
+          "#0a1518",
+          Colors.dark.backgroundRoot,
+        ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -89,7 +96,11 @@ export default function EmailVerificationScreen() {
               <Feather name="mail" size={64} color={Colors.dark.primary} />
             </View>
             <View style={styles.checkBadge}>
-              <Feather name="check" size={16} color={Colors.dark.backgroundRoot} />
+              <Feather
+                name="check"
+                size={16}
+                color={Colors.dark.backgroundRoot}
+              />
             </View>
           </View>
 
@@ -118,7 +129,11 @@ export default function EmailVerificationScreen() {
               </ThemedText>
             </View>
             <View style={styles.tipItem}>
-              <Feather name="refresh-cw" size={18} color={Colors.dark.success} />
+              <Feather
+                name="refresh-cw"
+                size={18}
+                color={Colors.dark.success}
+              />
               <ThemedText style={styles.tipText}>
                 Didn't receive? Resend below
               </ThemedText>
@@ -127,7 +142,11 @@ export default function EmailVerificationScreen() {
 
           {resendSuccess ? (
             <View style={styles.successBanner}>
-              <Feather name="check-circle" size={20} color={Colors.dark.success} />
+              <Feather
+                name="check-circle"
+                size={20}
+                color={Colors.dark.success}
+              />
               <ThemedText style={styles.successText}>
                 Verification email sent!
               </ThemedText>

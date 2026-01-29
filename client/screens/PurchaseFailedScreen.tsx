@@ -1,5 +1,13 @@
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, View, Animated, Easing, Pressable, Linking, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Animated,
+  Easing,
+  Pressable,
+  Linking,
+  Platform,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -13,8 +21,12 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type PurchaseFailedScreenRouteProp = RouteProp<RootStackParamList, "PurchaseFailed">;
-type PurchaseFailedScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type PurchaseFailedScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "PurchaseFailed"
+>;
+type PurchaseFailedScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 const commonIssues = [
   {
@@ -41,16 +53,33 @@ export default function PurchaseFailedScreen() {
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const errorMessage = route.params?.errorMessage || "Something went wrong with your purchase";
+  const errorMessage =
+    route.params?.errorMessage || "Something went wrong with your purchase";
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
     const shake = Animated.sequence([
-      Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnim, {
+        toValue: 10,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -10,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 10,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
     ]);
 
     shake.start();
@@ -93,7 +122,12 @@ export default function PurchaseFailedScreen() {
           },
         ]}
       >
-        <Animated.View style={[styles.iconContainer, { transform: [{ translateX: shakeAnim }] }]}>
+        <Animated.View
+          style={[
+            styles.iconContainer,
+            { transform: [{ translateX: shakeAnim }] },
+          ]}
+        >
           <View style={styles.iconCircle}>
             <Feather name="x" size={48} color={Colors.dark.error} />
           </View>
@@ -109,15 +143,23 @@ export default function PurchaseFailedScreen() {
         </View>
 
         <Animated.View style={[styles.issuesSection, { opacity: fadeAnim }]}>
-          <ThemedText style={styles.sectionLabel}>POSSIBLE SOLUTIONS</ThemedText>
+          <ThemedText style={styles.sectionLabel}>
+            POSSIBLE SOLUTIONS
+          </ThemedText>
           {commonIssues.map((issue, index) => (
             <GlassCard key={index} style={styles.issueCard}>
               <View style={styles.issueIcon}>
-                <Feather name={issue.icon} size={18} color={Colors.dark.warning} />
+                <Feather
+                  name={issue.icon}
+                  size={18}
+                  color={Colors.dark.warning}
+                />
               </View>
               <View style={styles.issueContent}>
                 <ThemedText style={styles.issueTitle}>{issue.title}</ThemedText>
-                <ThemedText style={styles.issueDescription}>{issue.description}</ThemedText>
+                <ThemedText style={styles.issueDescription}>
+                  {issue.description}
+                </ThemedText>
               </View>
             </GlassCard>
           ))}

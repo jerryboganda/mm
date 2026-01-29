@@ -4,7 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ONBOARDING_COMPLETE_KEY = "@maternal_mind_onboarding_complete";
 
 export function useOnboarding() {
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<
+    boolean | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -26,16 +28,14 @@ export function useOnboarding() {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
       setHasCompletedOnboarding(true);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const resetOnboarding = async () => {
     try {
       await AsyncStorage.removeItem(ONBOARDING_COMPLETE_KEY);
       setHasCompletedOnboarding(false);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   return {

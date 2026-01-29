@@ -131,9 +131,7 @@ export function GlassInput({
           </Pressable>
         ) : null}
       </Pressable>
-      {error ? (
-        <ThemedText style={styles.errorText}>{error}</ThemedText>
-      ) : null}
+      {error ? <ThemedText style={styles.errorText}>{error}</ThemedText> : null}
     </View>
   );
 }
@@ -145,7 +143,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.03)",
+    backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: BorderRadius.md,
     borderWidth: 1,
     borderColor: Colors.dark.glassBorder,

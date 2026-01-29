@@ -17,7 +17,10 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing } from "@/constants/theme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 
-type LearnScreenNavigationProp = NativeStackNavigationProp<LearnStackParamList, "LearnHome">;
+type LearnScreenNavigationProp = NativeStackNavigationProp<
+  LearnStackParamList,
+  "LearnHome"
+>;
 
 interface Book {
   id: string;
@@ -36,7 +39,12 @@ export default function LearnScreen() {
   const navigation = useNavigation<LearnScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: books, isLoading, error, refetch } = useQuery<Book[]>({
+  const {
+    data: books,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<Book[]>({
     queryKey: ["/api/books"],
   });
 
@@ -50,18 +58,31 @@ export default function LearnScreen() {
     <GlassCard
       title={item.title}
       subtitle={`${item.chaptersCount} Chapters`}
-      onPress={() => navigation.navigate("Chapters", { bookId: item.id, bookTitle: item.title })}
-      icon={
-        <Feather name="book-open" size={24} color={Colors.dark.primary} />
+      onPress={() =>
+        navigation.navigate("Chapters", {
+          bookId: item.id,
+          bookTitle: item.title,
+        })
       }
+      icon={<Feather name="book-open" size={24} color={Colors.dark.primary} />}
       rightElement={
-        <View style={[styles.badge, item.isPremium ? styles.premiumBadge : styles.freeBadge]}>
-          <Feather 
-            name={item.isPremium ? "star" : "unlock"} 
-            size={10} 
-            color={item.isPremium ? "#fbbf24" : Colors.dark.success} 
+        <View
+          style={[
+            styles.badge,
+            item.isPremium ? styles.premiumBadge : styles.freeBadge,
+          ]}
+        >
+          <Feather
+            name={item.isPremium ? "star" : "unlock"}
+            size={10}
+            color={item.isPremium ? "#fbbf24" : Colors.dark.success}
           />
-          <ThemedText style={[styles.badgeText, item.isPremium ? styles.premiumText : styles.freeText]}>
+          <ThemedText
+            style={[
+              styles.badgeText,
+              item.isPremium ? styles.premiumText : styles.freeText,
+            ]}
+          >
             {item.isPremium ? "Premium" : "Free"}
           </ThemedText>
         </View>

@@ -99,9 +99,7 @@ export function OptionButton({
           },
         ]}
       >
-        <ThemedText
-          style={[styles.label, selected && { color: "#fff" }]}
-        >
+        <ThemedText style={[styles.label, selected && { color: "#fff" }]}>
           {label}
         </ThemedText>
       </View>

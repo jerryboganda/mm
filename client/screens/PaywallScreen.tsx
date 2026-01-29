@@ -15,7 +15,8 @@ import { usePurchases } from "@/lib/purchases";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type PaywallScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type PaywallScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -23,12 +24,14 @@ const premiumBenefits = [
   {
     icon: "book-open" as const,
     title: "Complete Textbook Access",
-    description: "Unlock all OB-GYN chapters and topics with in-depth explanations",
+    description:
+      "Unlock all OB-GYN chapters and topics with in-depth explanations",
   },
   {
     icon: "check-circle" as const,
     title: "Unlimited MCQ Practice",
-    description: "Practice with thousands of questions across all difficulty levels",
+    description:
+      "Practice with thousands of questions across all difficulty levels",
   },
   {
     icon: "trending-up" as const,
@@ -38,7 +41,8 @@ const premiumBenefits = [
   {
     icon: "bookmark" as const,
     title: "Bookmarks & Notes",
-    description: "Save important topics and add personal notes for quick reference",
+    description:
+      "Save important topics and add personal notes for quick reference",
   },
   {
     icon: "zap" as const,
@@ -48,7 +52,8 @@ const premiumBenefits = [
   {
     icon: "headphones" as const,
     title: "Priority Support",
-    description: "Get faster responses from our support team when you need help",
+    description:
+      "Get faster responses from our support team when you need help",
   },
 ];
 
@@ -70,9 +75,15 @@ export default function PaywallScreen() {
   if (isSubscribed) {
     return (
       <BackgroundGradient>
-        <View style={[styles.subscribedContainer, { paddingTop: insets.top + 60 }]}>
+        <View
+          style={[styles.subscribedContainer, { paddingTop: insets.top + 60 }]}
+        >
           <View style={styles.successIcon}>
-            <Feather name="check-circle" size={64} color={Colors.dark.success} />
+            <Feather
+              name="check-circle"
+              size={64}
+              color={Colors.dark.success}
+            />
           </View>
           <ThemedText type="h2" style={styles.successTitle}>
             You're Premium!
@@ -118,7 +129,8 @@ export default function PaywallScreen() {
             Go Premium
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Unlock the full power of Maternal Mind and accelerate your medical education
+            Unlock the full power of Maternal Mind and accelerate your medical
+            education
           </ThemedText>
         </View>
 
@@ -157,7 +169,9 @@ export default function PaywallScreen() {
           />
 
           <View style={styles.restoreRow}>
-            <ThemedText style={styles.restoreLabel}>Already a subscriber?</ThemedText>
+            <ThemedText style={styles.restoreLabel}>
+              Already a subscriber?
+            </ThemedText>
             <ThemedText style={styles.restoreLink} onPress={handleRestore}>
               Restore Purchases
             </ThemedText>

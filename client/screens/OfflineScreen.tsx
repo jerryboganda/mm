@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -52,7 +49,8 @@ export default function OfflineScreen({ onRetry }: OfflineScreenProps) {
           </ThemedText>
 
           <ThemedText style={styles.description}>
-            It looks like you're offline. Please check your internet connection and try again.
+            It looks like you're offline. Please check your internet connection
+            and try again.
           </ThemedText>
 
           <GlassCard style={styles.tipsCard}>

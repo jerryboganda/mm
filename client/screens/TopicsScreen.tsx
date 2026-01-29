@@ -39,7 +39,11 @@ export default function TopicsScreen() {
   const { chapterId, chapterTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: topics, isLoading, refetch } = useQuery<Topic[]>({
+  const {
+    data: topics,
+    isLoading,
+    refetch,
+  } = useQuery<Topic[]>({
     queryKey: ["/api/chapters", chapterId, "topics"],
   });
 
@@ -55,9 +59,9 @@ export default function TopicsScreen() {
       subtitle={item.description}
       onPress={() => {
         if (!item.isLocked) {
-          navigation.navigate("TopicReader", { 
-            topicId: item.id, 
-            topicTitle: item.title 
+          navigation.navigate("TopicReader", {
+            topicId: item.id,
+            topicTitle: item.title,
           });
         }
       }}

@@ -24,10 +24,7 @@ export function StatCard({
   return (
     <View style={[styles.container, style]}>
       <LinearGradient
-        colors={[
-          Colors.dark.glass,
-          "rgba(255,255,255,0.02)",
-        ]}
+        colors={[Colors.dark.glass, "rgba(255,255,255,0.08)"]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}

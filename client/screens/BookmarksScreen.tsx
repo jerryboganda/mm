@@ -15,7 +15,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type BookmarksScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type BookmarksScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface Bookmark {
   id: string;
@@ -32,7 +33,11 @@ export default function BookmarksScreen() {
   const navigation = useNavigation<BookmarksScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: bookmarks, isLoading, refetch } = useQuery<Bookmark[]>({
+  const {
+    data: bookmarks,
+    isLoading,
+    refetch,
+  } = useQuery<Bookmark[]>({
     queryKey: ["/api/bookmarks"],
   });
 
@@ -63,7 +68,9 @@ export default function BookmarksScreen() {
       }
       icon={<Feather name="bookmark" size={24} color={Colors.dark.primary} />}
       rightElement={
-        <ThemedText style={styles.dateText}>{formatDate(item.createdAt)}</ThemedText>
+        <ThemedText style={styles.dateText}>
+          {formatDate(item.createdAt)}
+        </ThemedText>
       }
       testID={`card-bookmark-${item.id}`}
       style={{ marginBottom: Spacing.md }}
@@ -98,7 +105,9 @@ export default function BookmarksScreen() {
             paddingTop: headerHeight + Spacing.xl,
             paddingBottom: insets.bottom + Spacing.xl,
           },
-          (!bookmarks || bookmarks.length === 0) && !isLoading && styles.emptyList,
+          (!bookmarks || bookmarks.length === 0) &&
+            !isLoading &&
+            styles.emptyList,
         ]}
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         refreshControl={

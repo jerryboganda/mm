@@ -66,8 +66,16 @@ export default function HelpSupportScreen() {
   const [issueDescription, setIssueDescription] = useState("");
 
   const reportIssueMutation = useMutation({
-    mutationFn: async (data: { type: string; description: string; email: string }) => {
-      const response = await apiRequest("POST", "/api/support/report-issue", data);
+    mutationFn: async (data: {
+      type: string;
+      description: string;
+      email: string;
+    }) => {
+      const response = await apiRequest(
+        "POST",
+        "/api/support/report-issue",
+        data,
+      );
       return response.json();
     },
     onSuccess: () => {
@@ -83,12 +91,15 @@ export default function HelpSupportScreen() {
               setIssueDescription("");
             },
           },
-        ]
+        ],
       );
     },
     onError: (error: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", error.message || "Failed to submit report. Please try again.");
+      Alert.alert(
+        "Error",
+        error.message || "Failed to submit report. Please try again.",
+      );
     },
   });
 
@@ -99,7 +110,9 @@ export default function HelpSupportScreen() {
 
   const handleContactSupport = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Linking.openURL("mailto:support@maternalmind.app?subject=Support%20Request");
+    Linking.openURL(
+      "mailto:support@maternalmind.app?subject=Support%20Request",
+    );
   };
 
   const handleSubmitIssue = () => {
@@ -143,7 +156,9 @@ export default function HelpSupportScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>FREQUENTLY ASKED QUESTIONS</ThemedText>
+          <ThemedText style={styles.sectionLabel}>
+            FREQUENTLY ASKED QUESTIONS
+          </ThemedText>
           {faqs.map((faq, index) => (
             <GlassCard
               key={index}
@@ -151,7 +166,9 @@ export default function HelpSupportScreen() {
               onPress={() => handleToggleFaq(index)}
             >
               <View style={styles.faqHeader}>
-                <ThemedText style={styles.faqQuestion}>{faq.question}</ThemedText>
+                <ThemedText style={styles.faqQuestion}>
+                  {faq.question}
+                </ThemedText>
                 <Feather
                   name={expandedFaq === index ? "chevron-up" : "chevron-down"}
                   size={20}
@@ -173,12 +190,18 @@ export default function HelpSupportScreen() {
                 <Feather name="mail" size={20} color={Colors.dark.primary} />
               </View>
               <View style={styles.contactContent}>
-                <ThemedText style={styles.contactTitle}>Email Support</ThemedText>
+                <ThemedText style={styles.contactTitle}>
+                  Email Support
+                </ThemedText>
                 <ThemedText style={styles.contactSubtitle}>
                   support@maternalmind.app
                 </ThemedText>
               </View>
-              <Feather name="external-link" size={18} color={Colors.dark.textSecondary} />
+              <Feather
+                name="external-link"
+                size={18}
+                color={Colors.dark.textSecondary}
+              />
             </View>
           </GlassCard>
         </View>
@@ -202,7 +225,11 @@ export default function HelpSupportScreen() {
                 <Feather
                   name={type.icon as any}
                   size={16}
-                  color={issueType === type.id ? Colors.dark.primary : Colors.dark.textSecondary}
+                  color={
+                    issueType === type.id
+                      ? Colors.dark.primary
+                      : Colors.dark.textSecondary
+                  }
                 />
                 <ThemedText
                   style={[
@@ -231,7 +258,9 @@ export default function HelpSupportScreen() {
           </GlassCard>
 
           <PrimaryButton
-            title={reportIssueMutation.isPending ? "Submitting..." : "Submit Report"}
+            title={
+              reportIssueMutation.isPending ? "Submitting..." : "Submit Report"
+            }
             onPress={handleSubmitIssue}
             disabled={reportIssueMutation.isPending}
             icon="send"

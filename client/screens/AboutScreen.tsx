@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, Linking, Image, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Linking,
+  Image,
+  Pressable,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
@@ -106,17 +113,25 @@ export default function AboutScreen() {
             <GlassCard
               key={item.id}
               style={styles.legalCard}
-              onPress={() => item.screen ? handleNavigate(item.screen) : handleOpenLink(item.url!)}
+              onPress={() =>
+                item.screen
+                  ? handleNavigate(item.screen)
+                  : handleOpenLink(item.url!)
+              }
             >
               <View style={styles.legalRow}>
                 <View style={styles.legalIcon}>
-                  <Feather name={item.icon} size={18} color={Colors.dark.primary} />
+                  <Feather
+                    name={item.icon}
+                    size={18}
+                    color={Colors.dark.primary}
+                  />
                 </View>
                 <ThemedText style={styles.legalTitle}>{item.title}</ThemedText>
-                <Feather 
-                  name={item.screen ? "chevron-right" : "external-link"} 
-                  size={16} 
-                  color={Colors.dark.textSecondary} 
+                <Feather
+                  name={item.screen ? "chevron-right" : "external-link"}
+                  size={16}
+                  color={Colors.dark.textSecondary}
                 />
               </View>
             </GlassCard>
@@ -131,11 +146,14 @@ export default function AboutScreen() {
                 key={index}
                 style={[
                   styles.acknowledgementRow,
-                  index < acknowledgements.length - 1 && styles.acknowledgementRowBorder,
+                  index < acknowledgements.length - 1 &&
+                    styles.acknowledgementRowBorder,
                 ]}
               >
                 <Feather name="check" size={14} color={Colors.dark.success} />
-                <ThemedText style={styles.acknowledgementText}>{item}</ThemedText>
+                <ThemedText style={styles.acknowledgementText}>
+                  {item}
+                </ThemedText>
               </View>
             ))}
           </GlassCard>
@@ -152,7 +170,9 @@ export default function AboutScreen() {
             </Pressable>
             <Pressable
               style={styles.socialButton}
-              onPress={() => handleOpenLink("https://instagram.com/maternalmind")}
+              onPress={() =>
+                handleOpenLink("https://instagram.com/maternalmind")
+              }
             >
               <Feather name="instagram" size={20} color={Colors.dark.text} />
             </Pressable>

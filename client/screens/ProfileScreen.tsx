@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, Image, Pressable, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Image,
+  Pressable,
+  Alert,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -16,7 +23,8 @@ import { useAuth } from "@/lib/auth";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type ProfileScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -147,7 +155,10 @@ export default function ProfileScreen() {
             ]}
           >
             <ThemedText
-              style={[styles.subscriptionText, { color: subscriptionBadge.color }]}
+              style={[
+                styles.subscriptionText,
+                { color: subscriptionBadge.color },
+              ]}
             >
               {subscriptionBadge.label}
             </ThemedText>
@@ -171,7 +182,11 @@ export default function ProfileScreen() {
                   Unlock all content and features
                 </ThemedText>
               </View>
-              <Feather name="chevron-right" size={24} color={Colors.dark.textSecondary} />
+              <Feather
+                name="chevron-right"
+                size={24}
+                color={Colors.dark.textSecondary}
+              />
             </View>
           </GlassCard>
         ) : null}
@@ -184,9 +199,19 @@ export default function ProfileScreen() {
               title={item.title}
               subtitle={item.subtitle}
               onPress={item.onPress}
-              icon={<Feather name={item.icon} size={20} color={Colors.dark.primary} />}
+              icon={
+                <Feather
+                  name={item.icon}
+                  size={20}
+                  color={Colors.dark.primary}
+                />
+              }
               rightElement={
-                <Feather name="chevron-right" size={20} color={Colors.dark.textSecondary} />
+                <Feather
+                  name="chevron-right"
+                  size={20}
+                  color={Colors.dark.textSecondary}
+                />
               }
               style={{ marginBottom: Spacing.md }}
               testID={`card-settings-${item.id}`}

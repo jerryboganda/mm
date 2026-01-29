@@ -22,7 +22,13 @@ import { BlurView } from "expo-blur";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/lib/auth";
-import { Colors, Spacing, BorderRadius, Typography, Shadows } from "@/constants/theme";
+import {
+  Colors,
+  Spacing,
+  BorderRadius,
+  Typography,
+  Shadows,
+} from "@/constants/theme";
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
@@ -72,7 +78,7 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
     return (
       <BlurView intensity={18} tint="dark" style={styles.bentoBackground}>
         <LinearGradient
-          colors={[glowColor, "rgba(255,255,255,0.02)"]}
+          colors={[glowColor, "rgba(255,255,255,0.08)"]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -82,28 +88,43 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
   };
 
   return (
-    <AnimatedListItem index={index} delay={60}>
-      <View
-        style={[
-          styles.bentoCard,
-          { borderColor: theme.glassBorder },
-          index === 0 && styles.bentoCardWide,
-        ]}
-      >
-        {renderBackground()}
-        <View style={styles.bentoContent}>
-          <View style={styles.bentoHeader}>
-            <View style={[styles.bentoIconContainer, { backgroundColor: `${item.color}20` }]}>
-              <Feather name={item.icon} size={20} color={item.color} />
+    <View
+      style={[
+        styles.bentoCardContainer,
+        index === 0 && styles.bentoCardWide,
+      ]}
+    >
+      <AnimatedListItem index={index} delay={60} style={{ width: "100%" }}>
+        <View
+          style={[
+            styles.bentoCard,
+            { borderColor: theme.glassBorder },
+          ]}
+        >
+          {renderBackground()}
+          <View style={styles.bentoContent}>
+            <View style={styles.bentoHeader}>
+              <View
+                style={[
+                  styles.bentoIconContainer,
+                  { backgroundColor: `${item.color}20` },
+                ]}
+              >
+                <Feather name={item.icon} size={20} color={item.color} />
+              </View>
+            </View>
+            <View style={styles.bentoValueContainer}>
+              <Text style={[styles.bentoValue, { color: item.color }]}>
+                {item.value}
+              </Text>
+              <Text style={[styles.bentoLabel, { color: theme.textSecondary }]}>
+                {item.label}
+              </Text>
             </View>
           </View>
-          <View style={styles.bentoValueContainer}>
-            <Text style={[styles.bentoValue, { color: item.color }]}>{item.value}</Text>
-            <Text style={[styles.bentoLabel, { color: theme.textSecondary }]}>{item.label}</Text>
-          </View>
         </View>
-      </View>
-    </AnimatedListItem>
+      </AnimatedListItem>
+    </View>
   );
 }
 
@@ -119,20 +140,35 @@ function ContinueLearningCard({
   return (
     <GlassCard onPress={onPress} variant="glow" style={styles.continueCard}>
       <View style={styles.continueContent}>
-        <Text style={[styles.continueLabel, { color: theme.primary }]}>CONTINUE LEARNING</Text>
-        <Text style={[styles.continueTitle, { color: theme.text }]} numberOfLines={1}>
+        <Text style={[styles.continueLabel, { color: theme.primary }]}>
+          CONTINUE LEARNING
+        </Text>
+        <Text
+          style={[styles.continueTitle, { color: theme.text }]}
+          numberOfLines={1}
+        >
           {topic.title}
         </Text>
-        <Text style={[styles.continueSubtitle, { color: theme.textSecondary }]} numberOfLines={1}>
+        <Text
+          style={[styles.continueSubtitle, { color: theme.textSecondary }]}
+          numberOfLines={1}
+        >
           {topic.chapterTitle} - {topic.bookTitle}
         </Text>
         <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { backgroundColor: theme.glassBorder }]}>
+          <View
+            style={[styles.progressBar, { backgroundColor: theme.glassBorder }]}
+          >
             <View
-              style={[styles.progressFill, { width: `${topic.progress}%`, backgroundColor: theme.primary }]}
+              style={[
+                styles.progressFill,
+                { width: `${topic.progress}%`, backgroundColor: theme.primary },
+              ]}
             />
           </View>
-          <Text style={[styles.progressText, { color: theme.textMuted }]}>{topic.progress}%</Text>
+          <Text style={[styles.progressText, { color: theme.textMuted }]}>
+            {topic.progress}%
+          </Text>
         </View>
       </View>
       <View style={[styles.continueArrow, { backgroundColor: theme.primary }]}>
@@ -160,10 +196,16 @@ function RecommendedCard({
           <Feather name="book-open" size={16} color={theme.primary} />
         </View>
         <View style={styles.recommendedContent}>
-          <Text style={[styles.recommendedTitle, { color: theme.text }]} numberOfLines={1}>
+          <Text
+            style={[styles.recommendedTitle, { color: theme.text }]}
+            numberOfLines={1}
+          >
             {topic.title}
           </Text>
-          <Text style={[styles.recommendedSubtitle, { color: theme.textMuted }]} numberOfLines={1}>
+          <Text
+            style={[styles.recommendedSubtitle, { color: theme.textMuted }]}
+            numberOfLines={1}
+          >
             {topic.chapterTitle}
           </Text>
         </View>
@@ -182,7 +224,11 @@ export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const { data: progressData, isLoading: progressLoading, refetch: refetchProgress } = useQuery({
+  const {
+    data: progressData,
+    isLoading: progressLoading,
+    refetch: refetchProgress,
+  } = useQuery({
     queryKey: ["/api/user/progress"],
   });
 
@@ -218,7 +264,10 @@ export default function HomeScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    navigation.navigate("TopicReader", { topicId: topic.id, topicTitle: topic.title });
+    navigation.navigate("TopicReader", {
+      topicId: topic.id,
+      topicTitle: topic.title,
+    });
   };
 
   const progress = progressData as any;
@@ -242,7 +291,9 @@ export default function HomeScreen() {
     {
       id: "accuracy",
       label: "Avg. Score",
-      value: progress?.averageScore ? `${Math.round(progress.averageScore)}%` : "—",
+      value: progress?.averageScore
+        ? `${Math.round(progress.averageScore)}%`
+        : "—",
       icon: "target",
       color: Colors.dark.warning,
       variant: "warning",
@@ -281,7 +332,8 @@ export default function HomeScreen() {
     },
   ];
 
-  const continueTopic = recentTopics && recentTopics.length > 0 ? recentTopics[0] : null;
+  const continueTopic =
+    recentTopics && recentTopics.length > 0 ? recentTopics[0] : null;
 
   const firstName = user?.name?.split(" ")[0] || "Student";
   const greeting = getGreeting();
@@ -296,11 +348,19 @@ export default function HomeScreen() {
   const sections = [
     { type: "header" as const },
     { type: "stats" as const },
-    ...(continueTopic ? [{ type: "continue" as const, data: continueTopic }] : []),
+    ...(continueTopic
+      ? [{ type: "continue" as const, data: continueTopic }]
+      : []),
     { type: "recommended" as const },
   ];
 
-  const renderItem = ({ item, index }: { item: (typeof sections)[0]; index: number }) => {
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: (typeof sections)[0];
+    index: number;
+  }) => {
     switch (item.type) {
       case "header":
         return (
@@ -308,15 +368,32 @@ export default function HomeScreen() {
             <View style={styles.headerSection}>
               <View style={styles.greetingRow}>
                 <View>
-                  <Text style={[styles.greeting, { color: theme.textSecondary }]}>{greeting},</Text>
-                  <Text style={[styles.userName, { color: theme.text }]}>{firstName}</Text>
+                  <Text
+                    style={[styles.greeting, { color: theme.textSecondary }]}
+                  >
+                    {greeting},
+                  </Text>
+                  <Text style={[styles.userName, { color: theme.text }]}>
+                    {firstName}
+                  </Text>
                 </View>
                 <Pressable
-                  style={[styles.notificationButton, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
+                  style={[
+                    styles.notificationButton,
+                    {
+                      backgroundColor: theme.glass,
+                      borderColor: theme.glassBorder,
+                    },
+                  ]}
                   onPress={handleNotifications}
                 >
                   <Feather name="bell" size={20} color={theme.text} />
-                  <View style={[styles.notificationBadge, { backgroundColor: theme.primary }]} />
+                  <View
+                    style={[
+                      styles.notificationBadge,
+                      { backgroundColor: theme.primary },
+                    ]}
+                  />
                 </Pressable>
               </View>
             </View>
@@ -327,14 +404,20 @@ export default function HomeScreen() {
         return (
           <View style={styles.statsSection}>
             <AnimatedListItem index={1} delay={50}>
-              <Text style={[styles.sectionTitle, { color: theme.text }]}>Your Progress</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                Your Progress
+              </Text>
             </AnimatedListItem>
             {progressLoading ? (
-              <ActivityIndicator size="small" color={theme.primary} style={{ marginTop: Spacing.lg }} />
+              <ActivityIndicator
+                size="small"
+                color={theme.primary}
+                style={{ marginTop: Spacing.lg }}
+              />
             ) : (
               <View style={styles.bentoGrid}>
                 {stats.map((stat, idx) => (
-                  <BentoStatCard key={stat.id} item={stat} index={idx + 2} />
+                  <BentoStatCard key={stat.id} item={stat} index={idx} />
                 ))}
               </View>
             )}
@@ -357,7 +440,9 @@ export default function HomeScreen() {
         return (
           <View style={styles.recommendedSection}>
             <AnimatedListItem index={8} delay={60}>
-              <Text style={[styles.sectionTitle, { color: theme.text }]}>Recommended Topics</Text>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+                Recommended Topics
+              </Text>
             </AnimatedListItem>
             {recommendedTopics.map((topic, idx) => (
               <RecommendedCard
@@ -444,10 +529,13 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginHorizontal: -Spacing.xs,
   },
-  bentoCard: {
+  bentoCardContainer: {
     width: "48%",
     marginHorizontal: "1%",
     marginBottom: Spacing.md,
+  },
+  bentoCard: {
+    width: "100%",
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
     overflow: "hidden",
@@ -455,7 +543,6 @@ const styles = StyleSheet.create({
   },
   bentoCardWide: {
     width: "98%",
-    minHeight: 110,
   },
   bentoBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -545,6 +632,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   recommendedCard: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
     padding: Spacing.md,
