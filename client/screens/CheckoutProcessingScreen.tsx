@@ -1,5 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, View, ActivityIndicator, Animated, Easing } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Animated,
+  Easing,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 
@@ -11,7 +17,9 @@ interface Props {
   message?: string;
 }
 
-export default function CheckoutProcessingScreen({ message = "Processing your purchase..." }: Props) {
+export default function CheckoutProcessingScreen({
+  message = "Processing your purchase...",
+}: Props) {
   const insets = useSafeAreaInsets();
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -31,7 +39,7 @@ export default function CheckoutProcessingScreen({ message = "Processing your pu
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-      ])
+      ]),
     );
 
     const rotate = Animated.loop(
@@ -40,7 +48,7 @@ export default function CheckoutProcessingScreen({ message = "Processing your pu
         duration: 2000,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     );
 
     pulse.start();
@@ -60,7 +68,9 @@ export default function CheckoutProcessingScreen({ message = "Processing your pu
   return (
     <BackgroundGradient>
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        <Animated.View style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}>
+        <Animated.View
+          style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}
+        >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <Feather name="loader" size={48} color={Colors.dark.primary} />
           </Animated.View>
@@ -71,7 +81,8 @@ export default function CheckoutProcessingScreen({ message = "Processing your pu
         </ThemedText>
 
         <ThemedText style={styles.subtitle}>
-          Please wait while we securely process your payment. Do not close the app.
+          Please wait while we securely process your payment. Do not close the
+          app.
         </ThemedText>
 
         <View style={styles.stepsContainer}>
@@ -86,7 +97,9 @@ export default function CheckoutProcessingScreen({ message = "Processing your pu
             <View style={[styles.stepIcon, styles.stepIconActive]}>
               <ActivityIndicator size="small" color="#fff" />
             </View>
-            <ThemedText style={styles.stepText}>Processing subscription</ThemedText>
+            <ThemedText style={styles.stepText}>
+              Processing subscription
+            </ThemedText>
           </View>
           <View style={styles.stepLine} />
           <View style={styles.step}>

@@ -16,19 +16,28 @@ import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Feather } from "@expo/vector-icons";
 
-type ResetPasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "ResetPassword">;
-type ResetPasswordScreenRouteProp = RouteProp<RootStackParamList, "ResetPassword">;
+type ResetPasswordScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ResetPassword"
+>;
+type ResetPasswordScreenRouteProp = RouteProp<
+  RootStackParamList,
+  "ResetPassword"
+>;
 
 export default function ResetPasswordScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const route = useRoute<ResetPasswordScreenRouteProp>();
-  
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{
+    password?: string;
+    confirmPassword?: string;
+  }>({});
   const [token, setToken] = useState("");
 
   useEffect(() => {
@@ -48,19 +57,19 @@ export default function ResetPasswordScreen() {
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    
+
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     if (!confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,7 +81,10 @@ export default function ResetPasswordScreen() {
     }
 
     if (!token) {
-      Alert.alert("Error", "Invalid reset link. Please request a new password reset.");
+      Alert.alert(
+        "Error",
+        "Invalid reset link. Please request a new password reset.",
+      );
       return;
     }
 
@@ -80,11 +92,14 @@ export default function ResetPasswordScreen() {
 
     try {
       const baseUrl = getApiUrl();
-      const response = await fetch(new URL("/api/auth/reset-password", baseUrl), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
+      const response = await fetch(
+        new URL("/api/auth/reset-password", baseUrl),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, password }),
+        },
+      );
 
       const data = await response.json();
 
@@ -117,13 +132,18 @@ export default function ResetPasswordScreen() {
         >
           <View style={styles.successContainer}>
             <View style={styles.successIcon}>
-              <Feather name="check-circle" size={48} color={Colors.dark.primary} />
+              <Feather
+                name="check-circle"
+                size={48}
+                color={Colors.dark.primary}
+              />
             </View>
             <ThemedText type="h2" style={styles.successTitle}>
               Password Reset!
             </ThemedText>
             <ThemedText style={styles.successMessage}>
-              Your password has been successfully reset. You can now sign in with your new password.
+              Your password has been successfully reset. You can now sign in
+              with your new password.
             </ThemedText>
             <PrimaryButton
               title="Sign In"

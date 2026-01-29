@@ -72,10 +72,14 @@ export default function AttemptDetailScreen() {
 
   const getModeLabel = (mode: string) => {
     switch (mode) {
-      case "topic": return "Topic Quiz";
-      case "mixed": return "Mixed Quiz";
-      case "wrong": return "Wrong Questions";
-      default: return mode;
+      case "topic":
+        return "Topic Quiz";
+      case "mixed":
+        return "Mixed Quiz";
+      case "wrong":
+        return "Wrong Questions";
+      default:
+        return mode;
     }
   };
 
@@ -91,7 +95,11 @@ export default function AttemptDetailScreen() {
             { paddingTop: headerHeight + Spacing.xl },
           ]}
         >
-          <LoadingSkeleton width="100%" height={120} style={{ marginBottom: 16 }} />
+          <LoadingSkeleton
+            width="100%"
+            height={120}
+            style={{ marginBottom: 16 }}
+          />
           <View style={styles.statsRow}>
             <CardSkeleton />
           </View>
@@ -126,7 +134,12 @@ export default function AttemptDetailScreen() {
         scrollIndicatorInsets={{ bottom: insets.bottom }}
       >
         <View style={styles.scoreSection}>
-          <View style={[styles.scoreCircle, isHighScore && styles.scoreCircleSuccess]}>
+          <View
+            style={[
+              styles.scoreCircle,
+              isHighScore && styles.scoreCircleSuccess,
+            ]}
+          >
             <LinearGradient
               colors={
                 isHighScore
@@ -145,9 +158,13 @@ export default function AttemptDetailScreen() {
             {getModeLabel(attempt.mode)}
           </ThemedText>
           {attempt.topicTitle ? (
-            <ThemedText style={styles.topicName}>{attempt.topicTitle}</ThemedText>
+            <ThemedText style={styles.topicName}>
+              {attempt.topicTitle}
+            </ThemedText>
           ) : null}
-          <ThemedText style={styles.dateText}>{formatDate(attempt.date)}</ThemedText>
+          <ThemedText style={styles.dateText}>
+            {formatDate(attempt.date)}
+          </ThemedText>
         </View>
 
         <View style={styles.statsRow}>
@@ -188,7 +205,11 @@ export default function AttemptDetailScreen() {
                 <View
                   style={[
                     styles.questionBadge,
-                    { backgroundColor: q.isCorrect ? Colors.dark.success : Colors.dark.error },
+                    {
+                      backgroundColor: q.isCorrect
+                        ? Colors.dark.success
+                        : Colors.dark.error,
+                    },
                   ]}
                 >
                   <Feather
@@ -222,7 +243,8 @@ export default function AttemptDetailScreen() {
                           style={[
                             styles.optionLabelText,
                             isCorrect && { color: Colors.dark.success },
-                            isSelected && !isCorrect && { color: Colors.dark.error },
+                            isSelected &&
+                              !isCorrect && { color: Colors.dark.error },
                           ]}
                         >
                           {option.label}
@@ -232,7 +254,8 @@ export default function AttemptDetailScreen() {
                         style={[
                           styles.optionText,
                           isCorrect && { color: Colors.dark.success },
-                          isSelected && !isCorrect && { color: Colors.dark.error },
+                          isSelected &&
+                            !isCorrect && { color: Colors.dark.error },
                         ]}
                       >
                         {option.text}
@@ -241,7 +264,9 @@ export default function AttemptDetailScreen() {
                         <Feather
                           name={isCorrect ? "check-circle" : "x-circle"}
                           size={16}
-                          color={isCorrect ? Colors.dark.success : Colors.dark.error}
+                          color={
+                            isCorrect ? Colors.dark.success : Colors.dark.error
+                          }
                           style={styles.optionIcon}
                         />
                       ) : isCorrect ? (
@@ -261,9 +286,13 @@ export default function AttemptDetailScreen() {
                 <View style={styles.explanationContainer}>
                   <View style={styles.explanationHeader}>
                     <Feather name="info" size={14} color={Colors.dark.info} />
-                    <ThemedText style={styles.explanationLabel}>Explanation</ThemedText>
+                    <ThemedText style={styles.explanationLabel}>
+                      Explanation
+                    </ThemedText>
                   </View>
-                  <ThemedText style={styles.explanationText}>{q.explanation}</ThemedText>
+                  <ThemedText style={styles.explanationText}>
+                    {q.explanation}
+                  </ThemedText>
                 </View>
               ) : null}
             </GlassCard>

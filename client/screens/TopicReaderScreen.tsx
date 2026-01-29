@@ -126,11 +126,31 @@ export default function TopicReaderScreen() {
             { paddingTop: headerHeight + Spacing.xl },
           ]}
         >
-          <LoadingSkeleton width="80%" height={32} style={{ marginBottom: 24 }} />
-          <LoadingSkeleton width="100%" height={16} style={{ marginBottom: 12 }} />
-          <LoadingSkeleton width="100%" height={16} style={{ marginBottom: 12 }} />
-          <LoadingSkeleton width="90%" height={16} style={{ marginBottom: 12 }} />
-          <LoadingSkeleton width="100%" height={16} style={{ marginBottom: 24 }} />
+          <LoadingSkeleton
+            width="80%"
+            height={32}
+            style={{ marginBottom: 24 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={16}
+            style={{ marginBottom: 12 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={16}
+            style={{ marginBottom: 12 }}
+          />
+          <LoadingSkeleton
+            width="90%"
+            height={16}
+            style={{ marginBottom: 12 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={16}
+            style={{ marginBottom: 24 }}
+          />
           <LoadingSkeleton width="100%" height={200} borderRadius={16} />
         </ScrollView>
       </BackgroundGradient>
@@ -181,13 +201,19 @@ export default function TopicReaderScreen() {
           />
         ) : (
           <View style={styles.completedBadge}>
-            <Feather name="check-circle" size={20} color={Colors.dark.success} />
+            <Feather
+              name="check-circle"
+              size={20}
+              color={Colors.dark.success}
+            />
             <ThemedText style={styles.completedText}>Completed</ThemedText>
           </View>
         )}
       </ScrollView>
 
-      <View style={[styles.floatingNav, { bottom: insets.bottom + Spacing.lg }]}>
+      <View
+        style={[styles.floatingNav, { bottom: insets.bottom + Spacing.lg }]}
+      >
         {topic?.previousTopicId ? (
           <Pressable
             style={styles.navButton}
@@ -204,11 +230,11 @@ export default function TopicReaderScreen() {
         {topic?.nextTopicId ? (
           <Pressable
             style={[styles.navButton, styles.navButtonPrimary]}
-            onPress={() =>
-              navigation.setParams({ topicId: topic.nextTopicId })
-            }
+            onPress={() => navigation.setParams({ topicId: topic.nextTopicId })}
           >
-            <ThemedText style={styles.navButtonTextPrimary}>Next Topic</ThemedText>
+            <ThemedText style={styles.navButtonTextPrimary}>
+              Next Topic
+            </ThemedText>
             <Feather name="chevron-right" size={24} color="#fff" />
           </Pressable>
         ) : null}

@@ -15,7 +15,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type RecentActivityScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type RecentActivityScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface Activity {
   id: string;
@@ -32,7 +33,11 @@ export default function RecentActivityScreen() {
   const navigation = useNavigation<RecentActivityScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: activities, isLoading, refetch } = useQuery<Activity[]>({
+  const {
+    data: activities,
+    isLoading,
+    refetch,
+  } = useQuery<Activity[]>({
     queryKey: ["/api/recent-activity"],
   });
 
@@ -73,7 +78,9 @@ export default function RecentActivityScreen() {
       }
       icon={<Feather name="clock" size={24} color={Colors.dark.primary} />}
       rightElement={
-        <ThemedText style={styles.timeText}>{formatTimeAgo(item.viewedAt)}</ThemedText>
+        <ThemedText style={styles.timeText}>
+          {formatTimeAgo(item.viewedAt)}
+        </ThemedText>
       }
       testID={`card-activity-${item.id}`}
       style={{ marginBottom: Spacing.md }}
@@ -108,7 +115,9 @@ export default function RecentActivityScreen() {
             paddingTop: headerHeight + Spacing.xl,
             paddingBottom: insets.bottom + Spacing.xl,
           },
-          (!activities || activities.length === 0) && !isLoading && styles.emptyList,
+          (!activities || activities.length === 0) &&
+            !isLoading &&
+            styles.emptyList,
         ]}
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         refreshControl={

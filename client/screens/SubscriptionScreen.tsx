@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { StyleSheet, View, ScrollView, Pressable, ActivityIndicator, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Pressable,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
@@ -15,7 +22,8 @@ import { usePurchases } from "@/lib/purchases";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type SubscriptionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type SubscriptionScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface FallbackPlan {
   id: string;
@@ -104,9 +112,11 @@ export default function SubscriptionScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<SubscriptionScreenNavigationProp>();
-  const { packages, loading, isSubscribed, purchase, restorePurchases } = usePurchases();
-  
-  const [selectedPackage, setSelectedPackage] = useState<PurchasesPackage | null>(null);
+  const { packages, loading, isSubscribed, purchase, restorePurchases } =
+    usePurchases();
+
+  const [selectedPackage, setSelectedPackage] =
+    useState<PurchasesPackage | null>(null);
   const [selectedFallback, setSelectedFallback] = useState<string>("quarterly");
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -115,13 +125,13 @@ export default function SubscriptionScreen() {
 
   const handlePurchase = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     if (hasRevenueCatPackages && selectedPackage) {
       setPurchasing(true);
       try {
         const success = await purchase(selectedPackage);
         setPurchasing(false);
-        
+
         if (success) {
           navigation.replace("PurchaseSuccess");
         }
@@ -158,7 +168,11 @@ export default function SubscriptionScreen() {
           ]}
         >
           <View style={styles.successIcon}>
-            <Feather name="check-circle" size={64} color={Colors.dark.success} />
+            <Feather
+              name="check-circle"
+              size={64}
+              color={Colors.dark.success}
+            />
           </View>
           <ThemedText type="h2" style={styles.successTitle}>
             You're Subscribed!
@@ -181,15 +195,18 @@ export default function SubscriptionScreen() {
       <BackgroundGradient>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.dark.primary} />
-          <ThemedText style={styles.loadingText}>Loading subscription options...</ThemedText>
+          <ThemedText style={styles.loadingText}>
+            Loading subscription options...
+          </ThemedText>
         </View>
       </BackgroundGradient>
     );
   }
 
-  const selectedPlanFeatures = hasRevenueCatPackages && selectedPackage
-    ? getFeatures(selectedPackage.identifier)
-    : fallbackPlans.find((p) => p.id === selectedFallback)?.features || [];
+  const selectedPlanFeatures =
+    hasRevenueCatPackages && selectedPackage
+      ? getFeatures(selectedPackage.identifier)
+      : fallbackPlans.find((p) => p.id === selectedFallback)?.features || [];
 
   return (
     <BackgroundGradient>
@@ -213,27 +230,84 @@ export default function SubscriptionScreen() {
         </View>
 
         <View style={styles.plansContainer}>
-          {hasRevenueCatPackages ? (
-            packages.map((pkg) => {
-              const isSelected = selectedPackage?.identifier === pkg.identifier;
-              const isPopular = pkg.identifier.includes("quarterly") || pkg.packageType === "THREE_MONTH";
-              
-              return (
+          {hasRevenueCatPackages
+            ? packages.map((pkg) => {
+                const isSelected =
+                  selectedPackage?.identifier === pkg.identifier;
+                const isPopular =
+                  pkg.identifier.includes("quarterly") ||
+                  pkg.packageType === "THREE_MONTH";
+
+                return (
+                  <Pressable
+                    key={pkg.identifier}
+                    onPress={() => {
+                      setSelectedPackage(pkg);
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    style={[
+                      styles.planCard,
+                      isSelected && styles.planCardSelected,
+                      isPopular && styles.planCardPopular,
+                    ]}
+                  >
+                    {isPopular ? (
+                      <View style={styles.popularBadge}>
+                        <ThemedText style={styles.popularText}>
+                          BEST VALUE
+                        </ThemedText>
+                      </View>
+                    ) : null}
+
+                    <View style={styles.planHeader}>
+                      <View
+                        style={[
+                          styles.radioOuter,
+                          isSelected && styles.radioOuterSelected,
+                        ]}
+                      >
+                        {isSelected ? <View style={styles.radioInner} /> : null}
+                      </View>
+                      <View style={styles.planInfo}>
+                        <ThemedText type="h4" style={styles.planName}>
+                          {pkg.product.title}
+                        </ThemedText>
+                        {pkg.product.description ? (
+                          <ThemedText
+                            style={styles.planDescription}
+                            numberOfLines={1}
+                          >
+                            {pkg.product.description}
+                          </ThemedText>
+                        ) : null}
+                      </View>
+                      <View style={styles.priceContainer}>
+                        <ThemedText type="h3" style={styles.price}>
+                          {pkg.product.priceString}
+                        </ThemedText>
+                      </View>
+                    </View>
+                  </Pressable>
+                );
+              })
+            : fallbackPlans.map((plan) => (
                 <Pressable
-                  key={pkg.identifier}
+                  key={plan.id}
                   onPress={() => {
-                    setSelectedPackage(pkg);
+                    setSelectedFallback(plan.id);
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
                   style={[
                     styles.planCard,
-                    isSelected && styles.planCardSelected,
-                    isPopular && styles.planCardPopular,
+                    selectedFallback === plan.id && styles.planCardSelected,
+                    plan.popular && styles.planCardPopular,
                   ]}
                 >
-                  {isPopular ? (
+                  {plan.popular ? (
                     <View style={styles.popularBadge}>
-                      <ThemedText style={styles.popularText}>BEST VALUE</ThemedText>
+                      <ThemedText style={styles.popularText}>
+                        BEST VALUE
+                      </ThemedText>
                     </View>
                   ) : null}
 
@@ -241,86 +315,45 @@ export default function SubscriptionScreen() {
                     <View
                       style={[
                         styles.radioOuter,
-                        isSelected && styles.radioOuterSelected,
+                        selectedFallback === plan.id &&
+                          styles.radioOuterSelected,
                       ]}
                     >
-                      {isSelected ? <View style={styles.radioInner} /> : null}
+                      {selectedFallback === plan.id ? (
+                        <View style={styles.radioInner} />
+                      ) : null}
                     </View>
                     <View style={styles.planInfo}>
                       <ThemedText type="h4" style={styles.planName}>
-                        {pkg.product.title}
+                        {plan.name}
                       </ThemedText>
-                      {pkg.product.description ? (
-                        <ThemedText style={styles.planDescription} numberOfLines={1}>
-                          {pkg.product.description}
-                        </ThemedText>
+                      {plan.savings ? (
+                        <View style={styles.savingsBadge}>
+                          <ThemedText style={styles.savingsText}>
+                            {plan.savings}
+                          </ThemedText>
+                        </View>
                       ) : null}
                     </View>
                     <View style={styles.priceContainer}>
                       <ThemedText type="h3" style={styles.price}>
-                        {pkg.product.priceString}
+                        {plan.price}
+                      </ThemedText>
+                      <ThemedText style={styles.period}>
+                        {plan.period}
                       </ThemedText>
                     </View>
                   </View>
                 </Pressable>
-              );
-            })
-          ) : (
-            fallbackPlans.map((plan) => (
-              <Pressable
-                key={plan.id}
-                onPress={() => {
-                  setSelectedFallback(plan.id);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
-                style={[
-                  styles.planCard,
-                  selectedFallback === plan.id && styles.planCardSelected,
-                  plan.popular && styles.planCardPopular,
-                ]}
-              >
-                {plan.popular ? (
-                  <View style={styles.popularBadge}>
-                    <ThemedText style={styles.popularText}>BEST VALUE</ThemedText>
-                  </View>
-                ) : null}
-
-                <View style={styles.planHeader}>
-                  <View
-                    style={[
-                      styles.radioOuter,
-                      selectedFallback === plan.id && styles.radioOuterSelected,
-                    ]}
-                  >
-                    {selectedFallback === plan.id ? <View style={styles.radioInner} /> : null}
-                  </View>
-                  <View style={styles.planInfo}>
-                    <ThemedText type="h4" style={styles.planName}>
-                      {plan.name}
-                    </ThemedText>
-                    {plan.savings ? (
-                      <View style={styles.savingsBadge}>
-                        <ThemedText style={styles.savingsText}>{plan.savings}</ThemedText>
-                      </View>
-                    ) : null}
-                  </View>
-                  <View style={styles.priceContainer}>
-                    <ThemedText type="h3" style={styles.price}>
-                      {plan.price}
-                    </ThemedText>
-                    <ThemedText style={styles.period}>{plan.period}</ThemedText>
-                  </View>
-                </View>
-              </Pressable>
-            ))
-          )}
+              ))}
         </View>
 
         {!hasRevenueCatPackages && Platform.OS !== "web" ? (
           <View style={styles.previewNotice}>
             <Feather name="info" size={16} color={Colors.dark.primary} />
             <ThemedText style={styles.previewText}>
-              Running in preview mode. Configure RevenueCat to enable real purchases.
+              Running in preview mode. Configure RevenueCat to enable real
+              purchases.
             </ThemedText>
           </View>
         ) : null}
@@ -338,9 +371,10 @@ export default function SubscriptionScreen() {
         </View>
 
         <PrimaryButton
-          title={hasRevenueCatPackages && selectedPackage 
-            ? `Subscribe for ${selectedPackage.product.priceString}`
-            : "Subscribe Now"
+          title={
+            hasRevenueCatPackages && selectedPackage
+              ? `Subscribe for ${selectedPackage.product.priceString}`
+              : "Subscribe Now"
           }
           onPress={handlePurchase}
           loading={purchasing}
@@ -349,15 +383,17 @@ export default function SubscriptionScreen() {
           testID="button-subscribe"
         />
 
-        <Pressable 
-          style={styles.restoreButton} 
+        <Pressable
+          style={styles.restoreButton}
           onPress={handleRestore}
           disabled={restoring}
         >
           {restoring ? (
             <ActivityIndicator size="small" color={Colors.dark.primary} />
           ) : (
-            <ThemedText style={styles.restoreText}>Restore Purchases</ThemedText>
+            <ThemedText style={styles.restoreText}>
+              Restore Purchases
+            </ThemedText>
           )}
         </Pressable>
 

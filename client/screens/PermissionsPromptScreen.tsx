@@ -17,7 +17,8 @@ import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const ONBOARDING_COMPLETE_KEY = "@maternal_mind_onboarding_complete";
 
-type PermissionsPromptScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type PermissionsPromptScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 export default function PermissionsPromptScreen() {
   const insets = useSafeAreaInsets();
@@ -29,22 +30,22 @@ export default function PermissionsPromptScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+
       if (existingStatus === "granted") {
         await completeOnboarding();
         return;
       }
 
       const { status } = await Notifications.requestPermissionsAsync();
-      
+
       if (status === "denied" && Platform.OS !== "web") {
         try {
           await Linking.openSettings();
-        } catch (error) {
-        }
+        } catch (error) {}
       }
-      
+
       await completeOnboarding();
     } catch (error) {
       await completeOnboarding();
@@ -61,8 +62,7 @@ export default function PermissionsPromptScreen() {
   const completeOnboarding = async () => {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
-    } catch (error) {
-    }
+    } catch (error) {}
     navigation.reset({
       index: 0,
       routes: [{ name: "Register" }],
@@ -72,7 +72,11 @@ export default function PermissionsPromptScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[Colors.dark.backgroundRoot, "#0a1518", Colors.dark.backgroundRoot]}
+        colors={[
+          Colors.dark.backgroundRoot,
+          "#0a1518",
+          Colors.dark.backgroundRoot,
+        ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -98,8 +102,8 @@ export default function PermissionsPromptScreen() {
             Stay on Track
           </ThemedText>
           <ThemedText style={styles.description}>
-            Enable notifications to receive study reminders, quiz alerts, and updates
-            on your learning progress.
+            Enable notifications to receive study reminders, quiz alerts, and
+            updates on your learning progress.
           </ThemedText>
 
           <GlassCard style={styles.benefitsCard}>
@@ -108,7 +112,9 @@ export default function PermissionsPromptScreen() {
                 <Feather name="clock" size={20} color={Colors.dark.primary} />
               </View>
               <View style={styles.benefitText}>
-                <ThemedText style={styles.benefitTitle}>Study Reminders</ThemedText>
+                <ThemedText style={styles.benefitTitle}>
+                  Study Reminders
+                </ThemedText>
                 <ThemedText style={styles.benefitDesc}>
                   Get gentle nudges to keep your study streak
                 </ThemedText>
@@ -122,7 +128,9 @@ export default function PermissionsPromptScreen() {
                 <Feather name="award" size={20} color={Colors.dark.warning} />
               </View>
               <View style={styles.benefitText}>
-                <ThemedText style={styles.benefitTitle}>Achievement Alerts</ThemedText>
+                <ThemedText style={styles.benefitTitle}>
+                  Achievement Alerts
+                </ThemedText>
                 <ThemedText style={styles.benefitDesc}>
                   Celebrate your milestones and progress
                 </ThemedText>
@@ -150,7 +158,13 @@ export default function PermissionsPromptScreen() {
             title="Enable Notifications"
             onPress={handleEnableNotifications}
             loading={isRequesting}
-            icon={<Feather name="bell" size={20} color={Colors.dark.backgroundRoot} />}
+            icon={
+              <Feather
+                name="bell"
+                size={20}
+                color={Colors.dark.backgroundRoot}
+              />
+            }
             style={styles.enableButton}
             testID="button-enable-notifications"
           />

@@ -1,7 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet, View, Pressable, Alert, BackHandler, Modal, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Alert,
+  BackHandler,
+  Modal,
+  ScrollView,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation, useRoute, RouteProp, useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  RouteProp,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Feather } from "@expo/vector-icons";
@@ -19,7 +32,10 @@ import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type QuizPlayerRouteProp = RouteProp<RootStackParamList, "QuizPlayer">;
-type QuizPlayerNavigationProp = NativeStackNavigationProp<RootStackParamList, "QuizPlayer">;
+type QuizPlayerNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "QuizPlayer"
+>;
 
 interface QuizQuestion {
   id: string;
@@ -52,8 +68,8 @@ export default function QuizPlayerScreen() {
   });
 
   const submitMutation = useMutation({
-    mutationFn: async (data: { 
-      quizId: string; 
+    mutationFn: async (data: {
+      quizId: string;
       answers: Record<string, string>;
       mode: string;
       topicId?: string;
@@ -72,7 +88,8 @@ export default function QuizPlayerScreen() {
 
   const currentQuestion = quizData?.questions[currentIndex];
   const totalQuestions = quizData?.questions.length || 0;
-  const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
+  const progress =
+    totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = totalQuestions - answeredCount;
 
@@ -106,15 +123,20 @@ export default function QuizPlayerScreen() {
           "Your progress will be lost if you leave now.",
           [
             { text: "Continue Quiz", style: "cancel" },
-            { text: "Quit", style: "destructive", onPress: () => navigation.goBack() },
-          ]
+            {
+              text: "Quit",
+              style: "destructive",
+              onPress: () => navigation.goBack(),
+            },
+          ],
         );
         return true;
       };
 
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      return () => BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-    }, [navigation])
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [navigation]),
   );
 
   const handleSelectOption = (label: string) => {
@@ -127,14 +149,18 @@ export default function QuizPlayerScreen() {
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setSelectedOption(answers[quizData!.questions[currentIndex + 1]?.id] || null);
+      setSelectedOption(
+        answers[quizData!.questions[currentIndex + 1]?.id] || null,
+      );
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
-      setSelectedOption(answers[quizData!.questions[currentIndex - 1]?.id] || null);
+      setSelectedOption(
+        answers[quizData!.questions[currentIndex - 1]?.id] || null,
+      );
     }
   };
 
@@ -149,8 +175,8 @@ export default function QuizPlayerScreen() {
     if (!quizData) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setShowSubmitModal(false);
-    submitMutation.mutate({ 
-      quizId: quizData.quizId, 
+    submitMutation.mutate({
+      quizId: quizData.quizId,
       answers,
       mode,
       topicId,
@@ -171,12 +197,37 @@ export default function QuizPlayerScreen() {
   if (isLoading) {
     return (
       <BackgroundGradient>
-        <View style={[styles.container, { paddingTop: insets.top + Spacing["3xl"] }]}>
-          <LoadingSkeleton width="60%" height={20} style={{ marginBottom: 24 }} />
-          <LoadingSkeleton width="100%" height={100} style={{ marginBottom: 24 }} />
-          <LoadingSkeleton width="100%" height={60} style={{ marginBottom: 12 }} />
-          <LoadingSkeleton width="100%" height={60} style={{ marginBottom: 12 }} />
-          <LoadingSkeleton width="100%" height={60} style={{ marginBottom: 12 }} />
+        <View
+          style={[
+            styles.container,
+            { paddingTop: insets.top + Spacing["3xl"] },
+          ]}
+        >
+          <LoadingSkeleton
+            width="60%"
+            height={20}
+            style={{ marginBottom: 24 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={100}
+            style={{ marginBottom: 24 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={60}
+            style={{ marginBottom: 12 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={60}
+            style={{ marginBottom: 12 }}
+          />
+          <LoadingSkeleton
+            width="100%"
+            height={60}
+            style={{ marginBottom: 12 }}
+          />
           <LoadingSkeleton width="100%" height={60} />
         </View>
       </BackgroundGradient>
@@ -191,14 +242,14 @@ export default function QuizPlayerScreen() {
         <View style={styles.header}>
           <Pressable
             onPress={() => {
-              Alert.alert(
-                "Quit Quiz?",
-                "Your progress will be lost.",
-                [
-                  { text: "Continue", style: "cancel" },
-                  { text: "Quit", style: "destructive", onPress: () => navigation.goBack() },
-                ]
-              );
+              Alert.alert("Quit Quiz?", "Your progress will be lost.", [
+                { text: "Continue", style: "cancel" },
+                {
+                  text: "Quit",
+                  style: "destructive",
+                  onPress: () => navigation.goBack(),
+                },
+              ]);
             }}
             style={styles.closeButton}
           >
@@ -213,17 +264,26 @@ export default function QuizPlayerScreen() {
               <ThemedText style={styles.questionNumber}>
                 {currentIndex + 1} / {totalQuestions}
               </ThemedText>
-              <Feather name="grid" size={16} color={Colors.dark.textSecondary} style={{ marginLeft: 6 }} />
+              <Feather
+                name="grid"
+                size={16}
+                color={Colors.dark.textSecondary}
+                style={{ marginLeft: 6 }}
+              />
             </Pressable>
             {timeRemaining !== null ? (
-              <View style={[
-                styles.timer,
-                timeRemaining < 60 && styles.timerWarning,
-              ]}>
+              <View
+                style={[
+                  styles.timer,
+                  timeRemaining < 60 && styles.timerWarning,
+                ]}
+              >
                 <Feather
                   name="clock"
                   size={14}
-                  color={timeRemaining < 60 ? Colors.dark.error : Colors.dark.text}
+                  color={
+                    timeRemaining < 60 ? Colors.dark.error : Colors.dark.text
+                  }
                 />
                 <ThemedText
                   style={[
@@ -238,7 +298,11 @@ export default function QuizPlayerScreen() {
           </View>
         </View>
 
-        <ProgressBar progress={progress} height={4} style={styles.progressBar} />
+        <ProgressBar
+          progress={progress}
+          height={4}
+          style={styles.progressBar}
+        />
 
         <View style={styles.questionContainer}>
           <View style={styles.difficultyBadge}>
@@ -264,12 +328,17 @@ export default function QuizPlayerScreen() {
           ))}
         </View>
 
-        <View style={[styles.footer, { paddingBottom: insets.bottom + Spacing.lg }]}>
+        <View
+          style={[styles.footer, { paddingBottom: insets.bottom + Spacing.lg }]}
+        >
           <View style={styles.navButtons}>
             <Pressable
               onPress={handlePrevious}
               disabled={currentIndex === 0}
-              style={[styles.navButton, currentIndex === 0 && styles.navButtonDisabled]}
+              style={[
+                styles.navButton,
+                currentIndex === 0 && styles.navButtonDisabled,
+              ]}
             >
               <Feather name="chevron-left" size={24} color={Colors.dark.text} />
             </Pressable>
@@ -303,9 +372,21 @@ export default function QuizPlayerScreen() {
         onRequestClose={() => setShowNavigator(false)}
       >
         <View style={styles.modalOverlay}>
-          <Pressable style={styles.modalBackdrop} onPress={() => setShowNavigator(false)} />
-          <View style={[styles.navigatorSheet, { paddingBottom: insets.bottom + Spacing.lg }]}>
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+          <Pressable
+            style={styles.modalBackdrop}
+            onPress={() => setShowNavigator(false)}
+          />
+          <View
+            style={[
+              styles.navigatorSheet,
+              { paddingBottom: insets.bottom + Spacing.lg },
+            ]}
+          >
+            <BlurView
+              intensity={80}
+              tint="dark"
+              style={StyleSheet.absoluteFill}
+            />
             <View style={styles.navigatorHandle} />
             <View style={styles.navigatorHeader}>
               <ThemedText type="h4">Question Navigator</ThemedText>
@@ -315,15 +396,32 @@ export default function QuizPlayerScreen() {
             </View>
             <View style={styles.navigatorStats}>
               <View style={styles.statChip}>
-                <View style={[styles.statDot, { backgroundColor: Colors.dark.success }]} />
-                <ThemedText style={styles.statText}>{answeredCount} Answered</ThemedText>
+                <View
+                  style={[
+                    styles.statDot,
+                    { backgroundColor: Colors.dark.success },
+                  ]}
+                />
+                <ThemedText style={styles.statText}>
+                  {answeredCount} Answered
+                </ThemedText>
               </View>
               <View style={styles.statChip}>
-                <View style={[styles.statDot, { backgroundColor: Colors.dark.textMuted }]} />
-                <ThemedText style={styles.statText}>{unansweredCount} Unanswered</ThemedText>
+                <View
+                  style={[
+                    styles.statDot,
+                    { backgroundColor: Colors.dark.textMuted },
+                  ]}
+                />
+                <ThemedText style={styles.statText}>
+                  {unansweredCount} Unanswered
+                </ThemedText>
               </View>
             </View>
-            <ScrollView style={styles.navigatorGrid} contentContainerStyle={styles.navigatorGridContent}>
+            <ScrollView
+              style={styles.navigatorGrid}
+              contentContainerStyle={styles.navigatorGridContent}
+            >
               <View style={styles.questionsGrid}>
                 {quizData?.questions.map((q, index) => {
                   const isAnswered = Boolean(answers[q.id]);
@@ -363,27 +461,44 @@ export default function QuizPlayerScreen() {
         onRequestClose={() => setShowSubmitModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <Pressable style={styles.modalBackdrop} onPress={() => setShowSubmitModal(false)} />
+          <Pressable
+            style={styles.modalBackdrop}
+            onPress={() => setShowSubmitModal(false)}
+          />
           <View style={styles.submitModalContent}>
-            <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView
+              intensity={80}
+              tint="dark"
+              style={StyleSheet.absoluteFill}
+            />
             <View style={styles.submitModalIcon}>
-              <Feather name="check-circle" size={48} color={Colors.dark.primary} />
+              <Feather
+                name="check-circle"
+                size={48}
+                color={Colors.dark.primary}
+              />
             </View>
             <ThemedText type="h3" style={styles.submitModalTitle}>
               Submit Quiz?
             </ThemedText>
             <ThemedText style={styles.submitModalText}>
               You've answered {answeredCount} of {totalQuestions} questions.
-              {unansweredCount > 0 ? ` ${unansweredCount} question${unansweredCount > 1 ? 's' : ''} will be marked as incorrect.` : ''}
+              {unansweredCount > 0
+                ? ` ${unansweredCount} question${unansweredCount > 1 ? "s" : ""} will be marked as incorrect.`
+                : ""}
             </ThemedText>
             <View style={styles.submitModalStats}>
               <View style={styles.submitModalStat}>
                 <Feather name="check" size={16} color={Colors.dark.success} />
-                <ThemedText style={styles.submitModalStatText}>{answeredCount} Answered</ThemedText>
+                <ThemedText style={styles.submitModalStatText}>
+                  {answeredCount} Answered
+                </ThemedText>
               </View>
               <View style={styles.submitModalStat}>
                 <Feather name="minus" size={16} color={Colors.dark.textMuted} />
-                <ThemedText style={styles.submitModalStatText}>{unansweredCount} Skipped</ThemedText>
+                <ThemedText style={styles.submitModalStatText}>
+                  {unansweredCount} Skipped
+                </ThemedText>
               </View>
             </View>
             <View style={styles.submitModalButtons}>
@@ -391,7 +506,9 @@ export default function QuizPlayerScreen() {
                 onPress={() => setShowSubmitModal(false)}
                 style={styles.submitModalCancelButton}
               >
-                <ThemedText style={styles.submitModalCancelText}>Review Answers</ThemedText>
+                <ThemedText style={styles.submitModalCancelText}>
+                  Review Answers
+                </ThemedText>
               </Pressable>
               <PrimaryButton
                 title="Submit"

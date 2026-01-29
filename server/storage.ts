@@ -22,7 +22,7 @@ import {
   type QuizAttempt,
   type PasswordResetToken,
   type RecentActivity,
-} from "@shared/schema";
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, avg, gt } from "drizzle-orm";
 import crypto from "crypto";
@@ -31,42 +31,56 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   getBooks(): Promise<Book[]>;
   getBook(id: string): Promise<Book | undefined>;
-  
+
   getChaptersByBook(bookId: string): Promise<Chapter[]>;
   getChapter(id: string): Promise<Chapter | undefined>;
-  
+
   getTopicsByChapter(chapterId: string): Promise<Topic[]>;
   getTopic(id: string): Promise<Topic | undefined>;
-  
+
   getContentBlocksByTopic(topicId: string): Promise<ContentBlock[]>;
-  
+
   getMCQsByTopic(topicId: string): Promise<MCQ[]>;
   getMCQs(limit?: number, difficulty?: string): Promise<MCQ[]>;
   getMCQ(id: string): Promise<MCQ | undefined>;
-  
+
   getUserProgress(userId: string): Promise<UserProgress[]>;
-  getTopicProgress(userId: string, topicId: string): Promise<UserProgress | undefined>;
+  getTopicProgress(
+    userId: string,
+    topicId: string,
+  ): Promise<UserProgress | undefined>;
   markTopicComplete(userId: string, topicId: string): Promise<void>;
-  
+
   getBookmarks(userId: string): Promise<Bookmark[]>;
   toggleBookmark(userId: string, topicId: string): Promise<boolean>;
   isBookmarked(userId: string, topicId: string): Promise<boolean>;
-  
-  createQuizAttempt(attempt: Omit<QuizAttempt, "id" | "createdAt">): Promise<QuizAttempt>;
+
+  createQuizAttempt(
+    attempt: Omit<QuizAttempt, "id" | "createdAt">,
+  ): Promise<QuizAttempt>;
   getQuizAttempt(id: string): Promise<QuizAttempt | undefined>;
   getQuizAttempts(userId: string): Promise<QuizAttempt[]>;
-  getQuizStats(userId: string): Promise<{ totalAttempts: number; averageScore: number; wrongQuestionsCount: number }>;
+  getQuizStats(
+    userId: string,
+  ): Promise<{
+    totalAttempts: number;
+    averageScore: number;
+    wrongQuestionsCount: number;
+  }>;
   getWrongQuestions(userId: string): Promise<MCQ[]>;
-  
+
   createPasswordResetToken(userId: string): Promise<string>;
   getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
   markTokenUsed(tokenId: string): Promise<void>;
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
-  updateUserProfile(userId: string, data: { name: string }): Promise<User | undefined>;
-  
+  updateUserProfile(
+    userId: string,
+    data: { name: string },
+  ): Promise<User | undefined>;
+
   recordTopicView(userId: string, topicId: string): Promise<void>;
   getRecentActivity(userId: string, limit?: number): Promise<RecentActivity[]>;
 }
@@ -109,7 +123,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getChapter(id: string): Promise<Chapter | undefined> {
-    const [chapter] = await db.select().from(chapters).where(eq(chapters.id, id));
+    const [chapter] = await db
+      .select()
+      .from(chapters)
+      .where(eq(chapters.id, id));
     return chapter || undefined;
   }
 
@@ -144,7 +161,12 @@ export class DatabaseStorage implements IStorage {
   async getMCQs(limit = 10, difficulty?: string): Promise<MCQ[]> {
     let query = db.select().from(mcqs).where(eq(mcqs.isPublished, true));
     if (difficulty && difficulty !== "all") {
-      query = db.select().from(mcqs).where(and(eq(mcqs.isPublished, true), eq(mcqs.difficulty, difficulty)));
+      query = db
+        .select()
+        .from(mcqs)
+        .where(
+          and(eq(mcqs.isPublished, true), eq(mcqs.difficulty, difficulty)),
+        );
     }
     return await query.limit(limit).orderBy(sql`RANDOM()`);
   }
@@ -155,14 +177,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserProgress(userId: string): Promise<UserProgress[]> {
-    return await db.select().from(userProgress).where(eq(userProgress.userId, userId));
+    return await db
+      .select()
+      .from(userProgress)
+      .where(eq(userProgress.userId, userId));
   }
 
-  async getTopicProgress(userId: string, topicId: string): Promise<UserProgress | undefined> {
+  async getTopicProgress(
+    userId: string,
+    topicId: string,
+  ): Promise<UserProgress | undefined> {
     const [progress] = await db
       .select()
       .from(userProgress)
-      .where(and(eq(userProgress.userId, userId), eq(userProgress.topicId, topicId)));
+      .where(
+        and(eq(userProgress.userId, userId), eq(userProgress.topicId, topicId)),
+      );
     return progress || undefined;
   }
 
@@ -214,13 +244,18 @@ export class DatabaseStorage implements IStorage {
     return !!existing;
   }
 
-  async createQuizAttempt(attempt: Omit<QuizAttempt, "id" | "createdAt">): Promise<QuizAttempt> {
+  async createQuizAttempt(
+    attempt: Omit<QuizAttempt, "id" | "createdAt">,
+  ): Promise<QuizAttempt> {
     const [result] = await db.insert(quizAttempts).values(attempt).returning();
     return result;
   }
 
   async getQuizAttempt(id: string): Promise<QuizAttempt | undefined> {
-    const [attempt] = await db.select().from(quizAttempts).where(eq(quizAttempts.id, id));
+    const [attempt] = await db
+      .select()
+      .from(quizAttempts)
+      .where(eq(quizAttempts.id, id));
     return attempt || undefined;
   }
 
@@ -232,13 +267,22 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(quizAttempts.createdAt));
   }
 
-  async getQuizStats(userId: string): Promise<{ totalAttempts: number; averageScore: number; wrongQuestionsCount: number }> {
+  async getQuizStats(
+    userId: string,
+  ): Promise<{
+    totalAttempts: number;
+    averageScore: number;
+    wrongQuestionsCount: number;
+  }> {
     const attempts = await this.getQuizAttempts(userId);
     const totalAttempts = attempts.length;
-    const averageScore = totalAttempts > 0
-      ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / totalAttempts)
-      : 0;
-    
+    const averageScore =
+      totalAttempts > 0
+        ? Math.round(
+          attempts.reduce((sum, a) => sum + a.score, 0) / totalAttempts,
+        )
+        : 0;
+
     let wrongQuestionsCount = 0;
     for (const attempt of attempts) {
       wrongQuestionsCount += attempt.wrongCount;
@@ -249,23 +293,27 @@ export class DatabaseStorage implements IStorage {
 
   async getWrongQuestions(userId: string): Promise<MCQ[]> {
     const attempts = await this.getQuizAttempts(userId);
-    
+
     // Sort attempts by date (oldest first) to process in chronological order
-    const sortedAttempts = [...attempts].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    const sortedAttempts = [...attempts].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );
-    
+
     // Track the latest result for each question
     // Process from oldest to newest so latest answer overwrites
     const questionStatus = new Map<string, boolean>();
-    
+
     for (const attempt of sortedAttempts) {
-      const answers = attempt.answers as Record<string, { selected: string; correct: string; isCorrect: boolean }>;
+      const answers = attempt.answers as Record<
+        string,
+        { selected: string; correct: string; isCorrect: boolean }
+      >;
       for (const [mcqId, answer] of Object.entries(answers)) {
         questionStatus.set(mcqId, answer.isCorrect);
       }
     }
-    
+
     // Get only questions that are still marked as wrong (not corrected in later attempts)
     const wrongIds: string[] = [];
     for (const [mcqId, isCorrect] of questionStatus.entries()) {
@@ -276,24 +324,29 @@ export class DatabaseStorage implements IStorage {
 
     if (wrongIds.length === 0) return [];
 
-    const allMcqs = await db.select().from(mcqs).where(eq(mcqs.isPublished, true));
-    return allMcqs.filter(m => wrongIds.includes(m.id));
+    const allMcqs = await db
+      .select()
+      .from(mcqs)
+      .where(eq(mcqs.isPublished, true));
+    return allMcqs.filter((m) => wrongIds.includes(m.id));
   }
 
   async createPasswordResetToken(userId: string): Promise<string> {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
-    
+
     await db.insert(passwordResetTokens).values({
       userId,
       token,
       expiresAt,
     });
-    
+
     return token;
   }
 
-  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+  async getPasswordResetToken(
+    token: string,
+  ): Promise<PasswordResetToken | undefined> {
     const [resetToken] = await db
       .select()
       .from(passwordResetTokens)
@@ -301,8 +354,8 @@ export class DatabaseStorage implements IStorage {
         and(
           eq(passwordResetTokens.token, token),
           eq(passwordResetTokens.used, false),
-          gt(passwordResetTokens.expiresAt, new Date())
-        )
+          gt(passwordResetTokens.expiresAt, new Date()),
+        ),
       );
     return resetToken || undefined;
   }
@@ -314,14 +367,20 @@ export class DatabaseStorage implements IStorage {
       .where(eq(passwordResetTokens.id, tokenId));
   }
 
-  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+  async updateUserPassword(
+    userId: string,
+    hashedPassword: string,
+  ): Promise<void> {
     await db
       .update(users)
       .set({ password: hashedPassword })
       .where(eq(users.id, userId));
   }
 
-  async updateUserProfile(userId: string, data: { name: string }): Promise<User | undefined> {
+  async updateUserProfile(
+    userId: string,
+    data: { name: string },
+  ): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({ name: data.name })
@@ -335,7 +394,12 @@ export class DatabaseStorage implements IStorage {
     const [existing] = await db
       .select()
       .from(recentActivity)
-      .where(and(eq(recentActivity.userId, userId), eq(recentActivity.topicId, topicId)));
+      .where(
+        and(
+          eq(recentActivity.userId, userId),
+          eq(recentActivity.topicId, topicId),
+        ),
+      );
 
     if (existing) {
       // Update the viewedAt timestamp
@@ -349,7 +413,10 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getRecentActivity(userId: string, limit: number = 20): Promise<RecentActivity[]> {
+  async getRecentActivity(
+    userId: string,
+    limit: number = 20,
+  ): Promise<RecentActivity[]> {
     return await db
       .select()
       .from(recentActivity)

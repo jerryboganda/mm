@@ -119,7 +119,11 @@ export function GlassCard({
         <View style={styles.cardBackground}>
           <LinearGradient
             colors={[
-              active ? "rgba(0,212,255,0.12)" : isSubtle ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)",
+              active
+                ? "rgba(0,212,255,0.12)"
+                : isSubtle
+                  ? "rgba(255,255,255,0.02)"
+                  : "rgba(255,255,255,0.04)",
               active ? "rgba(0,212,255,0.04)" : "rgba(255,255,255,0.01)",
             ]}
             style={StyleSheet.absoluteFill}
@@ -138,8 +142,8 @@ export function GlassCard({
       >
         <LinearGradient
           colors={[
-            active ? "rgba(0,212,255,0.15)" : "rgba(255,255,255,0.06)",
-            active ? "rgba(0,212,255,0.05)" : "rgba(255,255,255,0.02)",
+            active ? "rgba(0,212,255,0.3)" : "rgba(255,255,255,0.15)",
+            active ? "rgba(0,212,255,0.15)" : "rgba(255,255,255,0.08)",
           ]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}

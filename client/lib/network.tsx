@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
 import NetInfo from "@react-native-community/netinfo";
 
 interface NetworkContextType {
@@ -12,7 +19,9 @@ const NetworkContext = createContext<NetworkContextType | null>(null);
 
 export function NetworkProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState<boolean | null>(true);
-  const [isInternetReachable, setIsInternetReachable] = useState<boolean | null>(true);
+  const [isInternetReachable, setIsInternetReachable] = useState<
+    boolean | null
+  >(true);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {

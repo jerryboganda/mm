@@ -77,7 +77,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { hasCompletedOnboarding, isLoading: onboardingLoading } = useOnboarding();
+  const { hasCompletedOnboarding, isLoading: onboardingLoading } =
+    useOnboarding();
 
   if (authLoading || onboardingLoading) {
     return (

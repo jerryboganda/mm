@@ -17,8 +17,12 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type TopicProgressDetailRouteProp = RouteProp<RootStackParamList, "TopicProgressDetail">;
-type TopicProgressDetailNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type TopicProgressDetailRouteProp = RouteProp<
+  RootStackParamList,
+  "TopicProgressDetail"
+>;
+type TopicProgressDetailNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface RecentAttempt {
   id: string;
@@ -42,7 +46,7 @@ interface TopicProgressData {
 }
 
 const { width: screenWidth } = Dimensions.get("window");
-const chartWidth = screenWidth - (Spacing.lg * 2) - 32;
+const chartWidth = screenWidth - Spacing.lg * 2 - 32;
 
 export default function TopicProgressDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -113,7 +117,10 @@ export default function TopicProgressDetailScreen() {
                 <View key={index} style={styles.chartBarContainer}>
                   <View style={[styles.chartBar, { height: barHeight }]}>
                     <LinearGradient
-                      colors={[getScoreColor(point.score), `${getScoreColor(point.score)}80`]}
+                      colors={[
+                        getScoreColor(point.score),
+                        `${getScoreColor(point.score)}80`,
+                      ]}
                       style={StyleSheet.absoluteFill}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 0, y: 1 }}
@@ -141,8 +148,16 @@ export default function TopicProgressDetailScreen() {
             { paddingTop: headerHeight + Spacing.xl },
           ]}
         >
-          <LoadingSkeleton width="60%" height={24} style={{ marginBottom: 8 }} />
-          <LoadingSkeleton width="40%" height={16} style={{ marginBottom: 24 }} />
+          <LoadingSkeleton
+            width="60%"
+            height={24}
+            style={{ marginBottom: 8 }}
+          />
+          <LoadingSkeleton
+            width="40%"
+            height={16}
+            style={{ marginBottom: 24 }}
+          />
           <View style={styles.statsRow}>
             <CardSkeleton />
           </View>
@@ -200,9 +215,7 @@ export default function TopicProgressDetailScreen() {
 
         <View style={styles.section}>
           <ThemedText style={styles.sectionLabel}>ACCURACY TREND</ThemedText>
-          <GlassCard style={styles.chartCard}>
-            {renderTrendChart()}
-          </GlassCard>
+          <GlassCard style={styles.chartCard}>{renderTrendChart()}</GlassCard>
         </View>
 
         <View style={styles.section}>
@@ -211,7 +224,11 @@ export default function TopicProgressDetailScreen() {
             progress.recentAttempts.map((attempt) => (
               <GlassCard
                 key={attempt.id}
-                onPress={() => navigation.navigate("AttemptDetail", { attemptId: attempt.id })}
+                onPress={() =>
+                  navigation.navigate("AttemptDetail", {
+                    attemptId: attempt.id,
+                  })
+                }
                 style={styles.attemptCard}
               >
                 <View style={styles.attemptRow}>
@@ -221,7 +238,11 @@ export default function TopicProgressDetailScreen() {
                     </ThemedText>
                     <View style={styles.attemptStats}>
                       <View style={styles.attemptStat}>
-                        <Feather name="check" size={12} color={Colors.dark.success} />
+                        <Feather
+                          name="check"
+                          size={12}
+                          color={Colors.dark.success}
+                        />
                         <ThemedText style={styles.attemptStatText}>
                           {attempt.correctCount}/{attempt.totalQuestions}
                         </ThemedText>
@@ -235,7 +256,10 @@ export default function TopicProgressDetailScreen() {
                     ]}
                   >
                     <ThemedText
-                      style={[styles.scoreText, { color: getScoreColor(attempt.score) }]}
+                      style={[
+                        styles.scoreText,
+                        { color: getScoreColor(attempt.score) },
+                      ]}
                     >
                       {attempt.score}%
                     </ThemedText>
@@ -255,7 +279,9 @@ export default function TopicProgressDetailScreen() {
         <View style={styles.actionSection}>
           <PrimaryButton
             title="Practice This Topic"
-            onPress={() => navigation.navigate("QuizPlayer", { mode: "topic", topicId })}
+            onPress={() =>
+              navigation.navigate("QuizPlayer", { mode: "topic", topicId })
+            }
             icon="play"
             testID="button-practice-topic"
           />

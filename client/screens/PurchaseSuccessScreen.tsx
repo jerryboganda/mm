@@ -15,7 +15,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type PurchaseSuccessScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type PurchaseSuccessScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 const unlockFeatures = [
   { icon: "book-open" as const, text: "All textbook content unlocked" },
@@ -68,7 +69,9 @@ export default function PurchaseSuccessScreen() {
           },
         ]}
       >
-        <Animated.View style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}>
+        <Animated.View
+          style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}
+        >
           <LinearGradient
             colors={[Colors.dark.success, "#16a34a"]}
             style={styles.iconGradient}
@@ -84,7 +87,8 @@ export default function PurchaseSuccessScreen() {
             Welcome to Premium!
           </ThemedText>
           <ThemedText style={styles.subtitle}>
-            Your subscription is now active. Enjoy unlimited access to all Maternal Mind features.
+            Your subscription is now active. Enjoy unlimited access to all
+            Maternal Mind features.
           </ThemedText>
         </Animated.View>
 
@@ -100,9 +104,15 @@ export default function PurchaseSuccessScreen() {
                 ]}
               >
                 <View style={styles.featureIcon}>
-                  <Feather name={feature.icon} size={18} color={Colors.dark.success} />
+                  <Feather
+                    name={feature.icon}
+                    size={18}
+                    color={Colors.dark.success}
+                  />
                 </View>
-                <ThemedText style={styles.featureText}>{feature.text}</ThemedText>
+                <ThemedText style={styles.featureText}>
+                  {feature.text}
+                </ThemedText>
                 <Feather name="check" size={18} color={Colors.dark.success} />
               </View>
             ))}

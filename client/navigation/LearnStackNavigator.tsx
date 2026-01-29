@@ -27,7 +27,8 @@ export type LearnStackParamList = {
 const Stack = createNativeStackNavigator<LearnStackParamList>();
 
 function SearchButton() {
-  const navigation = useNavigation<NativeStackNavigationProp<LearnStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<LearnStackParamList>>();
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -35,7 +36,11 @@ function SearchButton() {
   };
 
   return (
-    <Pressable onPress={handlePress} style={{ padding: Spacing.sm }} hitSlop={10}>
+    <Pressable
+      onPress={handlePress}
+      style={{ padding: Spacing.sm }}
+      hitSlop={10}
+    >
       <Feather name="search" size={22} color={Colors.dark.text} />
     </Pressable>
   );

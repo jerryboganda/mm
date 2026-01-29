@@ -15,7 +15,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type PracticeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type PracticeScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface QuizStats {
   totalAttempts: number;
@@ -98,15 +99,13 @@ export default function PracticeScreen() {
                 if (mode.id === "topic") {
                   navigation.navigate("QuizTopicSelect");
                 } else {
-                  navigation.navigate("QuizPlayer", { 
+                  navigation.navigate("QuizPlayer", {
                     mode: mode.id as "mixed" | "wrong",
-                    topicId: undefined 
+                    topicId: undefined,
                   });
                 }
               }}
-              icon={
-                <Feather name={mode.icon} size={24} color={mode.color} />
-              }
+              icon={<Feather name={mode.icon} size={24} color={mode.color} />}
               disabled={mode.disabled}
               testID={`card-quiz-${mode.id}`}
               style={{ marginBottom: Spacing.md }}
@@ -121,7 +120,11 @@ export default function PracticeScreen() {
             subtitle="Timer, question count, difficulty"
             onPress={() => navigation.navigate("QuizSettings")}
             icon={
-              <Feather name="settings" size={24} color={Colors.dark.textSecondary} />
+              <Feather
+                name="settings"
+                size={24}
+                color={Colors.dark.textSecondary}
+              />
             }
             testID="card-quiz-settings"
           />

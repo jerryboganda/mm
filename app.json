@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Maternal Mind",
-    "slug": "maternal-mind",
+    "slug": "maternalmind",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -39,10 +39,24 @@
         }
       ],
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fc2a8779-9dbb-407c-9622-d02c88e300de"
+      }
+    },
+    "owner": "egjerrys-organization"
   }
 }

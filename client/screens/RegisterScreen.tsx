@@ -14,13 +14,16 @@ import { useAuth } from "@/lib/auth";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type RegisterScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Register">;
+type RegisterScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Register"
+>;
 
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register } = useAuth();
-  
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -154,7 +157,7 @@ export default function RegisterScreen() {
           <ThemedText style={styles.footerText}>
             Already have an account?
           </ThemedText>
-          <Pressable onPress={() => navigation.goBack()}>
+          <Pressable onPress={() => navigation.navigate("Login")}>
             <ThemedText style={styles.signInLink}> Sign In</ThemedText>
           </Pressable>
         </View>

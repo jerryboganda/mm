@@ -17,16 +17,7 @@ async function getToken(): Promise<string | null> {
  * @returns {string} The API base URL
  */
 export function getApiUrl(): string {
-  let host = process.env.EXPO_PUBLIC_DOMAIN;
-
-  if (!host) {
-    throw new Error("EXPO_PUBLIC_DOMAIN is not set");
-  }
-
-  // Keep the :5000 port for Replit routing to Express server
-  let url = new URL(`https://${host}`);
-
-  return url.href;
+  return "http://185.252.233.186:5000";
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -69,38 +60,38 @@ export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
-    const baseUrl = getApiUrl();
-    const path = queryKey[0] as string;
-    const url = new URL(path, baseUrl);
-    
-    if (queryKey.length > 1) {
-      for (let i = 1; i < queryKey.length; i++) {
-        const segment = queryKey[i];
-        if (segment !== undefined && segment !== null) {
-          url.pathname = url.pathname + "/" + String(segment);
+    async ({ queryKey }) => {
+      const baseUrl = getApiUrl();
+      const path = queryKey[0] as string;
+      const url = new URL(path, baseUrl);
+
+      if (queryKey.length > 1) {
+        for (let i = 1; i < queryKey.length; i++) {
+          const segment = queryKey[i];
+          if (segment !== undefined && segment !== null) {
+            url.pathname = url.pathname + "/" + String(segment);
+          }
         }
       }
-    }
-    
-    const token = await getToken();
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
 
-    const res = await fetch(url, {
-      credentials: "include",
-      headers,
-    });
+      const token = await getToken();
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
-    }
+      const res = await fetch(url, {
+        credentials: "include",
+        headers,
+      });
 
-    await throwIfResNotOk(res);
-    return await res.json();
-  };
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    };
 
 export const queryClient = new QueryClient({
   defaultOptions: {

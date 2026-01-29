@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { Platform, Alert } from "react-native";
 import Purchases, {
   PurchasesPackage,
@@ -17,11 +23,16 @@ interface PurchasesContextType {
   refreshCustomerInfo: () => Promise<void>;
 }
 
-const PurchasesContext = createContext<PurchasesContextType | undefined>(undefined);
+const PurchasesContext = createContext<PurchasesContextType | undefined>(
+  undefined,
+);
 
-const REVENUECAT_API_KEY_IOS = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS || "";
-const REVENUECAT_API_KEY_ANDROID = process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID || "";
-const REVENUECAT_ENTITLEMENT_ID = process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID || "pro";
+const REVENUECAT_API_KEY_IOS =
+  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS || "";
+const REVENUECAT_API_KEY_ANDROID =
+  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID || "";
+const REVENUECAT_ENTITLEMENT_ID =
+  process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID || "pro";
 
 export function PurchasesProvider({ children }: { children: ReactNode }) {
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -42,10 +53,15 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const apiKey = Platform.OS === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
+      const apiKey =
+        Platform.OS === "ios"
+          ? REVENUECAT_API_KEY_IOS
+          : REVENUECAT_API_KEY_ANDROID;
 
       if (!apiKey) {
-        console.log("RevenueCat API key not configured - running in preview mode");
+        console.log(
+          "RevenueCat API key not configured - running in preview mode",
+        );
         setLoading(false);
         return;
       }
@@ -68,7 +84,7 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
     try {
       const info = await Purchases.getCustomerInfo();
       setCustomerInfo(info);
-      
+
       const entitlement = info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
       setIsSubscribed(!!entitlement);
     } catch (err: any) {
@@ -88,25 +104,35 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const purchase = async (packageToPurchase: PurchasesPackage): Promise<boolean> => {
+  const purchase = async (
+    packageToPurchase: PurchasesPackage,
+  ): Promise<boolean> => {
     try {
       if (!initialized) {
-        Alert.alert("Not Available", "In-app purchases are not available in preview mode. Please use the app on a real device.");
+        Alert.alert(
+          "Not Available",
+          "In-app purchases are not available in preview mode. Please use the app on a real device.",
+        );
         return false;
       }
 
-      const { customerInfo: info } = await Purchases.purchasePackage(packageToPurchase);
+      const { customerInfo: info } =
+        await Purchases.purchasePackage(packageToPurchase);
       setCustomerInfo(info);
-      
+
       const entitlement = info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
       const success = !!entitlement;
       setIsSubscribed(success);
-      
+
       return success;
     } catch (err: any) {
       if (!err.userCancelled) {
         console.error("Purchase error:", err);
-        Alert.alert("Purchase Failed", err.message || "There was an error processing your purchase. Please try again.");
+        Alert.alert(
+          "Purchase Failed",
+          err.message ||
+            "There was an error processing your purchase. Please try again.",
+        );
       }
       return false;
     }
@@ -115,27 +141,40 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   const restorePurchases = async (): Promise<boolean> => {
     try {
       if (!initialized) {
-        Alert.alert("Not Available", "Restore purchases is not available in preview mode.");
+        Alert.alert(
+          "Not Available",
+          "Restore purchases is not available in preview mode.",
+        );
         return false;
       }
 
       const info = await Purchases.restorePurchases();
       setCustomerInfo(info);
-      
+
       const entitlement = info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
       const success = !!entitlement;
       setIsSubscribed(success);
-      
+
       if (success) {
-        Alert.alert("Restored!", "Your subscription has been restored successfully.");
+        Alert.alert(
+          "Restored!",
+          "Your subscription has been restored successfully.",
+        );
       } else {
-        Alert.alert("No Purchases Found", "We couldn't find any previous purchases to restore.");
+        Alert.alert(
+          "No Purchases Found",
+          "We couldn't find any previous purchases to restore.",
+        );
       }
-      
+
       return success;
     } catch (err: any) {
       console.error("Restore error:", err);
-      Alert.alert("Restore Failed", err.message || "There was an error restoring your purchases. Please try again.");
+      Alert.alert(
+        "Restore Failed",
+        err.message ||
+          "There was an error restoring your purchases. Please try again.",
+      );
       return false;
     }
   };

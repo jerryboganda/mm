@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Modal,
-  Pressable,
-} from "react-native";
+import { StyleSheet, View, Modal, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -63,7 +58,8 @@ export function SessionExpiredModal({
                 </ThemedText>
 
                 <ThemedText style={styles.description}>
-                  Your session has expired for security reasons. Please log in again to continue using Maternal Mind.
+                  Your session has expired for security reasons. Please log in
+                  again to continue using Maternal Mind.
                 </ThemedText>
 
                 <View style={styles.infoBox}>

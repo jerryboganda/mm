@@ -14,17 +14,22 @@ import { useAuth } from "@/lib/auth";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, "Login">;
+type LoginScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Login"
+>;
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login } = useAuth();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {},
+  );
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -54,7 +59,10 @@ export default function LoginScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Login Failed", error.message || "Please check your credentials and try again.");
+      Alert.alert(
+        "Login Failed",
+        error.message || "Please check your credentials and try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -107,7 +115,7 @@ export default function LoginScreen() {
             error={errors.password}
           />
 
-          <Pressable 
+          <Pressable
             style={styles.forgotPassword}
             onPress={() => navigation.navigate("ForgotPassword")}
           >

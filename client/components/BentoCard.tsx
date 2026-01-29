@@ -91,13 +91,13 @@ export function BentoCard({
   const getGlowColor = () => {
     switch (variant) {
       case "accent":
-        return "rgba(0,212,255,0.12)";
+        return "rgba(0,212,255,0.22)";
       case "success":
-        return "rgba(34,197,94,0.12)";
+        return "rgba(34,197,94,0.22)";
       case "purple":
-        return "rgba(168,85,247,0.12)";
+        return "rgba(168,85,247,0.22)";
       case "warning":
-        return "rgba(245,158,11,0.12)";
+        return "rgba(245,158,11,0.22)";
       default:
         return "rgba(255,255,255,0.03)";
     }
@@ -127,7 +127,7 @@ export function BentoCard({
     return (
       <BlurView intensity={18} tint="dark" style={styles.background}>
         <LinearGradient
-          colors={[glowColor, "rgba(255,255,255,0.02)"]}
+          colors={[glowColor, "rgba(255,255,255,0.08)"]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -157,8 +157,17 @@ export function BentoCard({
       <View style={[styles.content, isWide && styles.contentWide]}>
         <View style={styles.header}>
           {icon ? (
-            <View style={[styles.iconContainer, { backgroundColor: `${accentColor}15` }]}>
-              <Feather name={icon} size={isSmall ? 18 : 22} color={accentColor} />
+            <View
+              style={[
+                styles.iconContainer,
+                { backgroundColor: `${accentColor}15` },
+              ]}
+            >
+              <Feather
+                name={icon}
+                size={isSmall ? 18 : 22}
+                color={accentColor}
+              />
             </View>
           ) : null}
           <ThemedText
@@ -183,7 +192,11 @@ export function BentoCard({
             {value}
           </ThemedText>
           {subtitle ? (
-            <ThemedText type="caption" style={styles.subtitle} numberOfLines={1}>
+            <ThemedText
+              type="caption"
+              style={styles.subtitle}
+              numberOfLines={1}
+            >
               {subtitle}
             </ThemedText>
           ) : null}

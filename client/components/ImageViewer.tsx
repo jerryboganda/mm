@@ -11,7 +11,11 @@ import {
 import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { GestureDetector, Gesture, GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  GestureDetector,
+  Gesture,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -102,7 +106,7 @@ export function ImageViewer({ visible, imageUri, onClose }: ImageViewerProps) {
   const composedGesture = Gesture.Simultaneous(
     pinchGesture,
     panGesture,
-    doubleTapGesture
+    doubleTapGesture,
   );
 
   const animatedStyle = useAnimatedStyle(() => ({

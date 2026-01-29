@@ -3,14 +3,20 @@ import { Text, type TextProps } from "react-native";
 import { Colors, Typography } from "@/constants/theme";
 
 export type ThemedTextProps = TextProps & {
-  type?: "h1" | "h2" | "h3" | "h4" | "body" | "small" | "caption" | "label" | "link";
+  type?:
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "body"
+  | "small"
+  | "caption"
+  | "label"
+  | "link"
+  | "stat";
 };
 
-export function ThemedText({
-  style,
-  type = "body",
-  ...rest
-}: ThemedTextProps) {
+export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
   const getColor = () => {
     if (type === "link") {
       return Colors.dark.link;
@@ -38,6 +44,8 @@ export function ThemedText({
         return { ...Typography.label, fontFamily: "Inter_500Medium" };
       case "link":
         return { ...Typography.link, fontFamily: "Inter_400Regular" };
+      case "stat":
+        return { ...Typography.stat, fontFamily: "Inter_700Bold" };
       default:
         return { ...Typography.body, fontFamily: "Inter_400Regular" };
     }

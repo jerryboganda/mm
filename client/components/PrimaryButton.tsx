@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, Pressable, ViewStyle, ActivityIndicator, Platform } from "react-native";
+import {
+  StyleSheet,
+  Pressable,
+  ViewStyle,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -107,7 +113,8 @@ export function PrimaryButton({
   };
 
   const iconSize = isSmall ? 16 : isLarge ? 24 : 20;
-  const iconColor = isPrimary || isSuccess || isDanger ? "#fff" : Colors.dark.primary;
+  const iconColor =
+    isPrimary || isSuccess || isDanger ? "#fff" : Colors.dark.primary;
 
   return (
     <AnimatedPressable
@@ -128,7 +135,7 @@ export function PrimaryButton({
         style,
       ]}
     >
-      {(isPrimary || isSuccess || isDanger) ? (
+      {isPrimary || isSuccess || isDanger ? (
         <LinearGradient
           colors={getGradientColors()}
           style={StyleSheet.absoluteFill}
@@ -138,7 +145,9 @@ export function PrimaryButton({
       ) : null}
       {loading ? (
         <ActivityIndicator
-          color={(isPrimary || isSuccess || isDanger) ? "#fff" : Colors.dark.primary}
+          color={
+            isPrimary || isSuccess || isDanger ? "#fff" : Colors.dark.primary
+          }
           size={isSmall ? "small" : "small"}
         />
       ) : (

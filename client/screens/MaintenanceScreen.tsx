@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -57,9 +54,7 @@ export default function MaintenanceScreen({
             Under Maintenance
           </ThemedText>
 
-          <ThemedText style={styles.description}>
-            {message}
-          </ThemedText>
+          <ThemedText style={styles.description}>{message}</ThemedText>
 
           {estimatedTime ? (
             <GlassCard style={styles.timeCard}>
@@ -89,7 +84,11 @@ export default function MaintenanceScreen({
                 </ThemedText>
               </View>
               <View style={styles.infoItem}>
-                <Feather name="database" size={16} color={Colors.dark.primary} />
+                <Feather
+                  name="database"
+                  size={16}
+                  color={Colors.dark.primary}
+                />
                 <ThemedText style={styles.infoText}>
                   Database maintenance for better performance
                 </ThemedText>

@@ -1,5 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View, ScrollView, RefreshControl, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  RefreshControl,
+  Pressable,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -18,7 +24,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type ProgressScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type ProgressScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface ProgressData {
   totalAttempts: number;
@@ -47,7 +54,11 @@ export default function ProgressScreen() {
   const navigation = useNavigation<ProgressScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: progress, isLoading, refetch } = useQuery<ProgressData>({
+  const {
+    data: progress,
+    isLoading,
+    refetch,
+  } = useQuery<ProgressData>({
     queryKey: ["/api/progress"],
   });
 
@@ -196,7 +207,9 @@ export default function ProgressScreen() {
           {progress.recentAttempts.map((attempt) => (
             <GlassCard
               key={attempt.id}
-              onPress={() => navigation.navigate("AttemptDetail", { attemptId: attempt.id })}
+              onPress={() =>
+                navigation.navigate("AttemptDetail", { attemptId: attempt.id })
+              }
               style={styles.attemptCard}
             >
               <View style={styles.attemptHeader}>
@@ -205,8 +218,8 @@ export default function ProgressScreen() {
                     {attempt.mode === "topic"
                       ? attempt.topicTitle
                       : attempt.mode === "mixed"
-                      ? "Mixed Quiz"
-                      : "Wrong Questions"}
+                        ? "Mixed Quiz"
+                        : "Wrong Questions"}
                   </ThemedText>
                   <ThemedText style={styles.attemptDate}>
                     {formatDate(attempt.date)}
@@ -220,8 +233,8 @@ export default function ProgressScreen() {
                         attempt.score >= 80
                           ? "rgba(34,197,94,0.2)"
                           : attempt.score >= 50
-                          ? "rgba(234,179,8,0.2)"
-                          : "rgba(239,68,68,0.2)",
+                            ? "rgba(234,179,8,0.2)"
+                            : "rgba(239,68,68,0.2)",
                     },
                   ]}
                 >
@@ -233,8 +246,8 @@ export default function ProgressScreen() {
                           attempt.score >= 80
                             ? Colors.dark.success
                             : attempt.score >= 50
-                            ? Colors.dark.warning
-                            : Colors.dark.error,
+                              ? Colors.dark.warning
+                              : Colors.dark.error,
                       },
                     ]}
                   >

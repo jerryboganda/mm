@@ -36,7 +36,9 @@ export function AnimatedListItem({
 }: AnimatedListItemProps) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(direction === "down" ? -20 : 20);
-  const translateX = useSharedValue(direction === "left" ? 20 : direction === "right" ? -20 : 0);
+  const translateX = useSharedValue(
+    direction === "left" ? 20 : direction === "right" ? -20 : 0,
+  );
   const scale = useSharedValue(0.95);
 
   useEffect(() => {
@@ -44,27 +46,27 @@ export function AnimatedListItem({
 
     opacity.value = withDelay(
       itemDelay,
-      withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) })
+      withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) }),
     );
 
     if (type === "combined" || type === "fade") {
       translateY.value = withDelay(
         itemDelay,
-        withSpring(0, { damping: 14, stiffness: 120 })
+        withSpring(0, { damping: 14, stiffness: 120 }),
       );
     }
 
     if (type === "combined" || type === "scale") {
       scale.value = withDelay(
         itemDelay,
-        withSpring(1, { damping: 12, stiffness: 150 })
+        withSpring(1, { damping: 12, stiffness: 150 }),
       );
     }
 
     if (direction === "left" || direction === "right") {
       translateX.value = withDelay(
         itemDelay,
-        withSpring(0, { damping: 14, stiffness: 120 })
+        withSpring(0, { damping: 14, stiffness: 120 }),
       );
     }
   }, [index, delay, direction, type]);
@@ -79,19 +81,23 @@ export function AnimatedListItem({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, style]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
   );
 }
 
 export const ListAnimations = {
-  FadeInDown: (delay: number) => FadeInDown.delay(delay).springify().damping(14).stiffness(120),
-  FadeInUp: (delay: number) => FadeInUp.delay(delay).springify().damping(14).stiffness(120),
-  FadeInLeft: (delay: number) => FadeInLeft.delay(delay).springify().damping(14).stiffness(120),
-  FadeInRight: (delay: number) => FadeInRight.delay(delay).springify().damping(14).stiffness(120),
-  SlideInDown: (delay: number) => SlideInDown.delay(delay).springify().damping(14).stiffness(120),
-  SlideInUp: (delay: number) => SlideInUp.delay(delay).springify().damping(14).stiffness(120),
+  FadeInDown: (delay: number) =>
+    FadeInDown.delay(delay).springify().damping(14).stiffness(120),
+  FadeInUp: (delay: number) =>
+    FadeInUp.delay(delay).springify().damping(14).stiffness(120),
+  FadeInLeft: (delay: number) =>
+    FadeInLeft.delay(delay).springify().damping(14).stiffness(120),
+  FadeInRight: (delay: number) =>
+    FadeInRight.delay(delay).springify().damping(14).stiffness(120),
+  SlideInDown: (delay: number) =>
+    SlideInDown.delay(delay).springify().damping(14).stiffness(120),
+  SlideInUp: (delay: number) =>
+    SlideInUp.delay(delay).springify().damping(14).stiffness(120),
 };
 
 export function getStaggerDelay(index: number, baseDelay: number = 50): number {

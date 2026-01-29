@@ -47,7 +47,13 @@ const FILTERS: { key: FilterType; label: string }[] = [
   { key: "topics", label: "Topics" },
 ];
 
-function SearchResultCard({ item, onPress }: { item: SearchResult; onPress: () => void }) {
+function SearchResultCard({
+  item,
+  onPress,
+}: {
+  item: SearchResult;
+  onPress: () => void;
+}) {
   const getIcon = () => {
     switch (item.type) {
       case "book":
@@ -108,7 +114,7 @@ export default function SearchScreen() {
 
   const debouncedSetQuery = useMemo(
     () => debounce((text: string) => setDebouncedQuery(text), 300),
-    []
+    [],
   );
 
   const handleQueryChange = (text: string) => {
@@ -116,7 +122,11 @@ export default function SearchScreen() {
     debouncedSetQuery(text);
   };
 
-  const { data: results, isLoading, isFetching } = useQuery<SearchResult[]>({
+  const {
+    data: results,
+    isLoading,
+    isFetching,
+  } = useQuery<SearchResult[]>({
     queryKey: ["/api/search", debouncedQuery, activeFilter],
     queryFn: async () => {
       if (debouncedQuery.length < 2) return [];
@@ -181,7 +191,9 @@ export default function SearchScreen() {
 
   return (
     <BackgroundGradient>
-      <View style={[styles.container, { paddingTop: headerHeight + Spacing.lg }]}>
+      <View
+        style={[styles.container, { paddingTop: headerHeight + Spacing.lg }]}
+      >
         <View style={styles.searchContainer}>
           <View style={styles.searchInputWrapper}>
             <Feather name="search" size={18} color={Colors.dark.textMuted} />
@@ -239,7 +251,11 @@ export default function SearchScreen() {
           </View>
         ) : filteredResults.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Feather name="file-minus" size={48} color={Colors.dark.textMuted} />
+            <Feather
+              name="file-minus"
+              size={48}
+              color={Colors.dark.textMuted}
+            />
             <ThemedText style={styles.emptyTitle}>No Results</ThemedText>
             <ThemedText style={styles.emptySubtitle}>
               Try different keywords or change the filter
@@ -250,7 +266,10 @@ export default function SearchScreen() {
             data={filteredResults}
             keyExtractor={(item) => `${item.type}-${item.id}`}
             renderItem={({ item }) => (
-              <SearchResultCard item={item} onPress={() => handleResultPress(item)} />
+              <SearchResultCard
+                item={item}
+                onPress={() => handleResultPress(item)}
+              />
             )}
             contentContainerStyle={{
               paddingHorizontal: Spacing.lg,
@@ -258,10 +277,13 @@ export default function SearchScreen() {
             }}
             scrollIndicatorInsets={{ bottom: insets.bottom }}
             keyboardShouldPersistTaps="handled"
-            ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
+            ItemSeparatorComponent={() => (
+              <View style={{ height: Spacing.sm }} />
+            )}
             ListHeaderComponent={
               <ThemedText style={styles.resultsCount}>
-                {filteredResults.length} result{filteredResults.length !== 1 ? "s" : ""} found
+                {filteredResults.length} result
+                {filteredResults.length !== 1 ? "s" : ""} found
               </ThemedText>
             }
           />

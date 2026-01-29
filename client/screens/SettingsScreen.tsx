@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { StyleSheet, View, ScrollView, Switch, Alert, Platform, Linking } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Switch,
+  Alert,
+  Platform,
+  Linking,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
@@ -14,7 +22,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type SettingsScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -44,7 +53,7 @@ export default function SettingsScreen() {
                 }
               },
             },
-          ]
+          ],
         );
         return;
       }
@@ -53,10 +62,11 @@ export default function SettingsScreen() {
     setPushNotifications(value);
   };
 
-  const handleToggle = (setter: (value: boolean) => void) => (value: boolean) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setter(value);
-  };
+  const handleToggle =
+    (setter: (value: boolean) => void) => (value: boolean) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setter(value);
+    };
 
   type SettingItem = {
     id: string;
@@ -166,7 +176,11 @@ export default function SettingsScreen() {
             {group.items.map((item) => (
               <GlassCard
                 key={item.id}
-                style={item.disabled ? [styles.settingCard, styles.settingCardDisabled] : styles.settingCard}
+                style={
+                  item.disabled
+                    ? [styles.settingCard, styles.settingCardDisabled]
+                    : styles.settingCard
+                }
                 onPress={item.type === "navigation" ? item.onPress : undefined}
               >
                 <View style={styles.settingRow}>
@@ -179,7 +193,11 @@ export default function SettingsScreen() {
                     <Feather
                       name={item.icon}
                       size={18}
-                      color={item.disabled ? Colors.dark.textMuted : Colors.dark.primary}
+                      color={
+                        item.disabled
+                          ? Colors.dark.textMuted
+                          : Colors.dark.primary
+                      }
                     />
                   </View>
                   <View style={styles.settingContent}>

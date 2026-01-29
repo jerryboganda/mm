@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
@@ -57,7 +53,10 @@ export default function DisclaimerScreen() {
               </ThemedText>
             </View>
             <ThemedText style={styles.paragraph}>
-              Maternal Mind is designed exclusively for educational purposes. The content provided within this application is intended to supplement medical education for students studying obstetrics and gynecology.
+              Maternal Mind is designed exclusively for educational purposes.
+              The content provided within this application is intended to
+              supplement medical education for students studying obstetrics and
+              gynecology.
             </ThemedText>
           </View>
 
@@ -71,7 +70,10 @@ export default function DisclaimerScreen() {
               </ThemedText>
             </View>
             <ThemedText style={styles.paragraph}>
-              The information in this application does not constitute medical advice, diagnosis, or treatment recommendations. This content should never be used as a substitute for professional medical judgment.
+              The information in this application does not constitute medical
+              advice, diagnosis, or treatment recommendations. This content
+              should never be used as a substitute for professional medical
+              judgment.
             </ThemedText>
           </View>
 
@@ -79,13 +81,19 @@ export default function DisclaimerScreen() {
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Feather name="user-check" size={20} color={Colors.dark.success} />
+              <Feather
+                name="user-check"
+                size={20}
+                color={Colors.dark.success}
+              />
               <ThemedText type="h4" style={styles.sectionTitle}>
                 Consult Healthcare Providers
               </ThemedText>
             </View>
             <ThemedText style={styles.paragraph}>
-              Always consult qualified healthcare professionals for medical concerns. Clinical decisions should be based on individual patient assessment and current clinical guidelines.
+              Always consult qualified healthcare professionals for medical
+              concerns. Clinical decisions should be based on individual patient
+              assessment and current clinical guidelines.
             </ThemedText>
           </View>
 
@@ -99,16 +107,23 @@ export default function DisclaimerScreen() {
               </ThemedText>
             </View>
             <ThemedText style={styles.paragraph}>
-              Medical knowledge evolves continuously. While we strive to keep content current, some information may not reflect the latest research or guidelines. Always verify with up-to-date sources.
+              Medical knowledge evolves continuously. While we strive to keep
+              content current, some information may not reflect the latest
+              research or guidelines. Always verify with up-to-date sources.
             </ThemedText>
           </View>
         </GlassCard>
 
         <GlassCard style={[styles.card, styles.warningCard]}>
           <View style={styles.warningContent}>
-            <Feather name="alert-circle" size={24} color={Colors.dark.warning} />
+            <Feather
+              name="alert-circle"
+              size={24}
+              color={Colors.dark.warning}
+            />
             <ThemedText style={styles.warningText}>
-              By continuing to use Maternal Mind, you acknowledge that you have read and understood this disclaimer.
+              By continuing to use Maternal Mind, you acknowledge that you have
+              read and understood this disclaimer.
             </ThemedText>
           </View>
         </GlassCard>

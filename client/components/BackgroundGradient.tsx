@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, ViewStyle, Dimensions, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ViewStyle,
+  Dimensions,
+  Platform,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
   useSharedValue,
@@ -38,56 +44,83 @@ export function BackgroundGradient({
     if (animated && Platform.OS !== "web") {
       orbScale1.value = withRepeat(
         withSequence(
-          withTiming(1.15, { duration: 8000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 8000, easing: Easing.inOut(Easing.ease) })
+          withTiming(1.15, {
+            duration: 8000,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(1, { duration: 8000, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        true
+        true,
       );
 
       orbScale2.value = withRepeat(
         withSequence(
-          withTiming(1.2, { duration: 10000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 10000, easing: Easing.inOut(Easing.ease) })
+          withTiming(1.2, {
+            duration: 10000,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(1, { duration: 10000, easing: Easing.inOut(Easing.ease) }),
         ),
         -1,
-        true
+        true,
       );
 
       orbOpacity1.value = withRepeat(
         withSequence(
-          withTiming(0.12, { duration: 6000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.08, { duration: 6000, easing: Easing.inOut(Easing.ease) })
+          withTiming(0.12, {
+            duration: 6000,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(0.08, {
+            duration: 6000,
+            easing: Easing.inOut(Easing.ease),
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       orbOpacity2.value = withRepeat(
         withSequence(
-          withTiming(0.08, { duration: 7000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.04, { duration: 7000, easing: Easing.inOut(Easing.ease) })
+          withTiming(0.08, {
+            duration: 7000,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(0.04, {
+            duration: 7000,
+            easing: Easing.inOut(Easing.ease),
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       orbTranslateY1.value = withRepeat(
         withSequence(
           withTiming(20, { duration: 9000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(-20, { duration: 9000, easing: Easing.inOut(Easing.ease) })
+          withTiming(-20, {
+            duration: 9000,
+            easing: Easing.inOut(Easing.ease),
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       orbTranslateX2.value = withRepeat(
         withSequence(
-          withTiming(15, { duration: 11000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(-15, { duration: 11000, easing: Easing.inOut(Easing.ease) })
+          withTiming(15, {
+            duration: 11000,
+            easing: Easing.inOut(Easing.ease),
+          }),
+          withTiming(-15, {
+            duration: 11000,
+            easing: Easing.inOut(Easing.ease),
+          }),
         ),
         -1,
-        true
+        true,
       );
     }
   }, [animated]);
@@ -128,8 +161,12 @@ export function BackgroundGradient({
         <View style={styles.orbContainer}>
           {Platform.OS !== "web" && animated ? (
             <>
-              <Animated.View style={[styles.orb, styles.orbTopRight, animatedOrb1Style]} />
-              <Animated.View style={[styles.orb, styles.orbBottomLeft, animatedOrb2Style]} />
+              <Animated.View
+                style={[styles.orb, styles.orbTopRight, animatedOrb1Style]}
+              />
+              <Animated.View
+                style={[styles.orb, styles.orbBottomLeft, animatedOrb2Style]}
+              />
             </>
           ) : (
             <>
@@ -137,12 +174,8 @@ export function BackgroundGradient({
               <View style={[styles.orb, styles.orbBottomLeft]} />
             </>
           )}
-          {isAuth ? (
-            <View style={[styles.orb, styles.orbCenter]} />
-          ) : null}
-          {isQuiz ? (
-            <View style={[styles.orb, styles.orbQuiz]} />
-          ) : null}
+          {isAuth ? <View style={[styles.orb, styles.orbCenter]} /> : null}
+          {isQuiz ? <View style={[styles.orb, styles.orbQuiz]} /> : null}
           {isImmersive ? (
             <>
               <View style={[styles.orb, styles.orbAccent]} />

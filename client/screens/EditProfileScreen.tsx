@@ -64,12 +64,13 @@ export default function EditProfileScreen() {
   const handlePickImage = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (!permissionResult.granted) {
       Alert.alert(
         "Permission Required",
-        "Please allow access to your photo library to change your profile picture."
+        "Please allow access to your photo library to change your profile picture.",
       );
       return;
     }
@@ -88,7 +89,7 @@ export default function EditProfileScreen() {
 
   const handleSave = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     if (!name.trim()) {
       Alert.alert("Error", "Name cannot be empty");
       return;
@@ -99,15 +100,19 @@ export default function EditProfileScreen() {
 
   const handleCancel = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
+
     if (hasChanges) {
       Alert.alert(
         "Discard Changes?",
         "You have unsaved changes. Are you sure you want to go back?",
         [
           { text: "Keep Editing", style: "cancel" },
-          { text: "Discard", style: "destructive", onPress: () => navigation.goBack() },
-        ]
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => navigation.goBack(),
+          },
+        ],
       );
     } else {
       navigation.goBack();
@@ -173,7 +178,9 @@ export default function EditProfileScreen() {
 
         <View style={styles.buttonSection}>
           <PrimaryButton
-            title={updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
+            title={
+              updateProfileMutation.isPending ? "Saving..." : "Save Changes"
+            }
             onPress={handleSave}
             disabled={!hasChanges || updateProfileMutation.isPending}
             style={styles.saveButton}

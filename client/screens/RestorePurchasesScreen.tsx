@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Animated, Easing, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Animated,
+  Easing,
+  ActivityIndicator,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,7 +21,8 @@ import { usePurchases } from "@/lib/purchases";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-type RestorePurchasesScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type RestorePurchasesScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 type RestoreStatus = "idle" | "restoring" | "success" | "not_found" | "error";
 
@@ -37,7 +44,7 @@ export default function RestorePurchasesScreen() {
           duration: 1500,
           easing: Easing.linear,
           useNativeDriver: true,
-        })
+        }),
       ).start();
     }
   }, [status]);
@@ -96,7 +103,9 @@ export default function RestorePurchasesScreen() {
       case "restoring":
         return (
           <View style={styles.statusContainer}>
-            <Animated.View style={[styles.iconCircle, { transform: [{ rotate: spin }] }]}>
+            <Animated.View
+              style={[styles.iconCircle, { transform: [{ rotate: spin }] }]}
+            >
               <Feather name="loader" size={40} color={Colors.dark.primary} />
             </Animated.View>
             <ThemedText type="h3" style={styles.statusTitle}>
@@ -111,7 +120,12 @@ export default function RestorePurchasesScreen() {
       case "success":
         return (
           <View style={styles.statusContainer}>
-            <Animated.View style={[styles.successCircle, { transform: [{ scale: scaleAnim }] }]}>
+            <Animated.View
+              style={[
+                styles.successCircle,
+                { transform: [{ scale: scaleAnim }] },
+              ]}
+            >
               <LinearGradient
                 colors={[Colors.dark.success, "#16a34a"]}
                 style={StyleSheet.absoluteFill}
@@ -137,19 +151,26 @@ export default function RestorePurchasesScreen() {
       case "not_found":
         return (
           <View style={styles.statusContainer}>
-            <Animated.View style={[styles.warningCircle, { transform: [{ scale: scaleAnim }] }]}>
+            <Animated.View
+              style={[
+                styles.warningCircle,
+                { transform: [{ scale: scaleAnim }] },
+              ]}
+            >
               <Feather name="search" size={40} color={Colors.dark.warning} />
             </Animated.View>
             <ThemedText type="h3" style={styles.statusTitle}>
               No Purchases Found
             </ThemedText>
             <ThemedText style={styles.statusSubtitle}>
-              We couldn't find any previous purchases associated with your account
+              We couldn't find any previous purchases associated with your
+              account
             </ThemedText>
             <GlassCard style={styles.helpCard}>
               <Feather name="info" size={18} color={Colors.dark.info} />
               <ThemedText style={styles.helpText}>
-                Make sure you're signed in with the same account you used for the original purchase
+                Make sure you're signed in with the same account you used for
+                the original purchase
               </ThemedText>
             </GlassCard>
             <PrimaryButton
@@ -166,7 +187,12 @@ export default function RestorePurchasesScreen() {
       case "error":
         return (
           <View style={styles.statusContainer}>
-            <Animated.View style={[styles.errorCircle, { transform: [{ scale: scaleAnim }] }]}>
+            <Animated.View
+              style={[
+                styles.errorCircle,
+                { transform: [{ scale: scaleAnim }] },
+              ]}
+            >
               <Feather name="x" size={40} color={Colors.dark.error} />
             </Animated.View>
             <ThemedText type="h3" style={styles.statusTitle}>
@@ -191,28 +217,51 @@ export default function RestorePurchasesScreen() {
         return (
           <View style={styles.idleContainer}>
             <View style={styles.iconCircle}>
-              <Feather name="refresh-cw" size={40} color={Colors.dark.primary} />
+              <Feather
+                name="refresh-cw"
+                size={40}
+                color={Colors.dark.primary}
+              />
             </View>
             <ThemedText type="h2" style={styles.title}>
               Restore Purchases
             </ThemedText>
             <ThemedText style={styles.subtitle}>
-              If you've previously subscribed to Maternal Mind Premium, you can restore your subscription here
+              If you've previously subscribed to Maternal Mind Premium, you can
+              restore your subscription here
             </ThemedText>
 
             <GlassCard style={styles.infoCard}>
               <ThemedText style={styles.infoTitle}>When to restore:</ThemedText>
               <View style={styles.infoRow}>
-                <Feather name="smartphone" size={16} color={Colors.dark.textSecondary} />
-                <ThemedText style={styles.infoText}>Switching to a new device</ThemedText>
+                <Feather
+                  name="smartphone"
+                  size={16}
+                  color={Colors.dark.textSecondary}
+                />
+                <ThemedText style={styles.infoText}>
+                  Switching to a new device
+                </ThemedText>
               </View>
               <View style={styles.infoRow}>
-                <Feather name="refresh-cw" size={16} color={Colors.dark.textSecondary} />
-                <ThemedText style={styles.infoText}>Reinstalled the app</ThemedText>
+                <Feather
+                  name="refresh-cw"
+                  size={16}
+                  color={Colors.dark.textSecondary}
+                />
+                <ThemedText style={styles.infoText}>
+                  Reinstalled the app
+                </ThemedText>
               </View>
               <View style={styles.infoRow}>
-                <Feather name="user" size={16} color={Colors.dark.textSecondary} />
-                <ThemedText style={styles.infoText}>Signed in with a different account</ThemedText>
+                <Feather
+                  name="user"
+                  size={16}
+                  color={Colors.dark.textSecondary}
+                />
+                <ThemedText style={styles.infoText}>
+                  Signed in with a different account
+                </ThemedText>
               </View>
             </GlassCard>
 
@@ -223,7 +272,10 @@ export default function RestorePurchasesScreen() {
               style={styles.restoreButton}
               testID="button-restore"
             />
-            <ThemedText style={styles.goBackLink} onPress={() => navigation.goBack()}>
+            <ThemedText
+              style={styles.goBackLink}
+              onPress={() => navigation.goBack()}
+            >
               Cancel
             </ThemedText>
           </View>
