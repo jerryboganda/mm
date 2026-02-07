@@ -170,7 +170,7 @@ export function GlassCard({
         {icon ? <View style={styles.iconContainer}>{icon}</View> : null}
         <View style={styles.textContainer}>
           {title ? (
-            <ThemedText type="h4" style={styles.title}>
+            <ThemedText type="h4" style={styles.title} numberOfLines={2}>
               {title}
             </ThemedText>
           ) : null}
@@ -178,6 +178,7 @@ export function GlassCard({
             <ThemedText
               type="small"
               style={{ color: Colors.dark.textSecondary }}
+              numberOfLines={2}
             >
               {subtitle}
             </ThemedText>
