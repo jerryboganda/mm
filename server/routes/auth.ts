@@ -1,9 +1,13 @@
 import { Router, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Resend } from "resend";
 import twilio from "twilio";
 import { storage } from "../storage";
+import {
+  sendEmail,
+  verificationEmailHtml,
+  passwordResetEmailHtml,
+} from "../email";
 import {
   loginSchema,
   registerSchema,
@@ -14,9 +18,6 @@ import { z } from "zod";
 import { AuthRequest, authMiddleware, rateLimiter } from "../middleware";
 
 const router = Router();
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
 
 const twilioClient =
   process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
@@ -69,22 +70,14 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
       isEmailVerified: false,
     });
 
-    // Send Verification Email
-    if (resend) {
-      await resend.emails.send({
-        from: "Maternal Mind <noreply@maternalmind.app>",
-        to: user.email,
-        subject: "Verify Your Email - Maternal Mind",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #11a4d4;">Welcome to Maternal Mind!</h1>
-            <p>Your verification code is:</p>
-            <h2 style="background: #f0f9ff; color: #11a4d4; padding: 15px; text-align: center; letter-spacing: 5px; border-radius: 8px;">${emailOtp}</h2>
-            <p>This code will expire in 15 minutes.</p>
-          </div>
-        `,
-      });
-    } else if (process.env.NODE_ENV !== "production") {
+    // Send Verification Email via Brevo SMTP
+    const emailSent = await sendEmail({
+      to: user.email,
+      subject: "Verify Your Email - Maternal Mind",
+      html: verificationEmailHtml(emailOtp),
+    });
+
+    if (!emailSent && process.env.NODE_ENV !== "production") {
       console.log(`[DEV] Email OTP for ${user.email}: ${emailOtp}`);
     }
 
@@ -153,6 +146,49 @@ router.post("/verify-email", rateLimiter(10, 15 * 60 * 1000), async (req, res) =
   } catch (error) {
     console.error("Verify email error:", error);
     res.status(500).json({ message: "Verification failed" });
+  }
+});
+
+// ── Resend verification email ──
+router.post("/resend-verification", rateLimiter(3, 15 * 60 * 1000), async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await storage.getUserByEmail(email);
+    if (!user) {
+      // Don't reveal whether user exists
+      return res.json({ message: "If an account exists, a new code has been sent." });
+    }
+
+    if (user.isEmailVerified) {
+      return res.json({ message: "Email already verified" });
+    }
+
+    const emailOtp = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await storage.updateUserVerification(user.id, {
+      emailVerificationToken: emailOtp,
+      emailTokenExpiresAt: otpExpiresAt,
+    });
+
+    const emailSent = await sendEmail({
+      to: user.email,
+      subject: "Verify Your Email - Maternal Mind",
+      html: verificationEmailHtml(emailOtp),
+    });
+
+    if (!emailSent && process.env.NODE_ENV !== "production") {
+      console.log(`[DEV] Resend OTP for ${user.email}: ${emailOtp}`);
+    }
+
+    res.json({ message: "If an account exists, a new code has been sent." });
+  } catch (error) {
+    console.error("Resend verification error:", error);
+    res.status(500).json({ message: "Failed to resend verification email" });
   }
 });
 
@@ -298,27 +334,14 @@ router.post("/forgot-password", rateLimiter(3, 15 * 60 * 1000), async (req, res)
     const token = await storage.createPasswordResetToken(user.id);
     const resetLink = `https://${req.get("host")}/reset-password?token=${token}`;
 
-    if (resend) {
-      try {
-        await resend.emails.send({
-          from: "Maternal Mind <noreply@maternalmind.app>",
-          to: user.email,
-          subject: "Reset Your Password - Maternal Mind",
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h1 style="color: #11a4d4;">Reset Your Password</h1>
-              <p>Hello ${user.name},</p>
-              <p>You requested to reset your password. Click below:</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${resetLink}" style="background: #11a4d4; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px;">Reset Password</a>
-              </div>
-            </div>
-          `,
-        });
-      } catch (err) {
-        console.error("Email error:", err);
-      }
-    } else if (process.env.NODE_ENV !== "production") {
+    // Send password reset email via Brevo SMTP
+    const emailSent = await sendEmail({
+      to: user.email,
+      subject: "Reset Your Password - Maternal Mind",
+      html: passwordResetEmailHtml(user.name, resetLink),
+    });
+
+    if (!emailSent && process.env.NODE_ENV !== "production") {
       console.log(`[DEV] Reset link for ${user.email}: ${resetLink}`);
     }
 

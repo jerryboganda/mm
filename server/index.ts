@@ -101,14 +101,14 @@ function setupHealthCheck(app: express.Application) {
 function setupBodyParsing(app: express.Application) {
   app.use(
     express.json({
-      limit: '10kb',
+      limit: '5mb',
       verify: (req, _res, buf) => {
         req.rawBody = buf;
       },
     }),
   );
 
-  app.use(express.urlencoded({ extended: false, limit: '10kb' }));
+  app.use(express.urlencoded({ extended: false, limit: '5mb' }));
 }
 
 function setupRequestLogging(app: express.Application) {
@@ -218,6 +218,24 @@ function configureExpoAndLanding(app: express.Application) {
   const appName = getAppName();
 
   log("Serving static Expo files with dynamic manifest routing");
+
+  // ── Serve Admin Panel SPA at /admin/* ──
+  const adminDistPath = path.resolve(process.cwd(), "admin_dist");
+  if (fs.existsSync(adminDistPath)) {
+    app.use("/admin", express.static(adminDistPath));
+    // SPA fallback: any /admin/* route serves index.html
+    app.get("/admin/{*splat}", (_req: Request, res: Response) => {
+      const indexPath = path.join(adminDistPath, "index.html");
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send("Admin panel not built");
+      }
+    });
+    log("Admin panel: serving from /admin/");
+  } else {
+    log("Admin panel: admin_dist not found — skipping");
+  }
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith("/api")) {

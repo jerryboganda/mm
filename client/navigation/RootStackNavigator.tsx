@@ -38,6 +38,7 @@ import AboutScreen from "@/screens/AboutScreen";
 import TermsPrivacyScreen from "@/screens/TermsPrivacyScreen";
 import DisclaimerScreen from "@/screens/DisclaimerScreen";
 import SpacedReviewScreen from "@/screens/SpacedReviewScreen";
+import AdminEmailSettingsScreen from "@/screens/AdminEmailSettingsScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -74,6 +75,7 @@ export type RootStackParamList = {
   TermsPrivacy: undefined;
   Disclaimer: undefined;
   SpacedReview: undefined;
+  AdminEmailSettings: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -320,6 +322,14 @@ export default function RootStackNavigator() {
                 headerShown: false,
                 gestureEnabled: false,
                 animation: "slide_from_bottom",
+              }}
+            />
+            <Stack.Screen
+              name="AdminEmailSettings"
+              component={AdminEmailSettingsScreen}
+              options={{
+                headerTitle: "Email Settings",
+                presentation: "card",
               }}
             />
           </>

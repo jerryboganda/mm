@@ -12,6 +12,7 @@ import {
   recentActivity,
   reviewSchedule,
   contentReports,
+  appSettings,
   type User,
   type InsertUser,
   type Book,
@@ -26,9 +27,10 @@ import {
   type RecentActivity,
   type ReviewSchedule,
   type ContentReport,
+  type AppSetting,
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, avg, gt, lte } from "drizzle-orm";
+import { eq, and, desc, sql, count, avg, gt, lte, inArray } from "drizzle-orm";
 import crypto from "crypto";
 
 export interface IStorage {
@@ -132,6 +134,12 @@ export interface IStorage {
       isRead: boolean;
     }[]
   >;
+
+  // App Settings (admin config)
+  getAppSettings(keys?: string[]): Promise<AppSetting[]>;
+  getAppSetting(key: string): Promise<string | null>;
+  setAppSetting(key: string, value: string): Promise<void>;
+  setAppSettings(settings: { key: string; value: string }[]): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -993,6 +1001,44 @@ export class DatabaseStorage implements IStorage {
     // No announcements table yet — return empty list.
     // When an announcements table is added to schema, this will query it.
     return [];
+  }
+
+  // ── App Settings ──────────────────────────
+
+  async getAppSettings(keys?: string[]): Promise<AppSetting[]> {
+    if (keys && keys.length > 0) {
+      return db
+        .select()
+        .from(appSettings)
+        .where(inArray(appSettings.key, keys));
+    }
+    return db.select().from(appSettings);
+  }
+
+  async getAppSetting(key: string): Promise<string | null> {
+    const [setting] = await db
+      .select()
+      .from(appSettings)
+      .where(eq(appSettings.key, key));
+    return setting?.value ?? null;
+  }
+
+  async setAppSetting(key: string, value: string): Promise<void> {
+    const existing = await this.getAppSetting(key);
+    if (existing !== null) {
+      await db
+        .update(appSettings)
+        .set({ value, updatedAt: new Date() })
+        .where(eq(appSettings.key, key));
+    } else {
+      await db.insert(appSettings).values({ key, value });
+    }
+  }
+
+  async setAppSettings(settings: { key: string; value: string }[]): Promise<void> {
+    for (const { key, value } of settings) {
+      await this.setAppSetting(key, value);
+    }
   }
 }
 
