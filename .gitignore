@@ -6,6 +6,12 @@
 # Local dev state
 .local/
 
+# Local tooling skills
+.agent/
+
+# Server build output
+server_dist/
+
 # dependencies
 node_modules/
 
