@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
-  Text,
   FlatList,
   StyleSheet,
   Pressable,
@@ -87,16 +86,16 @@ function SearchResultCard({
       </View>
       <View style={styles.resultContent}>
         <View style={styles.resultHeader}>
-          <Text style={styles.resultTitle} numberOfLines={1}>
+          <ThemedText style={styles.resultTitle} numberOfLines={1}>
             {item.title}
-          </Text>
+          </ThemedText>
           <View style={styles.typeTag}>
-            <Text style={styles.typeTagText}>{getTypeLabel()}</Text>
+            <ThemedText style={styles.typeTagText}>{getTypeLabel()}</ThemedText>
           </View>
         </View>
-        <Text style={styles.resultSubtitle} numberOfLines={1}>
+        <ThemedText style={styles.resultSubtitle} numberOfLines={1}>
           {item.subtitle}
-        </Text>
+        </ThemedText>
       </View>
       <Feather name="chevron-right" size={18} color={Colors.dark.textMuted} />
     </Pressable>
@@ -225,14 +224,14 @@ export default function SearchScreen() {
               ]}
               onPress={() => handleFilterPress(filter.key)}
             >
-              <Text
+              <ThemedText
                 style={[
                   styles.filterText,
                   activeFilter === filter.key && styles.filterTextActive,
                 ]}
               >
                 {filter.label}
-              </Text>
+              </ThemedText>
             </Pressable>
           ))}
         </View>

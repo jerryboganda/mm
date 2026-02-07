@@ -57,6 +57,13 @@ export default function PracticeScreen() {
       color: Colors.dark.error,
       disabled: !stats?.wrongQuestionsCount,
     },
+    {
+      id: "exam",
+      title: "Exam Simulation",
+      description: "Timed exam with 30 questions, no going back",
+      icon: "award" as const,
+      color: Colors.dark.warning,
+    },
   ];
 
   return (
@@ -98,6 +105,12 @@ export default function PracticeScreen() {
               onPress={() => {
                 if (mode.id === "topic") {
                   navigation.navigate("QuizTopicSelect");
+                } else if (mode.id === "exam") {
+                  navigation.navigate("QuizPlayer", {
+                    mode: "exam",
+                    topicId: undefined,
+                    questionCount: 30,
+                  });
                 } else {
                   navigation.navigate("QuizPlayer", {
                     mode: mode.id as "mixed" | "wrong",

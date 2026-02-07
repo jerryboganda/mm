@@ -54,7 +54,8 @@ export default function QuizPlayerScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<QuizPlayerNavigationProp>();
   const route = useRoute<QuizPlayerRouteProp>();
-  const { mode, topicId } = route.params;
+  const { mode, topicId, questionCount: paramQuestionCount } = route.params;
+  const isExamMode = mode === "exam";
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -64,7 +65,14 @@ export default function QuizPlayerScreen() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
 
   const { data: quizData, isLoading } = useQuery<QuizData>({
-    queryKey: ["/api/quiz/start", mode, topicId],
+    queryKey: ['/api/quiz/start', mode === 'exam' ? 'mixed' : mode, topicId, paramQuestionCount],
+    queryFn: async () => {
+      const queryMode = mode === 'exam' ? 'mixed' : mode;
+      const countParam = paramQuestionCount ? `&count=${paramQuestionCount}` : '';
+      const topicParam = topicId ? `&topicId=${topicId}` : '';
+      const res = await apiRequest('GET', `/api/quiz/start/${queryMode}?${topicParam}${countParam}`);
+      return res.json();
+    },
   });
 
   const submitMutation = useMutation({
@@ -239,6 +247,12 @@ export default function QuizPlayerScreen() {
   return (
     <BackgroundGradient variant="quiz">
       <View style={[styles.container, { paddingTop: insets.top + Spacing.lg }]}>
+        {isExamMode && (
+          <View style={styles.examBanner}>
+            <Feather name="award" size={16} color={Colors.dark.warning} />
+            <ThemedText style={styles.examBannerText}>Exam Simulation Mode</ThemedText>
+          </View>
+        )}
         <View style={styles.header}>
           <Pressable
             onPress={() => {
@@ -529,6 +543,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
+  },
+  examBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(245,158,11,0.15)",
+    borderRadius: BorderRadius.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: "rgba(245,158,11,0.3)",
+  },
+  examBannerText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: Colors.dark.warning,
+    marginLeft: Spacing.sm,
   },
   header: {
     flexDirection: "row",

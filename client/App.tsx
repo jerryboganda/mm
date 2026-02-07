@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, AppState } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -25,8 +25,82 @@ import { PurchasesProvider } from "@/lib/purchases";
 import { NetworkProvider } from "@/lib/network";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
 import { Colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
+import { persistQueryCache, restoreQueryCache } from "@/lib/offline-cache";
 
 SplashScreen.preventAutoHideAsync();
+
+// Deep linking configuration
+const linking = {
+  prefixes: ["maternalmind://", "https://maternalmind.app"],
+  config: {
+    screens: {
+      Main: {
+        screens: {
+          HomeTab: "home",
+          LibraryTab: {
+            screens: {
+              Books: "library",
+              Chapters: "library/book/:bookId",
+              Topics: "library/chapter/:chapterId",
+            },
+          },
+          QuizTab: "quiz",
+          ProgressTab: "progress",
+          ProfileTab: "profile",
+        },
+      },
+      TopicReader: "topic/:topicId",
+      QuizPlayer: "quiz/play/:mode",
+      QuizResults: "quiz/results/:resultId",
+      ResetPassword: "reset-password",
+      Subscription: "subscribe",
+      Bookmarks: "bookmarks",
+    },
+  },
+};
+
+function AppContent() {
+  const { theme, isDark } = useTheme();
+
+  const navigationTheme = {
+    dark: isDark,
+    colors: {
+      primary: theme.primary,
+      background: theme.backgroundRoot,
+      card: theme.backgroundDefault,
+      text: theme.text,
+      border: theme.glassBorder,
+      notification: theme.primary,
+    },
+    fonts: {
+      regular: {
+        fontFamily: "Inter_400Regular",
+        fontWeight: "400" as const,
+      },
+      medium: {
+        fontFamily: "Inter_500Medium",
+        fontWeight: "500" as const,
+      },
+      bold: {
+        fontFamily: "Inter_700Bold",
+        fontWeight: "700" as const,
+      },
+      heavy: {
+        fontFamily: "Inter_700Bold",
+        fontWeight: "700" as const,
+      },
+    },
+  };
+
+  return (
+    <NavigationContainer theme={navigationTheme} linking={linking}>
+      <AppNetworkWrapper>
+        <RootStackNavigator />
+      </AppNetworkWrapper>
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -43,6 +117,21 @@ export default function App() {
     }
   }, [fontsLoaded, fontError]);
 
+  // Restore offline cache on startup
+  useEffect(() => {
+    restoreQueryCache(queryClient);
+  }, []);
+
+  // Persist cache when app goes to background
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "background" || state === "inactive") {
+        persistQueryCache(queryClient);
+      }
+    });
+    return () => subscription.remove();
+  }, []);
+
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -56,42 +145,8 @@ export default function App() {
               <SafeAreaProvider>
                 <GestureHandlerRootView style={styles.root}>
                   <KeyboardProvider>
-                    <NavigationContainer
-                      theme={{
-                        dark: true,
-                        colors: {
-                          primary: Colors.dark.primary,
-                          background: Colors.dark.backgroundRoot,
-                          card: Colors.dark.backgroundDefault,
-                          text: Colors.dark.text,
-                          border: Colors.dark.glassBorder,
-                          notification: Colors.dark.primary,
-                        },
-                        fonts: {
-                          regular: {
-                            fontFamily: "Inter_400Regular",
-                            fontWeight: "400",
-                          },
-                          medium: {
-                            fontFamily: "Inter_500Medium",
-                            fontWeight: "500",
-                          },
-                          bold: {
-                            fontFamily: "Inter_700Bold",
-                            fontWeight: "700",
-                          },
-                          heavy: {
-                            fontFamily: "Inter_700Bold",
-                            fontWeight: "700",
-                          },
-                        },
-                      }}
-                    >
-                      <AppNetworkWrapper>
-                        <RootStackNavigator />
-                      </AppNetworkWrapper>
-                    </NavigationContainer>
-                    <StatusBar style="light" />
+                    <AppContent />
+                    <StatusBar style="auto" />
                   </KeyboardProvider>
                 </GestureHandlerRootView>
               </SafeAreaProvider>

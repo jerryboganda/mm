@@ -22,7 +22,11 @@ export function StatCard({
   style,
 }: StatCardProps) {
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[styles.container, style]}
+      accessibilityRole="text"
+      accessibilityLabel={`${label}: ${value}`}
+    >
       <LinearGradient
         colors={[Colors.dark.glass, "rgba(255,255,255,0.08)"]}
         style={StyleSheet.absoluteFill}

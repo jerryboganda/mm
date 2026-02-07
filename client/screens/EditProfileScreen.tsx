@@ -174,6 +174,58 @@ export default function EditProfileScreen() {
               Email cannot be changed
             </ThemedText>
           </GlassCard>
+
+          <GlassCard style={styles.inputCard}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View>
+                <ThemedText style={styles.inputLabel}>Mobile Number</ThemedText>
+                {user?.isPhoneVerified ? (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Feather
+                      name="check-circle"
+                      size={14}
+                      color={Colors.dark.success}
+                      style={{ marginRight: 6 }}
+                    />
+                    <ThemedText
+                      style={{ color: Colors.dark.success, fontSize: 14 }}
+                    >
+                      Verified
+                    </ThemedText>
+                  </View>
+                ) : (
+                  <ThemedText
+                    style={{ color: Colors.dark.error, fontSize: 14 }}
+                  >
+                    Not Verified
+                  </ThemedText>
+                )}
+              </View>
+              <Pressable
+                onPress={() => navigation.navigate("VerifyPhone" as never)}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.7 : 1,
+                  padding: 8,
+                })}
+              >
+                <ThemedText
+                  style={{
+                    color: Colors.dark.primary,
+                    fontWeight: "600",
+                    fontSize: 14,
+                  }}
+                >
+                  {user?.isPhoneVerified ? "Update" : "Verify Now"}
+                </ThemedText>
+              </Pressable>
+            </View>
+          </GlassCard>
         </View>
 
         <View style={styles.buttonSection}>

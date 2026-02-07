@@ -123,6 +123,9 @@ export function PrimaryButton({
       onPressOut={handlePressOut}
       disabled={disabled || loading}
       testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[
         styles.button,
         animatedStyle,

@@ -1,0 +1,54 @@
+# Server-side code (not needed for mobile build)
+server/
+server_dist/
+scripts/
+drizzle.config.ts
+
+# Docker / deployment
+Dockerfile
+docker-compose.yml
+
+# Android native build (EAS builds its own)
+android/
+
+# iOS native build
+ios/
+
+# Docs / notes
+*.md
+attached_assets/
+linux vps memory file.md
+
+# Dependencies (EAS installs its own)
+node_modules/
+
+# Expo
+.expo/
+dist/
+dist-test/
+web-build/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*

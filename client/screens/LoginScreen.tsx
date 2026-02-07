@@ -4,13 +4,19 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Haptics from "expo-haptics";
+import { Ionicons } from "@expo/vector-icons";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { useAuth } from "@/lib/auth";
+import {
+  useAuth,
+  saveCredentials,
+  getSavedCredentials,
+  clearSavedCredentials,
+} from "@/lib/auth";
 import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
@@ -26,10 +32,28 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );
+
+  React.useEffect(() => {
+    loadCredentials();
+  }, []);
+
+  const loadCredentials = async () => {
+    try {
+      const { email: savedEmail } =
+        await getSavedCredentials();
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberMe(true);
+      }
+    } catch (error) {
+      console.error("Failed to load credentials:", error);
+    }
+  };
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -56,8 +80,19 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(email, password);
+
+      if (rememberMe) {
+        await saveCredentials(email, password);
+      } else {
+        await clearSavedCredentials();
+      }
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error: any) {
+      if (error.code === "EMAIL_NOT_VERIFIED") {
+        navigation.navigate("VerifyEmail", { email });
+        return;
+      }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
         "Login Failed",
@@ -114,6 +149,24 @@ export default function LoginScreen() {
             autoComplete="password"
             error={errors.password}
           />
+
+          <Pressable
+            style={styles.rememberMeContainer}
+            onPress={() => setRememberMe(!rememberMe)}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                rememberMe && styles.checkboxChecked,
+                { borderColor: Colors.dark.glassBorder },
+              ]}
+            >
+              {rememberMe && (
+                <Ionicons name="checkmark" size={12} color="white" />
+              )}
+            </View>
+            <ThemedText style={styles.rememberMeText}>Remember me</ThemedText>
+          </Pressable>
 
           <Pressable
             style={styles.forgotPassword}
@@ -174,6 +227,30 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
+  },
+  rememberMeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Spacing.md,
+    marginTop: Spacing.sm,
+  },
+  rememberMeText: {
+    marginLeft: Spacing.sm,
+    color: Colors.dark.textSecondary,
+    fontSize: 14,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 4,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.dark.primary,
+    borderColor: Colors.dark.primary,
   },
   forgotPassword: {
     alignSelf: "flex-end",

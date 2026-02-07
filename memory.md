@@ -1,82 +1,15 @@
-# Session Memory: Android APK Build
+# 🧠 Maternal Mind - Project Memory (A-Z)
 
-> **Created**: 2026-01-29
-> **Topic**: Building React Native Expo Android APK on Windows
+## 🌐 Infrastructure & Deployment
 
-## 🎯 Objective
+### 🖥️ VPS Backend (Live)
 
-Build a standalone Android APK for the "MaternalMind" React Native Expo project to allow testing on a physical device without a development server.
+- **IP Address**: `185.252.233.186`
+- **Port**: `5000`
+- **Stack**: Docker Compose (Node.js App + PostgreSQL)
+- **Directory**: `/root/maternalmind`
 
-## 🛠️ Key Challenges & Solutions
-
-### 1. Windows Path Length Limit (Max 260 Characters)
-
-* **Issue**: The default project path on the desktop was too long, causing `ninja` and `CMake` errors during native module compilation (specifically `react-native-keyboard-controller` and `reanimated`).
-* **Failed Attempts**: Creating a directory junction (`C:\Users\Admin\MM`) was insufficient because some build tasks still resolved the absolute canonical path.
-* **Solution**: Moved the entire project to a top-level temporary directory: **`C:\M`**. This shortened the paths enough to bypass the limit.
-
-### 2. NDK & CMake Configuration
-
-* **Issue**: Gradle could not find the installed NDK or CMake versions.
-* **Solution**: Manually configured `android/local.properties` with absolute paths using forward slashes:
-
-    ```properties
-    sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk
-    ndk.dir=C:/Users/Admin/AppData/Local/Android/Sdk/ndk/27.1.12297006
-    ```
-
-### 3. Splash Screen Freeze (Debug vs. Release)
-
-* **Issue**: The initial `app-debug.apk` installed successfully but froze on the splash screen.
-* **Root Cause**: Debug builds in React Native expect a running Metro bundler server to fetch the JavaScript bundle. Without it, the app waits indefinitely.
-* **Solution**: Generated a **Release** build (`assembleRelease`). Release builds bundle the JavaScript assets inside the APK, allowing it to run standalone.
-
-### 4. Asset Embedding in Release Build
-
-* **Issue**: Standard `assembleRelease` sometimes misses Expo assets in a hybrid setup.
-* **Solution**: Manually copied the compiled JS bundle and assets before final packaging:
-  * JS Bundle: `dist/_expo/static/js/android/*.hbc` -> `src/main/assets/index.android.bundle`
-  * Resources: `dist/assets` -> `src/main/res`
-
-## 📂 Critical Paths
-
-* **Original Project**: `c:\Users\Admin\Desktop\MM React + Expo App`
-* **Build Workspace**: `C:\M` (Temporary, used for building)
-* **Final APK**: `c:\Users\Admin\Desktop\MM React + Expo App\app-release.apk`
-
-## 📜 Key Commands Executed
-
-```powershell
-# 1. Clean Deep
-Remove-Item -Path "node_modules", ".cxx", "build" -Recurse -Force
-npm install
-
-# 2. Build Release (at C:\M)
-cmd /c "gradlew assembleRelease"
-```
-
-## 📦 Final Deliverable
-
-* **File**: `app-release.apk` (~104 MB)
-* **Status**: Verifed build success (Exit Code 0). Copied to user desktop.
-
-## 🚀 Backend Deployment (VPS)
->
-> **Deployed**: 2026-01-29
-> **Host**: `185.252.233.186` (User: root)
-
-### 📂 Directory Structure
-
-* **Path**: `/root/maternalmind`
-* **Files**: `docker-compose.yml`, `Dockerfile`, `package.json`, `server/`, `shared/`
-
-### 🔧 Configuration
-
-* **Port**: `5000` (Mapped to host 5000:5000)
-* **Database**: Postgres 15 (Docker container `maternalmind-db-1`)
-* **Runtime**: Node.js 20 + `tsx` (Modified Dockerfile to handle path aliases)
-
-### 📜 Shortcuts
+### 📜 Server Shortcuts
 
 ```bash
 # SSH into VPS
@@ -85,12 +18,58 @@ ssh root@185.252.233.186
 # Check Logs
 cd /root/maternalmind && docker compose logs -f app
 
+# Restart Backend (after code changes)
+cd /root/maternalmind && docker compose up -d --build app
+
 # Run Migrations
 cd /root/maternalmind && docker compose exec app npm run db:push
 ```
 
-## 🛠️ Project Status & Sync
+## 🏗️ Android Build System (EAS Cloud)
 
-* **GitHub Repo**: `https://github.com/jerryboganda/mm` (Synced)
-* **API Configuration**: Client is hardcoded to `http://185.252.233.186:5000` in `client/lib/query-client.ts`.
-* **Latest APK**: Rebuilding with live API connection...
+Due to local Windows environment constraints (path length limits and NDK setup), we transitioned to **EAS Build** (Expo Application Services).
+
+- **EAS Project ID**: `fc2a8779-9dbb-407c-9622-d02c88e300de`
+- **Build Profile**: `preview` (Outputs a standalone **APK**)
+- **Build Command**: `npx eas-cli build --profile preview --platform android`
+- **Dashboard**: [Expo Dashboard](https://expo.dev/accounts/egjerrys-organization/projects/maternalmind/builds)
+
+### 🛠️ Critical Network & Schema Fixes (Android)
+
+To resolve "Network request failed" and schema errors:
+
+1. **Cleartext Traffic**: Enabled via `expo-build-properties` plugin in `app.json` (required for HTTP connections to the VPS).
+2. **CORS**: Server `index.ts` updated with a robust policy to allow mobile app platform origins.
+3. **Dependency Fix**: Ran `npx expo install --fix` to align all packages with the Expo SDK.
+
+## 📂 Source Control
+
+- **GitHub Repository**: `https://github.com/jerryboganda/mm`
+- **Status**: Synced and pushed.
+
+## 🧪 Development Workflow
+
+1. **Mobile Testing**: Use EAS for builds. Avoid local `gradlew assemble` on this machine due to environment conflicts.
+2. **Native Configuration**: Any Android manifest or system changes must be added to `app.json` -> `plugins` -> `expo-build-properties`.
+3. **Emulator Troubleshooting**: The local emulator requires **Windows Hypervisor Platform** or **HAXM** to be enabled in BIOS/Windows Features for x86_64 acceleration. Since virtualization is disabled in BIOS on this machine, use **Expo Go**, **Web Testing**, or **EAS Builds** (standalone APKs) for previewing changes.
+
+## ✨ UI, Navigation & Visibility Improvements (Jan 2026)
+
+Recent updates have focused on refining the Android user experience and app-wide aesthetics.
+
+### 🎨 Design & Visibility
+
+- **High-Contrast Glass**: Tripled the base opacity for all "glass" elements in `theme.ts`.
+- **Visibility Boost**: Updated `GlassCard`, `BentoCard`, `StatCard`, and `GlassInput` to ensure crisp readability against deep black backgrounds.
+- **Dashboard Layout**: Resolved squashing issues on the Home screen cards. Fixed flexbox constraints and container widths for animated items.
+- **Hero Stats**: Fixed indexing logic so the first stat card ("Topics Read") correctly uses the wide "hero" layout.
+
+### 🗺️ Navigation & Platform UX
+
+- **Android System Bar**: Implemented dynamic safe area handling in `MainTabNavigator.tsx`. The bottom tab bar now respects the Android system navigation bar, preventing UI overlap across different display modes.
+- **Reliable Navigation**: Updated the "Sign In" link in the registration flow to use explicit `navigation.navigate("Login")` instead of `goBack()`, ensuring a consistent path for users.
+
+### 🚀 Build History
+
+- **Last Build (0380c558-14bb-46f9-9cbe-eb5f4284e2eb)**: Full APK including UI, Contrast, and Navigation fixes.
+- **Status**: Active and downloadable via [Expo Projects](https://expo.dev/accounts/egjerrys-organization/projects/maternalmind/builds).

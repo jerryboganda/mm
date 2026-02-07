@@ -1,0 +1,142 @@
+﻿import { Router } from "express";
+import { storage } from "../storage";
+import { AuthRequest, authMiddleware } from "../middleware";
+
+const router = Router();
+
+// Get due reviews count (for badge on home screen)
+router.get("/due-count", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const count = await storage.getDueReviewCount(req.userId!);
+    res.json({ count });
+  } catch (error) {
+    console.error("Get due review count error:", error);
+    res.status(500).json({ message: "Failed to get due review count" });
+  }
+});
+
+// Get due review cards with MCQ details
+router.get("/due", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 20;
+    const dueReviews = await storage.getDueReviews(req.userId!, limit);
+
+    if (dueReviews.length === 0) {
+      return res.json({ reviews: [], questions: [] });
+    }
+
+    // Batch-fetch MCQ details
+    const mcqIds = dueReviews.map((r) => r.mcqId);
+    const allMcqs = await storage.getMCQsByIds(mcqIds);
+    const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
+
+    const questions = dueReviews
+      .map((review) => {
+        const mcq = mcqMap.get(review.mcqId);
+        if (!mcq) return null;
+        return {
+          reviewId: review.id,
+          mcqId: mcq.id,
+          question: mcq.question,
+          options: mcq.options as { label: string; text: string }[],
+          difficulty: mcq.difficulty,
+          interval: review.interval,
+          repetitions: review.repetitions,
+        };
+      })
+      .filter(Boolean);
+
+    res.json({ questions });
+  } catch (error) {
+    console.error("Get due reviews error:", error);
+    res.status(500).json({ message: "Failed to get due reviews" });
+  }
+});
+
+// Submit a review result (SM-2 quality rating)
+router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { reviewId, mcqId, selectedAnswer } = req.body;
+
+    if (!selectedAnswer || typeof selectedAnswer !== "string") {
+      return res.status(400).json({ message: "selectedAnswer is required" });
+    }
+    if (!reviewId && !mcqId) {
+      return res.status(400).json({ message: "reviewId or mcqId is required" });
+    }
+
+    // If no reviewId, create one on the fly
+    let actualReviewId = reviewId;
+    if (!actualReviewId && mcqId) {
+      const review = await storage.getOrCreateReview(req.userId!, mcqId);
+      actualReviewId = review.id;
+    }
+
+    if (!actualReviewId) {
+      return res.status(400).json({ message: "reviewId or mcqId required" });
+    }
+
+    // Get the MCQ to check the answer
+    const review = await storage.getDueReviews(req.userId!, 100);
+    const thisReview = review.find((r) => r.id === actualReviewId);
+    const mcq = thisReview
+      ? await storage.getMCQ(thisReview.mcqId)
+      : mcqId
+        ? await storage.getMCQ(mcqId)
+        : null;
+
+    if (!mcq) {
+      return res.status(404).json({ message: "MCQ not found" });
+    }
+
+    const isCorrect = selectedAnswer === mcq.correctAnswer;
+    // SM-2 quality: 5 = perfect, 4 = correct with hesitation, 3 = correct with difficulty
+    // 2 = incorrect but close, 1 = incorrect, 0 = complete blank
+    const quality = isCorrect ? 4 : 1;
+
+    const updated = await storage.updateReview(actualReviewId, quality);
+
+    res.json({
+      isCorrect,
+      correctAnswer: mcq.correctAnswer,
+      explanation: mcq.explanation,
+      nextReviewAt: updated.nextReviewAt.toISOString(),
+      interval: updated.interval,
+    });
+  } catch (error) {
+    console.error("Submit review error:", error);
+    res.status(500).json({ message: "Failed to submit review" });
+  }
+});
+
+// Enqueue wrong answers from a quiz attempt for spaced repetition
+router.post("/enqueue", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const { attemptId } = req.body;
+
+    const attempt = await storage.getQuizAttempt(attemptId);
+    if (!attempt || attempt.userId !== req.userId) {
+      return res.status(404).json({ message: "Attempt not found" });
+    }
+
+    const answers = attempt.answers as Record<string, { isCorrect: boolean }>;
+
+    let enqueued = 0;
+    for (const [mcqId, answer] of Object.entries(answers)) {
+      if (!answer.isCorrect) {
+        await storage.getOrCreateReview(req.userId!, mcqId);
+        enqueued++;
+      }
+    }
+
+    res.json({
+      enqueued,
+      message: `${enqueued} questions added to review queue`,
+    });
+  } catch (error) {
+    console.error("Enqueue reviews error:", error);
+    res.status(500).json({ message: "Failed to enqueue reviews" });
+  }
+});
+
+export default router;

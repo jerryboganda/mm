@@ -68,7 +68,10 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      await register(name, email, password);
+      const result = await register(name, email, password);
+      if (result && "requiresEmailVerification" in result && result.requiresEmailVerification) {
+        navigation.navigate("VerifyEmail", { email });
+      }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);

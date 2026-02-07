@@ -20,6 +20,7 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme, setThemeMode } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type SettingsScreenNavigationProp =
@@ -30,6 +31,7 @@ export default function SettingsScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
+  const { themeMode } = useTheme();
   const [pushNotifications, setPushNotifications] = useState(true);
   const [studyReminders, setStudyReminders] = useState(true);
   const [quizReminders, setQuizReminders] = useState(false);
@@ -86,6 +88,38 @@ export default function SettingsScreen() {
   };
 
   const settingsGroups: SettingsGroup[] = [
+    {
+      title: "APPEARANCE",
+      items: [
+        {
+          id: "theme-dark",
+          title: "Dark Mode",
+          subtitle: "Dark background with glow effects",
+          icon: "moon",
+          type: "toggle",
+          value: themeMode === "dark",
+          onToggle: () => setThemeMode("dark"),
+        },
+        {
+          id: "theme-light",
+          title: "Light Mode",
+          subtitle: "Light background for daytime",
+          icon: "sun",
+          type: "toggle",
+          value: themeMode === "light",
+          onToggle: () => setThemeMode("light"),
+        },
+        {
+          id: "theme-system",
+          title: "Follow System",
+          subtitle: "Match your device settings",
+          icon: "smartphone",
+          type: "toggle",
+          value: themeMode === "system",
+          onToggle: () => setThemeMode("system"),
+        },
+      ],
+    },
     {
       title: "NOTIFICATIONS",
       items: [

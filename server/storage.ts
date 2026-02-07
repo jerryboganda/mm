@@ -10,6 +10,8 @@ import {
   quizAttempts,
   passwordResetTokens,
   recentActivity,
+  reviewSchedule,
+  contentReports,
   type User,
   type InsertUser,
   type Book,
@@ -22,9 +24,11 @@ import {
   type QuizAttempt,
   type PasswordResetToken,
   type RecentActivity,
+  type ReviewSchedule,
+  type ContentReport,
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, avg, gt } from "drizzle-orm";
+import { eq, and, desc, sql, count, avg, gt, lte } from "drizzle-orm";
 import crypto from "crypto";
 
 export interface IStorage {
@@ -83,6 +87,51 @@ export interface IStorage {
 
   recordTopicView(userId: string, topicId: string): Promise<void>;
   getRecentActivity(userId: string, limit?: number): Promise<RecentActivity[]>;
+
+  updateUserVerification(
+    userId: string,
+    data: {
+      isEmailVerified?: boolean;
+      emailVerificationToken?: string | null;
+      emailTokenExpiresAt?: Date | null;
+      isPhoneVerified?: boolean;
+      phoneVerificationToken?: string | null;
+      phoneTokenExpiresAt?: Date | null;
+    },
+  ): Promise<User | undefined>;
+
+  updateUserPhoneOtp(
+    userId: string,
+    data: {
+      phoneNumber: string;
+      phoneVerificationToken: string;
+      phoneTokenExpiresAt: Date;
+    },
+  ): Promise<User | undefined>;
+
+  getRecommendedTopics(
+    userId: string,
+    limit?: number,
+  ): Promise<
+    {
+      id: string;
+      title: string;
+      chapterTitle: string;
+      bookTitle: string;
+      progress: number;
+    }[]
+  >;
+
+  getAnnouncements(): Promise<
+    {
+      id: string;
+      title: string;
+      message: string;
+      type: string;
+      createdAt: string;
+      isRead: boolean;
+    }[]
+  >;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -424,6 +473,528 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(recentActivity.viewedAt))
       .limit(limit);
   }
+
+  async updateUserVerification(
+    userId: string,
+    data: {
+      isEmailVerified?: boolean;
+      emailVerificationToken?: string | null;
+      emailTokenExpiresAt?: Date | null;
+      isPhoneVerified?: boolean;
+      phoneVerificationToken?: string | null;
+      phoneTokenExpiresAt?: Date | null;
+    },
+  ): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  async updateUserPhoneOtp(
+    userId: string,
+    data: {
+      phoneNumber: string;
+      phoneVerificationToken: string;
+      phoneTokenExpiresAt: Date;
+    },
+  ): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  // ── Efficient batch queries (P1 — eliminate N+1) ──────────────────────
+
+  /** Get all chapters with topic counts using LEFT JOIN + GROUP BY */
+  async getAllChaptersGroupedByBook(): Promise<
+    { bookId: string; chapterId: string; chapterTitle: string; chapterDescription: string | null; chapterOrder: number | null; topicCount: number }[]
+  > {
+    const rows = await db
+      .select({
+        bookId: chapters.bookId,
+        chapterId: chapters.id,
+        chapterTitle: chapters.title,
+        chapterDescription: chapters.description,
+        chapterOrder: chapters.order,
+        topicCount: sql<number>`cast(count(${topics.id}) as int)`.as("topic_count"),
+      })
+      .from(chapters)
+      .leftJoin(
+        topics,
+        and(eq(topics.chapterId, chapters.id), eq(topics.isPublished, true)),
+      )
+      .where(eq(chapters.isPublished, true))
+      .groupBy(chapters.bookId, chapters.id, chapters.title, chapters.description, chapters.order)
+      .orderBy(chapters.order);
+    return rows;
+  }
+
+  /** Get all topics for a book (across all its chapters) in one query */
+  async getTopicsByBook(bookId: string): Promise<Topic[]> {
+    return await db
+      .select({ topic: topics })
+      .from(topics)
+      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .where(and(eq(chapters.bookId, bookId), eq(topics.isPublished, true)))
+      .orderBy(chapters.order, topics.order)
+      .then((rows) => rows.map((r) => r.topic));
+  }
+
+  /** Full-text search using SQL ILIKE — no table scan */
+  async searchContent(
+    query: string,
+    filter: string,
+    limit: number = 50,
+  ): Promise<
+    {
+      id: string;
+      type: "book" | "chapter" | "topic";
+      title: string;
+      subtitle: string;
+      bookId?: string;
+      bookTitle?: string;
+      chapterId?: string;
+      chapterTitle?: string;
+    }[]
+  > {
+    const pattern = `%${query}%`;
+    const results: any[] = [];
+
+    if (filter === "all" || filter === "books") {
+      const bookResults = await db
+        .select()
+        .from(books)
+        .where(
+          and(
+            eq(books.isPublished, true),
+            sql`(${books.title} ILIKE ${pattern} OR ${books.description} ILIKE ${pattern})`,
+          ),
+        )
+        .limit(limit);
+      for (const b of bookResults) {
+        results.push({
+          id: b.id,
+          type: "book" as const,
+          title: b.title,
+          subtitle: b.description || "Book",
+        });
+      }
+    }
+
+    if (filter === "all" || filter === "chapters") {
+      const chapterResults = await db
+        .select({
+          chapterId: chapters.id,
+          chapterTitle: chapters.title,
+          chapterDescription: chapters.description,
+          bookId: books.id,
+          bookTitle: books.title,
+        })
+        .from(chapters)
+        .innerJoin(books, eq(chapters.bookId, books.id))
+        .where(
+          and(
+            eq(chapters.isPublished, true),
+            sql`(${chapters.title} ILIKE ${pattern} OR ${chapters.description} ILIKE ${pattern})`,
+          ),
+        )
+        .limit(limit);
+      for (const c of chapterResults) {
+        results.push({
+          id: c.chapterId,
+          type: "chapter" as const,
+          title: c.chapterTitle,
+          subtitle: c.bookTitle,
+          bookId: c.bookId,
+          bookTitle: c.bookTitle,
+        });
+      }
+    }
+
+    if (filter === "all" || filter === "topics") {
+      const topicResults = await db
+        .select({
+          topicId: topics.id,
+          topicTitle: topics.title,
+          topicDescription: topics.description,
+          chapterId: chapters.id,
+          chapterTitle: chapters.title,
+          bookId: books.id,
+          bookTitle: books.title,
+        })
+        .from(topics)
+        .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+        .innerJoin(books, eq(chapters.bookId, books.id))
+        .where(
+          and(
+            eq(topics.isPublished, true),
+            sql`(${topics.title} ILIKE ${pattern} OR ${topics.description} ILIKE ${pattern})`,
+          ),
+        )
+        .limit(limit);
+      for (const t of topicResults) {
+        results.push({
+          id: t.topicId,
+          type: "topic" as const,
+          title: t.topicTitle,
+          subtitle: `${t.bookTitle} > ${t.chapterTitle}`,
+          bookId: t.bookId,
+          bookTitle: t.bookTitle,
+          chapterId: t.chapterId,
+          chapterTitle: t.chapterTitle,
+        });
+      }
+    }
+
+    return results.slice(0, limit);
+  }
+
+  /** Get quiz topics with question counts using a JOIN instead of N+1 */
+  async getQuizTopicsWithCounts(): Promise<
+    { id: string; title: string; chapterTitle: string; questionCount: number }[]
+  > {
+    const rows = await db
+      .select({
+        topicId: topics.id,
+        topicTitle: topics.title,
+        chapterTitle: chapters.title,
+        questionCount: sql<number>`count(${mcqs.id})`.as("question_count"),
+      })
+      .from(topics)
+      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .innerJoin(mcqs, eq(mcqs.topicId, topics.id))
+      .where(and(eq(topics.isPublished, true), eq(mcqs.isPublished, true)))
+      .groupBy(topics.id, topics.title, chapters.title)
+      .having(sql`count(${mcqs.id}) > 0`);
+
+    return rows.map((r) => ({
+      id: r.topicId,
+      title: r.topicTitle,
+      chapterTitle: r.chapterTitle,
+      questionCount: Number(r.questionCount),
+    }));
+  }
+
+  /** Get multiple MCQs by ID in one query (batch for quiz results) */
+  async getMCQsByIds(ids: string[]): Promise<MCQ[]> {
+    if (ids.length === 0) return [];
+    return await db
+      .select()
+      .from(mcqs)
+      .where(sql`${mcqs.id} IN ${ids}`);
+  }
+
+  /** Get bookmarks with full topic→chapter→book details via JOINs */
+  async getBookmarksWithDetails(userId: string): Promise<
+    {
+      id: string;
+      topicId: string;
+      topicTitle: string;
+      chapterTitle: string;
+      bookTitle: string;
+      createdAt: Date;
+    }[]
+  > {
+    return await db
+      .select({
+        id: bookmarks.id,
+        topicId: topics.id,
+        topicTitle: topics.title,
+        chapterTitle: chapters.title,
+        bookTitle: books.title,
+        createdAt: bookmarks.createdAt,
+      })
+      .from(bookmarks)
+      .innerJoin(topics, eq(bookmarks.topicId, topics.id))
+      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .innerJoin(books, eq(chapters.bookId, books.id))
+      .where(eq(bookmarks.userId, userId))
+      .orderBy(desc(bookmarks.createdAt));
+  }
+
+  /** Get recent activity with full topic→chapter→book details via JOINs */
+  async getRecentActivityWithDetails(
+    userId: string,
+    limit: number = 20,
+  ): Promise<
+    {
+      id: string;
+      topicId: string;
+      topicTitle: string;
+      chapterTitle: string;
+      bookTitle: string;
+      viewedAt: Date;
+    }[]
+  > {
+    return await db
+      .select({
+        id: recentActivity.id,
+        topicId: topics.id,
+        topicTitle: topics.title,
+        chapterTitle: chapters.title,
+        bookTitle: books.title,
+        viewedAt: recentActivity.viewedAt,
+      })
+      .from(recentActivity)
+      .innerJoin(topics, eq(recentActivity.topicId, topics.id))
+      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .innerJoin(books, eq(chapters.bookId, books.id))
+      .where(eq(recentActivity.userId, userId))
+      .orderBy(desc(recentActivity.viewedAt))
+      .limit(limit);
+  }
+
+  /** Get quiz attempts with pagination */
+  async getQuizAttemptsPaginated(
+    userId: string,
+    page: number = 1,
+    pageSize: number = 20,
+  ): Promise<{ data: QuizAttempt[]; total: number; page: number; pageSize: number }> {
+    const offset = (page - 1) * pageSize;
+
+    const [totalResult] = await db
+      .select({ total: count() })
+      .from(quizAttempts)
+      .where(eq(quizAttempts.userId, userId));
+
+    const data = await db
+      .select()
+      .from(quizAttempts)
+      .where(eq(quizAttempts.userId, userId))
+      .orderBy(desc(quizAttempts.createdAt))
+      .limit(pageSize)
+      .offset(offset);
+
+    return {
+      data,
+      total: Number(totalResult?.total ?? 0),
+      page,
+      pageSize,
+    };
+  }
+
+  // ── Spaced Repetition (SM-2) ──────────────────────────────────
+
+  /** Get cards due for review */
+  async getDueReviews(userId: string, limit: number = 20): Promise<ReviewSchedule[]> {
+    return await db
+      .select()
+      .from(reviewSchedule)
+      .where(
+        and(
+          eq(reviewSchedule.userId, userId),
+          lte(reviewSchedule.nextReviewAt, new Date()),
+        ),
+      )
+      .orderBy(reviewSchedule.nextReviewAt)
+      .limit(limit);
+  }
+
+  /** Get or create a review schedule entry */
+  async getOrCreateReview(userId: string, mcqId: string): Promise<ReviewSchedule> {
+    const [existing] = await db
+      .select()
+      .from(reviewSchedule)
+      .where(
+        and(eq(reviewSchedule.userId, userId), eq(reviewSchedule.mcqId, mcqId)),
+      );
+
+    if (existing) return existing;
+
+    const [created] = await db
+      .insert(reviewSchedule)
+      .values({ userId, mcqId })
+      .returning();
+    return created;
+  }
+
+  /** Update review schedule after answering (SM-2 algorithm) */
+  async updateReview(
+    reviewId: string,
+    quality: number, // 0-5 quality rating
+  ): Promise<ReviewSchedule> {
+    const [review] = await db
+      .select()
+      .from(reviewSchedule)
+      .where(eq(reviewSchedule.id, reviewId));
+
+    if (!review) throw new Error("Review not found");
+
+    let { easeFactor, interval, repetitions } = review;
+    const ef = easeFactor / 100; // convert back to decimal
+
+    // SM-2 algorithm
+    if (quality >= 3) {
+      // Correct answer
+      if (repetitions === 0) {
+        interval = 1;
+      } else if (repetitions === 1) {
+        interval = 6;
+      } else {
+        interval = Math.round(interval * ef);
+      }
+      repetitions++;
+    } else {
+      // Incorrect — reset
+      repetitions = 0;
+      interval = 1;
+    }
+
+    // Update ease factor
+    const newEf = Math.max(
+      1.3,
+      ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)),
+    );
+
+    const nextReviewAt = new Date();
+    nextReviewAt.setDate(nextReviewAt.getDate() + interval);
+
+    const [updated] = await db
+      .update(reviewSchedule)
+      .set({
+        easeFactor: Math.round(newEf * 100),
+        interval,
+        repetitions,
+        nextReviewAt,
+        lastReviewedAt: new Date(),
+      })
+      .where(eq(reviewSchedule.id, reviewId))
+      .returning();
+
+    return updated;
+  }
+
+  /** Count due reviews for a user */
+  async getDueReviewCount(userId: string): Promise<number> {
+    const [result] = await db
+      .select({ count: count() })
+      .from(reviewSchedule)
+      .where(
+        and(
+          eq(reviewSchedule.userId, userId),
+          lte(reviewSchedule.nextReviewAt, new Date()),
+        ),
+      );
+    return Number(result?.count ?? 0);
+  }
+
+  // ── Content Error Reports ─────────────────────────────────────
+
+  /** Create a content error report */
+  async createContentReport(data: {
+    userId: string;
+    contentType: string;
+    contentId: string;
+    reportType: string;
+    description: string;
+  }): Promise<ContentReport> {
+    const [report] = await db
+      .insert(contentReports)
+      .values(data)
+      .returning();
+    return report;
+  }
+
+  /** Get content reports (for admin) */
+  async getContentReports(
+    status?: string,
+    limit: number = 50,
+  ): Promise<ContentReport[]> {
+    let query = db.select().from(contentReports).orderBy(desc(contentReports.createdAt)).limit(limit);
+    if (status) {
+      return await db
+        .select()
+        .from(contentReports)
+        .where(eq(contentReports.status, status))
+        .orderBy(desc(contentReports.createdAt))
+        .limit(limit);
+    }
+    return await query;
+  }
+
+  /** Update report status */
+  async updateContentReportStatus(
+    reportId: string,
+    status: string,
+    reviewedBy: string,
+  ): Promise<ContentReport | undefined> {
+    const [updated] = await db
+      .update(contentReports)
+      .set({ status, reviewedBy, reviewedAt: new Date() })
+      .where(eq(contentReports.id, reportId))
+      .returning();
+    return updated || undefined;
+  }
+
+  /** Get recommended topics: incomplete topics from books the user has been active in */
+  async getRecommendedTopics(
+    userId: string,
+    limit: number = 5,
+  ): Promise<
+    {
+      id: string;
+      title: string;
+      chapterTitle: string;
+      bookTitle: string;
+      progress: number;
+    }[]
+  > {
+    // Find topics user hasn't completed, ordered by book activity
+    const result = await db
+      .select({
+        id: topics.id,
+        title: topics.title,
+        chapterTitle: chapters.title,
+        bookTitle: books.title,
+      })
+      .from(topics)
+      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .innerJoin(books, eq(chapters.bookId, books.id))
+      .where(
+        and(
+          eq(topics.isPublished, true),
+          eq(chapters.isPublished, true),
+          eq(books.isPublished, true),
+          sql`${topics.id} NOT IN (
+            SELECT ${userProgress.topicId} FROM ${userProgress}
+            WHERE ${userProgress.userId} = ${userId} AND ${userProgress.isCompleted} = true
+          )`,
+        ),
+      )
+      .orderBy(sql`RANDOM()`)
+      .limit(limit);
+
+    return result.map((r) => ({
+      id: r.id,
+      title: r.title,
+      chapterTitle: r.chapterTitle,
+      bookTitle: r.bookTitle,
+      progress: 0,
+    }));
+  }
+
+  /** Get system announcements — for now returns empty since no announcements table exists yet */
+  async getAnnouncements(): Promise<
+    {
+      id: string;
+      title: string;
+      message: string;
+      type: string;
+      createdAt: string;
+      isRead: boolean;
+    }[]
+  > {
+    // No announcements table yet — return empty list.
+    // When an announcements table is added to schema, this will query it.
+    return [];
+  }
 }
+
 
 export const storage = new DatabaseStorage();

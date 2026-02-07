@@ -46,10 +46,10 @@ router.post(
           .json({ message: "Issue type and description are required" });
       }
 
-      // Log the issue for now - in production, you'd save to database or send to support system
-      console.log(`[SUPPORT] Issue reported by ${email}:`);
-      console.log(`  Type: ${type}`);
-      console.log(`  Description: ${description}`);
+      // Log the issue (structured, no PII leaks in production)
+      if (process.env.NODE_ENV !== "production") {
+        console.log(`[SUPPORT] Issue reported by ${email}: ${type}`);
+      }
 
       // Optionally send email to support
       if (process.env.RESEND_API_KEY) {
@@ -90,35 +90,22 @@ router.get(
   async (req: AuthRequest, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 20;
-      const recentActivities = await storage.getRecentActivity(
+      // Single JOIN query instead of N+1 individual lookups
+      const activitiesWithDetails = await storage.getRecentActivityWithDetails(
         req.userId!,
         limit,
       );
 
-      // Enrich with topic/chapter/book details
-      const activitiesWithDetails = await Promise.all(
-        recentActivities.map(async (activity) => {
-          const topic = await storage.getTopic(activity.topicId);
-          if (!topic) return null;
-
-          const chapter = await storage.getChapter(topic.chapterId);
-          if (!chapter) return null;
-
-          const book = await storage.getBook(chapter.bookId);
-          if (!book) return null;
-
-          return {
-            id: activity.id,
-            topicId: topic.id,
-            topicTitle: topic.title,
-            chapterTitle: chapter.title,
-            bookTitle: book.title,
-            viewedAt: activity.viewedAt.toISOString(),
-          };
-        }),
+      res.json(
+        activitiesWithDetails.map((a) => ({
+          id: a.id,
+          topicId: a.topicId,
+          topicTitle: a.topicTitle,
+          chapterTitle: a.chapterTitle,
+          bookTitle: a.bookTitle,
+          viewedAt: a.viewedAt.toISOString(),
+        })),
       );
-
-      res.json(activitiesWithDetails.filter(Boolean));
     } catch (error) {
       console.error("Get recent activity error:", error);
       res.status(500).json({ message: "Failed to get recent activity" });
@@ -128,31 +115,19 @@ router.get(
 
 router.get("/bookmarks", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const userBookmarks = await storage.getBookmarks(req.userId!);
+    // Single JOIN query instead of N+1 individual lookups
+    const bookmarksWithDetails = await storage.getBookmarksWithDetails(req.userId!);
 
-    const bookmarksWithDetails = await Promise.all(
-      userBookmarks.map(async (bookmark) => {
-        const topic = await storage.getTopic(bookmark.topicId);
-        if (!topic) return null;
-
-        const chapter = await storage.getChapter(topic.chapterId);
-        if (!chapter) return null;
-
-        const book = await storage.getBook(chapter.bookId);
-        if (!book) return null;
-
-        return {
-          id: bookmark.id,
-          topicId: topic.id,
-          topicTitle: topic.title,
-          chapterTitle: chapter.title,
-          bookTitle: book.title,
-          createdAt: bookmark.createdAt.toISOString(),
-        };
-      }),
+    res.json(
+      bookmarksWithDetails.map((b) => ({
+        id: b.id,
+        topicId: b.topicId,
+        topicTitle: b.topicTitle,
+        chapterTitle: b.chapterTitle,
+        bookTitle: b.bookTitle,
+        createdAt: b.createdAt.toISOString(),
+      })),
     );
-
-    res.json(bookmarksWithDetails.filter(Boolean));
   } catch (error) {
     console.error("Get bookmarks error:", error);
     res.status(500).json({ message: "Failed to get bookmarks" });
