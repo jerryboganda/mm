@@ -1,6 +1,7 @@
 import { Text, type TextProps } from "react-native";
 
 import { Colors, Typography } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -17,11 +18,13 @@ export type ThemedTextProps = TextProps & {
 };
 
 export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
+  const { theme } = useTheme();
+
   const getColor = () => {
     if (type === "link") {
-      return Colors.dark.link;
+      return theme.link;
     }
-    return Colors.dark.text;
+    return theme.text;
   };
 
   const getTypeStyle = () => {

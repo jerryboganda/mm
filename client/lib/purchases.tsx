@@ -59,9 +59,11 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
           : REVENUECAT_API_KEY_ANDROID;
 
       if (!apiKey) {
-        console.log(
-          "RevenueCat API key not configured - running in preview mode",
-        );
+        if (__DEV__) {
+          console.log(
+            "RevenueCat API key not configured - running in preview mode",
+          );
+        }
         setLoading(false);
         return;
       }

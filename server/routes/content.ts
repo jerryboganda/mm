@@ -6,21 +6,34 @@ const router = Router();
 
 router.get("/books", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const booksData = await storage.getBooks();
-    const userProgressData = await storage.getUserProgress(req.userId!);
+    const [booksData, allChapters, userProgressData] = await Promise.all([
+      storage.getBooks(),
+      storage.getAllChaptersGroupedByBook(),
+      storage.getUserProgress(req.userId!),
+    ]);
 
+    const completedTopicIds = new Set(
+      userProgressData.filter((p) => p.isCompleted).map((p) => p.topicId),
+    );
+
+    // Group chapter data by book
+    const chaptersByBook = new Map<string, { count: number; topicCount: number }>();
+    for (const ch of allChapters) {
+      const existing = chaptersByBook.get(ch.bookId) || { count: 0, topicCount: 0 };
+      existing.count++;
+      existing.topicCount += ch.topicCount;
+      chaptersByBook.set(ch.bookId, existing);
+    }
+
+    // For completed count, fetch all topics per book in parallel (2 queries total, not N^2)
     const booksWithProgress = await Promise.all(
       booksData.map(async (book) => {
-        const chaptersData = await storage.getChaptersByBook(book.id);
-        let totalTopics = 0;
+        const stats = chaptersByBook.get(book.id) || { count: 0, topicCount: 0 };
         let completedTopics = 0;
 
-        for (const chapter of chaptersData) {
-          const topicsData = await storage.getTopicsByChapter(chapter.id);
-          totalTopics += topicsData.length;
-          completedTopics += topicsData.filter((t) =>
-            userProgressData.some((p) => p.topicId === t.id && p.isCompleted),
-          ).length;
+        if (stats.topicCount > 0) {
+          const bookTopics = await storage.getTopicsByBook(book.id);
+          completedTopics = bookTopics.filter((t) => completedTopicIds.has(t.id)).length;
         }
 
         return {
@@ -28,10 +41,10 @@ router.get("/books", authMiddleware, async (req: AuthRequest, res) => {
           title: book.title,
           description: book.description,
           imageUrl: book.imageUrl,
-          chaptersCount: chaptersData.length,
+          chaptersCount: stats.count,
           progress:
-            totalTopics > 0
-              ? Math.round((completedTopics / totalTopics) * 100)
+            stats.topicCount > 0
+              ? Math.round((completedTopics / stats.topicCount) * 100)
               : 0,
         };
       }),
@@ -191,93 +204,46 @@ router.post(
 
 router.get("/search", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const query = ((req.query.query as string) || "").toLowerCase().trim();
+    const query = ((req.query.query as string) || "").trim();
     const filter = (req.query.filter as string) || "all";
 
     if (query.length < 2) {
       return res.json([]);
     }
 
-    const results: {
-      id: string;
-      type: "book" | "chapter" | "topic";
-      title: string;
-      subtitle: string;
-      bookId?: string;
-      bookTitle?: string;
-      chapterId?: string;
-      chapterTitle?: string;
-    }[] = [];
-
-    const booksData = await storage.getBooks();
-
-    for (const book of booksData) {
-      // Search books
-      if (filter === "all" || filter === "books") {
-        if (
-          book.title.toLowerCase().includes(query) ||
-          (book.description && book.description.toLowerCase().includes(query))
-        ) {
-          results.push({
-            id: book.id,
-            type: "book",
-            title: book.title,
-            subtitle: book.description || "Book",
-          });
-        }
-      }
-
-      const chaptersData = await storage.getChaptersByBook(book.id);
-
-      for (const chapter of chaptersData) {
-        // Search chapters
-        if (filter === "all" || filter === "chapters") {
-          if (
-            chapter.title.toLowerCase().includes(query) ||
-            (chapter.description &&
-              chapter.description.toLowerCase().includes(query))
-          ) {
-            results.push({
-              id: chapter.id,
-              type: "chapter",
-              title: chapter.title,
-              subtitle: book.title,
-              bookId: book.id,
-              bookTitle: book.title,
-            });
-          }
-        }
-
-        // Search topics
-        if (filter === "all" || filter === "topics") {
-          const topicsData = await storage.getTopicsByChapter(chapter.id);
-          for (const topic of topicsData) {
-            if (
-              topic.title.toLowerCase().includes(query) ||
-              (topic.description &&
-                topic.description.toLowerCase().includes(query))
-            ) {
-              results.push({
-                id: topic.id,
-                type: "topic",
-                title: topic.title,
-                subtitle: `${book.title} > ${chapter.title}`,
-                bookId: book.id,
-                bookTitle: book.title,
-                chapterId: chapter.id,
-                chapterTitle: chapter.title,
-              });
-            }
-          }
-        }
-      }
-    }
-
-    // Limit results
-    res.json(results.slice(0, 50));
+    // Use SQL ILIKE search instead of fetching all content and filtering in JS
+    const results = await storage.searchContent(query, filter, 50);
+    res.json(results);
   } catch (error) {
     console.error("Search error:", error);
     res.status(500).json({ message: "Search failed" });
+  }
+});
+
+// Recommended topics: topics the user hasn't completed yet, from books they've been active in
+router.get(
+  "/recommended-topics",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 5, 20);
+      const topics = await storage.getRecommendedTopics(req.userId!, limit);
+      res.json(topics);
+    } catch (error) {
+      console.error("Get recommended topics error:", error);
+      res.status(500).json({ message: "Failed to get recommended topics" });
+    }
+  },
+);
+
+// Announcements for the notification feed
+router.get("/announcements", authMiddleware, async (_req: AuthRequest, res) => {
+  try {
+    const announcements = await storage.getAnnouncements();
+    res.json(announcements);
+  } catch (error) {
+    console.error("Get announcements error:", error);
+    res.status(500).json({ message: "Failed to get announcements" });
   }
 });
 

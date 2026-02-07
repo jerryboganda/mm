@@ -27,44 +27,6 @@ type Announcement = {
   isRead: boolean;
 };
 
-const mockAnnouncements: Announcement[] = [
-  {
-    id: "1",
-    title: "New Chapter Added",
-    message:
-      "A new chapter on Gestational Diabetes has been added to the Obstetrics textbook. Check it out!",
-    type: "new_content",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-  },
-  {
-    id: "2",
-    title: "Practice Questions Updated",
-    message: "50 new MCQs have been added covering High-Risk Pregnancy topics.",
-    type: "update",
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-  },
-  {
-    id: "3",
-    title: "Study Tip",
-    message:
-      "Remember to review the Antepartum Care section before your upcoming exam. Good luck!",
-    type: "info",
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: true,
-  },
-  {
-    id: "4",
-    title: "Exam Reminder",
-    message:
-      "The OB-GYN module exam is scheduled for next week. Make sure to complete all practice quizzes.",
-    type: "important",
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: true,
-  },
-];
-
 function getTypeIcon(type: Announcement["type"]) {
   switch (type) {
     case "new_content":
@@ -169,11 +131,8 @@ export default function NotificationsScreen() {
     data: announcements,
     isLoading,
     refetch,
-  } = useQuery({
+  } = useQuery<Announcement[]>({
     queryKey: ["/api/announcements"],
-    queryFn: async () => {
-      return mockAnnouncements;
-    },
     staleTime: 5 * 60 * 1000,
   });
 

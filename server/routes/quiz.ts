@@ -16,32 +16,8 @@ router.get("/stats", authMiddleware, async (req: AuthRequest, res) => {
 
 router.get("/topics", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const booksData = await storage.getBooks();
-    const quizTopics: {
-      id: string;
-      title: string;
-      chapterTitle: string;
-      questionCount: number;
-    }[] = [];
-
-    for (const book of booksData) {
-      const chaptersData = await storage.getChaptersByBook(book.id);
-      for (const chapter of chaptersData) {
-        const topicsData = await storage.getTopicsByChapter(chapter.id);
-        for (const topic of topicsData) {
-          const mcqsData = await storage.getMCQsByTopic(topic.id);
-          if (mcqsData.length > 0) {
-            quizTopics.push({
-              id: topic.id,
-              title: topic.title,
-              chapterTitle: chapter.title,
-              questionCount: mcqsData.length,
-            });
-          }
-        }
-      }
-    }
-
+    // Single JOIN query replaces triple-nested N+1 loop
+    const quizTopics = await storage.getQuizTopicsWithCounts();
     res.json(quizTopics);
   } catch (error) {
     console.error("Get quiz topics error:", error);
@@ -53,6 +29,10 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { mode } = req.params;
     const topicId = req.query.topicId as string | undefined;
+    const questionCount = Math.min(
+      Math.max(parseInt(req.query.count as string) || 10, 1),
+      50, // cap at 50
+    );
     let questions: any[] = [];
 
     if (mode === "topic" && topicId) {
@@ -60,12 +40,12 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
     } else if (mode === "wrong") {
       questions = await storage.getWrongQuestions(req.userId!);
     } else {
-      questions = await storage.getMCQs(10);
+      questions = await storage.getMCQs(questionCount);
     }
 
     const shuffledQuestions = questions
       .sort(() => Math.random() - 0.5)
-      .slice(0, 10)
+      .slice(0, questionCount)
       .map((q) => ({
         id: q.id,
         question: q.question,
@@ -76,7 +56,8 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
     res.json({
       quizId: `quiz-${Date.now()}`,
       questions: shuffledQuestions,
-      timeLimit: 10,
+      questionCount,
+      timeLimit: questionCount, // 1 minute per question
     });
   } catch (error) {
     console.error("Start quiz error:", error);
@@ -87,13 +68,26 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
 router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { quizId, answers, mode, topicId } = req.body;
+
+    if (!answers || typeof answers !== "object" || Object.keys(answers).length === 0) {
+      return res.status(400).json({ message: "Answers object is required" });
+    }
+    if (!mode || typeof mode !== "string") {
+      return res.status(400).json({ message: "Quiz mode is required" });
+    }
+
     const answerEntries = Object.entries(answers as Record<string, string>);
+
+    // Batch-fetch all MCQs in one query instead of N individual fetches
+    const mcqIds = answerEntries.map(([mcqId]) => mcqId);
+    const allMcqs = await storage.getMCQsByIds(mcqIds);
+    const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
 
     let correctCount = 0;
     const detailedAnswers: Record<string, any> = {};
 
     for (const [mcqId, selectedAnswer] of answerEntries) {
-      const mcq = await storage.getMCQ(mcqId);
+      const mcq = mcqMap.get(mcqId);
       if (mcq) {
         const isCorrect = selectedAnswer === mcq.correctAnswer;
         if (isCorrect) correctCount++;
@@ -144,19 +138,22 @@ router.get(
       }
 
       const answers = attempt.answers as Record<string, any>;
-      const questions = await Promise.all(
-        Object.entries(answers).map(async ([mcqId, answer]) => {
-          const mcq = await storage.getMCQ(mcqId);
-          return {
-            id: mcqId,
-            question: mcq?.question || "Question not found",
-            selectedAnswer: answer.selected,
-            correctAnswer: answer.correct,
-            isCorrect: answer.isCorrect,
-            explanation: answer.explanation || mcq?.explanation || "",
-          };
-        }),
-      );
+      const mcqIds = Object.keys(answers);
+      const allMcqs = await storage.getMCQsByIds(mcqIds);
+      const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
+
+      const questions = mcqIds.map((mcqId) => {
+        const mcq = mcqMap.get(mcqId);
+        const answer = answers[mcqId];
+        return {
+          id: mcqId,
+          question: mcq?.question || "Question not found",
+          selectedAnswer: answer.selected,
+          correctAnswer: answer.correct,
+          isCorrect: answer.isCorrect,
+          explanation: answer.explanation || mcq?.explanation || "",
+        };
+      });
 
       res.json({
         id: attempt.id,

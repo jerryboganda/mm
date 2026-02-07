@@ -1,8 +1,10 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { pool } from "./db";
 import * as fs from "fs";
 import * as path from "path";
+import * as crypto from "crypto";
 
 const app = express();
 const log = console.log;
@@ -14,14 +16,22 @@ declare module "http" {
 }
 
 function setupCors(app: express.Application) {
+  const ALLOWED_ORIGINS = [
+    process.env.ALLOWED_ORIGIN || "https://maternalmind.app",
+    "http://localhost:8081", // Expo dev
+    "http://localhost:19006", // Expo web
+  ];
+
   app.use((req, res, next) => {
     const origin = req.header("origin");
 
-    // For mobile apps, if an origin is present, we should echo it back to satisfy CORS
-    // since we use Access-Control-Allow-Credentials: true.
-    // If no origin is present (common for mobile fetch), we don't need the header.
-    if (origin) {
+    // For mobile apps without origin header, allow the request
+    // For web requests, validate origin against allowlist
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
+    } else if (!origin) {
+      // Mobile apps typically don't send Origin header - allow these
+      res.header("Access-Control-Allow-Origin", "*");
     }
 
     res.header(
@@ -39,16 +49,66 @@ function setupCors(app: express.Application) {
   });
 }
 
+function setupSecurityHeaders(app: express.Application) {
+  app.use((_req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("X-XSS-Protection", "1; mode=block");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains",
+    );
+    res.removeHeader("X-Powered-By");
+    next();
+  });
+}
+
+function setupRequestId(app: express.Application) {
+  app.use((req, _res, next) => {
+    (req as any).id = crypto.randomUUID();
+    next();
+  });
+}
+
+function setupHealthCheck(app: express.Application) {
+  app.get("/health", async (_req, res) => {
+    try {
+      // Check DB connectivity
+      const client = await pool.connect();
+      await client.query("SELECT 1");
+      client.release();
+      res.json({
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: process.env.npm_package_version || "1.0.0",
+      });
+    } catch {
+      res.status(503).json({
+        status: "unhealthy",
+        timestamp: new Date().toISOString(),
+        error: "Database connection failed",
+      });
+    }
+  });
+
+  app.get("/ready", async (_req, res) => {
+    res.json({ status: "ready" });
+  });
+}
+
 function setupBodyParsing(app: express.Application) {
   app.use(
     express.json({
+      limit: '10kb',
       verify: (req, _res, buf) => {
         req.rawBody = buf;
       },
     }),
   );
 
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 }
 
 function setupRequestLogging(app: express.Application) {
@@ -192,6 +252,12 @@ function configureExpoAndLanding(app: express.Application) {
 }
 
 function setupErrorHandler(app: express.Application) {
+  // 404 catch-all for unmatched API routes (Express 5 named wildcard syntax)
+  app.use("/api/{*path}", (_req: Request, res: Response) => {
+    res.status(404).json({ message: "Endpoint not found" });
+  });
+
+  // Global error handler
   app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
     const error = err as {
       status?: number;
@@ -200,9 +266,14 @@ function setupErrorHandler(app: express.Application) {
     };
 
     const status = error.status || error.statusCode || 500;
-    const message = error.message || "Internal Server Error";
+    const message =
+      status >= 500 && process.env.NODE_ENV === "production"
+        ? "Internal Server Error"
+        : error.message || "Internal Server Error";
 
-    console.error("Internal Server Error:", err);
+    if (status >= 500) {
+      console.error("Internal Server Error:", err);
+    }
 
     if (res.headersSent) {
       return next(err);
@@ -213,9 +284,12 @@ function setupErrorHandler(app: express.Application) {
 }
 
 (async () => {
+  setupSecurityHeaders(app);
+  setupRequestId(app);
   setupCors(app);
   setupBodyParsing(app);
   setupRequestLogging(app);
+  setupHealthCheck(app);
 
   configureExpoAndLanding(app);
 
@@ -234,4 +308,31 @@ function setupErrorHandler(app: express.Application) {
       log(`express server serving on port ${port}`);
     },
   );
+
+  // Graceful shutdown
+  const shutdown = async (signal: string) => {
+    log(`\n${signal} received — shutting down gracefully...`);
+    server.close(() => {
+      log("HTTP server closed");
+      pool
+        .end()
+        .then(() => {
+          log("DB pool drained");
+          process.exit(0);
+        })
+        .catch((err) => {
+          console.error("Error draining DB pool:", err);
+          process.exit(1);
+        });
+    });
+
+    // Force exit after 10s
+    setTimeout(() => {
+      console.error("Forced shutdown after timeout");
+      process.exit(1);
+    }, 10_000);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
 })();

@@ -29,8 +29,10 @@
 - `8081`: Aims Academy WordPress
 - `8080`: Amad Diagnostic Centre WordPress
 - `9000`: Ovo WPP Web
+- `5000`: Maternal Mind API (Express + PostgreSQL)
 
 ## Project Locations (CWDs)
+- **Maternal Mind:** `/root/maternal-mind`
 - **MarriageBureau:** `/root/doctormarriagebureau`
 - **Nginx Proxy Manager:** `/opt/docker/nginx-proxy-manager`
 - **Ovo WPP:** `/var/www/ovo-wpp`
@@ -50,3 +52,4 @@
 6. **Portainer:** `portainer`
 7. **Amad Diagnostic Portal:** `laravel-app-app-1`, `laravel-app-db-1`
 8. **WordPress Sites:** Multiple MariaDB/WordPress instances.
+9. **Maternal Mind:** `maternal-mind-app-1`, `maternal-mind-db-1`

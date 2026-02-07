@@ -24,6 +24,13 @@ export const users = pgTable("users", {
   subscriptionPlan: text("subscription_plan"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  isEmailVerified: boolean("is_email_verified").default(false).notNull(),
+  emailVerificationToken: text("email_verification_token"),
+  emailTokenExpiresAt: timestamp("email_token_expires_at"),
+  phoneNumber: text("phone_number"),
+  isPhoneVerified: boolean("is_phone_verified").default(false).notNull(),
+  phoneVerificationToken: text("phone_verification_token"),
+  phoneTokenExpiresAt: timestamp("phone_token_expires_at"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -82,7 +89,12 @@ export const topics = pgTable("topics", {
   description: text("description"),
   order: integer("order").default(0),
   isPublished: boolean("is_published").default(false),
+  author: text("author"),
+  source: text("source"),
+  references: text("references"),
+  lastReviewedAt: timestamp("last_reviewed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const topicsRelations = relations(topics, ({ one, many }) => ({
@@ -125,9 +137,13 @@ export const mcqs = pgTable("mcqs", {
   options: jsonb("options").notNull(),
   correctAnswer: text("correct_answer").notNull(),
   explanation: text("explanation"),
+  optionExplanations: jsonb("option_explanations"),
   difficulty: text("difficulty").notNull().default("medium"),
+  references: text("references"),
+  tags: jsonb("tags"),
   isPublished: boolean("is_published").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const mcqsRelations = relations(mcqs, ({ one }) => ({
@@ -265,10 +281,68 @@ export const recentActivityRelations = relations(recentActivity, ({ one }) => ({
   }),
 }));
 
+// ── Spaced Repetition (SM-2 algorithm) ──────────────────────────
+export const reviewSchedule = pgTable("review_schedule", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  mcqId: varchar("mcq_id")
+    .notNull()
+    .references(() => mcqs.id, { onDelete: "cascade" }),
+  easeFactor: integer("ease_factor").notNull().default(250), // stored as int × 100 (2.50 → 250)
+  interval: integer("interval").notNull().default(1), // days until next review
+  repetitions: integer("repetitions").notNull().default(0),
+  nextReviewAt: timestamp("next_review_at").defaultNow().notNull(),
+  lastReviewedAt: timestamp("last_reviewed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const reviewScheduleRelations = relations(reviewSchedule, ({ one }) => ({
+  user: one(users, {
+    fields: [reviewSchedule.userId],
+    references: [users.id],
+  }),
+  mcq: one(mcqs, {
+    fields: [reviewSchedule.mcqId],
+    references: [mcqs.id],
+  }),
+}));
+
+// ── Content Error Reports (TRUST-003) ──────────────────────────
+export const contentReports = pgTable("content_reports", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  contentType: text("content_type").notNull(), // 'topic' | 'mcq' | 'content_block'
+  contentId: varchar("content_id").notNull(),
+  reportType: text("report_type").notNull(), // 'error' | 'outdated' | 'unclear' | 'other'
+  description: text("description").notNull(),
+  status: text("status").notNull().default("pending"), // 'pending' | 'reviewed' | 'resolved' | 'dismissed'
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const contentReportsRelations = relations(contentReports, ({ one }) => ({
+  user: one(users, {
+    fields: [contentReports.userId],
+    references: [users.id],
+  }),
+}));
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
   name: true,
+  isEmailVerified: true,
+  emailVerificationToken: true,
+  emailTokenExpiresAt: true,
 });
 
 export const loginSchema = z.object({
@@ -303,3 +377,5 @@ export type Bookmark = typeof bookmarks.$inferSelect;
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type RecentActivity = typeof recentActivity.$inferSelect;
+export type ReviewSchedule = typeof reviewSchedule.$inferSelect;
+export type ContentReport = typeof contentReports.$inferSelect;

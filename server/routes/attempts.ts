@@ -35,27 +35,26 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
       );
     }
 
-    const attemptsWithDetails = await Promise.all(
-      filteredAttempts.map(async (a) => {
-        let topicTitle = undefined;
-        if (a.topicId) {
-          const topic = await storage.getTopic(a.topicId);
-          topicTitle = topic?.title;
-        }
-        return {
-          id: a.id,
-          date: a.createdAt.toISOString(),
-          score: a.score,
-          totalQuestions: a.totalQuestions,
-          correctCount: a.correctCount,
-          wrongCount: a.wrongCount,
-          timeTaken: a.timeTaken,
-          mode: a.mode,
-          topicId: a.topicId,
-          topicTitle,
-        };
-      }),
-    );
+    // Batch-fetch all unique topic titles instead of N+1 queries
+    const uniqueTopicIds = [...new Set(filteredAttempts.map((a) => a.topicId).filter(Boolean))] as string[];
+    const topicTitleMap = new Map<string, string>();
+    for (const tid of uniqueTopicIds) {
+      const topic = await storage.getTopic(tid);
+      if (topic) topicTitleMap.set(tid, topic.title);
+    }
+
+    const attemptsWithDetails = filteredAttempts.map((a) => ({
+      id: a.id,
+      date: a.createdAt.toISOString(),
+      score: a.score,
+      totalQuestions: a.totalQuestions,
+      correctCount: a.correctCount,
+      wrongCount: a.wrongCount,
+      timeTaken: a.timeTaken,
+      mode: a.mode,
+      topicId: a.topicId,
+      topicTitle: a.topicId ? topicTitleMap.get(a.topicId) : undefined,
+    }));
 
     res.json(attemptsWithDetails);
   } catch (error) {
@@ -86,9 +85,12 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
     >;
     const questionIds = Object.keys(answersData);
 
-    const questionsWithDetails = await Promise.all(
-      questionIds.map(async (qId) => {
-        const mcq = await storage.getMCQ(qId);
+    // Batch-fetch all MCQs in one query
+    const allMcqs = await storage.getMCQsByIds(questionIds);
+    const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
+
+    const questionsWithDetails = questionIds.map((qId) => {
+        const mcq = mcqMap.get(qId);
         const answerInfo = answersData[qId];
         return {
           id: qId,
@@ -99,8 +101,7 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
           isCorrect: answerInfo.isCorrect,
           explanation: mcq?.explanation || "",
         };
-      }),
-    );
+      });
 
     res.json({
       id: attempt.id,

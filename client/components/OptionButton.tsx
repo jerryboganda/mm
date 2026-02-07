@@ -80,6 +80,13 @@ export function OptionButton({
       onPressOut={handlePressOut}
       disabled={disabled}
       testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={`Option ${label}: ${text}`}
+      accessibilityState={{
+        disabled,
+        selected: selected,
+        ...(correct !== undefined && { checked: correct }),
+      }}
       style={[
         styles.container,
         animatedStyle,

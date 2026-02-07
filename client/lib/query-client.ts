@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
 const TOKEN_KEY = "auth_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
 
 async function getToken(): Promise<string | null> {
   if (Platform.OS === "web") {
@@ -12,12 +13,71 @@ async function getToken(): Promise<string | null> {
   }
 }
 
+async function setToken(key: string, value: string): Promise<void> {
+  if (Platform.OS === "web") {
+    localStorage.setItem(key, value);
+  } else {
+    await SecureStore.setItemAsync(key, value);
+  }
+}
+
+async function removeToken(key: string): Promise<void> {
+  if (Platform.OS === "web") {
+    localStorage.removeItem(key);
+  } else {
+    await SecureStore.deleteItemAsync(key);
+  }
+}
+
 /**
  * Gets the base URL for the Express API server (e.g., "http://localhost:3000")
  * @returns {string} The API base URL
  */
 export function getApiUrl(): string {
-  return "http://185.252.233.186:5000";
+  return process.env.EXPO_PUBLIC_API_URL || "https://mm.polytronx.com";
+}
+
+// Refresh lock to prevent concurrent refresh requests
+let refreshPromise: Promise<string | null> | null = null;
+
+async function attemptTokenRefresh(): Promise<string | null> {
+  // Deduplicate concurrent refresh attempts
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const refreshToken =
+        Platform.OS === "web"
+          ? localStorage.getItem(REFRESH_TOKEN_KEY)
+          : await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+
+      if (!refreshToken) return null;
+
+      const baseUrl = getApiUrl();
+      const res = await fetch(new URL("/api/auth/refresh", baseUrl), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!res.ok) {
+        // Refresh token is invalid — clear everything
+        await removeToken(TOKEN_KEY);
+        await removeToken(REFRESH_TOKEN_KEY);
+        return null;
+      }
+
+      const data = await res.json();
+      await setToken(TOKEN_KEY, data.accessToken);
+      return data.accessToken as string;
+    } catch {
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 async function throwIfResNotOk(res: Response) {
@@ -34,7 +94,7 @@ export async function apiRequest(
 ): Promise<Response> {
   const baseUrl = getApiUrl();
   const url = new URL(route, baseUrl);
-  const token = await getToken();
+  let token = await getToken();
 
   const headers: Record<string, string> = {};
   if (data) {
@@ -44,12 +104,26 @@ export async function apiRequest(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(url, {
+  let res = await fetch(url, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
+
+  // Auto-refresh on 401
+  if (res.status === 401 && token) {
+    const newToken = await attemptTokenRefresh();
+    if (newToken) {
+      headers["Authorization"] = `Bearer ${newToken}`;
+      res = await fetch(url, {
+        method,
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+        credentials: "include",
+      });
+    }
+  }
 
   await throwIfResNotOk(res);
   return res;
@@ -74,16 +148,28 @@ export const getQueryFn: <T>(options: {
         }
       }
 
-      const token = await getToken();
+      let token = await getToken();
       const headers: Record<string, string> = {};
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch(url, {
+      let res = await fetch(url, {
         credentials: "include",
         headers,
       });
+
+      // Auto-refresh on 401
+      if (res.status === 401 && token) {
+        const newToken = await attemptTokenRefresh();
+        if (newToken) {
+          headers["Authorization"] = `Bearer ${newToken}`;
+          res = await fetch(url, {
+            credentials: "include",
+            headers,
+          });
+        }
+      }
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
         return null;
@@ -100,7 +186,21 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: (failureCount, error) => {
+        // Don't retry auth errors or client errors
+        const message = (error as Error)?.message || "";
+        if (
+          message.startsWith("401:") ||
+          message.startsWith("403:") ||
+          message.startsWith("404:") ||
+          message.startsWith("422:")
+        ) {
+          return false;
+        }
+        // Retry server errors and network errors up to 3 times
+        return failureCount < 3;
+      },
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
     },
     mutations: {
       retry: false,

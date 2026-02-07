@@ -161,6 +161,9 @@ export function GlassCard({
       disabled={disabled || !onPress}
       testID={testID}
       style={cardStyles}
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined}
+      accessibilityState={{ disabled, selected: active }}
     >
       {renderBackground()}
       <View style={styles.content}>

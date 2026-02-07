@@ -16,6 +16,9 @@ interface User {
   role: "student" | "admin";
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionPlan?: string;
+  isEmailVerified: boolean;
+  isPhoneVerified: boolean;
+  createdAt: string;
 }
 
 interface AuthContextType {
@@ -24,11 +27,19 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isSessionExpired: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+  ) => Promise<{ requiresEmailVerification?: boolean } | void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   setSessionExpired: (expired: boolean) => void;
   dismissSessionExpired: () => void;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  resendVerificationEmail: (email: string) => Promise<void>;
+  sendPhoneOtp: (phoneNumber: string) => Promise<void>;
+  verifyPhoneOtp: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -57,6 +68,33 @@ async function removeToken(key: string) {
     localStorage.removeItem(key);
   } else {
     await SecureStore.deleteItemAsync(key);
+  }
+}
+
+export async function saveCredentials(email: string, _password: string) {
+  // Only save email for convenience. Never store passwords.
+  if (Platform.OS === "web") {
+    localStorage.setItem("saved_email", email);
+  } else {
+    await SecureStore.setItemAsync("saved_email", email);
+  }
+}
+
+export async function getSavedCredentials() {
+  if (Platform.OS === "web") {
+    const email = localStorage.getItem("saved_email");
+    return { email, password: null };
+  } else {
+    const email = await SecureStore.getItemAsync("saved_email");
+    return { email, password: null };
+  }
+}
+
+export async function clearSavedCredentials() {
+  if (Platform.OS === "web") {
+    localStorage.removeItem("saved_email");
+  } else {
+    await SecureStore.deleteItemAsync("saved_email");
   }
 }
 
@@ -104,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || "Login failed");
+      throw error; // Return full error object to handle 403 cases
     }
 
     const data = await response.json();
@@ -127,15 +165,94 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || "Registration failed");
+      throw error;
     }
 
     const data = await response.json();
+
+    // If requiresEmailVerification, we don't set user yet
+    if (data.requiresEmailVerification) {
+      return { requiresEmailVerification: true };
+    }
+
     await setToken(TOKEN_KEY, data.accessToken);
     if (data.refreshToken) {
       await setToken(REFRESH_TOKEN_KEY, data.refreshToken);
     }
     setUser(data.user);
+    return {};
+  };
+
+  const verifyEmail = async (email: string, code: string) => {
+    const baseUrl = getApiUrl();
+    const response = await fetch(new URL("/api/auth/verify-email", baseUrl), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Verification failed");
+    }
+
+    const data = await response.json();
+    await setToken(TOKEN_KEY, data.accessToken);
+    setUser(data.user);
+  };
+
+  const resendVerificationEmail = async (email: string) => {
+    const baseUrl = getApiUrl();
+    const response = await fetch(new URL("/api/auth/resend-verification", baseUrl), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to resend email");
+    }
+  };
+
+  const sendPhoneOtp = async (phoneNumber: string) => {
+    const baseUrl = getApiUrl();
+    const token = await getToken(TOKEN_KEY);
+
+    const response = await fetch(new URL("/api/auth/send-phone-otp", baseUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ phoneNumber }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to send OTP");
+    }
+  };
+
+  const verifyPhoneOtp = async (code: string) => {
+    const baseUrl = getApiUrl();
+    const token = await getToken(TOKEN_KEY);
+    const response = await fetch(new URL("/api/auth/verify-phone-otp", baseUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ code }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Verification failed");
+    }
+
+    // Refresh user to get updated verification status
+    await checkAuth();
   };
 
   const logout = async () => {
@@ -181,6 +298,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshUser,
         setSessionExpired: setIsSessionExpired,
         dismissSessionExpired,
+        verifyEmail,
+        resendVerificationEmail,
+        sendPhoneOtp,
+        verifyPhoneOtp,
       }}
     >
       {children}

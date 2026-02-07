@@ -6,54 +6,62 @@ const router = Router();
 
 router.get("/", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const stats = await storage.getQuizStats(req.userId!);
-    const attempts = await storage.getQuizAttempts(req.userId!);
-    const userProgressData = await storage.getUserProgress(req.userId!);
+    // Fetch all needed data in parallel instead of N^2 nested loops
+    const [stats, attempts, userProgressData, allChapters] = await Promise.all([
+      storage.getQuizStats(req.userId!),
+      storage.getQuizAttempts(req.userId!),
+      storage.getUserProgress(req.userId!),
+      storage.getAllChaptersGroupedByBook(),
+    ]);
 
-    const booksData = await storage.getBooks();
-    let totalTopics = 0;
-    let topicsCompleted = 0;
-    const topicProgressMap: Map<
+    // Total topics from chapter LEFT JOIN counts
+    const totalTopics = allChapters.reduce((sum, ch) => sum + Number(ch.topicCount), 0);
+    const completedTopicIds = new Set(
+      userProgressData.filter((p) => p.isCompleted).map((p) => p.topicId),
+    );
+    const topicsCompleted = completedTopicIds.size;
+
+    // Build topic progress from attempts (group by topicId in JS — attempts already fetched)
+    const topicProgressMap = new Map<
       string,
       { title: string; accuracy: number; attempts: number }
-    > = new Map();
+    >();
 
-    for (const book of booksData) {
-      const chaptersData = await storage.getChaptersByBook(book.id);
-      for (const chapter of chaptersData) {
-        const topicsData = await storage.getTopicsByChapter(chapter.id);
-        totalTopics += topicsData.length;
+    const attemptsByTopic = new Map<string, typeof attempts>();
+    for (const a of attempts) {
+      if (!a.topicId) continue;
+      const list = attemptsByTopic.get(a.topicId) || [];
+      list.push(a);
+      attemptsByTopic.set(a.topicId, list);
+    }
 
-        for (const topic of topicsData) {
-          if (
-            userProgressData.some(
-              (p) => p.topicId === topic.id && p.isCompleted,
-            )
-          ) {
-            topicsCompleted++;
-          }
+    // We need topic titles for topics that have attempts — batch fetch
+    const topicIdsWithAttempts = [...attemptsByTopic.keys()];
+    if (topicIdsWithAttempts.length > 0) {
+      for (const [topicId, topicAttempts] of attemptsByTopic) {
+        const avgScore = Math.round(
+          topicAttempts.reduce((sum, a) => sum + a.score, 0) / topicAttempts.length,
+        );
+        // Use topicId as fallback title; actual title added below
+        topicProgressMap.set(topicId, {
+          title: topicId,
+          accuracy: avgScore,
+          attempts: topicAttempts.length,
+        });
+      }
 
-          const topicAttempts = attempts.filter((a) => a.topicId === topic.id);
-          if (topicAttempts.length > 0) {
-            const avgScore = Math.round(
-              topicAttempts.reduce((sum, a) => sum + a.score, 0) /
-                topicAttempts.length,
-            );
-            topicProgressMap.set(topic.id, {
-              title: topic.title,
-              accuracy: avgScore,
-              attempts: topicAttempts.length,
-            });
-          }
+      // Enrich with topic titles
+      for (const topicId of topicIdsWithAttempts) {
+        const topic = await storage.getTopic(topicId);
+        if (topic) {
+          const entry = topicProgressMap.get(topicId)!;
+          entry.title = topic.title;
         }
       }
     }
 
     const topicProgress = Array.from(topicProgressMap.entries()).map(
-      ([id, data]) => ({
-        id,
-        ...data,
-      }),
+      ([id, data]) => ({ id, ...data }),
     );
 
     const recentAttempts = attempts.slice(0, 10).map((a) => ({

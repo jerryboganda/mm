@@ -32,6 +32,7 @@ import {
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
+import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -229,7 +230,7 @@ export default function HomeScreen() {
     isLoading: progressLoading,
     refetch: refetchProgress,
   } = useQuery({
-    queryKey: ["/api/user/progress"],
+    queryKey: ["/api/progress"],
   });
 
   const { data: booksData } = useQuery({
@@ -237,11 +238,37 @@ export default function HomeScreen() {
   });
 
   const { data: recentTopics, refetch: refetchRecent } = useQuery({
-    queryKey: ["/api/user/recent-topics"],
+    queryKey: ["/api/recent-activity"],
     queryFn: async () => {
-      return [] as RecommendedTopic[];
+      try {
+        const { apiRequest } = await import("@/lib/query-client");
+        const res = await apiRequest("GET", "/api/recent-activity?limit=5");
+        const activities = await res.json();
+        return activities.map((activity: any) => ({
+          id: activity.topicId,
+          title: activity.topicTitle,
+          chapterTitle: activity.chapterTitle,
+          bookTitle: activity.bookTitle,
+          progress: 0,
+        })) as RecommendedTopic[];
+      } catch {
+        return [] as RecommendedTopic[];
+      }
     },
     staleTime: 5 * 60 * 1000,
+  });
+
+  const {
+    data: recommendedTopics = [],
+    refetch: refetchRecommended,
+  } = useQuery<RecommendedTopic[]>({
+    queryKey: ["/api/recommended-topics"],
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const { data: dueReviewData } = useQuery<{ count: number }>({
+    queryKey: ["/api/reviews/due-count"],
+    staleTime: 60 * 1000,
   });
 
   const handleRefresh = async () => {
@@ -249,7 +276,7 @@ export default function HomeScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    await Promise.all([refetchProgress(), refetchRecent()]);
+    await Promise.all([refetchProgress(), refetchRecent(), refetchRecommended()]);
     setRefreshing(false);
   };
 
@@ -268,6 +295,14 @@ export default function HomeScreen() {
       topicId: topic.id,
       topicTitle: topic.title,
     });
+  };
+
+  const handleStartReview = () => {
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    // Navigate through root navigator since SpacedReview is a root-level screen
+    (navigation as any).getParent()?.navigate("SpacedReview");
   };
 
   const progress = progressData as any;
@@ -308,30 +343,6 @@ export default function HomeScreen() {
     },
   ];
 
-  const recommendedTopics: RecommendedTopic[] = [
-    {
-      id: "rec1",
-      title: "Normal Labor and Delivery",
-      chapterTitle: "Labor & Delivery",
-      bookTitle: "Obstetrics",
-      progress: 0,
-    },
-    {
-      id: "rec2",
-      title: "Cervical Cancer Screening",
-      chapterTitle: "Gynecologic Oncology",
-      bookTitle: "Gynecology",
-      progress: 0,
-    },
-    {
-      id: "rec3",
-      title: "Prenatal Vitamins & Supplements",
-      chapterTitle: "Antepartum Care",
-      bookTitle: "Obstetrics",
-      progress: 0,
-    },
-  ];
-
   const continueTopic =
     recentTopics && recentTopics.length > 0 ? recentTopics[0] : null;
 
@@ -345,9 +356,12 @@ export default function HomeScreen() {
     return "Good evening";
   }
 
+  const dueCount = dueReviewData?.count || 0;
+
   const sections = [
     { type: "header" as const },
     { type: "stats" as const },
+    ...(dueCount > 0 ? [{ type: "review" as const }] : []),
     ...(continueTopic
       ? [{ type: "continue" as const, data: continueTopic }]
       : []),
@@ -433,6 +447,34 @@ export default function HomeScreen() {
                 onPress={() => handleTopicPress(item.data as RecommendedTopic)}
               />
             </View>
+          </AnimatedListItem>
+        );
+
+      case "review":
+        return (
+          <AnimatedListItem index={6} delay={55}>
+            <Pressable
+              style={[
+                styles.reviewBanner,
+                { backgroundColor: "rgba(139,92,246,0.12)", borderColor: Colors.dark.purple },
+              ]}
+              onPress={handleStartReview}
+            >
+              <View style={styles.reviewBannerLeft}>
+                <View style={[styles.reviewIconBg, { backgroundColor: "rgba(139,92,246,0.2)" }]}>
+                  <Feather name="repeat" size={20} color={Colors.dark.purple} />
+                </View>
+                <View>
+                  <Text style={[styles.reviewBannerTitle, { color: theme.text }]}>
+                    Spaced Review
+                  </Text>
+                  <Text style={[styles.reviewBannerSubtitle, { color: theme.textSecondary }]}>
+                    {dueCount} card{dueCount !== 1 ? "s" : ""} due for review
+                  </Text>
+                </View>
+              </View>
+              <Feather name="chevron-right" size={20} color={Colors.dark.purple} />
+            </Pressable>
           </AnimatedListItem>
         );
 
@@ -657,5 +699,34 @@ const styles = StyleSheet.create({
   },
   recommendedSubtitle: {
     ...Typography.caption,
+  },
+  reviewBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    marginBottom: Spacing.lg,
+  },
+  reviewBannerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.md,
+  },
+  reviewIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.full,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reviewBannerTitle: {
+    ...Typography.body,
+    fontWeight: "700",
+  },
+  reviewBannerSubtitle: {
+    ...Typography.caption,
+    marginTop: 2,
   },
 });

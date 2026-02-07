@@ -1,0 +1,17 @@
+node_modules
+android
+ios
+.expo
+.git
+*.md
+!README.md
+AUDIT_REPORT.md
+attached_assets
+design_guidelines.md
+memory.md
+linux vps memory file.md
+Maternal_Mind_Master_Mega_Revised_Plan.md
+.env
+.env.*
+!.env.example
+server_dist

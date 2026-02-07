@@ -1,5 +1,14 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, View, ScrollView, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Pressable,
+  Modal,
+  TextInput,
+  Alert,
+  Platform,
+} from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -43,6 +52,9 @@ export default function TopicReaderScreen() {
   const route = useRoute<TopicReaderRouteProp>();
   const { topicId, topicTitle } = route.params;
   const [viewerImage, setViewerImage] = useState<string | null>(null);
+  const [reportVisible, setReportVisible] = useState(false);
+  const [reportType, setReportType] = useState<string>("factual_error");
+  const [reportDescription, setReportDescription] = useState("");
 
   const { data: topic, isLoading } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
@@ -65,6 +77,34 @@ export default function TopicReaderScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    },
+  });
+
+  const reportMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", "/api/content-reports", {
+        contentType: "topic",
+        contentId: topicId,
+        reportType,
+        description: reportDescription,
+      });
+    },
+    onSuccess: () => {
+      setReportVisible(false);
+      setReportDescription("");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (Platform.OS === "web") {
+        window.alert("Thank you! Your report has been submitted.");
+      } else {
+        Alert.alert("Thank you!", "Your report has been submitted for review.");
+      }
+    },
+    onError: () => {
+      if (Platform.OS === "web") {
+        window.alert("Failed to submit report. Please try again.");
+      } else {
+        Alert.alert("Error", "Failed to submit report. Please try again.");
+      }
     },
   });
 
@@ -178,13 +218,42 @@ export default function TopicReaderScreen() {
             style={styles.bookmarkButton}
           >
             <Feather
-              name={topic?.isBookmarked ? "bookmark" : "bookmark"}
+              name="bookmark"
               size={24}
               color={
                 topic?.isBookmarked
                   ? Colors.dark.primary
                   : Colors.dark.textSecondary
               }
+              style={{
+                opacity: topic?.isBookmarked ? 1 : 0.6,
+              }}
+            />
+            {topic?.isBookmarked && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: Colors.dark.primary,
+                }}
+              />
+            )}
+          </Pressable>
+          <Pressable
+            onPress={() => setReportVisible(true)}
+            style={styles.bookmarkButton}
+            accessibilityRole="button"
+            accessibilityLabel="Report an error in this topic"
+          >
+            <Feather
+              name="flag"
+              size={22}
+              color={Colors.dark.textSecondary}
+              style={{ opacity: 0.6 }}
             />
           </Pressable>
         </View>
@@ -245,6 +314,81 @@ export default function TopicReaderScreen() {
         imageUri={viewerImage || ""}
         onClose={() => setViewerImage(null)}
       />
+
+      {/* Report Error Modal */}
+      <Modal
+        visible={reportVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setReportVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setReportVisible(false)}
+        >
+          <Pressable
+            style={styles.modalContent}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalHeader}>
+              <ThemedText type="h3">Report an Error</ThemedText>
+              <Pressable onPress={() => setReportVisible(false)}>
+                <Feather name="x" size={24} color={Colors.dark.text} />
+              </Pressable>
+            </View>
+
+            <ThemedText style={styles.modalLabel}>Error Type</ThemedText>
+            <View style={styles.reportTypeRow}>
+              {[
+                { value: "factual_error", label: "Factual" },
+                { value: "typo", label: "Typo" },
+                { value: "outdated", label: "Outdated" },
+                { value: "other", label: "Other" },
+              ].map((opt) => (
+                <Pressable
+                  key={opt.value}
+                  style={[
+                    styles.reportTypeChip,
+                    reportType === opt.value && styles.reportTypeChipActive,
+                  ]}
+                  onPress={() => setReportType(opt.value)}
+                >
+                  <ThemedText
+                    style={[
+                      styles.reportTypeChipText,
+                      reportType === opt.value &&
+                        styles.reportTypeChipTextActive,
+                    ]}
+                  >
+                    {opt.label}
+                  </ThemedText>
+                </Pressable>
+              ))}
+            </View>
+
+            <ThemedText style={styles.modalLabel}>Description</ThemedText>
+            <TextInput
+              style={styles.reportInput}
+              placeholder="Describe the error..."
+              placeholderTextColor={Colors.dark.textSecondary}
+              multiline
+              numberOfLines={4}
+              value={reportDescription}
+              onChangeText={setReportDescription}
+              textAlignVertical="top"
+            />
+
+            <PrimaryButton
+              title="Submit Report"
+              onPress={() => reportMutation.mutate()}
+              loading={reportMutation.isPending}
+              icon="send"
+              disabled={!reportDescription.trim()}
+              style={{ marginTop: Spacing.lg }}
+            />
+          </Pressable>
+        </Pressable>
+      </Modal>
     </BackgroundGradient>
   );
 }
@@ -367,5 +511,64 @@ const styles = StyleSheet.create({
     marginRight: Spacing.xs,
     color: "#fff",
     fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: Colors.dark.card,
+    borderTopLeftRadius: BorderRadius["2xl"],
+    borderTopRightRadius: BorderRadius["2xl"],
+    padding: Spacing.xl,
+    paddingBottom: Spacing["3xl"],
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.xl,
+  },
+  modalLabel: {
+    color: Colors.dark.textSecondary,
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.md,
+  },
+  reportTypeRow: {
+    flexDirection: "row",
+    gap: Spacing.sm,
+  },
+  reportTypeChip: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: Colors.dark.glassBorder,
+    backgroundColor: Colors.dark.glass,
+  },
+  reportTypeChipActive: {
+    borderColor: Colors.dark.primary,
+    backgroundColor: "rgba(139,92,246,0.15)",
+  },
+  reportTypeChipText: {
+    fontSize: 13,
+    color: Colors.dark.textSecondary,
+  },
+  reportTypeChipTextActive: {
+    color: Colors.dark.primary,
+    fontWeight: "600",
+  },
+  reportInput: {
+    backgroundColor: Colors.dark.glass,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: Colors.dark.glassBorder,
+    padding: Spacing.md,
+    color: Colors.dark.text,
+    fontSize: 15,
+    minHeight: 100,
   },
 });

@@ -1,25 +1,36 @@
-FROM node:20-alpine
+# ── Build stage ──
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run server:build
+# Ensure static-build exists even if no Expo build has been run
+RUN mkdir -p static-build
+# Mark server_dist as ESM to avoid Node.js reparsing overhead
+RUN echo '{"type":"module"}' > server_dist/package.json
 
+# ── Production stage ──
+FROM node:20-alpine
 WORKDIR /app
 
-# Copy package files
+# Copy only production artifacts
 COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-# Install dependencies
-# We need devDependencies for the build step (esbuild, typescript)
-RUN npm ci
+COPY --from=builder /app/server_dist ./server_dist
+COPY --from=builder /app/server/templates ./server/templates
+COPY --from=builder /app/assets ./assets
+COPY --from=builder /app/static-build ./static-build
+COPY --from=builder /app/app.json ./app.json
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 
-# Copy source code
-COPY . .
-
-# Build the server
-RUN npm run server:build
-
-# Expose the port the app runs on
 EXPOSE 5000
 
-# Set production environment
 ENV NODE_ENV=production
 
-# Start the server (using tsx to handle paths)
-CMD ["npx", "tsx", "server/index.ts"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://localhost:5000/health || exit 1
+
+CMD ["node", "server_dist/index.js"]

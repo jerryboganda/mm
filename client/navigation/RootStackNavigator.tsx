@@ -13,7 +13,8 @@ import LoginScreen from "@/screens/LoginScreen";
 import RegisterScreen from "@/screens/RegisterScreen";
 import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
 import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
-import EmailVerificationScreen from "@/screens/EmailVerificationScreen";
+import VerifyEmailScreen from "@/screens/VerifyEmailScreen";
+import VerifyPhoneScreen from "@/screens/VerifyPhoneScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import QuizTopicSelectScreen from "@/screens/QuizTopicSelectScreen";
 import QuizPlayerScreen from "@/screens/QuizPlayerScreen";
@@ -36,6 +37,7 @@ import HelpSupportScreen from "@/screens/HelpSupportScreen";
 import AboutScreen from "@/screens/AboutScreen";
 import TermsPrivacyScreen from "@/screens/TermsPrivacyScreen";
 import DisclaimerScreen from "@/screens/DisclaimerScreen";
+import SpacedReviewScreen from "@/screens/SpacedReviewScreen";
 import { Colors } from "@/constants/theme";
 
 export type RootStackParamList = {
@@ -47,10 +49,11 @@ export type RootStackParamList = {
   Register: undefined;
   ForgotPassword: undefined;
   ResetPassword: { token?: string };
-  EmailVerification: { email: string };
+  VerifyEmail: { email: string };
+  VerifyPhone: undefined;
   TopicReader: { topicId: string; topicTitle: string };
   QuizTopicSelect: undefined;
-  QuizPlayer: { mode: "topic" | "mixed" | "wrong"; topicId?: string };
+  QuizPlayer: { mode: "topic" | "mixed" | "wrong" | "exam"; topicId?: string; questionCount?: number };
   QuizResults: { resultId: string };
   QuizSettings: undefined;
   Subscription: undefined;
@@ -70,15 +73,23 @@ export type RootStackParamList = {
   About: undefined;
   TermsPrivacy: undefined;
   Disclaimer: undefined;
+  SpacedReview: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } =
     useOnboarding();
+
+  const accountAgeDays = user?.createdAt
+    ? (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+    : 0;
+
+  const requiresEmailVerification = user && !user.isEmailVerified;
+  const requiresPhoneVerification = user && accountAgeDays > 5 && !user.isPhoneVerified;
 
   if (authLoading || onboardingLoading) {
     return (
@@ -91,233 +102,268 @@ export default function RootStackNavigator() {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       {isAuthenticated ? (
-        <>
+        requiresEmailVerification ? (
           <Stack.Screen
-            name="Main"
-            component={MainTabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="TopicReader"
-            component={TopicReaderScreen}
-            options={({ route }) => ({
-              headerTitle: "Topic",
-              presentation: "card",
-            })}
-          />
-          <Stack.Screen
-            name="QuizTopicSelect"
-            component={QuizTopicSelectScreen}
-            options={{
-              headerTitle: "Select Topic",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="QuizPlayer"
-            component={QuizPlayerScreen}
-            options={{
-              headerShown: false,
-              presentation: "fullScreenModal",
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="QuizResults"
-            component={QuizResultsScreen}
-            options={{
-              headerShown: false,
-              presentation: "card",
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="QuizSettings"
-            component={QuizSettingsScreen}
-            options={{
-              headerTitle: "Quiz Settings",
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="Subscription"
-            component={SubscriptionScreen}
-            options={{
-              headerTitle: "Subscription",
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="Bookmarks"
-            component={BookmarksScreen}
-            options={{
-              headerTitle: "Bookmarks",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="RecentActivity"
-            component={RecentActivityScreen}
-            options={{
-              headerTitle: "Recent Activity",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="AttemptHistory"
-            component={AttemptHistoryScreen}
-            options={{
-              headerTitle: "Quiz History",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="AttemptDetail"
-            component={AttemptDetailScreen}
-            options={{
-              headerTitle: "Attempt Details",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="TopicProgressDetail"
-            component={TopicProgressDetailScreen}
-            options={{
-              headerTitle: "Topic Progress",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="Paywall"
-            component={PaywallScreen}
-            options={{
-              headerTitle: "",
-              presentation: "modal",
-            }}
-          />
-          <Stack.Screen
-            name="PurchaseSuccess"
-            component={PurchaseSuccessScreen}
-            options={{
-              headerShown: false,
-              presentation: "fullScreenModal",
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="PurchaseFailed"
-            component={PurchaseFailedScreen}
-            options={{
-              headerShown: false,
-              presentation: "fullScreenModal",
-            }}
-          />
-          <Stack.Screen
-            name="RestorePurchases"
-            component={RestorePurchasesScreen}
-            options={{
-              headerTitle: "Restore Purchases",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="EditProfile"
-            component={EditProfileScreen}
-            options={{
-              headerTitle: "Edit Profile",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{
-              headerTitle: "Settings",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="SecuritySettings"
-            component={SecuritySettingsScreen}
-            options={{
-              headerTitle: "Security",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="HelpSupport"
-            component={HelpSupportScreen}
-            options={{
-              headerTitle: "Help & Support",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="About"
-            component={AboutScreen}
-            options={{
-              headerTitle: "About",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="TermsPrivacy"
-            component={TermsPrivacyScreen}
-            options={{
-              headerTitle: "Legal",
-              presentation: "card",
-            }}
-          />
-          <Stack.Screen
-            name="Disclaimer"
-            component={DisclaimerScreen}
-            options={{
-              headerTitle: "Medical Disclaimer",
-              presentation: "card",
-            }}
-          />
-        </>
-      ) : hasCompletedOnboarding ? (
-        <>
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
+            name="VerifyEmail"
+            component={VerifyEmailScreen}
+            initialParams={{ email: user.email }}
             options={{
               headerTitle: "",
               headerTransparent: true,
             }}
           />
+        ) : requiresPhoneVerification ? (
           <Stack.Screen
-            name="ForgotPassword"
-            component={ForgotPasswordScreen}
+            name="VerifyPhone"
+            component={VerifyPhoneScreen}
             options={{
-              headerTitle: "",
-              headerTransparent: true,
+              headerTitle: "Verify Phone",
+              presentation: "card",
             }}
           />
-          <Stack.Screen
-            name="ResetPassword"
-            component={ResetPasswordScreen}
-            options={{
-              headerTitle: "",
-              headerTransparent: true,
-            }}
-          />
-          <Stack.Screen
-            name="EmailVerification"
-            component={EmailVerificationScreen}
-            options={{
-              headerTitle: "",
-              headerTransparent: true,
-            }}
-          />
-        </>
-      ) : (
+        ) : (
+          <>
+            <Stack.Screen
+              name="Main"
+              component={MainTabNavigator}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="VerifyPhone"
+              component={VerifyPhoneScreen}
+              options={{
+                headerTitle: "Verify Phone",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="TopicReader"
+              component={TopicReaderScreen}
+              options={({ route }) => ({
+                headerTitle: route.params.topicTitle,
+                presentation: "card",
+              })}
+            />
+            <Stack.Screen
+              name="QuizTopicSelect"
+              component={QuizTopicSelectScreen}
+              options={{
+                headerTitle: "Select Topic",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="QuizPlayer"
+              component={QuizPlayerScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+                animation: "slide_from_bottom",
+              }}
+            />
+            <Stack.Screen
+              name="QuizResults"
+              component={QuizResultsScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name="QuizSettings"
+              component={QuizSettingsScreen}
+              options={{
+                headerTitle: "Quiz Settings",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="Subscription"
+              component={SubscriptionScreen}
+              options={{
+                headerTitle: "Subscription",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="Bookmarks"
+              component={BookmarksScreen}
+              options={{
+                headerTitle: "Bookmarks",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="RecentActivity"
+              component={RecentActivityScreen}
+              options={{
+                headerTitle: "Recent Activity",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="AttemptHistory"
+              component={AttemptHistoryScreen}
+              options={{
+                headerTitle: "Attempt History",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="AttemptDetail"
+              component={AttemptDetailScreen}
+              options={{
+                headerTitle: "Attempt Detail",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="TopicProgressDetail"
+              component={TopicProgressDetailScreen}
+              options={({ route }) => ({
+                headerTitle: route.params.topicTitle,
+                presentation: "card",
+              })}
+            />
+            <Stack.Screen
+              name="Paywall"
+              component={PaywallScreen}
+              options={{
+                headerShown: false,
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen
+              name="PurchaseSuccess"
+              component={PurchaseSuccessScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name="PurchaseFailed"
+              component={PurchaseFailedScreen}
+              options={{
+                headerTitle: "Purchase Failed",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="RestorePurchases"
+              component={RestorePurchasesScreen}
+              options={{
+                headerTitle: "Restore Purchases",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfileScreen}
+              options={{
+                headerTitle: "Edit Profile",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{
+                headerTitle: "Settings",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="SecuritySettings"
+              component={SecuritySettingsScreen}
+              options={{
+                headerTitle: "Security",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="HelpSupport"
+              component={HelpSupportScreen}
+              options={{
+                headerTitle: "Help & Support",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="About"
+              component={AboutScreen}
+              options={{
+                headerTitle: "About",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="TermsPrivacy"
+              component={TermsPrivacyScreen}
+              options={{
+                headerTitle: "Terms & Privacy",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="Disclaimer"
+              component={DisclaimerScreen}
+              options={{
+                headerTitle: "Medical Disclaimer",
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="SpacedReview"
+              component={SpacedReviewScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+                animation: "slide_from_bottom",
+              }}
+            />
+          </>
+        )) : hasCompletedOnboarding ? (
+          <>
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{
+                headerTitle: "",
+                headerTransparent: true,
+              }}
+            />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPasswordScreen}
+              options={{
+                headerTitle: "",
+                headerTransparent: true,
+              }}
+            />
+            <Stack.Screen
+              name="ResetPassword"
+              component={ResetPasswordScreen}
+              options={{
+                headerTitle: "",
+                headerTransparent: true,
+              }}
+            />
+            <Stack.Screen
+              name="VerifyEmail"
+              component={VerifyEmailScreen}
+              options={{
+                headerTitle: "",
+                headerTransparent: true,
+              }}
+            />
+          </>
+        ) : (
         <>
           <Stack.Screen
             name="Welcome"
@@ -348,8 +394,8 @@ export default function RootStackNavigator() {
             }}
           />
           <Stack.Screen
-            name="EmailVerification"
-            component={EmailVerificationScreen}
+            name="VerifyEmail"
+            component={VerifyEmailScreen}
             options={{
               headerTitle: "",
               headerTransparent: true,
