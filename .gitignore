@@ -12,6 +12,9 @@
 # Server build output
 server_dist/
 
+# Admin panel build output
+admin_dist/
+
 # dependencies
 node_modules/
 
