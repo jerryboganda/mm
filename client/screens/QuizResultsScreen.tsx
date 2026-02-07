@@ -166,7 +166,7 @@ export default function QuizResultsScreen() {
                   Q{index + 1}
                 </ThemedText>
               </View>
-              <ThemedText style={styles.questionText}>{q.question}</ThemedText>
+              <ThemedText style={styles.questionText} numberOfLines={4}>{q.question}</ThemedText>
               <View style={styles.answerRow}>
                 <ThemedText style={styles.answerLabel}>Your answer:</ThemedText>
                 <ThemedText
@@ -330,6 +330,7 @@ const styles = StyleSheet.create({
   answerValue: {
     fontSize: 13,
     fontWeight: "600",
+    flex: 1,
   },
   explanationBox: {
     flexDirection: "row",

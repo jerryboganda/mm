@@ -172,7 +172,7 @@ export default function ProgressScreen() {
               style={styles.topicRow}
             >
               <View style={styles.topicInfo}>
-                <ThemedText style={styles.topicTitle}>{topic.title}</ThemedText>
+                <ThemedText style={styles.topicTitle} numberOfLines={1}>{topic.title}</ThemedText>
                 <ThemedText style={styles.topicAttempts}>
                   {topic.attempts} attempts
                 </ThemedText>
@@ -214,7 +214,7 @@ export default function ProgressScreen() {
             >
               <View style={styles.attemptHeader}>
                 <View style={styles.attemptInfo}>
-                  <ThemedText style={styles.attemptMode}>
+                  <ThemedText style={styles.attemptMode} numberOfLines={1}>
                     {attempt.mode === "topic"
                       ? attempt.topicTitle
                       : attempt.mode === "mixed"
@@ -308,6 +308,8 @@ const styles = StyleSheet.create({
   topicTitle: {
     fontSize: 14,
     fontWeight: "500",
+    flex: 1,
+    marginRight: Spacing.sm,
   },
   topicAttempts: {
     fontSize: 12,

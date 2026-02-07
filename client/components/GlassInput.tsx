@@ -35,12 +35,14 @@ export function GlassInput({
   onFocus,
   onBlur,
   secureTextEntry,
+  placeholder,
   ...props
 }: GlassInputProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<TextInput>(null);
-  const focusAnim = useSharedValue(value ? 1 : 0);
+  const hasValue = !!(value && value.length > 0);
+  const focusAnim = useSharedValue(hasValue ? 1 : 0);
 
   const labelStyle = useAnimatedStyle(() => ({
     transform: [
@@ -63,6 +65,9 @@ export function GlassInput({
     }
     onBlur?.(e);
   };
+
+  // Only show placeholder when focused (label has animated up) and no value yet
+  const effectivePlaceholder = isFocused && !hasValue ? placeholder : undefined;
 
   const isPassword = secureTextEntry !== undefined;
   const actualSecureTextEntry = isPassword && !showPassword;
@@ -108,6 +113,7 @@ export function GlassInput({
             value={value}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            placeholder={effectivePlaceholder}
             placeholderTextColor={Colors.dark.textMuted}
             selectionColor={Colors.dark.primary}
             secureTextEntry={actualSecureTextEntry}
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
   labelContainer: {
     position: "absolute",
     left: 0,
-    top: 16,
+    top: 18,
   },
   label: {
     ...Typography.body,
@@ -181,7 +187,7 @@ const styles = StyleSheet.create({
   input: {
     ...Typography.body,
     color: Colors.dark.text,
-    paddingTop: Spacing.sm,
+    paddingTop: 8,
     height: "100%",
   },
   rightIcon: {

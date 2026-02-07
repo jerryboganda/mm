@@ -153,10 +153,10 @@ export default function ProfileScreen() {
               ]}
             />
           </Pressable>
-          <ThemedText type="h3" style={styles.userName}>
+          <ThemedText type="h3" style={styles.userName} numberOfLines={1}>
             {user?.name || "Student"}
           </ThemedText>
-          <ThemedText style={styles.userEmail}>
+          <ThemedText style={styles.userEmail} numberOfLines={1}>
             {user?.email || "student@example.com"}
           </ThemedText>
           <View

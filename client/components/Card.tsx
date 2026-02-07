@@ -86,12 +86,12 @@ export function Card({
       ]}
     >
       {title ? (
-        <ThemedText type="h4" style={styles.cardTitle}>
+        <ThemedText type="h4" style={styles.cardTitle} numberOfLines={2}>
           {title}
         </ThemedText>
       ) : null}
       {description ? (
-        <ThemedText type="small" style={styles.cardDescription}>
+        <ThemedText type="small" style={styles.cardDescription} numberOfLines={3}>
           {description}
         </ThemedText>
       ) : null}

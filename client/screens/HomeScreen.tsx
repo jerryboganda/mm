@@ -115,10 +115,10 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
               </View>
             </View>
             <View style={styles.bentoValueContainer}>
-              <Text style={[styles.bentoValue, { color: item.color }]}>
+              <Text style={[styles.bentoValue, { color: item.color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                 {item.value}
               </Text>
-              <Text style={[styles.bentoLabel, { color: theme.textSecondary }]}>
+              <Text style={[styles.bentoLabel, { color: theme.textSecondary }]} numberOfLines={1}>
                 {item.label}
               </Text>
             </View>
@@ -387,7 +387,7 @@ export default function HomeScreen() {
                   >
                     {greeting},
                   </Text>
-                  <Text style={[styles.userName, { color: theme.text }]}>
+                  <Text style={[styles.userName, { color: theme.text }]} numberOfLines={1}>
                     {firstName}
                   </Text>
                 </View>
@@ -465,10 +465,10 @@ export default function HomeScreen() {
                   <Feather name="repeat" size={20} color={Colors.dark.purple} />
                 </View>
                 <View>
-                  <Text style={[styles.reviewBannerTitle, { color: theme.text }]}>
+                  <Text style={[styles.reviewBannerTitle, { color: theme.text }]} numberOfLines={1}>
                     Spaced Review
                   </Text>
-                  <Text style={[styles.reviewBannerSubtitle, { color: theme.textSecondary }]}>
+                  <Text style={[styles.reviewBannerSubtitle, { color: theme.textSecondary }]} numberOfLines={1}>
                     {dueCount} card{dueCount !== 1 ? "s" : ""} due for review
                   </Text>
                 </View>
