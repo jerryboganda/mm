@@ -32,7 +32,7 @@ SplashScreen.preventAutoHideAsync();
 
 // Deep linking configuration
 const linking = {
-  prefixes: ["maternalmind://", "https://maternalmind.app"],
+  prefixes: ["maternalmind://", "https://maternalmind.com.pk"],
   config: {
     screens: {
       Main: {

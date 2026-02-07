@@ -58,7 +58,7 @@ export default function AboutScreen() {
       id: "licenses",
       title: "Open Source Licenses",
       icon: "code" as const,
-      url: "https://maternalmind.app/licenses",
+      url: "https://maternalmind.com.pk/licenses",
     },
   ];
 
@@ -178,7 +178,7 @@ export default function AboutScreen() {
             </Pressable>
             <Pressable
               style={styles.socialButton}
-              onPress={() => handleOpenLink("https://maternalmind.app")}
+              onPress={() => handleOpenLink("https://maternalmind.com.pk")}
             >
               <Feather name="globe" size={20} color={Colors.dark.text} />
             </Pressable>

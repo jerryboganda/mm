@@ -228,7 +228,7 @@ export default function TermsPrivacyScreen() {
             </ThemedText>
             <ThemedText style={styles.paragraph}>
               If you have questions about this Privacy Policy, please contact us
-              at privacy@maternalmind.app.
+              at privacy@maternalmind.com.pk.
             </ThemedText>
           </GlassCard>
         )}

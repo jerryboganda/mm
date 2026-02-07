@@ -55,7 +55,7 @@ router.post(
       // Send email to support via Brevo SMTP
       try {
         await sendEmail({
-          to: "support@maternalmind.app",
+          to: "support@maternalmind.com.pk",
           subject: `[${type.toUpperCase()}] New Issue Report`,
           html: supportIssueEmailHtml(type, email, description),
         });
