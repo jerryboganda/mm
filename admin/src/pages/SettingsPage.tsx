@@ -3,12 +3,13 @@ import { api } from '../lib/api';
 import { Loader2, Mail, Save, FileText, Clock } from 'lucide-react';
 
 interface AuditLog {
-  id: number;
+  id: string;
   action: string;
   entityType: string;
-  entityId: number | null;
+  entityId: string | null;
   details: Record<string, unknown> | null;
   createdAt: string;
+  adminUserId?: string;
   adminName?: string;
 }
 
@@ -122,8 +123,8 @@ function AuditLogTab() {
 
   useEffect(() => {
     setLoading(true);
-    api.get<{ logs: AuditLog[]; total: number }>(`/admin/analytics/audit-logs?page=${page}&limit=${perPage}`)
-      .then((r) => { setLogs(r.logs); setTotal(r.total); })
+    api.get<{ data: AuditLog[]; total: number }>(`/admin/analytics/audit-logs?page=${page}&limit=${perPage}`)
+      .then((r) => { setLogs(r.data); setTotal(r.total); })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [page]);
