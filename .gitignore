@@ -6,6 +6,12 @@
 # Replit state
 .local/
 
+# Replit agent skills
+.agent/
+
+# Server build output
+server_dist/
+
 # dependencies
 node_modules/
 
