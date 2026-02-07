@@ -34,7 +34,7 @@ async function removeToken(key: string): Promise<void> {
  * @returns {string} The API base URL
  */
 export function getApiUrl(): string {
-  return process.env.EXPO_PUBLIC_API_URL || "https://mm.polytronx.com";
+  return process.env.EXPO_PUBLIC_API_URL || "https://maternalmind.com.pk";
 }
 
 // Refresh lock to prevent concurrent refresh requests

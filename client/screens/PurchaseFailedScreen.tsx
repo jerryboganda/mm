@@ -100,7 +100,7 @@ export default function PurchaseFailedScreen() {
 
   const handleContact = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL("mailto:support@maternalmind.app?subject=Purchase%20Issue");
+    Linking.openURL("mailto:support@maternalmind.com.pk?subject=Purchase%20Issue");
   };
 
   const handleCancel = () => {

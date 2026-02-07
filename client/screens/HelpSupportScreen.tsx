@@ -111,7 +111,7 @@ export default function HelpSupportScreen() {
   const handleContactSupport = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Linking.openURL(
-      "mailto:support@maternalmind.app?subject=Support%20Request",
+      "mailto:support@maternalmind.com.pk?subject=Support%20Request",
     );
   };
 
@@ -194,7 +194,7 @@ export default function HelpSupportScreen() {
                   Email Support
                 </ThemedText>
                 <ThemedText style={styles.contactSubtitle}>
-                  support@maternalmind.app
+                  support@maternalmind.com.pk
                 </ThemedText>
               </View>
               <Feather
