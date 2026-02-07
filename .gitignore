@@ -1,5 +1,11 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
+# APK build artifacts
+*.apk
+
+# Replit state
+.local/
+
 # dependencies
 node_modules/
 
