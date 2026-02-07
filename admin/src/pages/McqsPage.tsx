@@ -1,0 +1,454 @@
+import { useEffect, useState } from 'react';
+import { api } from '../lib/api';
+import {
+  Plus, Pencil, Trash2, Eye, EyeOff, Search, Upload,
+  Loader2, AlertCircle, ClipboardList, X, Download,
+} from 'lucide-react';
+
+interface MCQ {
+  id: string;
+  topicId: string;
+  question: string;
+  options: any;
+  correctAnswer: string;
+  explanation: string | null;
+  difficulty: string;
+  isPublished: boolean;
+  createdAt: string;
+}
+
+interface TopicRef {
+  id: string;
+  title: string;
+  chapterTitle: string;
+  bookTitle: string;
+}
+
+export default function McqsPage() {
+  const [mcqs, setMcqs] = useState<MCQ[]>([]);
+  const [total, setTotal] = useState(0);
+  const [topicsList, setTopics] = useState<TopicRef[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [filterTopic, setFilterTopic] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState('');
+
+  // Form
+  const [showForm, setShowForm] = useState(false);
+  const [editMcq, setEditMcq] = useState<MCQ | null>(null);
+  const [form, setForm] = useState({
+    topicId: '',
+    question: '',
+    optA: '', optB: '', optC: '', optD: '', optE: '',
+    correctAnswer: 'A',
+    explanation: '',
+    explA: '', explB: '', explC: '', explD: '', explE: '',
+    difficulty: 'medium',
+    references: '',
+    tags: '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  // Bulk import
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importTopicId, setImportTopicId] = useState('');
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState('');
+
+  const load = async () => {
+    try {
+      const params = new URLSearchParams({ page: String(page), pageSize: '20' });
+      if (search) params.set('search', search);
+      if (filterTopic) params.set('topicId', filterTopic);
+      if (filterDifficulty) params.set('difficulty', filterDifficulty);
+
+      const [result, topics] = await Promise.all([
+        api.get<{ data: MCQ[]; total: number }>(`/admin/content/mcqs?${params}`),
+        topicsList.length === 0 ? api.get<TopicRef[]>('/admin/content/topics/all') : Promise.resolve(topicsList),
+      ]);
+      setMcqs(result.data);
+      setTotal(result.total);
+      if (Array.isArray(topics)) setTopics(topics);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, [page, search, filterTopic, filterDifficulty]);
+
+  const openCreate = () => {
+    setEditMcq(null);
+    setForm({
+      topicId: filterTopic || '', question: '', optA: '', optB: '', optC: '', optD: '', optE: '',
+      correctAnswer: 'A', explanation: '', explA: '', explB: '', explC: '', explD: '', explE: '',
+      difficulty: 'medium', references: '', tags: '',
+    });
+    setShowForm(true);
+    setError('');
+  };
+
+  const openEdit = (m: MCQ) => {
+    const opts = m.options as Record<string, string>;
+    const optExpls = (m as any).optionExplanations as Record<string, string> | null;
+    setEditMcq(m);
+    setForm({
+      topicId: m.topicId,
+      question: m.question,
+      optA: opts?.A || '', optB: opts?.B || '', optC: opts?.C || '', optD: opts?.D || '', optE: opts?.E || '',
+      correctAnswer: m.correctAnswer,
+      explanation: m.explanation || '',
+      explA: optExpls?.A || '', explB: optExpls?.B || '', explC: optExpls?.C || '', explD: optExpls?.D || '', explE: optExpls?.E || '',
+      difficulty: m.difficulty,
+      references: (m as any).references || '',
+      tags: Array.isArray((m as any).tags) ? (m as any).tags.join(', ') : '',
+    });
+    setShowForm(true);
+    setError('');
+  };
+
+  const buildMcqPayload = () => {
+    const options: Record<string, string> = {};
+    if (form.optA) options.A = form.optA;
+    if (form.optB) options.B = form.optB;
+    if (form.optC) options.C = form.optC;
+    if (form.optD) options.D = form.optD;
+    if (form.optE) options.E = form.optE;
+
+    const optionExplanations: Record<string, string> = {};
+    if (form.explA) optionExplanations.A = form.explA;
+    if (form.explB) optionExplanations.B = form.explB;
+    if (form.explC) optionExplanations.C = form.explC;
+    if (form.explD) optionExplanations.D = form.explD;
+    if (form.explE) optionExplanations.E = form.explE;
+
+    return {
+      topicId: form.topicId,
+      question: form.question,
+      options,
+      correctAnswer: form.correctAnswer,
+      explanation: form.explanation || undefined,
+      optionExplanations: Object.keys(optionExplanations).length > 0 ? optionExplanations : undefined,
+      difficulty: form.difficulty,
+      references: form.references || undefined,
+      tags: form.tags ? form.tags.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
+    };
+  };
+
+  const handleSave = async () => {
+    if (!form.topicId || !form.question || !form.optA || !form.optB) {
+      setError('Topic, question, and at least 2 options required');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      const payload = buildMcqPayload();
+      if (editMcq) {
+        await api.put(`/admin/content/mcqs/${editMcq.id}`, payload);
+      } else {
+        await api.post('/admin/content/mcqs', payload);
+      }
+      setShowForm(false);
+      load();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (m: MCQ) => {
+    if (!confirm('Delete this MCQ?')) return;
+    try { await api.delete(`/admin/content/mcqs/${m.id}`); load(); } catch (err: any) { alert(err.message); }
+  };
+
+  const togglePublish = async (m: MCQ) => {
+    try { await api.put(`/admin/content/mcqs/${m.id}`, { isPublished: !m.isPublished }); load(); } catch (err: any) { alert(err.message); }
+  };
+
+  // ── Bulk Import ──
+  const handleBulkImport = async () => {
+    if (!importTopicId) { setImportResult('❌ Select a topic first'); return; }
+    setImporting(true);
+    setImportResult('');
+    try {
+      let mcqList: any[] = [];
+
+      // Try parsing as JSON first
+      try {
+        const parsed = JSON.parse(importText);
+        mcqList = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        // Parse as CSV: question,optA,optB,optC,optD,correct,explanation,difficulty
+        const lines = importText.trim().split('\n').filter((l) => l.trim());
+        const startIdx = lines[0]?.toLowerCase().includes('question') ? 1 : 0; // skip header
+        for (let i = startIdx; i < lines.length; i++) {
+          const cols = lines[i].split(/\t|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((c) => c.replace(/^"|"$/g, '').trim());
+          if (cols.length < 5) continue;
+          mcqList.push({
+            question: cols[0],
+            options: { A: cols[1], B: cols[2], C: cols[3], D: cols[4] || '' },
+            correctAnswer: cols[5] || 'A',
+            explanation: cols[6] || '',
+            difficulty: cols[7] || 'medium',
+          });
+        }
+      }
+
+      if (mcqList.length === 0) { setImportResult('❌ No valid MCQs found'); setImporting(false); return; }
+
+      // Attach topicId
+      mcqList = mcqList.map((m) => ({
+        ...m,
+        topicId: importTopicId,
+        options: m.options || { A: m.optA, B: m.optB, C: m.optC, D: m.optD },
+        correctAnswer: m.correctAnswer || m.correct || 'A',
+        difficulty: m.difficulty || 'medium',
+      }));
+
+      const res = await api.post<{ count: number }>('/admin/content/mcqs/bulk', { mcqs: mcqList });
+      setImportResult(`✅ Successfully imported ${res.count} MCQs!`);
+      setImportText('');
+      load();
+    } catch (err: any) {
+      setImportResult(`❌ Import failed: ${err.message}`);
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const totalPages = Math.ceil(total / 20);
+
+  if (loading && mcqs.length === 0) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary-500" /></div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">MCQs</h1>
+          <p className="text-gray-500 mt-1">{total} questions total</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => { setShowImport(true); setImportResult(''); }} className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-700 rounded-xl hover:bg-amber-100 transition-colors font-medium">
+            <Upload className="w-4 h-4" /> Bulk Import
+          </button>
+          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium">
+            <Plus className="w-4 h-4" /> Add MCQ
+          </button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="Search questions…"
+            className="w-full pl-9 pr-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm"
+          />
+        </div>
+        <select value={filterTopic} onChange={(e) => { setFilterTopic(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+          <option value="">All Topics</option>
+          {topicsList.map((t) => <option key={t.id} value={t.id}>{t.bookTitle} › {t.title}</option>)}
+        </select>
+        <select value={filterDifficulty} onChange={(e) => { setFilterDifficulty(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+          <option value="">All Difficulty</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+
+      {/* MCQ Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setShowForm(false)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl my-8" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">{editMcq ? 'Edit MCQ' : 'Create MCQ'}</h2>
+              <button onClick={() => setShowForm(false)} className="p-1 text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl mb-4 text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Topic *</label>
+                <select value={form.topicId} onChange={(e) => setForm({ ...form, topicId: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+                  <option value="">Select topic…</option>
+                  {topicsList.map((t) => <option key={t.id} value={t.id}>{t.bookTitle} › {t.chapterTitle} › {t.title}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Question *</label>
+                <textarea value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} rows={3} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none resize-none text-sm" />
+              </div>
+              {['A', 'B', 'C', 'D', 'E'].map((opt) => (
+                <div key={opt} className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Option {opt} {opt <= 'B' ? '*' : ''}</label>
+                    <input value={(form as any)[`opt${opt}`]} onChange={(e) => setForm({ ...form, [`opt${opt}`]: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Explanation {opt}</label>
+                    <input value={(form as any)[`expl${opt}`]} onChange={(e) => setForm({ ...form, [`expl${opt}`]: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" placeholder="Why this is right/wrong" />
+                  </div>
+                </div>
+              ))}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Correct Answer *</label>
+                  <select value={form.correctAnswer} onChange={(e) => setForm({ ...form, correctAnswer: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+                    {['A', 'B', 'C', 'D', 'E'].map((o) => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+                  <select value={form.difficulty} onChange={(e) => setForm({ ...form, difficulty: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">General Explanation</label>
+                <textarea value={form.explanation} onChange={(e) => setForm({ ...form, explanation: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">References</label>
+                  <input value={form.references} onChange={(e) => setForm({ ...form, references: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
+                  <input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none" placeholder="e.g., hypertension, pregnancy" />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
+              <button onClick={() => setShowForm(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">Cancel</button>
+              <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 font-medium">
+                {saving ? 'Saving…' : editMcq ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Import Modal */}
+      {showImport && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowImport(false)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Bulk Import MCQs</h2>
+              <button onClick={() => setShowImport(false)} className="p-1 text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Target Topic *</label>
+                <select value={importTopicId} onChange={(e) => setImportTopicId(e.target.value)} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+                  <option value="">Select topic…</option>
+                  {topicsList.map((t) => <option key={t.id} value={t.id}>{t.bookTitle} › {t.title}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Paste CSV or JSON
+                </label>
+                <textarea
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  rows={10}
+                  className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none font-mono"
+                  placeholder={`CSV format:\nquestion,optA,optB,optC,optD,correctAnswer,explanation,difficulty\n"What is X?","Answer A","Answer B","Answer C","Answer D","A","Because...","medium"\n\nOR JSON format:\n[{"question":"What is X?","options":{"A":"...","B":"...","C":"...","D":"..."},"correctAnswer":"A"}]`}
+                />
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-xl text-sm text-blue-700">
+                <p className="font-medium mb-1">Supported Formats:</p>
+                <p>• <strong>CSV</strong>: question, optA, optB, optC, optD, correct, explanation, difficulty</p>
+                <p>• <strong>JSON</strong>: Array of objects with question, options, correctAnswer, etc.</p>
+                <p>• Tab-separated values also supported</p>
+              </div>
+
+              {importResult && (
+                <div className={`p-3 rounded-xl text-sm ${importResult.startsWith('✅') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                  {importResult}
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={() => setShowImport(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">Cancel</button>
+              <button onClick={handleBulkImport} disabled={importing || !importText.trim()} className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-xl hover:bg-amber-700 disabled:opacity-50 font-medium">
+                {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                {importing ? 'Importing…' : 'Import'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MCQ List */}
+      {mcqs.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+          <ClipboardList className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500 font-medium">No MCQs found</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {mcqs.map((m) => {
+            const opts = m.options as Record<string, string>;
+            return (
+              <div key={m.id} className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-sm transition-all">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {m.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.difficulty === 'easy' ? 'bg-blue-100 text-blue-700' : m.difficulty === 'hard' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {m.difficulty}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900 line-clamp-2">{m.question}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Correct: {m.correctAnswer} • Options: {Object.keys(opts).join(', ')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => togglePublish(m)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
+                      {m.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <button onClick={() => openEdit(m)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(m)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-50">Previous</button>
+          <span className="text-sm text-gray-500">Page {page} of {totalPages}</span>
+          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-50">Next</button>
+        </div>
+      )}
+    </div>
+  );
+}

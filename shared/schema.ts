@@ -311,6 +311,60 @@ export const reviewScheduleRelations = relations(reviewSchedule, ({ one }) => ({
   }),
 }));
 
+// ── Admin App Settings (key-value store) ──────────────────────────
+export const appSettings = pgTable("app_settings", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ── Announcements ──────────────────────────
+export const announcements = pgTable("announcements", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").notNull().default("info"), // 'info' | 'warning' | 'update' | 'promo'
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const announcementsRelations = relations(announcements, ({ one }) => ({
+  creator: one(users, {
+    fields: [announcements.createdBy],
+    references: [users.id],
+  }),
+}));
+
+// ── Audit Logs ──────────────────────────
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  adminUserId: varchar("admin_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  action: text("action").notNull(), // 'create' | 'update' | 'delete' | 'publish' | 'unpublish'
+  entityType: text("entity_type").notNull(), // 'book' | 'chapter' | 'topic' | 'mcq' | 'user' | 'announcement'
+  entityId: varchar("entity_id"),
+  details: jsonb("details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  admin: one(users, {
+    fields: [auditLogs.adminUserId],
+    references: [users.id],
+  }),
+}));
+
 // ── Content Error Reports (TRUST-003) ──────────────────────────
 export const contentReports = pgTable("content_reports", {
   id: varchar("id")
@@ -379,3 +433,6 @@ export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type RecentActivity = typeof recentActivity.$inferSelect;
 export type ReviewSchedule = typeof reviewSchedule.$inferSelect;
 export type ContentReport = typeof contentReports.$inferSelect;
+export type AppSetting = typeof appSettings.$inferSelect;
+export type Announcement = typeof announcements.$inferSelect;
+export type AuditLog = typeof auditLogs.$inferSelect;

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { storage } from "../storage";
+import { sendEmail, supportIssueEmailHtml } from "../email";
 import { AuthRequest, authMiddleware } from "../middleware";
 
 const router = Router();
@@ -51,29 +52,15 @@ router.post(
         console.log(`[SUPPORT] Issue reported by ${email}: ${type}`);
       }
 
-      // Optionally send email to support
-      if (process.env.RESEND_API_KEY) {
-        try {
-          const { Resend } = await import("resend");
-          const resendClient = new Resend(process.env.RESEND_API_KEY);
-
-          await resendClient.emails.send({
-            from: "Maternal Mind <noreply@maternalmind.app>",
-            to: ["support@maternalmind.app"],
-            subject: `[${type.toUpperCase()}] New Issue Report`,
-            html: `
-            <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-              <h1 style="color: #11a4d4;">Issue Report</h1>
-              <p><strong>Type:</strong> ${type}</p>
-              <p><strong>User:</strong> ${email}</p>
-              <p><strong>Description:</strong></p>
-              <p style="background: #f5f5f5; padding: 15px; border-radius: 8px;">${description}</p>
-            </div>
-          `,
-          });
-        } catch (emailError) {
-          console.error("Failed to send support email:", emailError);
-        }
+      // Send email to support via Brevo SMTP
+      try {
+        await sendEmail({
+          to: "support@maternalmind.app",
+          subject: `[${type.toUpperCase()}] New Issue Report`,
+          html: supportIssueEmailHtml(type, email, description),
+        });
+      } catch (emailError) {
+        console.error("Failed to send support email:", emailError);
       }
 
       res.json({ message: "Issue reported successfully" });

@@ -10,6 +10,12 @@ RUN mkdir -p static-build
 # Mark server_dist as ESM to avoid Node.js reparsing overhead
 RUN echo '{"type":"module"}' > server_dist/package.json
 
+# ── Build admin SPA ──
+WORKDIR /app/admin
+RUN npm ci
+RUN npm run build
+WORKDIR /app
+
 # ── Production stage ──
 FROM node:20-alpine
 WORKDIR /app
@@ -22,6 +28,7 @@ COPY --from=builder /app/server_dist ./server_dist
 COPY --from=builder /app/server/templates ./server/templates
 COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/static-build ./static-build
+COPY --from=builder /app/admin_dist ./admin_dist
 COPY --from=builder /app/app.json ./app.json
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts

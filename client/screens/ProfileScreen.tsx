@@ -105,6 +105,17 @@ export default function ProfileScreen() {
     },
   ];
 
+  // Admin-only items
+  const adminItems = user?.role === "admin" ? [
+    {
+      id: "admin-email",
+      title: "Email Settings",
+      subtitle: "Configure Brevo SMTP & test emails",
+      icon: "mail" as const,
+      onPress: () => navigation.navigate("AdminEmailSettings" as any),
+    },
+  ] : [];
+
   return (
     <BackgroundGradient>
       <ScrollView
@@ -218,6 +229,36 @@ export default function ProfileScreen() {
             />
           ))}
         </View>
+
+        {adminItems.length > 0 ? (
+          <View style={styles.settingsSection}>
+            <ThemedText style={styles.sectionLabel}>ADMIN PANEL</ThemedText>
+            {adminItems.map((item) => (
+              <GlassCard
+                key={item.id}
+                title={item.title}
+                subtitle={item.subtitle}
+                onPress={item.onPress}
+                icon={
+                  <Feather
+                    name={item.icon}
+                    size={20}
+                    color={Colors.dark.warning}
+                  />
+                }
+                rightElement={
+                  <Feather
+                    name="chevron-right"
+                    size={20}
+                    color={Colors.dark.textSecondary}
+                  />
+                }
+                style={{ marginBottom: Spacing.md }}
+                testID={`card-admin-${item.id}`}
+              />
+            ))}
+          </View>
+        ) : null}
 
         <PrimaryButton
           title="Log Out"
