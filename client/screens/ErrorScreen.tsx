@@ -182,6 +182,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: "100%",
     gap: Spacing.md,
+    marginTop: Spacing.xl,
   },
   button: {
     width: "100%",

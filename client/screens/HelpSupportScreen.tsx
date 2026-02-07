@@ -378,5 +378,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
     fontFamily: "Inter_400Regular",
   },
-  submitButton: {},
+  submitButton: {
+    marginTop: Spacing.xl,
+  },
 });

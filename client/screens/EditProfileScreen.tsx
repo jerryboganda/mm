@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   buttonSection: {
-    marginTop: Spacing.lg,
+    marginTop: Spacing["2xl"],
   },
   saveButton: {
     marginBottom: Spacing.lg,

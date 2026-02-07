@@ -636,6 +636,7 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     flex: 1,
+    marginTop: Spacing.lg,
   },
   footer: {
     paddingTop: Spacing.lg,
