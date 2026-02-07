@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
   },
   button: {
-    marginTop: Spacing.md,
+    marginTop: Spacing.xl,
   },
   sessionCard: {
     padding: Spacing.lg,

@@ -255,6 +255,7 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.sm,
   },
   buttonSection: {
+    marginTop: Spacing["2xl"],
     gap: Spacing.md,
   },
   enableButton: {

@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.sm,
   },
   actionsSection: {
-    marginTop: Spacing.lg,
+    marginTop: Spacing["2xl"],
   },
   retryButton: {
     marginTop: Spacing.md,

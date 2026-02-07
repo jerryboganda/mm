@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     color: Colors.dark.textSecondary,
   },
   ctaSection: {
-    marginTop: Spacing.xl,
+    marginTop: Spacing["2xl"],
   },
   retryButton: {
     marginBottom: Spacing.lg,
