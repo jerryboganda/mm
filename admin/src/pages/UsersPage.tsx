@@ -27,7 +27,7 @@ export default function UsersPage() {
 
   const [showEdit, setShowEdit] = useState(false);
   const [editUser, setEditUser] = useState<UserItem | null>(null);
-  const [editForm, setEditForm] = useState({ role: '', name: '', subscriptionStatus: '', subscriptionPlan: '' });
+  const [editForm, setEditForm] = useState({ role: '', name: '', subscriptionStatus: '', subscriptionPlan: '', isEmailVerified: false, isPhoneVerified: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -55,6 +55,8 @@ export default function UsersPage() {
       name: u.name,
       subscriptionStatus: u.subscriptionStatus,
       subscriptionPlan: u.subscriptionPlan || '',
+      isEmailVerified: u.isEmailVerified,
+      isPhoneVerified: u.isPhoneVerified,
     });
     setShowEdit(true);
     setError('');
@@ -123,6 +125,20 @@ export default function UsersPage() {
                 <select value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm">
                   <option value="student">Student</option>
                   <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email Verified</label>
+                <select value={editForm.isEmailVerified ? 'true' : 'false'} onChange={(e) => setEditForm({ ...editForm, isEmailVerified: e.target.value === 'true' })} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+                  <option value="true">✅ Verified</option>
+                  <option value="false">❌ Unverified</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Verified</label>
+                <select value={editForm.isPhoneVerified ? 'true' : 'false'} onChange={(e) => setEditForm({ ...editForm, isPhoneVerified: e.target.value === 'true' })} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+                  <option value="true">✅ Verified</option>
+                  <option value="false">❌ Unverified</option>
                 </select>
               </div>
               <div>

@@ -45,10 +45,12 @@ router.get("/:id", async (req: AuthRequest, res) => {
 // Update user (role, subscription, name)
 router.put("/:id", async (req: AuthRequest, res) => {
   try {
-    const { role, subscriptionStatus, subscriptionPlan, subscriptionExpiresAt, name } = req.body;
+    const { role, subscriptionStatus, subscriptionPlan, subscriptionExpiresAt, name, isEmailVerified, isPhoneVerified } = req.body;
     const data: any = {};
     if (role !== undefined) data.role = role;
     if (name !== undefined) data.name = name;
+    if (isEmailVerified !== undefined) data.isEmailVerified = isEmailVerified;
+    if (isPhoneVerified !== undefined) data.isPhoneVerified = isPhoneVerified;
     if (subscriptionStatus !== undefined) data.subscriptionStatus = subscriptionStatus;
     if (subscriptionPlan !== undefined) data.subscriptionPlan = subscriptionPlan;
     if (subscriptionExpiresAt !== undefined) {
