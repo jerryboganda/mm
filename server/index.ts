@@ -19,7 +19,6 @@ function setupCors(app: express.Application) {
   const ALLOWED_ORIGINS = [
     process.env.ALLOWED_ORIGIN || "https://maternalmind.com.pk",
     "https://maternalmind.com.pk",
-    "https://mm.polytronx.com",
     "http://localhost:8081", // Expo dev
     "http://localhost:19006", // Expo web
   ];
