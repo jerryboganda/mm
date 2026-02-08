@@ -87,9 +87,6 @@ export default function AboutScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText type="h2" style={styles.appName}>
-            Maternal Mind
-          </ThemedText>
           <ThemedText style={styles.tagline}>
             OB-GYN Education Made Simple
           </ThemedText>
@@ -210,13 +207,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["2xl"],
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
+    width: 130,
+    height: 130,
+    borderRadius: 28,
     marginBottom: Spacing.lg,
-  },
-  appName: {
-    marginBottom: Spacing.xs,
   },
   tagline: {
     fontSize: 14,

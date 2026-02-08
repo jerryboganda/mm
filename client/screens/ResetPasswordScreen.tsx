@@ -252,10 +252,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["3xl"],
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
+    borderRadius: 22,
     marginBottom: Spacing.xl,
-    borderRadius: 16,
   },
   title: {
     color: Colors.dark.text,

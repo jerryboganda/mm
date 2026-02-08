@@ -36,16 +36,11 @@ export default function WelcomeScreen() {
         style={[styles.content, { paddingTop: insets.top + Spacing["3xl"] }]}
       >
         <View style={styles.logoSection}>
-          <View style={styles.logoContainer}>
-            <Image
-              source={require("../../assets/images/icon.png")}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-          <ThemedText type="h1" style={styles.title}>
-            Maternal Mind
-          </ThemedText>
+          <Image
+            source={require("../../assets/images/icon.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <ThemedText style={styles.tagline}>
             Master OB-GYN with confidence
           </ThemedText>
@@ -133,25 +128,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: Spacing["3xl"],
   },
-  logoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 30,
-    backgroundColor: "rgba(17,164,212,0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: Spacing.xl,
-    borderWidth: 2,
-    borderColor: "rgba(17,164,212,0.3)",
-  },
   logo: {
-    width: 80,
-    height: 80,
-  },
-  title: {
-    fontSize: 32,
-    textAlign: "center",
-    marginBottom: Spacing.sm,
+    width: 160,
+    height: 160,
+    borderRadius: 32,
+    marginBottom: Spacing.lg,
   },
   tagline: {
     fontSize: 16,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Heart, Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -40,9 +40,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl mb-4 shadow-lg shadow-primary-200">
-            <Heart className="w-8 h-8 text-white" />
-          </div>
+          <img src="/admin/logo.png" alt="Maternal Mind" className="w-16 h-16 rounded-2xl mx-auto mb-4 shadow-lg shadow-primary-200" />
           <h1 className="text-2xl font-bold text-gray-900">Maternal Mind</h1>
           <p className="text-gray-500 mt-1">Admin Panel Login</p>
         </div>
