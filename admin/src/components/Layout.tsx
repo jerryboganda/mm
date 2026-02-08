@@ -14,7 +14,6 @@ import {
   X,
   ChevronRight,
   ClipboardList,
-  Heart,
 } from 'lucide-react';
 
 const navItems = [
@@ -58,9 +57,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-          <div className="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
-            <Heart className="w-5 h-5 text-white" />
-          </div>
+          <img src="/admin/logo.png" alt="Maternal Mind" className="w-9 h-9 rounded-xl" />
           <div>
             <h1 className="text-lg font-bold text-gray-900 leading-tight">Maternal Mind</h1>
             <p className="text-[11px] text-gray-400 font-medium">Admin Panel</p>
