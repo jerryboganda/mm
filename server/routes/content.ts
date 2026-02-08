@@ -154,6 +154,10 @@ router.get(
       res.json({
         id: topic.id,
         title: topic.title,
+        author: topic.author || null,
+        source: topic.source || null,
+        references: topic.references || null,
+        updatedAt: topic.updatedAt?.toISOString() || null,
         isCompleted: progress?.isCompleted || false,
         isBookmarked,
         blocks: blocks.map((b) => ({

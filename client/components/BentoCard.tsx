@@ -143,6 +143,8 @@ export function BentoCard({
       onPressOut={handlePressOut}
       disabled={!onPress}
       testID={testID}
+      accessibilityRole={onPress ? "button" : "summary"}
+      accessibilityLabel={`${title}: ${value}${subtitle ? `, ${subtitle}` : ""}`}
       style={[
         styles.card,
         animatedStyle,

@@ -55,6 +55,6 @@ export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
   };
 
   return (
-    <Text style={[{ color: getColor() }, getTypeStyle(), style]} {...rest} />
+    <Text maxFontSizeMultiplier={1.5} style={[{ color: getColor() }, getTypeStyle(), style]} {...rest} />
   );
 }

@@ -13,6 +13,7 @@ import Animated, {
   FadeInRight,
   SlideInDown,
   SlideInUp,
+  useReducedMotion,
 } from "react-native-reanimated";
 
 interface AnimatedListItemProps {
@@ -34,14 +35,18 @@ export function AnimatedListItem({
   direction = "up",
   type = "combined",
 }: AnimatedListItemProps) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(direction === "down" ? -20 : 20);
+  const reduceMotion = useReducedMotion();
+
+  const opacity = useSharedValue(reduceMotion ? 1 : 0);
+  const translateY = useSharedValue(reduceMotion ? 0 : (direction === "down" ? -20 : 20));
   const translateX = useSharedValue(
-    direction === "left" ? 20 : direction === "right" ? -20 : 0,
+    reduceMotion ? 0 : (direction === "left" ? 20 : direction === "right" ? -20 : 0),
   );
-  const scale = useSharedValue(0.95);
+  const scale = useSharedValue(reduceMotion ? 1 : 0.95);
 
   useEffect(() => {
+    if (reduceMotion) return;
+
     const itemDelay = index * delay;
 
     opacity.value = withDelay(
@@ -69,7 +74,7 @@ export function AnimatedListItem({
         withSpring(0, { damping: 14, stiffness: 120 }),
       );
     }
-  }, [index, delay, direction, type]);
+  }, [index, delay, direction, type, reduceMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

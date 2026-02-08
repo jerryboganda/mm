@@ -5,6 +5,7 @@
  * All routes protected by authMiddleware + requireRole("admin").
  */
 import { Router } from "express";
+import { z } from "zod";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
 import {
   adminGetBooks, adminGetBook, adminCreateBook, adminUpdateBook, adminDeleteBook, adminReorderBooks,
@@ -15,6 +16,74 @@ import {
   adminGetAllTopicsFlat,
   createAuditLog,
 } from "../admin-storage";
+
+// ── Validation Schemas ──────────────────────────
+const bookSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200),
+  description: z.string().max(2000).optional().nullable(),
+  imageUrl: z.string().url().optional().nullable().or(z.literal("")),
+  isPublished: z.boolean().optional(),
+  order: z.number().int().optional(),
+});
+
+const chapterSchema = z.object({
+  bookId: z.string().min(1, "Book ID is required"),
+  title: z.string().min(1, "Title is required").max(200),
+  description: z.string().max(2000).optional().nullable(),
+  isPublished: z.boolean().optional(),
+  order: z.number().int().optional(),
+});
+
+const topicSchema = z.object({
+  chapterId: z.string().min(1, "Chapter ID is required"),
+  title: z.string().min(1, "Title is required").max(300),
+  description: z.string().max(5000).optional().nullable(),
+  isPublished: z.boolean().optional(),
+  order: z.number().int().optional(),
+  author: z.string().max(200).optional().nullable(),
+  source: z.string().max(500).optional().nullable(),
+  references: z.string().max(5000).optional().nullable(),
+});
+
+const contentBlockSchema = z.object({
+  topicId: z.string().min(1, "Topic ID is required"),
+  type: z.enum(["text", "heading", "image", "note"]),
+  content: z.string().min(1, "Content is required"),
+  order: z.number().int().optional(),
+});
+
+const mcqOptionSchema = z.object({
+  label: z.string().min(1),
+  text: z.string().min(1),
+});
+
+const mcqSchema = z.object({
+  topicId: z.string().min(1, "Topic ID is required"),
+  question: z.string().min(1, "Question is required").max(5000),
+  options: z.array(mcqOptionSchema).min(2, "At least 2 options required").max(6),
+  correctAnswer: z.string().min(1, "Correct answer is required"),
+  explanation: z.string().max(10000).optional().nullable(),
+  optionExplanations: z.record(z.string()).optional().nullable(),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+  references: z.string().max(5000).optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
+  isPublished: z.boolean().optional(),
+});
+
+const reorderSchema = z.object({
+  orderedIds: z.array(z.string().min(1)).min(1),
+});
+
+/** Validate request body against a Zod schema, return parsed data or send 400 */
+function validateBody<T>(schema: z.ZodSchema<T>, body: unknown, res: any): T | null {
+  const result = schema.safeParse(body);
+  if (!result.success) {
+    const errors = result.error.errors.map(e => `${e.path.join(".")}: ${e.message}`);
+    res.status(400).json({ message: "Validation failed", errors });
+    return null;
+  }
+  return result.data;
+}
 
 const router = Router();
 
@@ -37,7 +106,9 @@ router.get("/books", async (_req: AuthRequest, res) => {
 
 router.post("/books", async (req: AuthRequest, res) => {
   try {
-    const book = await adminCreateBook(req.body);
+    const data = validateBody(bookSchema, req.body, res);
+    if (!data) return;
+    const book = await adminCreateBook(data);
     await createAuditLog({ adminUserId: req.userId!, action: "create", entityType: "book", entityId: book.id, details: { title: book.title } });
     res.status(201).json(book);
   } catch (err: any) {
@@ -48,7 +119,9 @@ router.post("/books", async (req: AuthRequest, res) => {
 
 router.put("/books/:id", async (req: AuthRequest, res) => {
   try {
-    const book = await adminUpdateBook(req.params.id, req.body);
+    const data = validateBody(bookSchema.partial(), req.body, res);
+    if (!data) return;
+    const book = await adminUpdateBook(req.params.id, data);
     if (!book) return res.status(404).json({ message: "Book not found" });
     await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "book", entityId: book.id, details: req.body });
     res.json(book);
@@ -73,7 +146,9 @@ router.delete("/books/:id", async (req: AuthRequest, res) => {
 
 router.post("/books/reorder", async (req: AuthRequest, res) => {
   try {
-    await adminReorderBooks(req.body.orderedIds);
+    const data = validateBody(reorderSchema, req.body, res);
+    if (!data) return;
+    await adminReorderBooks(data.orderedIds);
     res.json({ message: "Books reordered" });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -95,7 +170,9 @@ router.get("/books/:bookId/chapters", async (req: AuthRequest, res) => {
 
 router.post("/chapters", async (req: AuthRequest, res) => {
   try {
-    const ch = await adminCreateChapter(req.body);
+    const data = validateBody(chapterSchema, req.body, res);
+    if (!data) return;
+    const ch = await adminCreateChapter(data);
     await createAuditLog({ adminUserId: req.userId!, action: "create", entityType: "chapter", entityId: ch.id, details: { title: ch.title } });
     res.status(201).json(ch);
   } catch (err: any) {
@@ -105,7 +182,9 @@ router.post("/chapters", async (req: AuthRequest, res) => {
 
 router.put("/chapters/:id", async (req: AuthRequest, res) => {
   try {
-    const ch = await adminUpdateChapter(req.params.id, req.body);
+    const data = validateBody(chapterSchema.partial(), req.body, res);
+    if (!data) return;
+    const ch = await adminUpdateChapter(req.params.id, data);
     if (!ch) return res.status(404).json({ message: "Chapter not found" });
     await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "chapter", entityId: ch.id, details: req.body });
     res.json(ch);
@@ -167,7 +246,9 @@ router.get("/topics/:id", async (req: AuthRequest, res) => {
 
 router.post("/topics", async (req: AuthRequest, res) => {
   try {
-    const t = await adminCreateTopic(req.body);
+    const data = validateBody(topicSchema, req.body, res);
+    if (!data) return;
+    const t = await adminCreateTopic(data);
     await createAuditLog({ adminUserId: req.userId!, action: "create", entityType: "topic", entityId: t.id, details: { title: t.title } });
     res.status(201).json(t);
   } catch (err: any) {
@@ -177,9 +258,11 @@ router.post("/topics", async (req: AuthRequest, res) => {
 
 router.put("/topics/:id", async (req: AuthRequest, res) => {
   try {
-    const t = await adminUpdateTopic(req.params.id, req.body);
+    const data = validateBody(topicSchema.partial(), req.body, res);
+    if (!data) return;
+    const t = await adminUpdateTopic(req.params.id, data);
     if (!t) return res.status(404).json({ message: "Topic not found" });
-    await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "topic", entityId: t.id, details: req.body });
+    await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "topic", entityId: t.id, details: data });
     res.json(t);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -220,7 +303,9 @@ router.get("/topics/:topicId/blocks", async (req: AuthRequest, res) => {
 
 router.post("/blocks", async (req: AuthRequest, res) => {
   try {
-    const cb = await adminCreateContentBlock(req.body);
+    const data = validateBody(contentBlockSchema, req.body, res);
+    if (!data) return;
+    const cb = await adminCreateContentBlock(data);
     await createAuditLog({ adminUserId: req.userId!, action: "create", entityType: "content_block", entityId: cb.id });
     res.status(201).json(cb);
   } catch (err: any) {
@@ -230,7 +315,9 @@ router.post("/blocks", async (req: AuthRequest, res) => {
 
 router.put("/blocks/:id", async (req: AuthRequest, res) => {
   try {
-    const cb = await adminUpdateContentBlock(req.params.id, req.body);
+    const data = validateBody(contentBlockSchema.partial(), req.body, res);
+    if (!data) return;
+    const cb = await adminUpdateContentBlock(req.params.id, data);
     if (!cb) return res.status(404).json({ message: "Content block not found" });
     await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "content_block", entityId: cb.id });
     res.json(cb);
@@ -291,7 +378,9 @@ router.get("/mcqs/:id", async (req: AuthRequest, res) => {
 
 router.post("/mcqs", async (req: AuthRequest, res) => {
   try {
-    const m = await adminCreateMcq(req.body);
+    const data = validateBody(mcqSchema, req.body, res);
+    if (!data) return;
+    const m = await adminCreateMcq(data);
     await createAuditLog({ adminUserId: req.userId!, action: "create", entityType: "mcq", entityId: m.id });
     res.status(201).json(m);
   } catch (err: any) {
@@ -301,7 +390,9 @@ router.post("/mcqs", async (req: AuthRequest, res) => {
 
 router.put("/mcqs/:id", async (req: AuthRequest, res) => {
   try {
-    const m = await adminUpdateMcq(req.params.id, req.body);
+    const data = validateBody(mcqSchema.partial(), req.body, res);
+    if (!data) return;
+    const m = await adminUpdateMcq(req.params.id, data);
     if (!m) return res.status(404).json({ message: "MCQ not found" });
     await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "mcq", entityId: m.id });
     res.json(m);
@@ -322,11 +413,10 @@ router.delete("/mcqs/:id", async (req: AuthRequest, res) => {
 
 router.post("/mcqs/bulk", async (req: AuthRequest, res) => {
   try {
-    const { mcqs: mcqList } = req.body;
-    if (!Array.isArray(mcqList) || mcqList.length === 0) {
-      return res.status(400).json({ message: "Provide an array of MCQs" });
-    }
-    const created = await adminBulkCreateMcqs(mcqList);
+    const bulkSchema = z.object({ mcqs: z.array(mcqSchema).min(1, "Provide at least 1 MCQ").max(500, "Max 500 MCQs per batch") });
+    const data = validateBody(bulkSchema, req.body, res);
+    if (!data) return;
+    const created = await adminBulkCreateMcqs(data.mcqs);
     await createAuditLog({ adminUserId: req.userId!, action: "bulk_create", entityType: "mcq", details: { count: created } });
     res.status(201).json({ message: `${created} MCQs created`, count: created });
   } catch (err: any) {
