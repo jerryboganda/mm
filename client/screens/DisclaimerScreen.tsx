@@ -1,18 +1,24 @@
 import React from "react";
 import { StyleSheet, View, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
+import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 export default function DisclaimerScreen() {
   const insets = useSafeAreaInsets();
-  const headerHeight = useHeaderHeight();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute();
+  // When shown during onboarding (headerShown: false), show continue button
+  const isOnboarding = !(route.params as any)?.fromSettings;
 
   return (
     <BackgroundGradient>
@@ -21,7 +27,7 @@ export default function DisclaimerScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: headerHeight + Spacing.xl,
+            paddingTop: insets.top + Spacing.xl,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -127,6 +133,19 @@ export default function DisclaimerScreen() {
             </ThemedText>
           </View>
         </GlassCard>
+
+        {isOnboarding && (
+          <PrimaryButton
+            title="I Understand & Continue"
+            onPress={() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Register" }],
+              });
+            }}
+            style={styles.continueButton}
+          />
+        )}
       </ScrollView>
     </BackgroundGradient>
   );
@@ -202,5 +221,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     color: Colors.dark.text,
+  },
+  continueButton: {
+    width: "100%",
+    marginTop: Spacing.md,
   },
 });

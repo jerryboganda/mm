@@ -400,6 +400,8 @@ export default function HomeScreen() {
                     },
                   ]}
                   onPress={handleNotifications}
+                  accessibilityRole="button"
+                  accessibilityLabel="Notifications"
                 >
                   <Feather name="bell" size={20} color={theme.text} />
                   <View
@@ -459,6 +461,8 @@ export default function HomeScreen() {
                 { backgroundColor: "rgba(139,92,246,0.12)", borderColor: Colors.dark.purple },
               ]}
               onPress={handleStartReview}
+              accessibilityRole="button"
+              accessibilityLabel={`Spaced Review: ${dueCount} cards due`}
             >
               <View style={styles.reviewBannerLeft}>
                 <View style={[styles.reviewIconBg, { backgroundColor: "rgba(139,92,246,0.2)" }]}>

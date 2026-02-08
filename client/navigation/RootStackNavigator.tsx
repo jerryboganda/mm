@@ -391,6 +391,11 @@ export default function RootStackNavigator() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="Disclaimer"
+            component={DisclaimerScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="Login"
             component={LoginScreen}
             options={{ headerShown: false }}

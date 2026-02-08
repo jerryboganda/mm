@@ -38,6 +38,10 @@ interface ContentBlock {
 interface TopicDetail {
   id: string;
   title: string;
+  author?: string | null;
+  source?: string | null;
+  references?: string | null;
+  updatedAt?: string | null;
   isCompleted: boolean;
   isBookmarked: boolean;
   blocks: ContentBlock[];
@@ -259,6 +263,45 @@ export default function TopicReaderScreen() {
         </View>
 
         {topic?.blocks?.map(renderBlock)}
+
+        {/* Content metadata: last updated, author, references */}
+        {(topic?.updatedAt || topic?.author || topic?.source || topic?.references) && (
+          <View style={styles.metadataSection}>
+            {(topic?.updatedAt || topic?.author) && (
+              <View style={styles.metadataRow}>
+                {topic?.updatedAt && (
+                  <View style={styles.metaBadge}>
+                    <Feather name="clock" size={12} color={Colors.dark.textMuted} />
+                    <ThemedText style={styles.metaBadgeText}>
+                      Updated {new Date(topic.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </ThemedText>
+                  </View>
+                )}
+                {topic?.author && (
+                  <View style={styles.metaBadge}>
+                    <Feather name="user" size={12} color={Colors.dark.textMuted} />
+                    <ThemedText style={styles.metaBadgeText}>{topic.author}</ThemedText>
+                  </View>
+                )}
+              </View>
+            )}
+            {topic?.references && (
+              <View style={styles.referencesBox}>
+                <View style={styles.referencesHeader}>
+                  <Feather name="book-open" size={14} color={Colors.dark.primary} />
+                  <ThemedText style={styles.referencesTitle}>References</ThemedText>
+                </View>
+                <ThemedText style={styles.referencesText}>{topic.references}</ThemedText>
+              </View>
+            )}
+            {topic?.source && (
+              <View style={styles.sourceRow}>
+                <Feather name="link" size={12} color={Colors.dark.textMuted} />
+                <ThemedText style={styles.sourceText}>Source: {topic.source}</ThemedText>
+              </View>
+            )}
+          </View>
+        )}
 
         {!topic?.isCompleted ? (
           <PrimaryButton
@@ -570,5 +613,65 @@ const styles = StyleSheet.create({
     color: Colors.dark.text,
     fontSize: 15,
     minHeight: 100,
+  },
+  metadataSection: {
+    marginTop: Spacing["2xl"],
+    paddingTop: Spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: Colors.dark.glassBorder,
+  },
+  metadataRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  metaBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: Colors.dark.glass,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: Colors.dark.glassBorder,
+  },
+  metaBadgeText: {
+    fontSize: 12,
+    color: Colors.dark.textMuted,
+  },
+  referencesBox: {
+    backgroundColor: "rgba(17,164,212,0.08)",
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: "rgba(17,164,212,0.15)",
+    marginBottom: Spacing.md,
+  },
+  referencesHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  referencesTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.dark.primary,
+  },
+  referencesText: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: Colors.dark.textSecondary,
+  },
+  sourceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  sourceText: {
+    fontSize: 12,
+    color: Colors.dark.textMuted,
   },
 });

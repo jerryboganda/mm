@@ -2,16 +2,48 @@ import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
 
+/** Calculate study streak: consecutive days (from today backwards) that had quiz activity or topic views */
+function calculateStudyStreak(attempts: { createdAt: Date }[], recentActivity: { viewedAt: Date }[]): number {
+  // Collect all unique activity dates (YYYY-MM-DD)
+  const activeDays = new Set<string>();
+  for (const a of attempts) {
+    activeDays.add(new Date(a.createdAt).toISOString().slice(0, 10));
+  }
+  for (const r of recentActivity) {
+    activeDays.add(new Date(r.viewedAt).toISOString().slice(0, 10));
+  }
+
+  if (activeDays.size === 0) return 0;
+
+  let streak = 0;
+  const now = new Date();
+  // Start from today and go backwards
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    if (activeDays.has(key)) {
+      streak++;
+    } else {
+      // Allow a grace period: if today has no activity yet, check if yesterday did
+      if (i === 0) continue;
+      break;
+    }
+  }
+  return streak;
+}
+
 const router = Router();
 
 router.get("/", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    // Fetch all needed data in parallel instead of N^2 nested loops
-    const [stats, attempts, userProgressData, allChapters] = await Promise.all([
+    // Fetch all needed data in parallel
+    const [stats, attempts, userProgressData, allChapters, recentActivity] = await Promise.all([
       storage.getQuizStats(req.userId!),
       storage.getQuizAttempts(req.userId!),
       storage.getUserProgress(req.userId!),
       storage.getAllChaptersGroupedByBook(),
+      storage.getRecentActivity(req.userId!, 365),
     ]);
 
     // Total topics from chapter LEFT JOIN counts
@@ -72,9 +104,15 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
       topicTitle: undefined,
     }));
 
+    // Calculate study streak from quiz attempts + topic views
+    const studyStreak = calculateStudyStreak(attempts, recentActivity as any);
+
     res.json({
       totalAttempts: stats.totalAttempts,
       averageAccuracy: stats.averageScore,
+      averageScore: stats.averageScore,
+      quizzesCompleted: stats.totalAttempts,
+      studyStreak,
       topicsCompleted,
       totalTopics,
       topicProgress,

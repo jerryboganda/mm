@@ -63,10 +63,7 @@ export default function PermissionsPromptScreen() {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
     } catch (error) {}
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Register" }],
-    });
+    navigation.navigate("Disclaimer" as any);
   };
 
   return (

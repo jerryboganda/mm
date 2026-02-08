@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   BackHandler,
   Modal,
   ScrollView,
+  AppState,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -63,6 +64,8 @@ export default function QuizPlayerScreen() {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showNavigator, setShowNavigator] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const timerStartRef = useRef<number | null>(null);
+  const totalTimerSecondsRef = useRef<number>(0);
 
   const { data: quizData, isLoading } = useQuery<QuizData>({
     queryKey: ['/api/quiz/start', mode === 'exam' ? 'mixed' : mode, topicId, paramQuestionCount],
@@ -103,21 +106,43 @@ export default function QuizPlayerScreen() {
 
   useEffect(() => {
     if (quizData?.timeLimit) {
-      setTimeRemaining(quizData.timeLimit * 60);
+      const totalSecs = quizData.timeLimit * 60;
+      totalTimerSecondsRef.current = totalSecs;
+      timerStartRef.current = Date.now();
+      setTimeRemaining(totalSecs);
     }
   }, [quizData?.timeLimit]);
+
+  // Recalculate time remaining when app returns from background
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active' && timerStartRef.current && totalTimerSecondsRef.current > 0) {
+        const elapsedSecs = Math.floor((Date.now() - timerStartRef.current) / 1000);
+        const remaining = totalTimerSecondsRef.current - elapsedSecs;
+        if (remaining <= 0) {
+          setTimeRemaining(0);
+          confirmSubmit();
+        } else {
+          setTimeRemaining(remaining);
+        }
+      }
+    });
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev === null || prev <= 1) {
-          confirmSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
+      if (!timerStartRef.current) return;
+      const elapsedSecs = Math.floor((Date.now() - timerStartRef.current) / 1000);
+      const remaining = totalTimerSecondsRef.current - elapsedSecs;
+      if (remaining <= 0) {
+        setTimeRemaining(0);
+        confirmSubmit();
+      } else {
+        setTimeRemaining(remaining);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
