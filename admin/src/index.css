@@ -44,6 +44,68 @@
 .ProseMirror em { @apply italic; }
 .ProseMirror u { @apply underline; }
 .ProseMirror s { @apply line-through; }
+.ProseMirror sup { @apply text-xs align-super; }
+.ProseMirror sub { @apply text-xs align-sub; }
+
+/* Links */
+.ProseMirror a,
+.ProseMirror .mm-link {
+  @apply text-blue-600 underline cursor-pointer;
+}
+
+/* Table styles — visible borders everywhere */
+.ProseMirror table,
+.ProseMirror .mm-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  table-layout: auto;
+  overflow: hidden;
+}
+.ProseMirror table td,
+.ProseMirror table th {
+  border: 1.5px solid #cbd5e1;       /* gray-300 */
+  padding: 0.5rem 0.75rem;
+  min-width: 80px;
+  vertical-align: top;
+  position: relative;
+}
+.ProseMirror table th {
+  @apply bg-gray-100 font-semibold text-gray-700;
+}
+.ProseMirror table tr:nth-child(even) td {
+  @apply bg-gray-50;
+}
+.ProseMirror table .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  @apply bg-primary-100/40;
+}
+
+/* Column resize handle */
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  @apply bg-primary-400;
+}
+
+/* Images */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+/* Text alignment */
+.ProseMirror [style*="text-align: center"] { text-align: center; }
+.ProseMirror [style*="text-align: right"] { text-align: right; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

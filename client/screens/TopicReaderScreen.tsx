@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -8,8 +8,10 @@ import {
   TextInput,
   Alert,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
+import RenderHtml from "react-native-render-html";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -36,7 +38,7 @@ type TopicReaderNavigationProp = NativeStackNavigationProp<
 
 interface ContentBlock {
   id: string;
-  type: "text" | "image" | "note" | "heading";
+  type: "text" | "image" | "note" | "heading" | "html" | "code";
   content: string;
   order: number;
 }
@@ -66,10 +68,100 @@ export default function TopicReaderScreen() {
   const [reportType, setReportType] = useState<string>("factual_error");
   const [reportDescription, setReportDescription] = useState("");
   const { theme } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
+  const contentWidth = windowWidth - Spacing.lg * 2;
 
   const { data: topic, isLoading } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
   });
+
+  /* ─── HTML rendering configuration for react-native-render-html ─── */
+  const htmlTagsStyles = useMemo(
+    () => ({
+      body: { color: theme.text, fontSize: 15, lineHeight: 24 },
+      p: { marginBottom: 8, color: theme.text },
+      h1: { fontSize: 24, fontWeight: "700" as const, color: theme.text, marginBottom: 8 },
+      h2: { fontSize: 20, fontWeight: "700" as const, color: theme.text, marginBottom: 6 },
+      h3: { fontSize: 17, fontWeight: "700" as const, color: theme.text, marginBottom: 4 },
+      strong: { fontWeight: "700" as const, color: theme.text },
+      b: { fontWeight: "700" as const },
+      em: { fontStyle: "italic" as const },
+      u: { textDecorationLine: "underline" as const },
+      s: { textDecorationLine: "line-through" as const },
+      a: { color: theme.primary, textDecorationLine: "underline" as const },
+      ul: { paddingLeft: 18, marginBottom: 8 },
+      ol: { paddingLeft: 18, marginBottom: 8 },
+      li: { marginBottom: 4, color: theme.text, fontSize: 15 },
+      blockquote: {
+        borderLeftWidth: 3,
+        borderLeftColor: theme.primary,
+        paddingLeft: 12,
+        fontStyle: "italic" as const,
+        color: theme.textSecondary,
+        marginVertical: 8,
+      },
+      sup: { fontSize: 10, lineHeight: 14 },
+      sub: { fontSize: 10, lineHeight: 14 },
+      hr: { borderColor: theme.glassBorder, borderWidth: 0.5, marginVertical: 12 },
+      /* Table styles — prominent borders */
+      table: {
+        borderWidth: 1.5,
+        borderColor: theme.glassBorder,
+        borderRadius: 8,
+        marginVertical: 12,
+        overflow: "hidden" as const,
+      },
+      th: {
+        backgroundColor: `${theme.primary}18`,
+        borderWidth: 1,
+        borderColor: theme.glassBorder,
+        padding: 8,
+        fontWeight: "700" as const,
+        color: theme.text,
+        fontSize: 13,
+      },
+      td: {
+        borderWidth: 1,
+        borderColor: theme.glassBorder,
+        padding: 8,
+        color: theme.text,
+        fontSize: 13,
+        verticalAlign: "top" as const,
+      },
+      tr: {},
+      thead: {},
+      tbody: {},
+      /* Code */
+      code: {
+        backgroundColor: `${theme.text}12`,
+        borderRadius: 4,
+        paddingHorizontal: 4,
+        fontSize: 13,
+        fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+        color: theme.primary,
+      },
+      pre: {
+        backgroundColor: `${theme.text}12`,
+        borderRadius: 8,
+        padding: 12,
+        marginVertical: 8,
+        overflow: "hidden" as const,
+      },
+      img: {
+        borderRadius: 12,
+        marginVertical: 8,
+      },
+    }),
+    [theme],
+  );
+
+  const htmlClassesStyles = useMemo(
+    () => ({
+      "mm-table": { borderWidth: 1.5, borderColor: theme.glassBorder },
+      "mm-link": { color: theme.primary },
+    }),
+    [theme],
+  );
 
   const bookmarkMutation = useMutation({
     mutationFn: async () => {
@@ -128,14 +220,38 @@ export default function TopicReaderScreen() {
           </ThemedText>
         );
       case "text":
+      case "html": {
+        // Render rich HTML produced by TipTap (tables, lists, formatting, etc.)
+        const html = block.content || "";
+        if (!html.trim()) return null;
+        // Check if the content looks like HTML (contains tags)
+        const looksLikeHtml = /<[a-z][\s\S]*>/i.test(html);
+        if (!looksLikeHtml) {
+          // Plain text fallback
+          return (
+            <ThemedText
+              key={block.id}
+              style={[styles.paragraph, { color: theme.textSecondary }]}
+            >
+              {html}
+            </ThemedText>
+          );
+        }
         return (
-          <ThemedText
-            key={block.id}
-            style={[styles.paragraph, { color: theme.textSecondary }]}
-          >
-            {block.content}
-          </ThemedText>
+          <View key={block.id} style={styles.htmlBlock}>
+            <RenderHtml
+              contentWidth={contentWidth}
+              source={{ html }}
+              tagsStyles={htmlTagsStyles}
+              classesStyles={htmlClassesStyles}
+              enableExperimentalBRCollapsing
+              enableExperimentalGhostLinesPrevention
+              enableExperimentalMarginCollapsing
+              defaultTextProps={{ selectable: true }}
+            />
+          </View>
         );
+      }
       case "image":
         return (
           <Pressable
@@ -640,6 +756,9 @@ const styles = StyleSheet.create({
   noteText: {
     flex: 1,
     lineHeight: 22,
+  },
+  htmlBlock: {
+    marginBottom: Spacing.md,
   },
   completeButton: {
     marginTop: Spacing["2xl"],
