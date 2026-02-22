@@ -12,7 +12,7 @@ RUN echo '{"type":"module"}' > server_dist/package.json
 
 # ── Build admin SPA ──
 WORKDIR /app/admin
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 RUN npm run build
 WORKDIR /app
 
