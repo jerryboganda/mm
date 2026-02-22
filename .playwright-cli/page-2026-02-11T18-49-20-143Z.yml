@@ -1,0 +1,179 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: For Institutions
+          - heading "Empower Your Training Programme" [level=1] [ref=e90]:
+            - text: Empower Your
+            - generic [ref=e91]: Training Programme
+          - paragraph [ref=e92]: Bring structured OB-GYN education to your hospital, residency programme, or medical institution with dedicated cohort management and institutional tools.
+        - generic [ref=e94]:
+          - generic [ref=e96]:
+            - generic [ref=e97]: Benefits
+            - heading "Built for Training Programmes" [level=2] [ref=e98]
+          - generic [ref=e99]:
+            - generic [ref=e101]:
+              - img [ref=e103]
+              - heading "Cohort Management" [level=3] [ref=e108]
+              - paragraph [ref=e109]: Onboard entire training cohorts with streamlined group enrollment. Assign content tracks and monitor collective progress.
+            - generic [ref=e111]:
+              - img [ref=e113]
+              - heading "Admin Dashboard" [level=3] [ref=e115]
+              - paragraph [ref=e116]: Track trainee engagement, completion rates, and performance metrics from a centralised administrator view.
+            - generic [ref=e118]:
+              - img [ref=e120]
+              - heading "Curriculum Alignment" [level=3] [ref=e123]
+              - paragraph [ref=e124]: Map platform content to your institution's training objectives and exam preparation requirements.
+            - generic [ref=e126]:
+              - img [ref=e128]
+              - heading "Data Privacy" [level=3] [ref=e130]
+              - paragraph [ref=e131]: Enterprise-grade security with dedicated data handling. Compliant with institutional data governance policies.
+            - generic [ref=e133]:
+              - img [ref=e135]
+              - heading "CPD Integration" [level=3] [ref=e138]
+              - paragraph [ref=e139]: Support continuing professional development tracking with documented learning hours and assessment records.
+            - generic [ref=e141]:
+              - img [ref=e143]
+              - heading "Instructor Tools" [level=3] [ref=e145]
+              - paragraph [ref=e146]: Enable supervising consultants to assign specific topics, create custom quizzes, and review trainee performance.
+        - generic [ref=e148]:
+          - generic [ref=e150]:
+            - generic [ref=e151]: Get Started
+            - heading "Request Institutional Access" [level=2] [ref=e152]
+            - paragraph [ref=e153]: Tell us about your institution and we will get back to you with a tailored proposal.
+          - generic [ref=e156]:
+            - generic [ref=e157]:
+              - generic [ref=e158]:
+                - generic [ref=e159]: Your Name
+                - textbox "Dr. Jane Smith" [ref=e160]
+              - generic [ref=e161]:
+                - generic [ref=e162]: Institution
+                - textbox "Hospital / University name" [ref=e163]
+            - generic [ref=e164]:
+              - generic [ref=e165]:
+                - generic [ref=e166]: Your Role
+                - textbox "Programme Director" [ref=e167]
+              - generic [ref=e168]:
+                - generic [ref=e169]: Email
+                - textbox "you@hospital.org" [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e172]: Estimated Cohort Size
+              - textbox "e.g. 20-50 trainees" [ref=e173]
+            - generic [ref=e174]:
+              - generic [ref=e175]: Message
+              - textbox "Tell us about your training programme and needs..." [ref=e176]
+            - button "Submit Request" [ref=e177] [cursor=pointer]:
+              - text: Submit Request
+              - img [ref=e178]
+    - contentinfo [ref=e182]:
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - link "Maternal Mind" [ref=e186] [cursor=pointer]:
+              - /url: /
+              - img [ref=e187]
+              - generic [ref=e212]: Maternal Mind
+            - paragraph [ref=e213]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e214]:
+              - paragraph [ref=e215]: Stay updated
+              - generic [ref=e217]:
+                - textbox "Your email" [ref=e218]
+                - button [ref=e219] [cursor=pointer]:
+                  - img [ref=e220]
+            - generic [ref=e224]:
+              - link "Email" [ref=e225] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e226]
+              - link "LinkedIn" [ref=e229] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/maternal-mind
+                - img [ref=e230]
+              - link "X" [ref=e232] [cursor=pointer]:
+                - /url: https://x.com/maternalmindapp
+                - img [ref=e233]
+          - generic [ref=e235]:
+            - heading "Product" [level=3] [ref=e236]
+            - list [ref=e237]:
+              - listitem [ref=e238]:
+                - link "Features" [ref=e239] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e240]:
+                - link "How It Works" [ref=e241] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e242]:
+                - link "Pricing" [ref=e243] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e244]:
+                - link "For Institutions" [ref=e245] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e246]:
+            - heading "Resources" [level=3] [ref=e247]
+            - list [ref=e248]:
+              - listitem [ref=e249]:
+                - link "MRCOG Part 1" [ref=e250] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e251]:
+                - link "MRCOG Part 2" [ref=e252] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e253]:
+                - link "MRCOG Part 3" [ref=e254] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e255]:
+                - link "FCPS OB-GYN" [ref=e256] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e257]:
+                - link "OB-GYN MCQs" [ref=e258] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e259]:
+            - heading "Company" [level=3] [ref=e260]
+            - list [ref=e261]:
+              - listitem [ref=e262]:
+                - link "About" [ref=e263] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e264]:
+                - link "Support" [ref=e265] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e266]:
+                - link "Media Kit" [ref=e267] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e268]:
+            - heading "Legal" [level=3] [ref=e269]
+            - list [ref=e270]:
+              - listitem [ref=e271]:
+                - link "Terms of Service" [ref=e272] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e273]:
+                - link "Privacy Policy" [ref=e274] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e275]:
+                - link "Disclaimer" [ref=e276] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e278]:
+          - paragraph [ref=e279]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e280]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.

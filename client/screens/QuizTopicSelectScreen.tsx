@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type QuizTopicSelectNavigationProp = NativeStackNavigationProp<
@@ -32,6 +33,7 @@ export default function QuizTopicSelectScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<QuizTopicSelectNavigationProp>();
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   const { data: topics, isLoading } = useQuery<QuizTopic[]>({
     queryKey: ["/api/quiz/topics"],
@@ -58,8 +60,8 @@ export default function QuizTopicSelectScreen() {
           size={24}
           color={
             selectedTopicId === item.id
-              ? Colors.dark.primary
-              : Colors.dark.textSecondary
+              ? theme.primary
+              : theme.textSecondary
           }
         />
       }
@@ -92,8 +94,13 @@ export default function QuizTopicSelectScreen() {
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         ListHeaderComponent={
           <View style={styles.header}>
-            <ThemedText style={styles.sectionLabel}>SELECT A TOPIC</ThemedText>
-            <ThemedText type="small" style={styles.subtitle}>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+              SELECT A TOPIC
+            </ThemedText>
+            <ThemedText
+              type="small"
+              style={[styles.subtitle, { color: theme.textSecondary }]}
+            >
               Choose a topic to practice MCQs from
             </ThemedText>
           </View>
@@ -102,7 +109,13 @@ export default function QuizTopicSelectScreen() {
       />
 
       <View
-        style={[styles.footer, { paddingBottom: insets.bottom + Spacing.lg }]}
+        style={[
+          styles.footer,
+          {
+            paddingBottom: insets.bottom + Spacing.lg,
+            backgroundColor: "transparent",
+          },
+        ]}
       >
         <PrimaryButton
           title="Start Quiz"
@@ -126,11 +139,10 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
   },
   subtitle: {
-    color: Colors.dark.textSecondary,
     marginTop: Spacing.xs,
   },
   footer: {
@@ -138,7 +150,6 @@ const styles = StyleSheet.create({
     left: Spacing.lg,
     right: Spacing.lg,
     bottom: 0,
-    backgroundColor: Colors.dark.backgroundRoot,
     paddingTop: Spacing.lg,
   },
 });

@@ -17,13 +17,23 @@
     ]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "client/**/*.ts",
+    "client/**/*.tsx",
+    "server/**/*.ts",
+    "server/**/*.tsx",
+    "shared/**/*.ts",
+    "shared/**/*.tsx",
+    "scripts/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "build",
     "dist",
+    "admin/**",
+    "Maternal Mind Website/**",
+    "android/**",
+    "admin_dist",
+    "server_dist",
     "**/*.test.ts"
   ]
 }

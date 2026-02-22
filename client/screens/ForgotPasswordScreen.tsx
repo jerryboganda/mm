@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, Alert } from "react-native";
+import { StyleSheet, View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,7 +11,8 @@ import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { getApiUrl } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Feather } from "@expo/vector-icons";
 
@@ -23,6 +24,7 @@ type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
 export default function ForgotPasswordScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
+  const { theme } = useTheme();
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -85,14 +87,14 @@ export default function ForgotPasswordScreen() {
           ]}
         >
           <View style={styles.successContainer}>
-            <View style={styles.successIcon}>
-              <Feather name="mail" size={48} color={Colors.dark.primary} />
+            <View style={[styles.successIcon, { backgroundColor: theme.glass }]}>
+              <Feather name="mail" size={48} color={theme.primary} />
             </View>
             <ThemedText type="h2" style={styles.successTitle}>
               Check Your Email
             </ThemedText>
-            <ThemedText style={styles.successMessage}>
-              If an account exists with {email}, we've sent password reset
+            <ThemedText style={[styles.successMessage, { color: theme.textSecondary }]}>
+              If an account exists with {email}, we&apos;ve sent password reset
               instructions.
             </ThemedText>
             <PrimaryButton
@@ -127,8 +129,8 @@ export default function ForgotPasswordScreen() {
           <ThemedText type="h1" style={styles.title}>
             Forgot Password
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Enter your email and we'll send you a reset link
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
+            Enter your email and we&apos;ll send you a reset link
           </ThemedText>
         </View>
 
@@ -156,11 +158,11 @@ export default function ForgotPasswordScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={styles.footerText}>
+          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
             Remember your password?{" "}
           </ThemedText>
           <ThemedText
-            style={styles.linkText}
+            style={[styles.linkText, { color: theme.primary }]}
             onPress={() => navigation.navigate("Login")}
           >
             Sign In
@@ -196,12 +198,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   title: {
-    color: Colors.dark.text,
     marginBottom: Spacing.sm,
     textAlign: "center",
   },
   subtitle: {
-    color: Colors.dark.textSecondary,
     textAlign: "center",
     fontSize: 15,
     lineHeight: 22,
@@ -219,11 +219,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    color: Colors.dark.textSecondary,
     fontSize: 14,
   },
   linkText: {
-    color: Colors.dark.primary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -235,18 +233,15 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: Colors.dark.glass,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: Spacing.xl,
   },
   successTitle: {
-    color: Colors.dark.text,
     marginBottom: Spacing.md,
     textAlign: "center",
   },
   successMessage: {
-    color: Colors.dark.textSecondary,
     textAlign: "center",
     fontSize: 15,
     lineHeight: 24,

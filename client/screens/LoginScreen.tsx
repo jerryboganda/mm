@@ -17,7 +17,8 @@ import {
   getSavedCredentials,
   clearSavedCredentials,
 } from "@/lib/auth";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
@@ -29,6 +30,7 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login } = useAuth();
+  const { theme, isDark } = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,8 +46,7 @@ export default function LoginScreen() {
 
   const loadCredentials = async () => {
     try {
-      const { email: savedEmail } =
-        await getSavedCredentials();
+      const { email: savedEmail } = await getSavedCredentials();
       if (savedEmail) {
         setEmail(savedEmail);
         setRememberMe(true);
@@ -124,12 +125,24 @@ export default function LoginScreen() {
           <ThemedText type="h1" style={styles.title}>
             Welcome Back
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
             Sign in to continue your learning journey
           </ThemedText>
         </View>
 
-        <View style={styles.form}>
+        <View
+          style={[
+            styles.formCard,
+            {
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.03)"
+                : "rgba(255,255,255,0.6)",
+              borderColor: isDark
+                ? "rgba(255,255,255,0.06)"
+                : "rgba(0,0,0,0.05)",
+            },
+          ]}
+        >
           <GlassInput
             label="Email"
             icon="mail"
@@ -158,21 +171,23 @@ export default function LoginScreen() {
               style={[
                 styles.checkbox,
                 rememberMe && styles.checkboxChecked,
-                { borderColor: Colors.dark.glassBorder },
+                { borderColor: theme.glassBorder },
               ]}
             >
               {rememberMe && (
                 <Ionicons name="checkmark" size={12} color="white" />
               )}
             </View>
-            <ThemedText style={styles.rememberMeText}>Remember me</ThemedText>
+            <ThemedText style={[styles.rememberMeText, { color: theme.textSecondary }]}>
+              Remember me
+            </ThemedText>
           </Pressable>
 
           <Pressable
             style={styles.forgotPassword}
             onPress={() => navigation.navigate("ForgotPassword")}
           >
-            <ThemedText style={styles.forgotPasswordText}>
+            <ThemedText style={[styles.forgotPasswordText, { color: `${theme.primary}CC` }]}>
               Forgot Password?
             </ThemedText>
           </Pressable>
@@ -188,11 +203,11 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={styles.footerText}>
-            Don't have an account?
+          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
+            Don&apos;t have an account?
           </ThemedText>
           <Pressable onPress={() => navigation.navigate("Register")}>
-            <ThemedText style={styles.signUpLink}> Sign Up</ThemedText>
+            <ThemedText style={[styles.signUpLink, { color: theme.primary }]}> Sign Up</ThemedText>
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
@@ -210,24 +225,31 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginBottom: Spacing["4xl"],
+    marginBottom: Spacing["3xl"],
   },
   logo: {
-    width: 110,
-    height: 110,
+    width: 100,
+    height: 100,
     borderRadius: 24,
-    marginBottom: Spacing["2xl"],
+    marginBottom: Spacing.xl,
   },
   title: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     textAlign: "center",
+    textShadowColor: "rgba(17,164,212,0.4)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 16,
   },
   subtitle: {
-    color: Colors.dark.textSecondary,
     textAlign: "center",
+    fontSize: 15,
+    lineHeight: 22,
   },
-  form: {
+  formCard: {
     flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: Spacing.xl,
   },
   rememberMeContainer: {
     flexDirection: "row",
@@ -237,7 +259,6 @@ const styles = StyleSheet.create({
   },
   rememberMeText: {
     marginLeft: Spacing.sm,
-    color: Colors.dark.textSecondary,
     fontSize: 14,
   },
   checkbox: {
@@ -250,15 +271,14 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   checkboxChecked: {
-    backgroundColor: Colors.dark.primary,
-    borderColor: Colors.dark.primary,
+    backgroundColor: "#11a4d4",
+    borderColor: "#11a4d4",
   },
   forgotPassword: {
     alignSelf: "flex-end",
     marginBottom: Spacing["2xl"],
   },
   forgotPasswordText: {
-    color: Colors.dark.primary,
     fontSize: 14,
   },
   loginButton: {
@@ -270,10 +290,8 @@ const styles = StyleSheet.create({
     marginTop: Spacing["3xl"],
   },
   footerText: {
-    color: Colors.dark.textSecondary,
   },
   signUpLink: {
-    color: Colors.dark.primary,
     fontWeight: "600",
   },
 });

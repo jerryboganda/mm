@@ -1,0 +1,5 @@
+[POST] https://maternalmind.com.pk/cdn-cgi/rum? => [FAILED] net::ERR_ABORTED
+[POST] https://maternalmind.com.pk/cdn-cgi/rum? => [FAILED] net::ERR_ABORTED
+[POST] https://maternalmind.com.pk/cdn-cgi/rum? => [204] 
+[POST] https://maternalmind.com.pk/api/institutional-request => [201] 
+[POST] https://maternalmind.com.pk/api/newsletter => [201] 

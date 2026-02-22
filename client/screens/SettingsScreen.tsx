@@ -19,8 +19,8 @@ import * as Notifications from "expo-notifications";
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
-import { useTheme, setThemeMode } from "@/hooks/useTheme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type SettingsScreenNavigationProp =
@@ -31,7 +31,7 @@ export default function SettingsScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
-  const { themeMode } = useTheme();
+  const { theme, themeMode, setThemeMode } = useTheme();
   const [pushNotifications, setPushNotifications] = useState(true);
   const [studyReminders, setStudyReminders] = useState(true);
   const [quizReminders, setQuizReminders] = useState(false);
@@ -60,13 +60,13 @@ export default function SettingsScreen() {
         return;
       }
     }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (hapticFeedback) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setPushNotifications(value);
   };
 
   const handleToggle =
     (setter: (value: boolean) => void) => (value: boolean) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      if (hapticFeedback) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setter(value);
     };
 
@@ -78,8 +78,9 @@ export default function SettingsScreen() {
     value?: boolean;
     onToggle?: (value: boolean) => void | Promise<void>;
     disabled?: boolean;
-    type?: "toggle" | "navigation";
+    type?: "toggle" | "navigation" | "selection";
     onPress?: () => void;
+    selected?: boolean;
   };
 
   type SettingsGroup = {
@@ -96,27 +97,27 @@ export default function SettingsScreen() {
           title: "Dark Mode",
           subtitle: "Dark background with glow effects",
           icon: "moon",
-          type: "toggle",
-          value: themeMode === "dark",
-          onToggle: () => setThemeMode("dark"),
+          type: "selection",
+          selected: themeMode === "dark",
+          onPress: () => setThemeMode("dark"),
         },
         {
           id: "theme-light",
           title: "Light Mode",
           subtitle: "Light background for daytime",
           icon: "sun",
-          type: "toggle",
-          value: themeMode === "light",
-          onToggle: () => setThemeMode("light"),
+          type: "selection",
+          selected: themeMode === "light",
+          onPress: () => setThemeMode("light"),
         },
         {
           id: "theme-system",
           title: "Follow System",
           subtitle: "Match your device settings",
           icon: "smartphone",
-          type: "toggle",
-          value: themeMode === "system",
-          onToggle: () => setThemeMode("system"),
+          type: "selection",
+          selected: themeMode === "system",
+          onPress: () => setThemeMode("system"),
         },
       ],
     },
@@ -206,7 +207,9 @@ export default function SettingsScreen() {
       >
         {settingsGroups.map((group) => (
           <View key={group.title} style={styles.section}>
-            <ThemedText style={styles.sectionLabel}>{group.title}</ThemedText>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+              {group.title}
+            </ThemedText>
             {group.items.map((item) => (
               <GlassCard
                 key={item.id}
@@ -215,13 +218,21 @@ export default function SettingsScreen() {
                     ? [styles.settingCard, styles.settingCardDisabled]
                     : styles.settingCard
                 }
-                onPress={item.type === "navigation" ? item.onPress : undefined}
+                onPress={
+                  item.type === "navigation" || item.type === "selection"
+                    ? () => {
+                      if (hapticFeedback) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      item.onPress?.();
+                    }
+                    : undefined
+                }
               >
                 <View style={styles.settingRow}>
                   <View
                     style={[
                       styles.iconContainer,
-                      item.disabled && styles.iconContainerDisabled,
+                      { backgroundColor: `${theme.primary}15` },
+                      item.disabled && { backgroundColor: theme.glass },
                     ]}
                   >
                     <Feather
@@ -229,8 +240,8 @@ export default function SettingsScreen() {
                       size={18}
                       color={
                         item.disabled
-                          ? Colors.dark.textMuted
-                          : Colors.dark.primary
+                          ? theme.textMuted
+                          : theme.primary
                       }
                     />
                   </View>
@@ -238,7 +249,7 @@ export default function SettingsScreen() {
                     <ThemedText
                       style={[
                         styles.settingTitle,
-                        item.disabled && styles.settingTitleDisabled,
+                        item.disabled && { color: theme.textMuted },
                       ]}
                     >
                       {item.title}
@@ -246,7 +257,8 @@ export default function SettingsScreen() {
                     <ThemedText
                       style={[
                         styles.settingSubtitle,
-                        item.disabled && styles.settingSubtitleDisabled,
+                        { color: theme.textSecondary },
+                        item.disabled && { color: theme.textMuted },
                       ]}
                     >
                       {item.subtitle}
@@ -256,19 +268,27 @@ export default function SettingsScreen() {
                     <Feather
                       name="chevron-right"
                       size={20}
-                      color={Colors.dark.textSecondary}
+                      color={theme.textSecondary}
                     />
+                  ) : item.type === "selection" ? (
+                    item.selected && (
+                      <Feather
+                        name="check"
+                        size={20}
+                        color={theme.primary}
+                      />
+                    )
                   ) : (
                     <Switch
                       value={item.value}
                       onValueChange={item.onToggle}
                       disabled={item.disabled}
                       trackColor={{
-                        false: Colors.dark.glass,
-                        true: Colors.dark.primary,
+                        false: theme.glass,
+                        true: theme.primary,
                       }}
                       thumbColor="#fff"
-                      ios_backgroundColor={Colors.dark.glass}
+                      ios_backgroundColor={theme.glass}
                     />
                   )}
                 </View>
@@ -294,8 +314,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   settingCard: {
@@ -313,13 +333,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: `${Colors.dark.primary}15`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
-  },
-  iconContainerDisabled: {
-    backgroundColor: Colors.dark.glass,
   },
   settingContent: {
     flex: 1,
@@ -329,14 +345,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginBottom: 2,
   },
-  settingTitleDisabled: {
-    color: Colors.dark.textMuted,
-  },
   settingSubtitle: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
-  },
-  settingSubtitleDisabled: {
-    color: Colors.dark.textMuted,
   },
 });

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { StyleSheet, AppState } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -18,7 +18,9 @@ import {
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/query-client";
 
-import RootStackNavigator from "@/navigation/RootStackNavigator";
+import RootStackNavigator, {
+  RootStackParamList,
+} from "@/navigation/RootStackNavigator";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth";
 import { PurchasesProvider } from "@/lib/purchases";
@@ -31,7 +33,7 @@ import { persistQueryCache, restoreQueryCache } from "@/lib/offline-cache";
 SplashScreen.preventAutoHideAsync();
 
 // Deep linking configuration
-const linking = {
+const linking: LinkingOptions<RootStackParamList> = {
   prefixes: ["maternalmind://", "https://maternalmind.com.pk"],
   config: {
     screens: {
@@ -94,7 +96,7 @@ function AppContent() {
   };
 
   return (
-    <NavigationContainer theme={navigationTheme} linking={linking}>
+    <NavigationContainer theme={navigationTheme} linking={linking as any}>
       <AppNetworkWrapper>
         <RootStackNavigator />
       </AppNetworkWrapper>

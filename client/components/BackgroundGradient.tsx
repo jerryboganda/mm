@@ -151,8 +151,8 @@ export function BackgroundGradient({
         <LinearGradient
           colors={[
             Colors.dark.backgroundRoot,
-            isImmersive ? "#030810" : "#050a0d",
-            isImmersive ? "#000000" : Colors.dark.backgroundRoot,
+            isImmersive ? "#0a1519" : "#0d1519",
+            isImmersive ? "#101d22" : Colors.dark.backgroundRoot,
           ]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     height: width * 0.9,
     top: -width * 0.35,
     right: -width * 0.35,
-    backgroundColor: "rgba(0,212,255,0.08)",
+    backgroundColor: "rgba(17,164,212,0.08)",
   },
   orbBottomLeft: {
     width: width * 0.7,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     height: width * 0.55,
     top: height * 0.32,
     left: width * 0.22,
-    backgroundColor: "rgba(0,212,255,0.06)",
+    backgroundColor: "rgba(17,164,212,0.06)",
   },
   orbQuiz: {
     width: width * 0.6,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     height: width * 0.4,
     top: height * 0.5,
     right: width * 0.1,
-    backgroundColor: "rgba(0,212,255,0.04)",
+    backgroundColor: "rgba(17,164,212,0.04)",
   },
   orbPurple: {
     width: width * 0.5,

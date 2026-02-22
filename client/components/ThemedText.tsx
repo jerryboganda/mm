@@ -5,16 +5,16 @@ import { useTheme } from "@/hooks/useTheme";
 
 export type ThemedTextProps = TextProps & {
   type?:
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "body"
-  | "small"
-  | "caption"
-  | "label"
-  | "link"
-  | "stat";
+    | "h1"
+    | "h2"
+    | "h3"
+    | "h4"
+    | "body"
+    | "small"
+    | "caption"
+    | "label"
+    | "link"
+    | "stat";
 };
 
 export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
@@ -55,6 +55,10 @@ export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
   };
 
   return (
-    <Text maxFontSizeMultiplier={1.5} style={[{ color: getColor() }, getTypeStyle(), style]} {...rest} />
+    <Text
+      maxFontSizeMultiplier={1.5}
+      style={[{ color: getColor() }, getTypeStyle(), style]}
+      {...rest}
+    />
   );
 }

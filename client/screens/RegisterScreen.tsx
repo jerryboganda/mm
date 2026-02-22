@@ -11,7 +11,8 @@ import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
@@ -23,6 +24,7 @@ export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register } = useAuth();
+  const { theme, isDark } = useTheme();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -69,7 +71,11 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       const result = await register(name, email, password);
-      if (result && "requiresEmailVerification" in result && result.requiresEmailVerification) {
+      if (
+        result &&
+        "requiresEmailVerification" in result &&
+        result.requiresEmailVerification
+      ) {
         navigation.navigate("VerifyEmail", { email });
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -102,12 +108,24 @@ export default function RegisterScreen() {
           <ThemedText type="h1" style={styles.title}>
             Create Account
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
             Start your OB-GYN learning journey
           </ThemedText>
         </View>
 
-        <View style={styles.form}>
+        <View
+          style={[
+            styles.form,
+            {
+              backgroundColor: isDark
+                ? "rgba(255,255,255,0.03)"
+                : "rgba(255,255,255,0.6)",
+              borderColor: isDark
+                ? "rgba(255,255,255,0.06)"
+                : "rgba(0,0,0,0.05)",
+            },
+          ]}
+        >
           <GlassInput
             label="Full Name"
             icon="user"
@@ -157,11 +175,11 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={styles.footerText}>
+          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
             Already have an account?
           </ThemedText>
           <Pressable onPress={() => navigation.navigate("Login")}>
-            <ThemedText style={styles.signInLink}> Sign In</ThemedText>
+            <ThemedText style={[styles.signInLink, { color: theme.primary }]}> Sign In</ThemedText>
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
@@ -188,15 +206,22 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["2xl"],
   },
   title: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     textAlign: "center",
+    textShadowColor: "rgba(17,164,212,0.4)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 16,
   },
   subtitle: {
-    color: Colors.dark.textSecondary,
     textAlign: "center",
+    fontSize: 15,
+    lineHeight: 22,
   },
   form: {
     flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: Spacing.xl,
   },
   registerButton: {
     marginTop: Spacing.xl,
@@ -207,10 +232,8 @@ const styles = StyleSheet.create({
     marginTop: Spacing["2xl"],
   },
   footerText: {
-    color: Colors.dark.textSecondary,
   },
   signInLink: {
-    color: Colors.dark.primary,
     fontWeight: "600",
   },
 });

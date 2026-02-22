@@ -38,9 +38,17 @@ export function AnimatedListItem({
   const reduceMotion = useReducedMotion();
 
   const opacity = useSharedValue(reduceMotion ? 1 : 0);
-  const translateY = useSharedValue(reduceMotion ? 0 : (direction === "down" ? -20 : 20));
+  const translateY = useSharedValue(
+    reduceMotion ? 0 : direction === "down" ? -20 : 20,
+  );
   const translateX = useSharedValue(
-    reduceMotion ? 0 : (direction === "left" ? 20 : direction === "right" ? -20 : 0),
+    reduceMotion
+      ? 0
+      : direction === "left"
+        ? 20
+        : direction === "right"
+          ? -20
+          : 0,
   );
   const scale = useSharedValue(reduceMotion ? 1 : 0.95);
 

@@ -10,13 +10,17 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function DisclaimerScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
+  const { theme, isDark } = useTheme();
+
   // When shown during onboarding (headerShown: false), show continue button
   const isOnboarding = !(route.params as any)?.fromSettings;
 
@@ -32,10 +36,12 @@ export default function DisclaimerScreen() {
           },
         ]}
         showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        bounces={false}
       >
         <View style={styles.iconContainer}>
           <LinearGradient
-            colors={[Colors.dark.warning, "#f59e0b"]}
+            colors={[theme.warning, "#f59e0b"]}
             style={styles.iconGradient}
           >
             <Feather name="alert-triangle" size={40} color="#fff" />
@@ -46,19 +52,19 @@ export default function DisclaimerScreen() {
           Medical Disclaimer
         </ThemedText>
 
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
           Please read this disclaimer carefully before using Maternal Mind
         </ThemedText>
 
         <GlassCard style={styles.card}>
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Feather name="book-open" size={20} color={Colors.dark.primary} />
+              <Feather name="book-open" size={20} color={theme.primary} />
               <ThemedText type="h4" style={styles.sectionTitle}>
                 Educational Purpose Only
               </ThemedText>
             </View>
-            <ThemedText style={styles.paragraph}>
+            <ThemedText style={[styles.paragraph, { color: theme.textSecondary }]}>
               Maternal Mind is designed exclusively for educational purposes.
               The content provided within this application is intended to
               supplement medical education for students studying obstetrics and
@@ -66,16 +72,16 @@ export default function DisclaimerScreen() {
             </ThemedText>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Feather name="x-circle" size={20} color={Colors.dark.error} />
+              <Feather name="x-circle" size={20} color={theme.error} />
               <ThemedText type="h4" style={styles.sectionTitle}>
                 Not Medical Advice
               </ThemedText>
             </View>
-            <ThemedText style={styles.paragraph}>
+            <ThemedText style={[styles.paragraph, { color: theme.textSecondary }]}>
               The information in this application does not constitute medical
               advice, diagnosis, or treatment recommendations. This content
               should never be used as a substitute for professional medical
@@ -83,36 +89,36 @@ export default function DisclaimerScreen() {
             </ThemedText>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Feather
                 name="user-check"
                 size={20}
-                color={Colors.dark.success}
+                color={theme.success}
               />
               <ThemedText type="h4" style={styles.sectionTitle}>
                 Consult Healthcare Providers
               </ThemedText>
             </View>
-            <ThemedText style={styles.paragraph}>
+            <ThemedText style={[styles.paragraph, { color: theme.textSecondary }]}>
               Always consult qualified healthcare professionals for medical
               concerns. Clinical decisions should be based on individual patient
               assessment and current clinical guidelines.
             </ThemedText>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Feather name="refresh-cw" size={20} color={Colors.dark.info} />
+              <Feather name="refresh-cw" size={20} color={theme.info} />
               <ThemedText type="h4" style={styles.sectionTitle}>
                 Content Updates
               </ThemedText>
             </View>
-            <ThemedText style={styles.paragraph}>
+            <ThemedText style={[styles.paragraph, { color: theme.textSecondary }]}>
               Medical knowledge evolves continuously. While we strive to keep
               content current, some information may not reflect the latest
               research or guidelines. Always verify with up-to-date sources.
@@ -120,14 +126,17 @@ export default function DisclaimerScreen() {
           </View>
         </GlassCard>
 
-        <GlassCard style={[styles.card, styles.warningCard]}>
+        <GlassCard style={[styles.warningCard, {
+          backgroundColor: isDark ? "rgba(234, 179, 8, 0.1)" : "rgba(234, 179, 8, 0.08)",
+          borderColor: isDark ? "rgba(234, 179, 8, 0.3)" : "rgba(234, 179, 8, 0.2)"
+        }]}>
           <View style={styles.warningContent}>
             <Feather
               name="alert-circle"
               size={24}
-              color={Colors.dark.warning}
+              color={theme.warning}
             />
-            <ThemedText style={styles.warningText}>
+            <ThemedText style={[styles.warningText, { color: theme.text }]}>
               By continuing to use Maternal Mind, you acknowledge that you have
               read and understood this disclaimer.
             </ThemedText>
@@ -175,7 +184,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.xl,
     paddingHorizontal: Spacing.lg,
   },
@@ -198,17 +206,13 @@ const styles = StyleSheet.create({
   paragraph: {
     fontSize: 14,
     lineHeight: 22,
-    color: Colors.dark.textSecondary,
     paddingLeft: Spacing.xl + Spacing.sm,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.dark.glassBorder,
     marginVertical: Spacing.lg,
   },
   warningCard: {
-    backgroundColor: "rgba(234, 179, 8, 0.1)",
-    borderColor: "rgba(234, 179, 8, 0.3)",
     borderWidth: 1,
   },
   warningContent: {
@@ -220,7 +224,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 22,
-    color: Colors.dark.text,
   },
   continueButton: {
     width: "100%",

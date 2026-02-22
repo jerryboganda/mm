@@ -12,6 +12,8 @@ import {
 } from "../admin-storage";
 
 const router = Router();
+const getParamValue = (param: string | string[]) =>
+  Array.isArray(param) ? param[0] : param;
 
 router.use(authMiddleware, requireRole("admin"));
 
@@ -34,7 +36,8 @@ router.get("/", async (req: AuthRequest, res) => {
 // Get user detail
 router.get("/:id", async (req: AuthRequest, res) => {
   try {
-    const user = await adminGetUserDetail(req.params.id);
+    const userId = getParamValue(req.params.id);
+    const user = await adminGetUserDetail(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (err: any) {
@@ -45,25 +48,38 @@ router.get("/:id", async (req: AuthRequest, res) => {
 // Update user (role, subscription, name)
 router.put("/:id", async (req: AuthRequest, res) => {
   try {
-    const { role, subscriptionStatus, subscriptionPlan, subscriptionExpiresAt, name, isEmailVerified, isPhoneVerified } = req.body;
+    const userId = getParamValue(req.params.id);
+    const {
+      role,
+      subscriptionStatus,
+      subscriptionPlan,
+      subscriptionExpiresAt,
+      name,
+      isEmailVerified,
+      isPhoneVerified,
+    } = req.body;
     const data: any = {};
     if (role !== undefined) data.role = role;
     if (name !== undefined) data.name = name;
     if (isEmailVerified !== undefined) data.isEmailVerified = isEmailVerified;
     if (isPhoneVerified !== undefined) data.isPhoneVerified = isPhoneVerified;
-    if (subscriptionStatus !== undefined) data.subscriptionStatus = subscriptionStatus;
-    if (subscriptionPlan !== undefined) data.subscriptionPlan = subscriptionPlan;
+    if (subscriptionStatus !== undefined)
+      data.subscriptionStatus = subscriptionStatus;
+    if (subscriptionPlan !== undefined)
+      data.subscriptionPlan = subscriptionPlan;
     if (subscriptionExpiresAt !== undefined) {
-      data.subscriptionExpiresAt = subscriptionExpiresAt ? new Date(subscriptionExpiresAt) : null;
+      data.subscriptionExpiresAt = subscriptionExpiresAt
+        ? new Date(subscriptionExpiresAt)
+        : null;
     }
 
-    const user = await adminUpdateUser(req.params.id, data);
+    const user = await adminUpdateUser(userId, data);
     if (!user) return res.status(404).json({ message: "User not found" });
     await createAuditLog({
       adminUserId: req.userId!,
       action: "update",
       entityType: "user",
-      entityId: req.params.id,
+      entityId: userId,
       details: data,
     });
     res.json({ ...user, password: undefined });
@@ -75,16 +91,19 @@ router.put("/:id", async (req: AuthRequest, res) => {
 // Delete user
 router.delete("/:id", async (req: AuthRequest, res) => {
   try {
+    const userId = getParamValue(req.params.id);
     // Prevent self-deletion
-    if (req.params.id === req.userId) {
-      return res.status(400).json({ message: "Cannot delete your own account" });
+    if (userId === req.userId) {
+      return res
+        .status(400)
+        .json({ message: "Cannot delete your own account" });
     }
-    await adminDeleteUser(req.params.id);
+    await adminDeleteUser(userId);
     await createAuditLog({
       adminUserId: req.userId!,
       action: "delete",
       entityType: "user",
-      entityId: req.params.id,
+      entityId: userId,
     });
     res.json({ message: "User deleted" });
   } catch (err: any) {

@@ -12,7 +12,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
@@ -38,6 +39,7 @@ export default function TopicsScreen() {
   const route = useRoute<TopicsScreenRouteProp>();
   const { chapterId, chapterTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
+  const { theme } = useTheme();
 
   const {
     data: topics,
@@ -67,15 +69,22 @@ export default function TopicsScreen() {
       }}
       icon={
         item.isLocked ? (
-          <View style={styles.lockedIcon}>
-            <Feather name="lock" size={18} color={Colors.dark.textMuted} />
+          <View
+            style={[
+              styles.lockedIcon,
+              { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+            ]}
+          >
+            <Feather name="lock" size={18} color={theme.textMuted} />
           </View>
         ) : item.isCompleted ? (
-          <View style={styles.completedIcon}>
+          <View
+            style={[styles.completedIcon, { backgroundColor: theme.success }]}
+          >
             <Feather name="check" size={20} color="#fff" />
           </View>
         ) : (
-          <Feather name="file-text" size={24} color={Colors.dark.primary} />
+          <Feather name="file-text" size={24} color={theme.primary} />
         )
       }
       rightElement={
@@ -86,7 +95,7 @@ export default function TopicsScreen() {
             </View>
           )}
           {item.isBookmarked && (
-            <Feather name="bookmark" size={20} color={Colors.dark.primary} />
+            <Feather name="bookmark" size={20} color={theme.primary} />
           )}
         </View>
       }
@@ -121,13 +130,18 @@ export default function TopicsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <ThemedText style={styles.sectionLabel}>TOPICS</ThemedText>
-            <ThemedText type="small" style={styles.chapterTitle}>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+              TOPICS
+            </ThemedText>
+            <ThemedText
+              type="small"
+              style={[styles.chapterTitle, { color: theme.textSecondary }]}
+            >
               {chapterTitle}
             </ThemedText>
           </View>
@@ -148,18 +162,16 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
   },
   chapterTitle: {
-    color: Colors.dark.textSecondary,
     marginTop: Spacing.xs,
   },
   completedIcon: {
     width: 28,
     height: 28,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.dark.success,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -167,11 +179,9 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
   topicCard: {
     marginBottom: Spacing.md,

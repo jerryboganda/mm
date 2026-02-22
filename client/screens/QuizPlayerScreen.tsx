@@ -29,7 +29,8 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { apiRequest, queryClient } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type QuizPlayerRouteProp = RouteProp<RootStackParamList, "QuizPlayer">;
@@ -57,6 +58,7 @@ export default function QuizPlayerScreen() {
   const route = useRoute<QuizPlayerRouteProp>();
   const { mode, topicId, questionCount: paramQuestionCount } = route.params;
   const isExamMode = mode === "exam";
+  const { theme, isDark } = useTheme();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -68,12 +70,22 @@ export default function QuizPlayerScreen() {
   const totalTimerSecondsRef = useRef<number>(0);
 
   const { data: quizData, isLoading } = useQuery<QuizData>({
-    queryKey: ['/api/quiz/start', mode === 'exam' ? 'mixed' : mode, topicId, paramQuestionCount],
+    queryKey: [
+      "/api/quiz/start",
+      mode === "exam" ? "mixed" : mode,
+      topicId,
+      paramQuestionCount,
+    ],
     queryFn: async () => {
-      const queryMode = mode === 'exam' ? 'mixed' : mode;
-      const countParam = paramQuestionCount ? `&count=${paramQuestionCount}` : '';
-      const topicParam = topicId ? `&topicId=${topicId}` : '';
-      const res = await apiRequest('GET', `/api/quiz/start/${queryMode}?${topicParam}${countParam}`);
+      const queryMode = mode === "exam" ? "mixed" : mode;
+      const countParam = paramQuestionCount
+        ? `&count=${paramQuestionCount}`
+        : "";
+      const topicParam = topicId ? `&topicId=${topicId}` : "";
+      const res = await apiRequest(
+        "GET",
+        `/api/quiz/start/${queryMode}?${topicParam}${countParam}`,
+      );
       return res.json();
     },
   });
@@ -115,9 +127,15 @@ export default function QuizPlayerScreen() {
 
   // Recalculate time remaining when app returns from background
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextState) => {
-      if (nextState === 'active' && timerStartRef.current && totalTimerSecondsRef.current > 0) {
-        const elapsedSecs = Math.floor((Date.now() - timerStartRef.current) / 1000);
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (
+        nextState === "active" &&
+        timerStartRef.current &&
+        totalTimerSecondsRef.current > 0
+      ) {
+        const elapsedSecs = Math.floor(
+          (Date.now() - timerStartRef.current) / 1000,
+        );
         const remaining = totalTimerSecondsRef.current - elapsedSecs;
         if (remaining <= 0) {
           setTimeRemaining(0);
@@ -135,7 +153,9 @@ export default function QuizPlayerScreen() {
 
     const timer = setInterval(() => {
       if (!timerStartRef.current) return;
-      const elapsedSecs = Math.floor((Date.now() - timerStartRef.current) / 1000);
+      const elapsedSecs = Math.floor(
+        (Date.now() - timerStartRef.current) / 1000,
+      );
       const remaining = totalTimerSecondsRef.current - elapsedSecs;
       if (remaining <= 0) {
         setTimeRemaining(0);
@@ -166,9 +186,11 @@ export default function QuizPlayerScreen() {
         return true;
       };
 
-      BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      return () =>
-        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+      return () => backHandler.remove();
     }, [navigation]),
   );
 
@@ -273,9 +295,21 @@ export default function QuizPlayerScreen() {
     <BackgroundGradient variant="quiz">
       <View style={[styles.container, { paddingTop: insets.top + Spacing.lg }]}>
         {isExamMode && (
-          <View style={styles.examBanner}>
-            <Feather name="award" size={16} color={Colors.dark.warning} />
-            <ThemedText style={styles.examBannerText}>Exam Simulation Mode</ThemedText>
+          <View
+            style={[
+              styles.examBanner,
+              {
+                backgroundColor: `${theme.warning}26`,
+                borderColor: `${theme.warning}4D`,
+              },
+            ]}
+          >
+            <Feather name="award" size={16} color={theme.warning} />
+            <ThemedText
+              style={[styles.examBannerText, { color: theme.warning }]}
+            >
+              Exam Simulation Mode
+            </ThemedText>
           </View>
         )}
         <View style={styles.header}>
@@ -290,23 +324,25 @@ export default function QuizPlayerScreen() {
                 },
               ]);
             }}
-            style={styles.closeButton}
+            style={[styles.closeButton, { backgroundColor: theme.glass }]}
           >
-            <Feather name="x" size={24} color={Colors.dark.text} />
+            <Feather name="x" size={24} color={theme.text} />
           </Pressable>
 
           <View style={styles.progressInfo}>
             <Pressable
               onPress={() => setShowNavigator(true)}
-              style={styles.questionCounter}
+              style={[styles.questionCounter, { backgroundColor: theme.glass }]}
             >
-              <ThemedText style={styles.questionNumber}>
+              <ThemedText
+                style={[styles.questionNumber, { color: theme.textSecondary }]}
+              >
                 {currentIndex + 1} / {totalQuestions}
               </ThemedText>
               <Feather
                 name="grid"
                 size={16}
-                color={Colors.dark.textSecondary}
+                color={theme.textSecondary}
                 style={{ marginLeft: 6 }}
               />
             </Pressable>
@@ -314,20 +350,21 @@ export default function QuizPlayerScreen() {
               <View
                 style={[
                   styles.timer,
-                  timeRemaining < 60 && styles.timerWarning,
+                  { backgroundColor: theme.glass },
+                  timeRemaining < 60 && {
+                    backgroundColor: `${theme.error}33`,
+                  },
                 ]}
               >
                 <Feather
                   name="clock"
                   size={14}
-                  color={
-                    timeRemaining < 60 ? Colors.dark.error : Colors.dark.text
-                  }
+                  color={timeRemaining < 60 ? theme.error : theme.text}
                 />
                 <ThemedText
                   style={[
                     styles.timerText,
-                    timeRemaining < 60 && { color: Colors.dark.error },
+                    timeRemaining < 60 && { color: theme.error },
                   ]}
                 >
                   {formatTime(timeRemaining)}
@@ -344,8 +381,12 @@ export default function QuizPlayerScreen() {
         />
 
         <View style={styles.questionContainer}>
-          <View style={styles.difficultyBadge}>
-            <ThemedText style={styles.difficultyText}>
+          <View
+            style={[styles.difficultyBadge, { backgroundColor: theme.glass }]}
+          >
+            <ThemedText
+              style={[styles.difficultyText, { color: theme.textSecondary }]}
+            >
               {currentQuestion?.difficulty.toUpperCase()}
             </ThemedText>
           </View>
@@ -376,10 +417,11 @@ export default function QuizPlayerScreen() {
               disabled={currentIndex === 0}
               style={[
                 styles.navButton,
+                { backgroundColor: theme.glass },
                 currentIndex === 0 && styles.navButtonDisabled,
               ]}
             >
-              <Feather name="chevron-left" size={24} color={Colors.dark.text} />
+              <Feather name="chevron-left" size={24} color={theme.text} />
             </Pressable>
 
             {isLastQuestion ? (
@@ -418,41 +460,50 @@ export default function QuizPlayerScreen() {
           <View
             style={[
               styles.navigatorSheet,
-              { paddingBottom: insets.bottom + Spacing.lg },
+              {
+                backgroundColor: theme.backgroundElevated,
+                paddingBottom: insets.bottom + Spacing.lg,
+              },
             ]}
           >
             <BlurView
               intensity={80}
-              tint="dark"
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
-            <View style={styles.navigatorHandle} />
+            <View
+              style={[styles.navigatorHandle, { backgroundColor: theme.glass }]}
+            />
             <View style={styles.navigatorHeader}>
               <ThemedText type="h4">Question Navigator</ThemedText>
               <Pressable onPress={() => setShowNavigator(false)}>
-                <Feather name="x" size={24} color={Colors.dark.text} />
+                <Feather name="x" size={24} color={theme.text} />
               </Pressable>
             </View>
             <View style={styles.navigatorStats}>
-              <View style={styles.statChip}>
+              <View style={[styles.statChip, { backgroundColor: theme.glass }]}>
                 <View
                   style={[
                     styles.statDot,
-                    { backgroundColor: Colors.dark.success },
+                    { backgroundColor: theme.success },
                   ]}
                 />
-                <ThemedText style={styles.statText}>
+                <ThemedText
+                  style={[styles.statText, { color: theme.textSecondary }]}
+                >
                   {answeredCount} Answered
                 </ThemedText>
               </View>
-              <View style={styles.statChip}>
+              <View style={[styles.statChip, { backgroundColor: theme.glass }]}>
                 <View
                   style={[
                     styles.statDot,
-                    { backgroundColor: Colors.dark.textMuted },
+                    { backgroundColor: theme.textMuted },
                   ]}
                 />
-                <ThemedText style={styles.statText}>
+                <ThemedText
+                  style={[styles.statText, { color: theme.textSecondary }]}
+                >
                   {unansweredCount} Unanswered
                 </ThemedText>
               </View>
@@ -471,15 +522,23 @@ export default function QuizPlayerScreen() {
                       onPress={() => handleJumpToQuestion(index)}
                       style={[
                         styles.questionDot,
-                        isAnswered && styles.questionDotAnswered,
-                        isCurrent && styles.questionDotCurrent,
+                        { backgroundColor: theme.glass },
+                        isAnswered && {
+                          backgroundColor: `${theme.success}30`,
+                          borderColor: theme.success,
+                        },
+                        isCurrent && {
+                          borderColor: theme.primary,
+                          borderWidth: 2,
+                        },
                       ]}
                     >
                       <ThemedText
                         style={[
                           styles.questionDotText,
-                          isAnswered && styles.questionDotTextAnswered,
-                          isCurrent && styles.questionDotTextCurrent,
+                          { color: theme.textMuted },
+                          isAnswered && { color: theme.success },
+                          isCurrent && { color: theme.primary },
                         ]}
                       >
                         {index + 1}
@@ -504,38 +563,61 @@ export default function QuizPlayerScreen() {
             style={styles.modalBackdrop}
             onPress={() => setShowSubmitModal(false)}
           />
-          <View style={styles.submitModalContent}>
+          <View
+            style={[
+              styles.submitModalContent,
+              { backgroundColor: theme.backgroundElevated },
+            ]}
+          >
             <BlurView
               intensity={80}
-              tint="dark"
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
-            <View style={styles.submitModalIcon}>
+            <View
+              style={[
+                styles.submitModalIcon,
+                { backgroundColor: `${theme.primary}20` },
+              ]}
+            >
               <Feather
                 name="check-circle"
                 size={48}
-                color={Colors.dark.primary}
+                color={theme.primary}
               />
             </View>
             <ThemedText type="h3" style={styles.submitModalTitle}>
               Submit Quiz?
             </ThemedText>
-            <ThemedText style={styles.submitModalText}>
-              You've answered {answeredCount} of {totalQuestions} questions.
+            <ThemedText
+              style={[styles.submitModalText, { color: theme.textSecondary }]}
+            >
+              You&apos;ve answered {answeredCount} of {totalQuestions}{" "}
+              questions.
               {unansweredCount > 0
                 ? ` ${unansweredCount} question${unansweredCount > 1 ? "s" : ""} will be marked as incorrect.`
                 : ""}
             </ThemedText>
             <View style={styles.submitModalStats}>
               <View style={styles.submitModalStat}>
-                <Feather name="check" size={16} color={Colors.dark.success} />
-                <ThemedText style={styles.submitModalStatText}>
+                <Feather name="check" size={16} color={theme.success} />
+                <ThemedText
+                  style={[
+                    styles.submitModalStatText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {answeredCount} Answered
                 </ThemedText>
               </View>
               <View style={styles.submitModalStat}>
-                <Feather name="minus" size={16} color={Colors.dark.textMuted} />
-                <ThemedText style={styles.submitModalStatText}>
+                <Feather name="minus" size={16} color={theme.textMuted} />
+                <ThemedText
+                  style={[
+                    styles.submitModalStatText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {unansweredCount} Skipped
                 </ThemedText>
               </View>
@@ -543,9 +625,14 @@ export default function QuizPlayerScreen() {
             <View style={styles.submitModalButtons}>
               <Pressable
                 onPress={() => setShowSubmitModal(false)}
-                style={styles.submitModalCancelButton}
+                style={[
+                  styles.submitModalCancelButton,
+                  { backgroundColor: theme.glass },
+                ]}
               >
-                <ThemedText style={styles.submitModalCancelText}>
+                <ThemedText
+                  style={[styles.submitModalCancelText, { color: theme.text }]}
+                >
                   Review Answers
                 </ThemedText>
               </Pressable>
@@ -573,18 +660,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(245,158,11,0.15)",
     borderRadius: BorderRadius.sm,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.md,
     borderWidth: 1,
-    borderColor: "rgba(245,158,11,0.3)",
   },
   examBannerText: {
     fontSize: 13,
     fontWeight: "600",
-    color: Colors.dark.warning,
     marginLeft: Spacing.sm,
   },
   header: {
@@ -597,7 +681,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -610,13 +693,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.full,
   },
   questionNumber: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.dark.textSecondary,
   },
   timer: {
     flexDirection: "row",
@@ -624,11 +705,7 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.lg,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.full,
-  },
-  timerWarning: {
-    backgroundColor: "rgba(239,68,68,0.2)",
   },
   timerText: {
     fontFamily: "monospace",
@@ -646,7 +723,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.full,
     marginBottom: Spacing.md,
   },
@@ -654,7 +730,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "600",
     letterSpacing: 1,
-    color: Colors.dark.textSecondary,
   },
   questionText: {
     lineHeight: 32,
@@ -674,7 +749,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: BorderRadius.md,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -697,7 +771,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   navigatorSheet: {
-    backgroundColor: Colors.dark.background,
     borderTopLeftRadius: BorderRadius["2xl"],
     borderTopRightRadius: BorderRadius["2xl"],
     paddingTop: Spacing.md,
@@ -708,7 +781,6 @@ const styles = StyleSheet.create({
   navigatorHandle: {
     width: 40,
     height: 4,
-    backgroundColor: Colors.dark.glass,
     borderRadius: 2,
     alignSelf: "center",
     marginBottom: Spacing.lg,
@@ -726,7 +798,6 @@ const styles = StyleSheet.create({
   statChip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.dark.glass,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.full,
@@ -740,7 +811,6 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
   },
   navigatorGrid: {
     flex: 1,
@@ -756,38 +826,21 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: BorderRadius.md,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
     margin: 4,
     borderWidth: 2,
     borderColor: "transparent",
   },
-  questionDotAnswered: {
-    backgroundColor: `${Colors.dark.success}30`,
-    borderColor: Colors.dark.success,
-  },
-  questionDotCurrent: {
-    borderColor: Colors.dark.primary,
-    borderWidth: 2,
-  },
   questionDotText: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.dark.textMuted,
-  },
-  questionDotTextAnswered: {
-    color: Colors.dark.success,
-  },
-  questionDotTextCurrent: {
-    color: Colors.dark.primary,
   },
   submitModalContent: {
     position: "absolute",
     left: Spacing.lg,
     right: Spacing.lg,
     top: "30%",
-    backgroundColor: Colors.dark.card,
     borderRadius: BorderRadius.xl,
     padding: Spacing.xl,
     alignItems: "center",
@@ -797,50 +850,46 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: `${Colors.dark.primary}20`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.lg,
   },
   submitModalTitle: {
-    marginBottom: Spacing.md,
-    textAlign: "center",
+    marginBottom: Spacing.sm,
   },
   submitModalText: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
-    marginBottom: Spacing.lg,
-    lineHeight: 22,
+    marginBottom: Spacing.xl,
   },
   submitModalStats: {
     flexDirection: "row",
+    justifyContent: "center",
     marginBottom: Spacing.xl,
+    gap: Spacing.xl,
   },
   submitModalStat: {
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: Spacing.md,
+    gap: Spacing.xs,
   },
   submitModalStatText: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
-    marginLeft: Spacing.xs,
+    fontWeight: "500",
   },
   submitModalButtons: {
     flexDirection: "row",
+    gap: Spacing.md,
     width: "100%",
   },
   submitModalCancelButton: {
     flex: 1,
-    paddingVertical: Spacing.md,
+    height: Spacing.buttonHeight,
+    borderRadius: BorderRadius.xl,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: Spacing.md,
-    backgroundColor: Colors.dark.glass,
-    borderRadius: BorderRadius.md,
   },
   submitModalCancelText: {
-    color: Colors.dark.text,
+    fontSize: 16,
     fontWeight: "600",
   },
   submitModalConfirmButton: {

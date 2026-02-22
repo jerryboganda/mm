@@ -54,7 +54,11 @@ export type RootStackParamList = {
   VerifyPhone: undefined;
   TopicReader: { topicId: string; topicTitle: string };
   QuizTopicSelect: undefined;
-  QuizPlayer: { mode: "topic" | "mixed" | "wrong" | "exam"; topicId?: string; questionCount?: number };
+  QuizPlayer: {
+    mode: "topic" | "mixed" | "wrong" | "exam";
+    topicId?: string;
+    questionCount?: number;
+  };
   QuizResults: { resultId: string };
   QuizSettings: undefined;
   Subscription: undefined;
@@ -91,7 +95,8 @@ export default function RootStackNavigator() {
     : 0;
 
   const requiresEmailVerification = user && !user.isEmailVerified;
-  const requiresPhoneVerification = user && accountAgeDays > 5 && !user.isPhoneVerified;
+  const requiresPhoneVerification =
+    user && accountAgeDays > 5 && !user.isPhoneVerified;
 
   if (authLoading || onboardingLoading) {
     return (
@@ -333,47 +338,48 @@ export default function RootStackNavigator() {
               }}
             />
           </>
-        )) : hasCompletedOnboarding ? (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={{
-                headerTitle: "",
-                headerTransparent: true,
-              }}
-            />
-            <Stack.Screen
-              name="ForgotPassword"
-              component={ForgotPasswordScreen}
-              options={{
-                headerTitle: "",
-                headerTransparent: true,
-              }}
-            />
-            <Stack.Screen
-              name="ResetPassword"
-              component={ResetPasswordScreen}
-              options={{
-                headerTitle: "",
-                headerTransparent: true,
-              }}
-            />
-            <Stack.Screen
-              name="VerifyEmail"
-              component={VerifyEmailScreen}
-              options={{
-                headerTitle: "",
-                headerTransparent: true,
-              }}
-            />
-          </>
-        ) : (
+        )
+      ) : hasCompletedOnboarding ? (
+        <>
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ResetPassword"
+            component={ResetPasswordScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="VerifyEmail"
+            component={VerifyEmailScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+        </>
+      ) : (
         <>
           <Stack.Screen
             name="Welcome"
@@ -403,6 +409,22 @@ export default function RootStackNavigator() {
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+            options={{
+              headerTitle: "",
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ResetPassword"
+            component={ResetPasswordScreen}
             options={{
               headerTitle: "",
               headerTransparent: true,

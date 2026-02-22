@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, Pressable, ViewStyle, View, Platform } from "react-native";
+import {
+  StyleSheet,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+  View,
+  Platform,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -19,7 +26,7 @@ interface GlassCardProps {
   subtitle?: string;
   children?: React.ReactNode;
   onPress?: () => void;
-  style?: ViewStyle | ViewStyle[];
+  style?: StyleProp<ViewStyle>;
   active?: boolean;
   disabled?: boolean;
   icon?: React.ReactNode;
@@ -120,11 +127,11 @@ export function GlassCard({
           <LinearGradient
             colors={[
               active
-                ? "rgba(0,212,255,0.12)"
+                ? "rgba(17,164,212,0.10)"
                 : isSubtle
                   ? "rgba(255,255,255,0.02)"
-                  : "rgba(255,255,255,0.04)",
-              active ? "rgba(0,212,255,0.04)" : "rgba(255,255,255,0.01)",
+                  : "rgba(255,255,255,0.03)",
+              active ? "rgba(17,164,212,0.03)" : "rgba(255,255,255,0.01)",
             ]}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
@@ -142,8 +149,8 @@ export function GlassCard({
       >
         <LinearGradient
           colors={[
-            active ? "rgba(0,212,255,0.3)" : "rgba(255,255,255,0.15)",
-            active ? "rgba(0,212,255,0.15)" : "rgba(255,255,255,0.08)",
+            active ? "rgba(17,164,212,0.20)" : "rgba(255,255,255,0.08)",
+            active ? "rgba(17,164,212,0.08)" : "rgba(255,255,255,0.03)",
           ]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
@@ -162,7 +169,9 @@ export function GlassCard({
       testID={testID}
       style={cardStyles}
       accessibilityRole={onPress ? "button" : undefined}
-      accessibilityLabel={title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined}
+      accessibilityLabel={
+        title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined
+      }
       accessibilityState={{ disabled, selected: active }}
     >
       {renderBackground()}

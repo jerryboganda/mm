@@ -16,7 +16,8 @@ import * as Haptics from "expo-haptics";
 
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const { width, height } = Dimensions.get("window");
@@ -29,17 +30,21 @@ interface OnboardingSlide {
   icon: keyof typeof Feather.glyphMap;
   title: string;
   description: string;
-  color: string;
+  color: string; // This can remain as a semantic color key or hex if specific
+  colorKey?: "primary" | "success" | "warning"; // Add this to map to theme
 }
 
-const slides: OnboardingSlide[] = [
+// We can't access theme hook here, so we'll define data inside the component or map it later.
+// Let's modify the slides data to be functional or mapped inside.
+
+const slidesData = [
   {
     id: "1",
     icon: "book-open",
     title: "Learn at Your Pace",
     description:
       "Access comprehensive OB-GYN content organized into books, chapters, and topics. Study anytime, anywhere.",
-    color: Colors.dark.primary,
+    colorKey: "primary",
   },
   {
     id: "2",
@@ -47,7 +52,7 @@ const slides: OnboardingSlide[] = [
     title: "Practice with Quizzes",
     description:
       "Test your knowledge with multiple choice questions. Choose topic-based, mixed, or retry wrong answers mode.",
-    color: Colors.dark.success,
+    colorKey: "success",
   },
   {
     id: "3",
@@ -55,7 +60,7 @@ const slides: OnboardingSlide[] = [
     title: "Track Your Progress",
     description:
       "Monitor your learning journey with detailed analytics. See your strengths and areas for improvement.",
-    color: Colors.dark.warning,
+    colorKey: "warning",
   },
   {
     id: "4",
@@ -63,7 +68,7 @@ const slides: OnboardingSlide[] = [
     title: "Bookmark & Review",
     description:
       "Save important topics for quick access. Build your personalized study collection.",
-    color: "#e879f9",
+    colorKey: "purple", // Custom color, handled below
   },
 ];
 
@@ -73,6 +78,20 @@ export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const { theme, isDark } = useTheme();
+
+  // Map slides with theme colors
+  const slides = slidesData.map((slide) => ({
+    ...slide,
+    color:
+      slide.colorKey === "primary"
+        ? theme.primary
+        : slide.colorKey === "success"
+          ? theme.success
+          : slide.colorKey === "warning"
+            ? theme.warning
+            : "#e879f9", // Keep purple static or map to something else if needed
+  }));
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
@@ -97,7 +116,7 @@ export default function OnboardingScreen() {
     item,
     index,
   }: {
-    item: OnboardingSlide;
+    item: (typeof slides)[0];
     index: number;
   }) => {
     return (
@@ -106,15 +125,19 @@ export default function OnboardingScreen() {
           <View
             style={[
               styles.iconContainer,
-              { backgroundColor: `${item.color}20` },
+              { backgroundColor: `${item.color}14` },
             ]}
           >
-            <Feather name={item.icon} size={64} color={item.color} />
+            <Feather
+              name={item.icon as any}
+              size={64}
+              color={item.color}
+            />
           </View>
           <ThemedText type="h2" style={styles.slideTitle}>
             {item.title}
           </ThemedText>
-          <ThemedText style={styles.slideDescription}>
+          <ThemedText style={[styles.slideDescription, { color: theme.textSecondary }]}>
             {item.description}
           </ThemedText>
         </View>
@@ -123,7 +146,7 @@ export default function OnboardingScreen() {
   };
 
   const onViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: Array<{ index: number | null }> }) => {
+    ({ viewableItems }: { viewableItems: { index: number | null }[] }) => {
       if (viewableItems.length > 0 && viewableItems[0].index !== null) {
         setCurrentIndex(viewableItems[0].index);
       }
@@ -137,12 +160,12 @@ export default function OnboardingScreen() {
   const isLastSlide = currentIndex === slides.length - 1;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <LinearGradient
         colors={[
-          Colors.dark.backgroundRoot,
-          "#0a1518",
-          Colors.dark.backgroundRoot,
+          theme.backgroundRoot,
+          isDark ? "#0a1518" : "#E0F7FA",
+          theme.backgroundRoot,
         ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
@@ -155,7 +178,7 @@ export default function OnboardingScreen() {
           style={styles.skipButton}
           testID="button-skip"
         >
-          <ThemedText style={styles.skipText}>Skip</ThemedText>
+          <ThemedText style={[styles.skipText, { color: theme.textSecondary }]}>Skip</ThemedText>
         </Pressable>
       </View>
 
@@ -180,7 +203,7 @@ export default function OnboardingScreen() {
         style={[styles.footer, { paddingBottom: insets.bottom + Spacing.xl }]}
       >
         <View style={styles.pagination}>
-          {slides.map((_, index) => {
+          {slides.map((slide, index) => {
             const inputRange = [
               (index - 1) * width,
               index * width,
@@ -197,13 +220,17 @@ export default function OnboardingScreen() {
               extrapolate: "clamp",
             });
 
+            // Dot color logic: use theme.primary for active/inactive but handle opacity
+            // Or use slide color?
+            // Original code used Colors.dark.primary.
+            // Let's use slide color if possible or just theme.primary
             return (
               <Animated.View
                 key={index}
                 style={[
                   styles.dot,
-                  { width: dotWidth, opacity },
-                  index === currentIndex && styles.dotActive,
+                  { width: dotWidth, opacity, backgroundColor: theme.primary },
+                  index === currentIndex && { backgroundColor: theme.primary },
                 ]}
               />
             );
@@ -214,15 +241,7 @@ export default function OnboardingScreen() {
           title={isLastSlide ? "Continue" : "Next"}
           onPress={handleNext}
           style={styles.nextButton}
-          icon={
-            isLastSlide ? undefined : (
-              <Feather
-                name="arrow-right"
-                size={20}
-                color={Colors.dark.backgroundRoot}
-              />
-            )
-          }
+          icon={isLastSlide ? undefined : "arrow-right"}
           testID="button-next"
         />
       </View>
@@ -233,7 +252,6 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.backgroundRoot,
   },
   header: {
     flexDirection: "row",
@@ -244,7 +262,6 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
   },
   skipText: {
-    color: Colors.dark.textSecondary,
     fontSize: 16,
   },
   slide: {
@@ -273,7 +290,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     lineHeight: 24,
-    color: Colors.dark.textSecondary,
   },
   footer: {
     paddingHorizontal: Spacing.xl,
@@ -288,10 +304,6 @@ const styles = StyleSheet.create({
   dot: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.dark.primary,
-  },
-  dotActive: {
-    backgroundColor: Colors.dark.primary,
   },
   nextButton: {
     width: "100%",

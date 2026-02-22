@@ -1,0 +1,2 @@
+[POST] https://admin.maternalmind.com.pk/cdn-cgi/rum? => [204] 
+[POST] https://admin.maternalmind.com.pk/api/auth/login => [401] 

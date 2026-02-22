@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Admin Settings API Routes
  *
  * All routes are protected by authMiddleware + requireRole("admin").
@@ -98,13 +98,7 @@ router.post(
         testRecipient,
       } = req.body;
 
-      if (
-        !smtpHost ||
-        !smtpUser ||
-        !smtpPass ||
-        !fromEmail ||
-        !testRecipient
-      ) {
+      if (!smtpHost || !smtpUser || !smtpPass || !fromEmail || !testRecipient) {
         return res.status(400).json({
           message:
             "SMTP Host, Login, Password, From Email, and Test Recipient are required",

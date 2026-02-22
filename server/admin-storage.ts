@@ -40,8 +40,8 @@ export async function adminGetBook(id: string): Promise<Book | undefined> {
 
 export async function adminCreateBook(data: {
   title: string;
-  description?: string;
-  imageUrl?: string;
+  description?: string | null;
+  imageUrl?: string | null;
   isPublished?: boolean;
   order?: number;
 }): Promise<Book> {
@@ -58,7 +58,13 @@ export async function adminCreateBook(data: {
 
 export async function adminUpdateBook(
   id: string,
-  data: Partial<{ title: string; description: string; imageUrl: string; isPublished: boolean; order: number }>,
+  data: Partial<{
+    title: string;
+    description: string | null;
+    imageUrl: string | null;
+    isPublished: boolean;
+    order: number;
+  }>,
 ): Promise<Book | undefined> {
   const [book] = await db
     .update(books)
@@ -91,7 +97,9 @@ export async function adminGetChapters(bookId: string): Promise<Chapter[]> {
     .orderBy(asc(chapters.order));
 }
 
-export async function adminGetChapter(id: string): Promise<Chapter | undefined> {
+export async function adminGetChapter(
+  id: string,
+): Promise<Chapter | undefined> {
   const [ch] = await db.select().from(chapters).where(eq(chapters.id, id));
   return ch || undefined;
 }
@@ -99,7 +107,7 @@ export async function adminGetChapter(id: string): Promise<Chapter | undefined> 
 export async function adminCreateChapter(data: {
   bookId: string;
   title: string;
-  description?: string;
+  description?: string | null;
   isPublished?: boolean;
   order?: number;
 }): Promise<Chapter> {
@@ -116,9 +124,19 @@ export async function adminCreateChapter(data: {
 
 export async function adminUpdateChapter(
   id: string,
-  data: Partial<{ title: string; description: string; isPublished: boolean; order: number; bookId: string }>,
+  data: Partial<{
+    title: string;
+    description: string | null;
+    isPublished: boolean;
+    order: number;
+    bookId: string;
+  }>,
 ): Promise<Chapter | undefined> {
-  const [ch] = await db.update(chapters).set(data).where(eq(chapters.id, id)).returning();
+  const [ch] = await db
+    .update(chapters)
+    .set(data)
+    .where(eq(chapters.id, id))
+    .returning();
   return ch || undefined;
 }
 
@@ -126,9 +144,15 @@ export async function adminDeleteChapter(id: string): Promise<void> {
   await db.delete(chapters).where(eq(chapters.id, id));
 }
 
-export async function adminReorderChapters(bookId: string, orderedIds: string[]): Promise<void> {
+export async function adminReorderChapters(
+  bookId: string,
+  orderedIds: string[],
+): Promise<void> {
   for (let i = 0; i < orderedIds.length; i++) {
-    await db.update(chapters).set({ order: i }).where(and(eq(chapters.id, orderedIds[i]), eq(chapters.bookId, bookId)));
+    await db
+      .update(chapters)
+      .set({ order: i })
+      .where(and(eq(chapters.id, orderedIds[i]), eq(chapters.bookId, bookId)));
   }
 }
 
@@ -150,12 +174,12 @@ export async function adminGetTopic(id: string): Promise<Topic | undefined> {
 export async function adminCreateTopic(data: {
   chapterId: string;
   title: string;
-  description?: string;
+  description?: string | null;
   isPublished?: boolean;
   order?: number;
-  author?: string;
-  source?: string;
-  references?: string;
+  author?: string | null;
+  source?: string | null;
+  references?: string | null;
 }): Promise<Topic> {
   if (data.order === undefined) {
     const [maxRow] = await db
@@ -172,13 +196,13 @@ export async function adminUpdateTopic(
   id: string,
   data: Partial<{
     title: string;
-    description: string;
+    description: string | null;
     isPublished: boolean;
     order: number;
     chapterId: string;
-    author: string;
-    source: string;
-    references: string;
+    author: string | null;
+    source: string | null;
+    references: string | null;
   }>,
 ): Promise<Topic | undefined> {
   const [t] = await db
@@ -193,15 +217,25 @@ export async function adminDeleteTopic(id: string): Promise<void> {
   await db.delete(topics).where(eq(topics.id, id));
 }
 
-export async function adminReorderTopics(chapterId: string, orderedIds: string[]): Promise<void> {
+export async function adminReorderTopics(
+  chapterId: string,
+  orderedIds: string[],
+): Promise<void> {
   for (let i = 0; i < orderedIds.length; i++) {
-    await db.update(topics).set({ order: i }).where(and(eq(topics.id, orderedIds[i]), eq(topics.chapterId, chapterId)));
+    await db
+      .update(topics)
+      .set({ order: i })
+      .where(
+        and(eq(topics.id, orderedIds[i]), eq(topics.chapterId, chapterId)),
+      );
   }
 }
 
 // ── Content Blocks CRUD ───────────────────────────────────────
 
-export async function adminGetContentBlocks(topicId: string): Promise<ContentBlock[]> {
+export async function adminGetContentBlocks(
+  topicId: string,
+): Promise<ContentBlock[]> {
   return db
     .select()
     .from(contentBlocks)
@@ -217,7 +251,9 @@ export async function adminCreateContentBlock(data: {
 }): Promise<ContentBlock> {
   if (data.order === undefined) {
     const [maxRow] = await db
-      .select({ maxOrder: sql<number>`coalesce(max(${contentBlocks.order}), -1)` })
+      .select({
+        maxOrder: sql<number>`coalesce(max(${contentBlocks.order}), -1)`,
+      })
       .from(contentBlocks)
       .where(eq(contentBlocks.topicId, data.topicId));
     data.order = (maxRow?.maxOrder ?? -1) + 1;
@@ -230,7 +266,11 @@ export async function adminUpdateContentBlock(
   id: string,
   data: Partial<{ type: string; content: string; order: number }>,
 ): Promise<ContentBlock | undefined> {
-  const [cb] = await db.update(contentBlocks).set(data).where(eq(contentBlocks.id, id)).returning();
+  const [cb] = await db
+    .update(contentBlocks)
+    .set(data)
+    .where(eq(contentBlocks.id, id))
+    .returning();
   return cb || undefined;
 }
 
@@ -238,9 +278,20 @@ export async function adminDeleteContentBlock(id: string): Promise<void> {
   await db.delete(contentBlocks).where(eq(contentBlocks.id, id));
 }
 
-export async function adminReorderContentBlocks(topicId: string, orderedIds: string[]): Promise<void> {
+export async function adminReorderContentBlocks(
+  topicId: string,
+  orderedIds: string[],
+): Promise<void> {
   for (let i = 0; i < orderedIds.length; i++) {
-    await db.update(contentBlocks).set({ order: i }).where(and(eq(contentBlocks.id, orderedIds[i]), eq(contentBlocks.topicId, topicId)));
+    await db
+      .update(contentBlocks)
+      .set({ order: i })
+      .where(
+        and(
+          eq(contentBlocks.id, orderedIds[i]),
+          eq(contentBlocks.topicId, topicId),
+        ),
+      );
   }
 }
 
@@ -260,13 +311,19 @@ export async function adminGetMcqs(filters?: {
 
   const conditions: any[] = [];
   if (filters?.topicId) conditions.push(eq(mcqs.topicId, filters.topicId));
-  if (filters?.difficulty) conditions.push(eq(mcqs.difficulty, filters.difficulty));
-  if (filters?.isPublished !== undefined) conditions.push(eq(mcqs.isPublished, filters.isPublished));
-  if (filters?.search) conditions.push(ilike(mcqs.question, `%${filters.search}%`));
+  if (filters?.difficulty)
+    conditions.push(eq(mcqs.difficulty, filters.difficulty));
+  if (filters?.isPublished !== undefined)
+    conditions.push(eq(mcqs.isPublished, filters.isPublished));
+  if (filters?.search)
+    conditions.push(ilike(mcqs.question, `%${filters.search}%`));
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [totalRow] = await db.select({ total: count() }).from(mcqs).where(where);
+  const [totalRow] = await db
+    .select({ total: count() })
+    .from(mcqs)
+    .where(where);
   const data = await db
     .select()
     .from(mcqs)
@@ -288,11 +345,11 @@ export async function adminCreateMcq(data: {
   question: string;
   options: unknown;
   correctAnswer: string;
-  explanation?: string;
-  optionExplanations?: unknown;
+  explanation?: string | null;
+  optionExplanations?: unknown | null;
   difficulty?: string;
-  references?: string;
-  tags?: unknown;
+  references?: string | null;
+  tags?: unknown | null;
   isPublished?: boolean;
 }): Promise<MCQ> {
   const [m] = await db.insert(mcqs).values(data).returning();
@@ -305,11 +362,11 @@ export async function adminUpdateMcq(
     question: string;
     options: unknown;
     correctAnswer: string;
-    explanation: string;
-    optionExplanations: unknown;
+    explanation: string | null;
+    optionExplanations: unknown | null;
     difficulty: string;
-    references: string;
-    tags: unknown;
+    references: string | null;
+    tags: unknown | null;
     isPublished: boolean;
     topicId: string;
   }>,
@@ -332,11 +389,11 @@ export async function adminBulkCreateMcqs(
     question: string;
     options: unknown;
     correctAnswer: string;
-    explanation?: string;
-    optionExplanations?: unknown;
+    explanation?: string | null;
+    optionExplanations?: unknown | null;
     difficulty?: string;
-    references?: string;
-    tags?: unknown;
+    references?: string | null;
+    tags?: unknown | null;
     isPublished?: boolean;
   }[],
 ): Promise<number> {
@@ -361,13 +418,19 @@ export async function adminGetUsers(filters?: {
   if (filters?.role) conditions.push(eq(users.role, filters.role));
   if (filters?.search) {
     conditions.push(
-      or(ilike(users.name, `%${filters.search}%`), ilike(users.email, `%${filters.search}%`)),
+      or(
+        ilike(users.name, `%${filters.search}%`),
+        ilike(users.email, `%${filters.search}%`),
+      ),
     );
   }
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const [totalRow] = await db.select({ total: count() }).from(users).where(where);
+  const [totalRow] = await db
+    .select({ total: count() })
+    .from(users)
+    .where(where);
   const data = await db
     .select({
       id: users.id,
@@ -403,7 +466,9 @@ export async function adminGetUserDetail(userId: string) {
   const [progressCount] = await db
     .select({ count: count() })
     .from(userProgress)
-    .where(and(eq(userProgress.userId, userId), eq(userProgress.isCompleted, true)));
+    .where(
+      and(eq(userProgress.userId, userId), eq(userProgress.isCompleted, true)),
+    );
 
   const [attemptCount] = await db
     .select({ count: count() })
@@ -428,7 +493,11 @@ export async function adminUpdateUser(
     name: string;
   }>,
 ): Promise<User | undefined> {
-  const [user] = await db.update(users).set(data).where(eq(users.id, userId)).returning();
+  const [user] = await db
+    .update(users)
+    .set(data)
+    .where(eq(users.id, userId))
+    .returning();
   return user || undefined;
 }
 
@@ -444,10 +513,21 @@ export async function adminGetDashboardStats() {
   const [totalChapters] = await db.select({ count: count() }).from(chapters);
   const [totalTopics] = await db.select({ count: count() }).from(topics);
   const [totalMcqs] = await db.select({ count: count() }).from(mcqs);
-  const [totalAttempts] = await db.select({ count: count() }).from(quizAttempts);
-  const [publishedBooks] = await db.select({ count: count() }).from(books).where(eq(books.isPublished, true));
-  const [publishedTopics] = await db.select({ count: count() }).from(topics).where(eq(topics.isPublished, true));
-  const [publishedMcqs] = await db.select({ count: count() }).from(mcqs).where(eq(mcqs.isPublished, true));
+  const [totalAttempts] = await db
+    .select({ count: count() })
+    .from(quizAttempts);
+  const [publishedBooks] = await db
+    .select({ count: count() })
+    .from(books)
+    .where(eq(books.isPublished, true));
+  const [publishedTopics] = await db
+    .select({ count: count() })
+    .from(topics)
+    .where(eq(topics.isPublished, true));
+  const [publishedMcqs] = await db
+    .select({ count: count() })
+    .from(mcqs)
+    .where(eq(mcqs.isPublished, true));
   const [pendingReports] = await db
     .select({ count: count() })
     .from(contentReports)
@@ -505,7 +585,9 @@ export async function adminGetQuizAnalytics() {
     .select({
       date: sql<string>`date(${quizAttempts.createdAt})`.as("date"),
       attempts: count(),
-      avgScore: sql<number>`round(avg(${quizAttempts.score}), 1)`.as("avg_score"),
+      avgScore: sql<number>`round(avg(${quizAttempts.score}), 1)`.as(
+        "avg_score",
+      ),
     })
     .from(quizAttempts)
     .where(sql`${quizAttempts.createdAt} >= now() - interval '30 days'`)
@@ -525,7 +607,9 @@ export async function adminGetContentStats() {
     .select({
       bookId: books.id,
       bookTitle: books.title,
-      chapterCount: sql<number>`count(distinct ${chapters.id})`.as("chapter_count"),
+      chapterCount: sql<number>`count(distinct ${chapters.id})`.as(
+        "chapter_count",
+      ),
       topicCount: sql<number>`count(distinct ${topics.id})`.as("topic_count"),
       mcqCount: sql<number>`count(distinct ${mcqs.id})`.as("mcq_count"),
     })

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   Alert,
   ActivityIndicator,
   Pressable,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -20,7 +21,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 import { getApiUrl } from "@/lib/query-client";
 import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
 
 const TOKEN_KEY = "auth_token";
 
@@ -98,8 +98,16 @@ export default function AdminEmailSettingsScreen() {
   };
 
   const handleSave = async () => {
-    if (!settings.smtpHost || !settings.smtpUser || !settings.smtpPass || !settings.fromEmail) {
-      Alert.alert("Validation Error", "SMTP Host, Login, Password, and From Email are required.");
+    if (
+      !settings.smtpHost ||
+      !settings.smtpUser ||
+      !settings.smtpPass ||
+      !settings.fromEmail
+    ) {
+      Alert.alert(
+        "Validation Error",
+        "SMTP Host, Login, Password, and From Email are required.",
+      );
       return;
     }
 
@@ -136,8 +144,16 @@ export default function AdminEmailSettingsScreen() {
       return;
     }
 
-    if (!settings.smtpHost || !settings.smtpUser || !settings.smtpPass || !settings.fromEmail) {
-      Alert.alert("Missing Config", "Please fill in all SMTP fields before testing.");
+    if (
+      !settings.smtpHost ||
+      !settings.smtpUser ||
+      !settings.smtpPass ||
+      !settings.fromEmail
+    ) {
+      Alert.alert(
+        "Missing Config",
+        "Please fill in all SMTP fields before testing.",
+      );
       return;
     }
 
@@ -163,11 +179,14 @@ export default function AdminEmailSettingsScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
         "âœ… Test Successful!",
-        `Test email sent to ${testRecipient}. Check your inbox!`
+        `Test email sent to ${testRecipient}. Check your inbox!`,
       );
     } catch (error: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("âŒ Test Failed", error.message || "Failed to send test email");
+      Alert.alert(
+        "âŒ Test Failed",
+        error.message || "Failed to send test email",
+      );
     } finally {
       setTesting(false);
     }
@@ -178,7 +197,9 @@ export default function AdminEmailSettingsScreen() {
       <BackgroundGradient>
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
           <ActivityIndicator size="large" color={Colors.dark.primary} />
-          <ThemedText style={styles.loadingText}>Loading settings...</ThemedText>
+          <ThemedText style={styles.loadingText}>
+            Loading settings...
+          </ThemedText>
         </View>
       </BackgroundGradient>
     );
@@ -287,10 +308,7 @@ export default function AdminEmailSettingsScreen() {
           title={saving ? "Saving..." : "Save Settings"}
           onPress={handleSave}
           disabled={saving || !hasChanges}
-          style={[
-            styles.saveButton,
-            hasChanges && styles.saveButtonActive,
-          ]}
+          style={[styles.saveButton, hasChanges && styles.saveButtonActive]}
         />
 
         {/* Divider */}
@@ -308,8 +326,8 @@ export default function AdminEmailSettingsScreen() {
             />
             <ThemedText style={styles.testDescription}>
               Send a test email to verify your SMTP configuration is working
-              correctly. The current settings (including unsaved changes) will be
-              used.
+              correctly. The current settings (including unsaved changes) will
+              be used.
             </ThemedText>
           </View>
           <View style={styles.testInputContainer}>
@@ -328,7 +346,7 @@ export default function AdminEmailSettingsScreen() {
             title={testing ? "Sending..." : "Send Test Email"}
             onPress={handleTestEmail}
             disabled={testing}
-            variant="outline"
+            variant="secondary"
             style={styles.testButton}
           />
         </GlassCard>

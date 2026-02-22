@@ -18,8 +18,9 @@ import Constants from "expo-constants";
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useTheme } from "@/hooks/useTheme";
 
 const appVersion = Constants.expoConfig?.version || "1.0.0";
 const buildNumber = Constants.expoConfig?.ios?.buildNumber || "1";
@@ -30,6 +31,7 @@ export default function AboutScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<NavigationProp>();
+  const { theme } = useTheme();
 
   const handleOpenLink = (url: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -87,25 +89,25 @@ export default function AboutScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText style={styles.tagline}>
+          <ThemedText style={[styles.tagline, { color: theme.textSecondary }]}>
             OB-GYN Education Made Simple
           </ThemedText>
         </View>
 
         <GlassCard style={styles.versionCard}>
           <View style={styles.versionRow}>
-            <ThemedText style={styles.versionLabel}>Version</ThemedText>
+            <ThemedText style={[styles.versionLabel, { color: theme.textSecondary }]}>Version</ThemedText>
             <ThemedText style={styles.versionValue}>{appVersion}</ThemedText>
           </View>
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: theme.glass }]} />
           <View style={styles.versionRow}>
-            <ThemedText style={styles.versionLabel}>Build</ThemedText>
+            <ThemedText style={[styles.versionLabel, { color: theme.textSecondary }]}>Build</ThemedText>
             <ThemedText style={styles.versionValue}>{buildNumber}</ThemedText>
           </View>
         </GlassCard>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>LEGAL</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>LEGAL</ThemedText>
           {legalItems.map((item) => (
             <GlassCard
               key={item.id}
@@ -117,18 +119,18 @@ export default function AboutScreen() {
               }
             >
               <View style={styles.legalRow}>
-                <View style={styles.legalIcon}>
+                <View style={[styles.legalIcon, { backgroundColor: `${theme.primary}15` }]}>
                   <Feather
                     name={item.icon}
                     size={18}
-                    color={Colors.dark.primary}
+                    color={theme.primary}
                   />
                 </View>
                 <ThemedText style={styles.legalTitle}>{item.title}</ThemedText>
                 <Feather
                   name={item.screen ? "chevron-right" : "external-link"}
                   size={16}
-                  color={Colors.dark.textSecondary}
+                  color={theme.textSecondary}
                 />
               </View>
             </GlassCard>
@@ -136,19 +138,21 @@ export default function AboutScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>ACKNOWLEDGEMENTS</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>ACKNOWLEDGEMENTS</ThemedText>
           <GlassCard style={styles.acknowledgementsCard}>
             {acknowledgements.map((item, index) => (
               <View
                 key={index}
                 style={[
                   styles.acknowledgementRow,
-                  index < acknowledgements.length - 1 &&
-                    styles.acknowledgementRowBorder,
+                  index < acknowledgements.length - 1 && {
+                    borderBottomWidth: 1,
+                    borderBottomColor: theme.glass,
+                  },
                 ]}
               >
-                <Feather name="check" size={14} color={Colors.dark.success} />
-                <ThemedText style={styles.acknowledgementText}>
+                <Feather name="check" size={14} color={theme.success} />
+                <ThemedText style={[styles.acknowledgementText, { color: theme.textSecondary }]}>
                   {item}
                 </ThemedText>
               </View>
@@ -157,36 +161,36 @@ export default function AboutScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>CONNECT</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CONNECT</ThemedText>
           <View style={styles.socialRow}>
             <Pressable
-              style={styles.socialButton}
+              style={[styles.socialButton, { backgroundColor: theme.glass }]}
               onPress={() => handleOpenLink("https://twitter.com/maternalmind")}
             >
-              <Feather name="twitter" size={20} color={Colors.dark.text} />
+              <Feather name="twitter" size={20} color={theme.text} />
             </Pressable>
             <Pressable
-              style={styles.socialButton}
+              style={[styles.socialButton, { backgroundColor: theme.glass }]}
               onPress={() =>
                 handleOpenLink("https://instagram.com/maternalmind")
               }
             >
-              <Feather name="instagram" size={20} color={Colors.dark.text} />
+              <Feather name="instagram" size={20} color={theme.text} />
             </Pressable>
             <Pressable
-              style={styles.socialButton}
+              style={[styles.socialButton, { backgroundColor: theme.glass }]}
               onPress={() => handleOpenLink("https://maternalmind.com.pk")}
             >
-              <Feather name="globe" size={20} color={Colors.dark.text} />
+              <Feather name="globe" size={20} color={theme.text} />
             </Pressable>
           </View>
         </View>
 
-        <View style={styles.footer}>
-          <ThemedText style={styles.copyright}>
+        <View style={[styles.footer, { borderTopColor: theme.glass }]}>
+          <ThemedText style={[styles.copyright, { color: theme.textMuted }]}>
             © 2026 Maternal Mind. All rights reserved.
           </ThemedText>
-          <ThemedText style={styles.madeWith}>
+          <ThemedText style={[styles.madeWith, { color: theme.textMuted }]}>
             Made with care for medical students worldwide
           </ThemedText>
         </View>
@@ -214,7 +218,6 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
   },
   versionCard: {
     marginBottom: Spacing["2xl"],
@@ -228,7 +231,6 @@ const styles = StyleSheet.create({
   },
   versionLabel: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
   },
   versionValue: {
     fontSize: 14,
@@ -236,7 +238,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.dark.glass,
     marginVertical: Spacing.sm,
   },
   section: {
@@ -245,8 +246,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   legalCard: {
@@ -261,7 +262,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: `${Colors.dark.primary}15`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -280,14 +280,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: Spacing.lg,
   },
-  acknowledgementRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.glass,
-  },
   acknowledgementText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.md,
   },
   socialRow: {
@@ -299,7 +294,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -308,15 +302,12 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xl,
     paddingTop: Spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: Colors.dark.glass,
   },
   copyright: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
     marginBottom: Spacing.xs,
   },
   madeWith: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
   },
 });

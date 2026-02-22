@@ -96,101 +96,111 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
   }
 });
 
-router.post("/verify-email", rateLimiter(10, 15 * 60 * 1000), async (req, res) => {
-  try {
-    const { email, code } = req.body;
-    if (!email || !code) {
-      return res.status(400).json({ message: "Email and code are required" });
-    }
+router.post(
+  "/verify-email",
+  rateLimiter(10, 15 * 60 * 1000),
+  async (req, res) => {
+    try {
+      const { email, code } = req.body;
+      if (!email || !code) {
+        return res.status(400).json({ message: "Email and code are required" });
+      }
 
-    const user = await storage.getUserByEmail(email);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-    if (user.isEmailVerified) {
-      return res.json({ message: "Email already verified" });
-    }
+      if (user.isEmailVerified) {
+        return res.json({ message: "Email already verified" });
+      }
 
-    if (
-      user.emailVerificationToken !== code ||
-      !user.emailTokenExpiresAt ||
-      new Date() > user.emailTokenExpiresAt
-    ) {
-      return res.status(400).json({ message: "Invalid or expired code" });
-    }
+      if (
+        user.emailVerificationToken !== code ||
+        !user.emailTokenExpiresAt ||
+        new Date() > user.emailTokenExpiresAt
+      ) {
+        return res.status(400).json({ message: "Invalid or expired code" });
+      }
 
-    // Mark verified
-    await storage.updateUserVerification(user.id, {
-      isEmailVerified: true,
-      emailVerificationToken: null,
-      emailTokenExpiresAt: null,
-    });
-
-    const accessToken = generateToken(user.id);
-    // SECURITY: Never include password hash or verification tokens in response
-    res.json({
-      accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        subscriptionStatus: user.subscriptionStatus,
-        subscriptionPlan: user.subscriptionPlan,
+      // Mark verified
+      await storage.updateUserVerification(user.id, {
         isEmailVerified: true,
-        isPhoneVerified: user.isPhoneVerified,
-        createdAt: user.createdAt,
-      },
-    });
-  } catch (error) {
-    console.error("Verify email error:", error);
-    res.status(500).json({ message: "Verification failed" });
-  }
-});
+        emailVerificationToken: null,
+        emailTokenExpiresAt: null,
+      });
+
+      const accessToken = generateToken(user.id);
+      // SECURITY: Never include password hash or verification tokens in response
+      res.json({
+        accessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          subscriptionStatus: user.subscriptionStatus,
+          subscriptionPlan: user.subscriptionPlan,
+          isEmailVerified: true,
+          isPhoneVerified: user.isPhoneVerified,
+          createdAt: user.createdAt,
+        },
+      });
+    } catch (error) {
+      console.error("Verify email error:", error);
+      res.status(500).json({ message: "Verification failed" });
+    }
+  },
+);
 
 // ── Resend verification email ──
-router.post("/resend-verification", rateLimiter(3, 15 * 60 * 1000), async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+router.post(
+  "/resend-verification",
+  rateLimiter(3, 15 * 60 * 1000),
+  async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal whether user exists
+        return res.json({
+          message: "If an account exists, a new code has been sent.",
+        });
+      }
+
+      if (user.isEmailVerified) {
+        return res.json({ message: "Email already verified" });
+      }
+
+      const emailOtp = generateOTP();
+      const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+      await storage.updateUserVerification(user.id, {
+        emailVerificationToken: emailOtp,
+        emailTokenExpiresAt: otpExpiresAt,
+      });
+
+      const emailSent = await sendEmail({
+        to: user.email,
+        subject: "Verify Your Email - Maternal Mind",
+        html: verificationEmailHtml(emailOtp),
+      });
+
+      if (!emailSent && process.env.NODE_ENV !== "production") {
+        console.log(`[DEV] Resend OTP for ${user.email}: ${emailOtp}`);
+      }
+
+      res.json({ message: "If an account exists, a new code has been sent." });
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ message: "Failed to resend verification email" });
     }
-
-    const user = await storage.getUserByEmail(email);
-    if (!user) {
-      // Don't reveal whether user exists
-      return res.json({ message: "If an account exists, a new code has been sent." });
-    }
-
-    if (user.isEmailVerified) {
-      return res.json({ message: "Email already verified" });
-    }
-
-    const emailOtp = generateOTP();
-    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
-
-    await storage.updateUserVerification(user.id, {
-      emailVerificationToken: emailOtp,
-      emailTokenExpiresAt: otpExpiresAt,
-    });
-
-    const emailSent = await sendEmail({
-      to: user.email,
-      subject: "Verify Your Email - Maternal Mind",
-      html: verificationEmailHtml(emailOtp),
-    });
-
-    if (!emailSent && process.env.NODE_ENV !== "production") {
-      console.log(`[DEV] Resend OTP for ${user.email}: ${emailOtp}`);
-    }
-
-    res.json({ message: "If an account exists, a new code has been sent." });
-  } catch (error) {
-    console.error("Resend verification error:", error);
-    res.status(500).json({ message: "Failed to resend verification email" });
-  }
-});
+  },
+);
 
 router.post("/login", rateLimiter(10, 15 * 60 * 1000), async (req, res) => {
   try {
@@ -243,47 +253,51 @@ router.post("/login", rateLimiter(10, 15 * 60 * 1000), async (req, res) => {
   }
 });
 
-router.post("/send-phone-otp", authMiddleware, async (req: AuthRequest, res) => {
-  try {
-    const { phoneNumber } = req.body;
-    const userId = req.userId!;
+router.post(
+  "/send-phone-otp",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const { phoneNumber } = req.body;
+      const userId = req.userId!;
 
-    const user = await storage.getUser(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+      const user = await storage.getUser(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
 
-    const phoneToUse = phoneNumber || user.phoneNumber;
+      const phoneToUse = phoneNumber || user.phoneNumber;
 
-    if (!phoneToUse) {
-      return res.status(400).json({ message: "Phone number is required" });
-    }
+      if (!phoneToUse) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
 
-    const otp = generateOTP();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+      const otp = generateOTP();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    // Save OTP to DB
-    await storage.updateUserPhoneOtp(userId, {
-      phoneNumber: phoneToUse,
-      phoneVerificationToken: otp,
-      phoneTokenExpiresAt: expiresAt,
-    });
-
-    // Send SMS via Twilio
-    if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
-      await twilioClient.messages.create({
-        body: `Your Maternal Mind verification code is: ${otp}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneToUse,
+      // Save OTP to DB
+      await storage.updateUserPhoneOtp(userId, {
+        phoneNumber: phoneToUse,
+        phoneVerificationToken: otp,
+        phoneTokenExpiresAt: expiresAt,
       });
-    } else if (process.env.NODE_ENV !== "production") {
-      console.log(`[DEV] SMS OTP for ${phoneToUse}: ${otp}`);
-    }
 
-    res.json({ message: "OTP sent successfully" });
-  } catch (error) {
-    console.error("Send Phone OTP error:", error);
-    res.status(500).json({ message: "Failed to send OTP" });
-  }
-});
+      // Send SMS via Twilio
+      if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+        await twilioClient.messages.create({
+          body: `Your Maternal Mind verification code is: ${otp}`,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: phoneToUse,
+        });
+      } else if (process.env.NODE_ENV !== "production") {
+        console.log(`[DEV] SMS OTP for ${phoneToUse}: ${otp}`);
+      }
+
+      res.json({ message: "OTP sent successfully" });
+    } catch (error) {
+      console.error("Send Phone OTP error:", error);
+      res.status(500).json({ message: "Failed to send OTP" });
+    }
+  },
+);
 
 router.post(
   "/verify-phone-otp",
@@ -319,41 +333,45 @@ router.post(
   },
 );
 
-router.post("/forgot-password", rateLimiter(3, 15 * 60 * 1000), async (req, res) => {
-  try {
-    const data = forgotPasswordSchema.parse(req.body);
+router.post(
+  "/forgot-password",
+  rateLimiter(3, 15 * 60 * 1000),
+  async (req, res) => {
+    try {
+      const data = forgotPasswordSchema.parse(req.body);
 
-    const user = await storage.getUserByEmail(data.email);
-    if (!user) {
-      return res.json({
+      const user = await storage.getUserByEmail(data.email);
+      if (!user) {
+        return res.json({
+          message:
+            "If an account exists with this email, a reset link has been sent.",
+        });
+      }
+
+      const token = await storage.createPasswordResetToken(user.id);
+      const resetLink = `https://${req.get("host")}/reset-password?token=${token}`;
+
+      // Send password reset email via Brevo SMTP
+      const emailSent = await sendEmail({
+        to: user.email,
+        subject: "Reset Your Password - Maternal Mind",
+        html: passwordResetEmailHtml(user.name, resetLink),
+      });
+
+      if (!emailSent && process.env.NODE_ENV !== "production") {
+        console.log(`[DEV] Reset link for ${user.email}: ${resetLink}`);
+      }
+
+      res.json({
         message:
           "If an account exists with this email, a reset link has been sent.",
       });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Failed to process request" });
     }
-
-    const token = await storage.createPasswordResetToken(user.id);
-    const resetLink = `https://${req.get("host")}/reset-password?token=${token}`;
-
-    // Send password reset email via Brevo SMTP
-    const emailSent = await sendEmail({
-      to: user.email,
-      subject: "Reset Your Password - Maternal Mind",
-      html: passwordResetEmailHtml(user.name, resetLink),
-    });
-
-    if (!emailSent && process.env.NODE_ENV !== "production") {
-      console.log(`[DEV] Reset link for ${user.email}: ${resetLink}`);
-    }
-
-    res.json({
-      message:
-        "If an account exists with this email, a reset link has been sent.",
-    });
-  } catch (error) {
-    console.error("Forgot password error:", error);
-    res.status(500).json({ message: "Failed to process request" });
-  }
-});
+  },
+);
 
 // Password reset
 router.post("/reset-password", async (req, res) => {
@@ -424,7 +442,9 @@ router.post("/refresh", rateLimiter(20, 60 * 1000), async (req, res) => {
       error instanceof jwt.JsonWebTokenError ||
       error instanceof jwt.TokenExpiredError
     ) {
-      return res.status(401).json({ message: "Invalid or expired refresh token" });
+      return res
+        .status(401)
+        .json({ message: "Invalid or expired refresh token" });
     }
     console.error("Token refresh error:", error);
     res.status(500).json({ message: "Token refresh failed" });

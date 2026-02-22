@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 
 import { useTheme } from "@/hooks/useTheme";
-import { Colors, Spacing, BorderRadius, Typography } from "@/constants/theme";
+import { Spacing, BorderRadius, Typography, ThemeColors } from "@/constants/theme";
 
 type Announcement = {
   id: string;
@@ -40,16 +40,16 @@ function getTypeIcon(type: Announcement["type"]) {
   }
 }
 
-function getTypeColor(type: Announcement["type"]) {
+function getTypeColor(type: Announcement["type"], theme: ThemeColors) {
   switch (type) {
     case "new_content":
-      return Colors.dark.success;
+      return theme.success;
     case "update":
-      return Colors.dark.primary;
+      return theme.primary;
     case "important":
-      return Colors.dark.warning;
+      return theme.warning;
     default:
-      return Colors.dark.info;
+      return theme.info;
   }
 }
 
@@ -70,7 +70,7 @@ function formatTimeAgo(dateString: string): string {
 
 function AnnouncementCard({ item }: { item: Announcement }) {
   const { theme } = useTheme();
-  const typeColor = getTypeColor(item.type);
+  const typeColor = getTypeColor(item.type, theme);
   const typeIcon = getTypeIcon(item.type);
 
   const handlePress = () => {

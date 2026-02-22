@@ -69,9 +69,7 @@ export interface IStorage {
   ): Promise<QuizAttempt>;
   getQuizAttempt(id: string): Promise<QuizAttempt | undefined>;
   getQuizAttempts(userId: string): Promise<QuizAttempt[]>;
-  getQuizStats(
-    userId: string,
-  ): Promise<{
+  getQuizStats(userId: string): Promise<{
     totalAttempts: number;
     averageScore: number;
     wrongQuestionsCount: number;
@@ -324,9 +322,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(quizAttempts.createdAt));
   }
 
-  async getQuizStats(
-    userId: string,
-  ): Promise<{
+  async getQuizStats(userId: string): Promise<{
     totalAttempts: number;
     averageScore: number;
     wrongQuestionsCount: number;
@@ -336,8 +332,8 @@ export class DatabaseStorage implements IStorage {
     const averageScore =
       totalAttempts > 0
         ? Math.round(
-          attempts.reduce((sum, a) => sum + a.score, 0) / totalAttempts,
-        )
+            attempts.reduce((sum, a) => sum + a.score, 0) / totalAttempts,
+          )
         : 0;
 
     let wrongQuestionsCount = 0;
@@ -521,7 +517,14 @@ export class DatabaseStorage implements IStorage {
 
   /** Get all chapters with topic counts using LEFT JOIN + GROUP BY */
   async getAllChaptersGroupedByBook(): Promise<
-    { bookId: string; chapterId: string; chapterTitle: string; chapterDescription: string | null; chapterOrder: number | null; topicCount: number }[]
+    {
+      bookId: string;
+      chapterId: string;
+      chapterTitle: string;
+      chapterDescription: string | null;
+      chapterOrder: number | null;
+      topicCount: number;
+    }[]
   > {
     const rows = await db
       .select({
@@ -530,7 +533,9 @@ export class DatabaseStorage implements IStorage {
         chapterTitle: chapters.title,
         chapterDescription: chapters.description,
         chapterOrder: chapters.order,
-        topicCount: sql<number>`cast(count(${topics.id}) as int)`.as("topic_count"),
+        topicCount: sql<number>`cast(count(${topics.id}) as int)`.as(
+          "topic_count",
+        ),
       })
       .from(chapters)
       .leftJoin(
@@ -538,7 +543,13 @@ export class DatabaseStorage implements IStorage {
         and(eq(topics.chapterId, chapters.id), eq(topics.isPublished, true)),
       )
       .where(eq(chapters.isPublished, true))
-      .groupBy(chapters.bookId, chapters.id, chapters.title, chapters.description, chapters.order)
+      .groupBy(
+        chapters.bookId,
+        chapters.id,
+        chapters.title,
+        chapters.description,
+        chapters.order,
+      )
       .orderBy(chapters.order);
     return rows;
   }
@@ -763,7 +774,12 @@ export class DatabaseStorage implements IStorage {
     userId: string,
     page: number = 1,
     pageSize: number = 20,
-  ): Promise<{ data: QuizAttempt[]; total: number; page: number; pageSize: number }> {
+  ): Promise<{
+    data: QuizAttempt[];
+    total: number;
+    page: number;
+    pageSize: number;
+  }> {
     const offset = (page - 1) * pageSize;
 
     const [totalResult] = await db
@@ -790,7 +806,10 @@ export class DatabaseStorage implements IStorage {
   // ── Spaced Repetition (SM-2) ──────────────────────────────────
 
   /** Get cards due for review */
-  async getDueReviews(userId: string, limit: number = 20): Promise<ReviewSchedule[]> {
+  async getDueReviews(
+    userId: string,
+    limit: number = 20,
+  ): Promise<ReviewSchedule[]> {
     return await db
       .select()
       .from(reviewSchedule)
@@ -805,7 +824,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   /** Get or create a review schedule entry */
-  async getOrCreateReview(userId: string, mcqId: string): Promise<ReviewSchedule> {
+  async getOrCreateReview(
+    userId: string,
+    mcqId: string,
+  ): Promise<ReviewSchedule> {
     const [existing] = await db
       .select()
       .from(reviewSchedule)
@@ -902,10 +924,7 @@ export class DatabaseStorage implements IStorage {
     reportType: string;
     description: string;
   }): Promise<ContentReport> {
-    const [report] = await db
-      .insert(contentReports)
-      .values(data)
-      .returning();
+    const [report] = await db.insert(contentReports).values(data).returning();
     return report;
   }
 
@@ -914,7 +933,11 @@ export class DatabaseStorage implements IStorage {
     status?: string,
     limit: number = 50,
   ): Promise<ContentReport[]> {
-    let query = db.select().from(contentReports).orderBy(desc(contentReports.createdAt)).limit(limit);
+    let query = db
+      .select()
+      .from(contentReports)
+      .orderBy(desc(contentReports.createdAt))
+      .limit(limit);
     if (status) {
       return await db
         .select()
@@ -1035,12 +1058,13 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async setAppSettings(settings: { key: string; value: string }[]): Promise<void> {
+  async setAppSettings(
+    settings: { key: string; value: string }[],
+  ): Promise<void> {
     for (const { key, value } of settings) {
       await this.setAppSetting(key, value);
     }
   }
 }
-
 
 export const storage = new DatabaseStorage();

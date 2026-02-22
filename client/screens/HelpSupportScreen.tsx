@@ -20,7 +20,8 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { apiRequest } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface FAQ {
   question: string;
@@ -60,6 +61,7 @@ export default function HelpSupportScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { user } = useAuth();
+  const { theme } = useTheme();
 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [issueType, setIssueType] = useState<string>("");
@@ -156,7 +158,7 @@ export default function HelpSupportScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
             FREQUENTLY ASKED QUESTIONS
           </ThemedText>
           {faqs.map((faq, index) => (
@@ -172,42 +174,44 @@ export default function HelpSupportScreen() {
                 <Feather
                   name={expandedFaq === index ? "chevron-up" : "chevron-down"}
                   size={20}
-                  color={Colors.dark.textSecondary}
+                  color={theme.textSecondary}
                 />
               </View>
               {expandedFaq === index ? (
-                <ThemedText style={styles.faqAnswer}>{faq.answer}</ThemedText>
+                <ThemedText style={[styles.faqAnswer, { color: theme.textSecondary }]}>
+                  {faq.answer}
+                </ThemedText>
               ) : null}
             </GlassCard>
           ))}
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>CONTACT US</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CONTACT US</ThemedText>
           <GlassCard style={styles.contactCard} onPress={handleContactSupport}>
             <View style={styles.contactRow}>
-              <View style={styles.contactIcon}>
-                <Feather name="mail" size={20} color={Colors.dark.primary} />
+              <View style={[styles.contactIcon, { backgroundColor: `${theme.primary}15` }]}>
+                <Feather name="mail" size={20} color={theme.primary} />
               </View>
               <View style={styles.contactContent}>
                 <ThemedText style={styles.contactTitle}>
                   Email Support
                 </ThemedText>
-                <ThemedText style={styles.contactSubtitle}>
+                <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
                   support@maternalmind.com.pk
                 </ThemedText>
               </View>
               <Feather
                 name="external-link"
                 size={18}
-                color={Colors.dark.textSecondary}
+                color={theme.textSecondary}
               />
             </View>
           </GlassCard>
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>REPORT AN ISSUE</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>REPORT AN ISSUE</ThemedText>
 
           <View style={styles.issueTypes}>
             {issueTypes.map((type) => (
@@ -215,7 +219,11 @@ export default function HelpSupportScreen() {
                 key={type.id}
                 style={[
                   styles.issueTypeButton,
-                  issueType === type.id && styles.issueTypeButtonActive,
+                  { backgroundColor: theme.glass },
+                  issueType === type.id && {
+                    borderColor: theme.primary,
+                    backgroundColor: `${theme.primary}15`,
+                  },
                 ]}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -227,14 +235,18 @@ export default function HelpSupportScreen() {
                   size={16}
                   color={
                     issueType === type.id
-                      ? Colors.dark.primary
-                      : Colors.dark.textSecondary
+                      ? theme.primary
+                      : theme.textSecondary
                   }
                 />
                 <ThemedText
                   style={[
                     styles.issueTypeLabel,
-                    issueType === type.id && styles.issueTypeLabelActive,
+                    { color: theme.textSecondary },
+                    issueType === type.id && {
+                      color: theme.primary,
+                      fontWeight: "500",
+                    },
                   ]}
                 >
                   {type.label}
@@ -247,9 +259,9 @@ export default function HelpSupportScreen() {
             <TextInput
               value={issueDescription}
               onChangeText={setIssueDescription}
-              style={styles.textArea}
+              style={[styles.textArea, { color: theme.text }]}
               placeholder="Describe your issue in detail..."
-              placeholderTextColor={Colors.dark.textMuted}
+              placeholderTextColor={theme.textMuted}
               multiline
               numberOfLines={5}
               textAlignVertical="top"
@@ -286,8 +298,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   faqCard: {
@@ -307,7 +319,6 @@ const styles = StyleSheet.create({
   },
   faqAnswer: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     marginTop: Spacing.md,
     lineHeight: 20,
   },
@@ -322,7 +333,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: `${Colors.dark.primary}15`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -337,7 +347,6 @@ const styles = StyleSheet.create({
   },
   contactSubtitle: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   issueTypes: {
     flexDirection: "row",
@@ -351,22 +360,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.dark.glass,
     borderWidth: 1,
     borderColor: "transparent",
   },
-  issueTypeButtonActive: {
-    borderColor: Colors.dark.primary,
-    backgroundColor: `${Colors.dark.primary}15`,
-  },
   issueTypeLabel: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.xs,
-  },
-  issueTypeLabelActive: {
-    color: Colors.dark.primary,
-    fontWeight: "500",
   },
   textAreaCard: {
     padding: Spacing.lg,
@@ -374,7 +373,6 @@ const styles = StyleSheet.create({
   },
   textArea: {
     fontSize: 15,
-    color: Colors.dark.text,
     minHeight: 100,
     fontFamily: "Inter_400Regular",
   },

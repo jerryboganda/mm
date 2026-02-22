@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Platform, Linking } from "react-native";
+import { StyleSheet, View, Platform, Linking, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -79,14 +79,20 @@ export default function PermissionsPromptScreen() {
         end={{ x: 1, y: 1 }}
       />
 
-      <View
-        style={[
-          styles.content,
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={[
+          styles.contentContainer,
           {
             paddingTop: insets.top + Spacing["3xl"],
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingBottom:
+              insets.bottom +
+              (Platform.OS === "android" ? Spacing["3xl"] : Spacing.xl),
           },
         ]}
+        showsVerticalScrollIndicator={false}
+        overScrollMode="never"
+        bounces={false}
       >
         <View style={styles.mainContent}>
           <View style={styles.iconContainer}>
@@ -155,13 +161,7 @@ export default function PermissionsPromptScreen() {
             title="Enable Notifications"
             onPress={handleEnableNotifications}
             loading={isRequesting}
-            icon={
-              <Feather
-                name="bell"
-                size={20}
-                color={Colors.dark.backgroundRoot}
-              />
-            }
+            icon="bell"
             style={styles.enableButton}
             testID="button-enable-notifications"
           />
@@ -173,7 +173,7 @@ export default function PermissionsPromptScreen() {
             testID="button-skip-notifications"
           />
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -186,6 +186,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: Spacing.xl,
+  },
+  contentContainer: {
+    flexGrow: 1,
     justifyContent: "space-between",
   },
   mainContent: {

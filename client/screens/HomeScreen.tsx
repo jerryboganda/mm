@@ -22,17 +22,10 @@ import { BlurView } from "expo-blur";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/lib/auth";
-import {
-  Colors,
-  Spacing,
-  BorderRadius,
-  Typography,
-  Shadows,
-} from "@/constants/theme";
+import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
-import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -54,12 +47,14 @@ type RecommendedTopic = {
 };
 
 function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
+
+  // Use theme colors with opacity for glow effects
   const glowColor = {
-    accent: "rgba(0,212,255,0.12)",
-    success: "rgba(34,197,94,0.12)",
-    warning: "rgba(245,158,11,0.12)",
-    purple: "rgba(168,85,247,0.12)",
+    accent: `${theme.primary}1A`,   // 10% opacity
+    success: `${theme.success}1A`,
+    warning: `${theme.warning}1A`,
+    purple: `${theme.purple || "#a855f7"}1A`,
   }[item.variant];
 
   const renderBackground = () => {
@@ -67,7 +62,7 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
       return (
         <View style={styles.bentoBackground}>
           <LinearGradient
-            colors={[glowColor, "rgba(255,255,255,0.02)"]}
+            colors={[glowColor, theme.glass]}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -77,9 +72,9 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
     }
 
     return (
-      <BlurView intensity={18} tint="dark" style={styles.bentoBackground}>
+      <BlurView intensity={18} tint={isDark ? "dark" : "light"} style={styles.bentoBackground}>
         <LinearGradient
-          colors={[glowColor, "rgba(255,255,255,0.08)"]}
+          colors={[glowColor, theme.glass]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -89,19 +84,9 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
   };
 
   return (
-    <View
-      style={[
-        styles.bentoCardContainer,
-        index === 0 && styles.bentoCardWide,
-      ]}
-    >
+    <View style={styles.bentoCardContainer}>
       <AnimatedListItem index={index} delay={60} style={{ width: "100%" }}>
-        <View
-          style={[
-            styles.bentoCard,
-            { borderColor: theme.glassBorder },
-          ]}
-        >
+        <View style={[styles.bentoCard, { borderColor: theme.glassBorder }]}>
           {renderBackground()}
           <View style={styles.bentoContent}>
             <View style={styles.bentoHeader}>
@@ -115,10 +100,18 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
               </View>
             </View>
             <View style={styles.bentoValueContainer}>
-              <Text style={[styles.bentoValue, { color: item.color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+              <Text
+                style={[styles.bentoValue, { color: item.color }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.7}
+              >
                 {item.value}
               </Text>
-              <Text style={[styles.bentoLabel, { color: theme.textSecondary }]} numberOfLines={1}>
+              <Text
+                style={[styles.bentoLabel, { color: theme.textSecondary }]}
+                numberOfLines={1}
+              >
                 {item.label}
               </Text>
             </View>
@@ -193,7 +186,12 @@ function RecommendedCard({
   return (
     <AnimatedListItem index={index} delay={80}>
       <GlassCard onPress={onPress} style={styles.recommendedCard}>
-        <View style={styles.recommendedIcon}>
+        <View
+          style={[
+            styles.recommendedIcon,
+            { backgroundColor: `${theme.primary}15` },
+          ]}
+        >
           <Feather name="book-open" size={16} color={theme.primary} />
         </View>
         <View style={styles.recommendedContent}>
@@ -233,10 +231,6 @@ export default function HomeScreen() {
     queryKey: ["/api/progress"],
   });
 
-  const { data: booksData } = useQuery({
-    queryKey: ["/api/books"],
-  });
-
   const { data: recentTopics, refetch: refetchRecent } = useQuery({
     queryKey: ["/api/recent-activity"],
     queryFn: async () => {
@@ -258,13 +252,11 @@ export default function HomeScreen() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const {
-    data: recommendedTopics = [],
-    refetch: refetchRecommended,
-  } = useQuery<RecommendedTopic[]>({
-    queryKey: ["/api/recommended-topics"],
-    staleTime: 10 * 60 * 1000,
-  });
+  const { data: recommendedTopics = [], refetch: refetchRecommended } =
+    useQuery<RecommendedTopic[]>({
+      queryKey: ["/api/recommended-topics"],
+      staleTime: 10 * 60 * 1000,
+    });
 
   const { data: dueReviewData } = useQuery<{ count: number }>({
     queryKey: ["/api/reviews/due-count"],
@@ -276,7 +268,11 @@ export default function HomeScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    await Promise.all([refetchProgress(), refetchRecent(), refetchRecommended()]);
+    await Promise.all([
+      refetchProgress(),
+      refetchRecent(),
+      refetchRecommended(),
+    ]);
     setRefreshing(false);
   };
 
@@ -312,7 +308,7 @@ export default function HomeScreen() {
       label: "Topics Read",
       value: progress?.topicsCompleted?.toString() || "0",
       icon: "book",
-      color: Colors.dark.primary,
+      color: theme.primary,
       variant: "accent",
     },
     {
@@ -320,7 +316,7 @@ export default function HomeScreen() {
       label: "Quizzes Done",
       value: progress?.quizzesCompleted?.toString() || "0",
       icon: "check-circle",
-      color: Colors.dark.success,
+      color: theme.success,
       variant: "success",
     },
     {
@@ -330,7 +326,7 @@ export default function HomeScreen() {
         ? `${Math.round(progress.averageScore)}%`
         : "—",
       icon: "target",
-      color: Colors.dark.warning,
+      color: theme.warning,
       variant: "warning",
     },
     {
@@ -338,7 +334,7 @@ export default function HomeScreen() {
       label: "Study Streak",
       value: progress?.studyStreak?.toString() || "0",
       icon: "zap",
-      color: Colors.dark.purple,
+      color: theme.purple || "#a855f7",
       variant: "purple",
     },
   ];
@@ -387,7 +383,10 @@ export default function HomeScreen() {
                   >
                     {greeting},
                   </Text>
-                  <Text style={[styles.userName, { color: theme.text }]} numberOfLines={1}>
+                  <Text
+                    style={[styles.userName, { color: theme.text }]}
+                    numberOfLines={1}
+                  >
                     {firstName}
                   </Text>
                 </View>
@@ -458,26 +457,51 @@ export default function HomeScreen() {
             <Pressable
               style={[
                 styles.reviewBanner,
-                { backgroundColor: "rgba(139,92,246,0.12)", borderColor: Colors.dark.purple },
+                {
+                  backgroundColor: `${theme.purple || "#8b5cf6"}1F`, // ~12% opacity equivalent
+                  borderColor: theme.purple || "#8b5cf6",
+                },
               ]}
               onPress={handleStartReview}
               accessibilityRole="button"
               accessibilityLabel={`Spaced Review: ${dueCount} cards due`}
             >
               <View style={styles.reviewBannerLeft}>
-                <View style={[styles.reviewIconBg, { backgroundColor: "rgba(139,92,246,0.2)" }]}>
-                  <Feather name="repeat" size={20} color={Colors.dark.purple} />
+                <View
+                  style={[
+                    styles.reviewIconBg,
+                    { backgroundColor: `${theme.purple || "#8b5cf6"}33` },
+                  ]}
+                >
+                  <Feather
+                    name="repeat"
+                    size={20}
+                    color={theme.purple || "#8b5cf6"}
+                  />
                 </View>
                 <View>
-                  <Text style={[styles.reviewBannerTitle, { color: theme.text }]} numberOfLines={1}>
+                  <Text
+                    style={[styles.reviewBannerTitle, { color: theme.text }]}
+                    numberOfLines={1}
+                  >
                     Spaced Review
                   </Text>
-                  <Text style={[styles.reviewBannerSubtitle, { color: theme.textSecondary }]} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.reviewBannerSubtitle,
+                      { color: theme.textSecondary },
+                    ]}
+                    numberOfLines={1}
+                  >
                     {dueCount} card{dueCount !== 1 ? "s" : ""} due for review
                   </Text>
                 </View>
               </View>
-              <Feather name="chevron-right" size={20} color={Colors.dark.purple} />
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={theme.purple || "#8b5cf6"}
+              />
             </Pressable>
           </AnimatedListItem>
         );
@@ -573,11 +597,10 @@ const styles = StyleSheet.create({
   bentoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginHorizontal: -Spacing.xs,
+    justifyContent: "space-between",
   },
   bentoCardContainer: {
     width: "48%",
-    marginHorizontal: "1%",
     marginBottom: Spacing.md,
   },
   bentoCard: {
@@ -586,9 +609,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
     minHeight: 130,
-  },
-  bentoCardWide: {
-    width: "98%",
   },
   bentoBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -688,7 +708,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: BorderRadius.sm,
-    backgroundColor: "rgba(0, 212, 255, 0.1)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,

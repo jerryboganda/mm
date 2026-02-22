@@ -172,7 +172,9 @@ export default function ProgressScreen() {
               style={styles.topicRow}
             >
               <View style={styles.topicInfo}>
-                <ThemedText style={styles.topicTitle} numberOfLines={1}>{topic.title}</ThemedText>
+                <ThemedText style={styles.topicTitle} numberOfLines={1}>
+                  {topic.title}
+                </ThemedText>
                 <ThemedText style={styles.topicAttempts}>
                   {topic.attempts} attempts
                 </ThemedText>
@@ -289,8 +291,9 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#11a4d4",
   },
   viewAllText: {
     fontSize: 13,

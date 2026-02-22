@@ -27,11 +27,11 @@ export default function QuizSettingsScreen() {
     id: "all" | "easy" | "medium" | "hard";
     label: string;
   }[] = [
-    { id: "all", label: "All" },
-    { id: "easy", label: "Easy" },
-    { id: "medium", label: "Medium" },
-    { id: "hard", label: "Hard" },
-  ];
+      { id: "all", label: "All" },
+      { id: "easy", label: "Easy" },
+      { id: "medium", label: "Medium" },
+      { id: "hard", label: "Hard" },
+    ];
 
   const handleToggleTimer = (value: boolean) => {
     setTimerEnabled(value);
@@ -187,8 +187,9 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#11a4d4",
     marginBottom: Spacing.md,
   },
   settingCard: {

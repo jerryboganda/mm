@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Centralized Email Service â€” Brevo SMTP
  *
  * All email sending in the app goes through this module.
@@ -7,6 +7,7 @@
  * BREVO_FROM_EMAIL, BREVO_FROM_NAME if no DB settings exist.
  */
 import nodemailer from "nodemailer";
+import type { Transporter } from "nodemailer";
 import { db } from "./db";
 import { appSettings } from "../shared/schema";
 import { inArray } from "drizzle-orm";
@@ -38,18 +39,34 @@ async function getSmtpConfig(): Promise<SmtpConfig | null> {
     const settings = await db
       .select()
       .from(appSettings)
-      .where(
-        inArray(appSettings.key, Object.values(SETTING_KEYS)),
-      );
+      .where(inArray(appSettings.key, Object.values(SETTING_KEYS)));
 
     const settingsMap = new Map(settings.map((s) => [s.key, s.value]));
 
-    const host = settingsMap.get(SETTING_KEYS.SMTP_HOST) || process.env.BREVO_SMTP_HOST || "";
-    const port = settingsMap.get(SETTING_KEYS.SMTP_PORT) || process.env.BREVO_SMTP_PORT || "587";
-    const user = settingsMap.get(SETTING_KEYS.SMTP_USER) || process.env.BREVO_SMTP_USER || "";
-    const pass = settingsMap.get(SETTING_KEYS.SMTP_PASS) || process.env.BREVO_SMTP_PASS || "";
-    const fromEmail = settingsMap.get(SETTING_KEYS.FROM_EMAIL) || process.env.BREVO_FROM_EMAIL || "";
-    const fromName = settingsMap.get(SETTING_KEYS.FROM_NAME) || process.env.BREVO_FROM_NAME || "Maternal Mind";
+    const host =
+      settingsMap.get(SETTING_KEYS.SMTP_HOST) ||
+      process.env.BREVO_SMTP_HOST ||
+      "";
+    const port =
+      settingsMap.get(SETTING_KEYS.SMTP_PORT) ||
+      process.env.BREVO_SMTP_PORT ||
+      "587";
+    const user =
+      settingsMap.get(SETTING_KEYS.SMTP_USER) ||
+      process.env.BREVO_SMTP_USER ||
+      "";
+    const pass =
+      settingsMap.get(SETTING_KEYS.SMTP_PASS) ||
+      process.env.BREVO_SMTP_PASS ||
+      "";
+    const fromEmail =
+      settingsMap.get(SETTING_KEYS.FROM_EMAIL) ||
+      process.env.BREVO_FROM_EMAIL ||
+      "";
+    const fromName =
+      settingsMap.get(SETTING_KEYS.FROM_NAME) ||
+      process.env.BREVO_FROM_NAME ||
+      "Maternal Mind";
 
     if (!host || !user || !pass || !fromEmail) {
       return null;
@@ -103,7 +120,9 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
   const config = await getSmtpConfig();
   if (!config) {
     if (process.env.NODE_ENV !== "production") {
-      console.log(`[DEV] Email not sent (no SMTP config). To: ${Array.isArray(options.to) ? options.to.join(", ") : options.to}, Subject: ${options.subject}`);
+      console.log(
+        `[DEV] Email not sent (no SMTP config). To: ${Array.isArray(options.to) ? options.to.join(", ") : options.to}, Subject: ${options.subject}`,
+      );
     } else {
       console.warn("[EMAIL] SMTP not configured â€” email not sent.");
     }
@@ -219,7 +238,10 @@ export function verificationEmailHtml(otp: string): string {
   `;
 }
 
-export function passwordResetEmailHtml(userName: string, resetLink: string): string {
+export function passwordResetEmailHtml(
+  userName: string,
+  resetLink: string,
+): string {
   return `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 30px;">
@@ -242,7 +264,11 @@ export function passwordResetEmailHtml(userName: string, resetLink: string): str
   `;
 }
 
-export function supportIssueEmailHtml(type: string, email: string, description: string): string {
+export function supportIssueEmailHtml(
+  type: string,
+  email: string,
+  description: string,
+): string {
   return `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 30px;">

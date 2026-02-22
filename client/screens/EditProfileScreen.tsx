@@ -24,7 +24,8 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { apiRequest } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -32,6 +33,7 @@ export default function EditProfileScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { user, refreshUser } = useAuth();
+  const { theme } = useTheme();
 
   const [name, setName] = useState(user?.name || "");
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -140,27 +142,43 @@ export default function EditProfileScreen() {
                   ? { uri: photoUri }
                   : require("../../assets/images/default-avatar.png")
               }
-              style={styles.photo}
+              style={[styles.photo, { borderColor: theme.primary }]}
               resizeMode="cover"
             />
-            <View style={styles.editBadge}>
+            <View
+              style={[
+                styles.editBadge,
+                {
+                  backgroundColor: theme.primary,
+                  borderColor: theme.backgroundRoot,
+                },
+              ]}
+            >
               <Feather name="camera" size={16} color="#fff" />
             </View>
           </Pressable>
-          <ThemedText style={styles.photoHint}>Tap to change photo</ThemedText>
+          <ThemedText style={[styles.photoHint, { color: theme.textMuted }]}>
+            Tap to change photo
+          </ThemedText>
         </View>
 
         <View style={styles.formSection}>
-          <ThemedText style={styles.sectionLabel}>PERSONAL INFO</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            PERSONAL INFO
+          </ThemedText>
 
           <GlassCard style={styles.inputCard}>
-            <ThemedText style={styles.inputLabel}>Full Name</ThemedText>
+            <ThemedText
+              style={[styles.inputLabel, { color: theme.textSecondary }]}
+            >
+              Full Name
+            </ThemedText>
             <TextInput
               value={name}
               onChangeText={setName}
-              style={styles.input}
+              style={[styles.input, { color: theme.text }]}
               placeholder="Enter your name"
-              placeholderTextColor={Colors.dark.textMuted}
+              placeholderTextColor={theme.textMuted}
               autoCapitalize="words"
               autoCorrect={false}
               testID="input-name"
@@ -168,9 +186,15 @@ export default function EditProfileScreen() {
           </GlassCard>
 
           <GlassCard style={styles.inputCard}>
-            <ThemedText style={styles.inputLabel}>Email</ThemedText>
-            <ThemedText style={styles.emailText}>{user?.email}</ThemedText>
-            <ThemedText style={styles.emailHint}>
+            <ThemedText
+              style={[styles.inputLabel, { color: theme.textSecondary }]}
+            >
+              Email
+            </ThemedText>
+            <ThemedText style={[styles.emailText, { color: theme.text }]}>
+              {user?.email}
+            </ThemedText>
+            <ThemedText style={[styles.emailHint, { color: theme.textMuted }]}>
               Email cannot be changed
             </ThemedText>
           </GlassCard>
@@ -184,24 +208,28 @@ export default function EditProfileScreen() {
               }}
             >
               <View>
-                <ThemedText style={styles.inputLabel}>Mobile Number</ThemedText>
+                <ThemedText
+                  style={[styles.inputLabel, { color: theme.textSecondary }]}
+                >
+                  Mobile Number
+                </ThemedText>
                 {user?.isPhoneVerified ? (
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Feather
                       name="check-circle"
                       size={14}
-                      color={Colors.dark.success}
+                      color={theme.success}
                       style={{ marginRight: 6 }}
                     />
                     <ThemedText
-                      style={{ color: Colors.dark.success, fontSize: 14 }}
+                      style={{ color: theme.success, fontSize: 14 }}
                     >
                       Verified
                     </ThemedText>
                   </View>
                 ) : (
                   <ThemedText
-                    style={{ color: Colors.dark.error, fontSize: 14 }}
+                    style={{ color: theme.error, fontSize: 14 }}
                   >
                     Not Verified
                   </ThemedText>
@@ -216,7 +244,7 @@ export default function EditProfileScreen() {
               >
                 <ThemedText
                   style={{
-                    color: Colors.dark.primary,
+                    color: theme.primary,
                     fontWeight: "600",
                     fontSize: 14,
                   }}
@@ -239,7 +267,11 @@ export default function EditProfileScreen() {
             testID="button-save-profile"
           />
           <Pressable onPress={handleCancel} style={styles.cancelButton}>
-            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+            <ThemedText
+              style={[styles.cancelText, { color: theme.textMuted }]}
+            >
+              Cancel
+            </ThemedText>
           </Pressable>
         </View>
       </ScrollView>
@@ -267,7 +299,6 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: Colors.dark.primary,
   },
   editBadge: {
     position: "absolute",
@@ -276,15 +307,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.dark.primary,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: Colors.dark.backgroundRoot,
   },
   photoHint: {
     fontSize: 13,
-    color: Colors.dark.textMuted,
   },
   formSection: {
     marginBottom: Spacing["2xl"],
@@ -292,8 +320,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   inputCard: {
@@ -303,22 +331,18 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 12,
     fontWeight: "500",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.sm,
   },
   input: {
     fontSize: 16,
-    color: Colors.dark.text,
     padding: 0,
     fontFamily: "Inter_400Regular",
   },
   emailText: {
     fontSize: 16,
-    color: Colors.dark.text,
   },
   emailHint: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
     marginTop: Spacing.xs,
   },
   buttonSection: {
@@ -333,6 +357,5 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 15,
-    color: Colors.dark.textMuted,
   },
 });

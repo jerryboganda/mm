@@ -1,0 +1,166 @@
+You are an elite product design + frontend engineering team (Brand Designer, UX Architect, Motion Designer, Copywriter, SEO Specialist, and Senior Next.js Engineer). Build a world-class, premium marketing website + lightweight product web portal for :contentReference[oaicite:6]{index=6}bile-first OB-GYN educational platform for postgraduate doctors (trainees progressing to consultants, and consultants in OB/GYN and relevant subspecialties).
+
+PRIMARY GOAL
+Create a beautiful, highly professional, conversion-optimized website that:
+1) communicates trust, clinical seriousness, and premium quality,
+2) explains the product clearly (Learn → Practice → Progress → Profile + Subscription),
+3) drives actions: Download app / Join waitlist / Request institutional access / Sign in,
+4) matches the Maternal Mind design system exactly (dark glassmorphism + neon cyan glow),
+5) feels “medical-tech luxury” and performs extremely well.
+
+AUDIENCE (research-informed)
+Design for these segments:
+- MRCOG candidates (Parts 1–3) and international OB-GYN trainees seeking structured prep.
+- FCPS (CPSP) trainees in Obstetrics & Gynaecology (Pakistan) and adjacent pathways.
+- Residents/registrars needing rapid revision + MCQ drilling.
+- Early consultants who want CPD-like continuous learning and quick refreshers.
+Tone: calm, precise, evidence-oriented, never gimmicky.
+
+NON-NEGOTIABLE BRAND + DESIGN SYSTEM (must follow)
+Brand concept: “Secure Precision”
+Visual style: Dark-themed Glassmorphism with semi-transparent layers, background blurs, and glowing accents. Premium medical software vibe.
+Memorable element: Neon cyan glow (#11a4d4) on interactive elements over deep teal/void backgrounds.
+
+Color palette:
+- Primary neon cyan: #11a4d4 (glows, primary buttons, active states)
+- Deep teal: #0c7fa6 (hover states, borders)
+- Background void dark: #101d22
+- Surface dark: #152228
+- Glass: rgba(255,255,255,0.05 to 0.1)
+- Text primary: rgba(255,255,255,0.95), secondary: rgba(255,255,255,0.7), muted: rgba(255,255,255,0.4)
+- Semantic: success #22c55e, warning #eab308, error #ef4444, info #3b82f6, purple accent #a855f7
+
+Typography:
+- Inter (Google font)
+- H1 32px light 300, tracking-tight
+- H2 24px semibold 600
+- H3 20px medium 500
+- Body 16px regular, line-height 24
+- Caption 14
+- Labels 12 medium uppercase tracking-widest
+- Monospace for OTP/timer motifs (when relevant)
+
+UI patterns:
+- Glass cards (bg-white/5, border-white/10, backdrop blur)
+- Hover: bg-white/10 and subtle cyan border glow
+- Buttons: primary cyan with neon glow shadow; ghost buttons for secondary
+- Background: ambient blurred “orbs” / mesh gradients; subtle parallax
+- Never break the calm/clinical vibe (no loud colors, no chaotic motion)
+
+WEBSITE INFORMATION ARCHITECTURE (deliver as sitemap + routes)
+Must include:
+1) Home (/) — premium hero + story + product tour + social proof + CTA
+2) Features (/features) — Learn / Practice / Progress / Subscription / Trust
+3) How It Works (/how-it-works) — Books→Chapters→Topics, quizzes, analytics loop
+4) Pricing (/pricing) — plans, comparison, “Best Value” highlight, FAQ
+5) For Institutions (/institutions) — hospitals/programs, cohort onboarding, admin/instructor benefits (even if future)
+6) About (/about) — mission, clinical rigor, roadmap highlights
+7) Legal hub (/legal) + Terms (/legal/terms) + Privacy (/legal/privacy) + Disclaimer (/legal/disclaimer)
+8) Support (/support) — contact form, email, troubleshooting, status messages
+9) Blog/Resources (/resources) — SEO landing pages for MRCOG/FCPS topics + study guides (CMS-ready)
+10) Auth pages (/signin, /signup) — optional lightweight portal sign-in (or deep link to app)
+11) Press/Media kit (/media) — logo, brand colors, screenshots
+
+HOMEPAGE REQUIREMENTS (world-class)
+Hero section:
+- Glass hero card with neon cyan accents
+- Headline: “Maternal Mind — Premium OB-GYN learning for postgraduate doctors.”
+- Subhead: structured content + MCQs + progress analytics; emphasize trust + clarity
+- Primary CTA: “Get the App” (iOS/Android) + “Join Waitlist” + “Request Institutional Access”
+- Secondary CTA: “Explore Features”
+- Include subtle animated background orbs and a “neon sweep” micro-animation on the primary CTA (respect reduced-motion)
+
+Product tour section:
+- Interactive tabbed/scroll-driven tour (Learn, Practice, Progress, Profile, Subscription)
+- Each step shows:
+  - short benefit statement,
+  - a glass “screen mock” (build as SVG/HTML mock if real screenshots not available),
+  - 3 bullet outcomes (e.g., “Faster recall”, “Exam-focused drilling”, “Track weak areas”)
+- Microinteractions: hover glow, card tilt (subtle), scroll reveal.
+
+Trust section:
+- “Educational use only, not medical advice” prominent but tasteful.
+- Highlight privacy/security posture in plain language (no overpromising).
+- References & citations concept (show “Cited explanations” as a future-ready feature even if roadmap).
+
+Social proof:
+- Testimonials carousel (seed with placeholder content; structure so real testimonials can be swapped)
+- Metrics counters (e.g., “Topics”, “MCQs”, “Study Streaks”) — if actual numbers unknown, use placeholders clearly marked.
+
+PRICING PAGE REQUIREMENTS
+- 3 plan cards (Monthly/Quarterly/Yearly) with glass style
+- “Best Value” badge
+- Feature checklist (offline access if future, analytics, bookmarks, wrong-questions mode, etc.)
+- “Restore purchases” link (if relevant)
+- FAQ accordion (glass)
+- Clear cancellation copy
+
+RESOURCES / SEO REQUIREMENTS
+- Build SEO landing pages framework:
+  - /resources/mrcog-part-1
+  - /resources/mrcog-part-2
+  - /resources/mrcog-part-3
+  - /resources/fcps-obgyn
+  - /resources/obgyn-mcqs
+- Each page includes: intro, study strategy, how Maternal Mind helps, FAQ, internal links, schema markup.
+- Use medically responsible language; avoid giving clinical instructions; keep it exam/education focused.
+
+UI COMPONENT LIBRARY (must implement)
+- GlassCard, GlassPanel, NeonButton, GhostButton, GlowLink
+- Tabs, Accordions, PricingCard, TestimonialCarousel
+- Sticky navbar with blur + active section glow
+- Footer with legal links + contact
+- Form components (floating labels, validation states)
+- Toast/notifications style (subtle)
+
+MOTION & ANIMATION (high polish, not flashy)
+Use Framer Motion (or GSAP if needed) with strict performance budget:
+- Scroll reveal: fade + slight translate + blur-in
+- Background orbs: slow floating animation + parallax on mouse move
+- Button hover: glow intensifies; focus ring neon cyan
+- Section transitions: subtle gradient wipe
+Accessibility:
+- Implement prefers-reduced-motion: reduce to fades/no parallax.
+
+TECH STACK (recommendation)
+- Next.js (App Router), TypeScript
+- Tailwind CSS + CSS variables for tokens
+- shadcn/ui components (re-skinned to glass theme) where helpful
+- Framer Motion for animation
+- next-seo or built-in metadata with OpenGraph/Twitter cards
+- MDX or headless CMS adapter (Contentlayer, Sanity, or Payload) for /resources blog
+
+PERFORMANCE + QUALITY BAR
+- Lighthouse targets: Performance 90+ (desktop), 80+ (mobile), Accessibility 95+, Best Practices 95+, SEO 95+
+- Optimize images, use next/image, lazy load below the fold
+- No heavy shader/3D by default; keep motion light and GPU-friendly
+- Keyboard navigable, strong contrast despite dark theme, proper focus states
+- Add analytics hooks (pluggable), cookie banner framework (region-aware)
+
+SECURITY / SENSITIVITY CONSTRAINTS
+- Do NOT expose any internal infrastructure (IPs, server paths, secrets, SSH commands) in the website content.
+- Avoid medical claims. Always keep language “educational platform” + “exam preparation” + “learning support”.
+- Legal: include Disclaimer page and a clear “not medical advice” banner in appropriate places.
+
+DELIVERABLES (agent must output all)
+1) Audience personas + messaging pillars (MRCOG/FCPS/Residents/Consultants)
+2) Sitemap + wireframe-level section plan
+3) UI design spec (tokens, components, motion rules)
+4) Complete Next.js codebase with the pages above
+5) Copywriting for every section (professional, concise, credible)
+6) SEO metadata + schema for resources pages
+7) Deployment instructions (Vercel-ready) + environment variable placeholders
+
+CONTENT MUST REFLECT PRODUCT CAPABILITIES
+Mirror app’s core flows in website narrative:
+- Learn: structured library (Books→Chapters→Topics)
+- Practice: MCQ modes (Topic, Mixed, Wrong Questions)
+- Progress: analytics, attempt history, accuracy trends
+- Profile: bookmarks, subscription status
+- Subscription paywall concept + restore purchases
+Also include reliability/trust UI patterns: offline/error/maintenance states as part of “built for clinicians” story.
+
+STYLE DIRECTION (visual references in words)
+Think: “premium medical SaaS meets modern consumer app”, dark glass layers, neon cyan micro-glows, calm depth, clean spacing, minimal clutter.
+
+Now execute end-to-end: research → plan → design → build → polish → produce final output.

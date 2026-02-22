@@ -34,7 +34,28 @@ async function removeToken(key: string): Promise<void> {
  * @returns {string} The API base URL
  */
 export function getApiUrl(): string {
-  return process.env.EXPO_PUBLIC_API_URL || "https://maternalmind.com.pk";
+  const configured = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (!configured) {
+    return "https://admin.maternalmind.com.pk";
+  }
+
+  try {
+    const parsed = new URL(configured);
+
+    // Guard against common production misconfiguration:
+    // the marketing site domain does not serve mobile auth APIs.
+    if (
+      parsed.hostname === "maternalmind.com.pk" ||
+      parsed.hostname === "www.maternalmind.com.pk"
+    ) {
+      return "https://admin.maternalmind.com.pk";
+    }
+
+    return parsed.origin;
+  } catch {
+    // Invalid URL in env: fall back to known-good production API host.
+    return "https://admin.maternalmind.com.pk";
+  }
 }
 
 // Refresh lock to prevent concurrent refresh requests
@@ -134,50 +155,50 @@ export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
-    async ({ queryKey }) => {
-      const baseUrl = getApiUrl();
-      const path = queryKey[0] as string;
-      const url = new URL(path, baseUrl);
+  async ({ queryKey }) => {
+    const baseUrl = getApiUrl();
+    const path = queryKey[0] as string;
+    const url = new URL(path, baseUrl);
 
-      if (queryKey.length > 1) {
-        for (let i = 1; i < queryKey.length; i++) {
-          const segment = queryKey[i];
-          if (segment !== undefined && segment !== null) {
-            url.pathname = url.pathname + "/" + String(segment);
-          }
+    if (queryKey.length > 1) {
+      for (let i = 1; i < queryKey.length; i++) {
+        const segment = queryKey[i];
+        if (segment !== undefined && segment !== null) {
+          url.pathname = url.pathname + "/" + String(segment);
         }
       }
+    }
 
-      let token = await getToken();
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+    let token = await getToken();
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    let res = await fetch(url, {
+      credentials: "include",
+      headers,
+    });
+
+    // Auto-refresh on 401
+    if (res.status === 401 && token) {
+      const newToken = await attemptTokenRefresh();
+      if (newToken) {
+        headers["Authorization"] = `Bearer ${newToken}`;
+        res = await fetch(url, {
+          credentials: "include",
+          headers,
+        });
       }
+    }
 
-      let res = await fetch(url, {
-        credentials: "include",
-        headers,
-      });
+    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+      return null;
+    }
 
-      // Auto-refresh on 401
-      if (res.status === 401 && token) {
-        const newToken = await attemptTokenRefresh();
-        if (newToken) {
-          headers["Authorization"] = `Bearer ${newToken}`;
-          res = await fetch(url, {
-            credentials: "include",
-            headers,
-          });
-        }
-      }
-
-      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        return null;
-      }
-
-      await throwIfResNotOk(res);
-      return await res.json();
-    };
+    await throwIfResNotOk(res);
+    return await res.json();
+  };
 
 export const queryClient = new QueryClient({
   defaultOptions: {

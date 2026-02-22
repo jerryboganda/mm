@@ -12,6 +12,8 @@ import {
 } from "../admin-storage";
 
 const router = Router();
+const getParamValue = (param: string | string[]) =>
+  Array.isArray(param) ? param[0] : param;
 
 router.use(authMiddleware, requireRole("admin"));
 
@@ -28,7 +30,9 @@ router.post("/", async (req: AuthRequest, res) => {
   try {
     const { title, message, type, isActive, expiresAt } = req.body;
     if (!title || !message) {
-      return res.status(400).json({ message: "Title and message are required" });
+      return res
+        .status(400)
+        .json({ message: "Title and message are required" });
     }
     const ann = await adminCreateAnnouncement({
       title,
@@ -38,7 +42,13 @@ router.post("/", async (req: AuthRequest, res) => {
       expiresAt: expiresAt ? new Date(expiresAt) : undefined,
       createdBy: req.userId,
     });
-    await createAuditLog({ adminUserId: req.userId!, action: "create", entityType: "announcement", entityId: ann.id, details: { title } });
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "create",
+      entityType: "announcement",
+      entityId: ann.id,
+      details: { title },
+    });
     res.status(201).json(ann);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -47,9 +57,16 @@ router.post("/", async (req: AuthRequest, res) => {
 
 router.put("/:id", async (req: AuthRequest, res) => {
   try {
-    const ann = await adminUpdateAnnouncement(req.params.id, req.body);
-    if (!ann) return res.status(404).json({ message: "Announcement not found" });
-    await createAuditLog({ adminUserId: req.userId!, action: "update", entityType: "announcement", entityId: ann.id });
+    const announcementId = getParamValue(req.params.id);
+    const ann = await adminUpdateAnnouncement(announcementId, req.body);
+    if (!ann)
+      return res.status(404).json({ message: "Announcement not found" });
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "update",
+      entityType: "announcement",
+      entityId: ann.id,
+    });
     res.json(ann);
   } catch (err: any) {
     res.status(500).json({ message: err.message });
@@ -58,8 +75,14 @@ router.put("/:id", async (req: AuthRequest, res) => {
 
 router.delete("/:id", async (req: AuthRequest, res) => {
   try {
-    await adminDeleteAnnouncement(req.params.id);
-    await createAuditLog({ adminUserId: req.userId!, action: "delete", entityType: "announcement", entityId: req.params.id });
+    const announcementId = getParamValue(req.params.id);
+    await adminDeleteAnnouncement(announcementId);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "delete",
+      entityType: "announcement",
+      entityId: announcementId,
+    });
     res.json({ message: "Announcement deleted" });
   } catch (err: any) {
     res.status(500).json({ message: err.message });

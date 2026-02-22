@@ -141,7 +141,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const contentType = response.headers.get("content-type") || "";
+      let error: any = { message: `Login failed (${response.status})` };
+
+      if (contentType.includes("application/json")) {
+        error = await response.json();
+      } else {
+        const raw = await response.text();
+        if (raw.includes("<!DOCTYPE html") || raw.includes("<html")) {
+          error = {
+            message:
+              "Login failed due to API endpoint configuration. Please update the app and try again.",
+          };
+        } else if (raw.trim()) {
+          error = { message: raw.trim() };
+        }
+      }
+
       throw error; // Return full error object to handle 403 cases
     }
 
@@ -203,11 +219,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const resendVerificationEmail = async (email: string) => {
     const baseUrl = getApiUrl();
-    const response = await fetch(new URL("/api/auth/resend-verification", baseUrl), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    const response = await fetch(
+      new URL("/api/auth/resend-verification", baseUrl),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      },
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -223,7 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ phoneNumber }),
     });
@@ -237,14 +256,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyPhoneOtp = async (code: string) => {
     const baseUrl = getApiUrl();
     const token = await getToken(TOKEN_KEY);
-    const response = await fetch(new URL("/api/auth/verify-phone-otp", baseUrl), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+    const response = await fetch(
+      new URL("/api/auth/verify-phone-otp", baseUrl),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ code }),
       },
-      body: JSON.stringify({ code }),
-    });
+    );
 
     if (!response.ok) {
       const error = await response.json();

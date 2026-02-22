@@ -89,7 +89,9 @@ export function requireRole(...roles: string[]) {
     const user = await storage.getUser(req.userId);
 
     if (!user || !roles.includes(user.role)) {
-      return res.status(403).json({ message: "Forbidden: insufficient permissions" });
+      return res
+        .status(403)
+        .json({ message: "Forbidden: insufficient permissions" });
     }
 
     req.userRole = user.role;

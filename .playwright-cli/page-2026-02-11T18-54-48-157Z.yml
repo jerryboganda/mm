@@ -1,0 +1,267 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - img [ref=e6]
+    - generic [ref=e32]:
+      - heading "Maternal Mind" [level=1] [ref=e33]
+      - paragraph [ref=e34]: OB-GYN Excellence
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: Features
+          - heading "Everything You Need for OB-GYN Excellence" [level=1] [ref=e90]:
+            - text: Everything You Need for
+            - generic [ref=e91]: OB-GYN Excellence
+          - paragraph [ref=e92]: Built specifically for postgraduate OB-GYN doctors, every feature is designed to support structured, exam-focused, evidence-based learning.
+        - generic [ref=e94]:
+          - generic [ref=e97]:
+            - generic [ref=e98]:
+              - img [ref=e100]
+              - heading "Structured Learning Library" [level=2] [ref=e102]
+              - paragraph [ref=e103]: Navigate an expertly organized OB-GYN knowledge base structured from Books to Chapters to Topics. Every piece of content is aligned to major exam syllabi including MRCOG and FCPS.
+              - list [ref=e104]:
+                - listitem [ref=e105]:
+                  - img [ref=e106]
+                  - generic [ref=e109]: Books organized by specialty area
+                - listitem [ref=e110]:
+                  - img [ref=e111]
+                  - generic [ref=e114]: Chapters with clear learning objectives
+                - listitem [ref=e115]:
+                  - img [ref=e116]
+                  - generic [ref=e119]: Topic-level granularity for focused study
+                - listitem [ref=e120]:
+                  - img [ref=e121]
+                  - generic [ref=e124]: Bookmark any topic for quick revisit
+            - generic [ref=e127]:
+              - generic [ref=e128]:
+                - img [ref=e130]
+                - generic [ref=e132]: Books organized by specialty area
+              - generic [ref=e133]:
+                - img [ref=e135]
+                - generic [ref=e137]: Chapters with clear learning objectives
+              - generic [ref=e138]:
+                - img [ref=e140]
+                - generic [ref=e142]: Topic-level granularity for focused study
+              - generic [ref=e143]:
+                - img [ref=e145]
+                - generic [ref=e147]: Bookmark any topic for quick revisit
+          - generic [ref=e150]:
+            - generic [ref=e151]:
+              - img [ref=e153]
+              - heading "Intelligent MCQ Practice" [level=2] [ref=e163]
+              - paragraph [ref=e164]: Multiple practice modes designed for different stages of your preparation. Topic-specific drilling, mixed question sets, and a dedicated wrong-questions mode to reinforce weak areas.
+              - list [ref=e165]:
+                - listitem [ref=e166]:
+                  - img [ref=e167]
+                  - generic [ref=e170]: Topic-specific MCQ sets
+                - listitem [ref=e171]:
+                  - img [ref=e172]
+                  - generic [ref=e175]: Mixed random question mode
+                - listitem [ref=e176]:
+                  - img [ref=e177]
+                  - generic [ref=e180]: Wrong-questions review mode
+                - listitem [ref=e181]:
+                  - img [ref=e182]
+                  - generic [ref=e185]: Detailed explanations with references
+            - generic [ref=e188]:
+              - generic [ref=e189]:
+                - img [ref=e191]
+                - generic [ref=e193]: Topic-specific MCQ sets
+              - generic [ref=e194]:
+                - img [ref=e196]
+                - generic [ref=e198]: Mixed random question mode
+              - generic [ref=e199]:
+                - img [ref=e201]
+                - generic [ref=e203]: Wrong-questions review mode
+              - generic [ref=e204]:
+                - img [ref=e206]
+                - generic [ref=e208]: Detailed explanations with references
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - img [ref=e214]
+              - heading "Progress Analytics Dashboard" [level=2] [ref=e216]
+              - paragraph [ref=e217]: Understand your learning trajectory with detailed analytics. Track accuracy trends, study streaks, attempt history, and identify areas that need more attention.
+              - list [ref=e218]:
+                - listitem [ref=e219]:
+                  - img [ref=e220]
+                  - generic [ref=e223]: Accuracy trends across topics
+                - listitem [ref=e224]:
+                  - img [ref=e225]
+                  - generic [ref=e228]: Study streak tracking
+                - listitem [ref=e229]:
+                  - img [ref=e230]
+                  - generic [ref=e233]: Attempt history with detailed review
+                - listitem [ref=e234]:
+                  - img [ref=e235]
+                  - generic [ref=e238]: Weak area identification
+            - generic [ref=e241]:
+              - generic [ref=e242]:
+                - img [ref=e244]
+                - generic [ref=e246]: Accuracy trends across topics
+              - generic [ref=e247]:
+                - img [ref=e249]
+                - generic [ref=e251]: Study streak tracking
+              - generic [ref=e252]:
+                - img [ref=e254]
+                - generic [ref=e256]: Attempt history with detailed review
+              - generic [ref=e257]:
+                - img [ref=e259]
+                - generic [ref=e261]: Weak area identification
+        - generic [ref=e263]:
+          - generic [ref=e265]:
+            - generic [ref=e266]: More Features
+            - heading "Designed for the Details" [level=2] [ref=e267]
+          - generic [ref=e268]:
+            - generic [ref=e270]:
+              - img [ref=e271]
+              - heading "Smart Bookmarks" [level=3] [ref=e273]
+              - paragraph [ref=e274]: Save and organize topics for quick revision sessions.
+            - generic [ref=e276]:
+              - img [ref=e277]
+              - heading "Offline Access" [level=3] [ref=e280]
+              - paragraph [ref=e281]: Study without internet. Content available offline.
+            - generic [ref=e283]:
+              - img [ref=e284]
+              - heading "Timed Practice" [level=3] [ref=e287]
+              - paragraph [ref=e288]: Simulate exam conditions with timed MCQ sessions.
+            - generic [ref=e290]:
+              - img [ref=e291]
+              - heading "Wrong Questions Mode" [level=3] [ref=e294]
+              - paragraph [ref=e295]: Automatically revisit questions you got wrong.
+            - generic [ref=e297]:
+              - img [ref=e298]
+              - heading "Mixed Mode" [level=3] [ref=e304]
+              - paragraph [ref=e305]: Random questions across all topics for comprehensive review.
+            - generic [ref=e307]:
+              - img [ref=e308]
+              - heading "Privacy & Security" [level=3] [ref=e310]
+              - paragraph [ref=e311]: Your data is encrypted and protected at all times.
+            - generic [ref=e313]:
+              - img [ref=e314]
+              - heading "Cited References" [level=3] [ref=e317]
+              - paragraph [ref=e318]: Evidence-based explanations with source citations.
+            - generic [ref=e320]:
+              - img [ref=e321]
+              - heading "Restore Purchases" [level=3] [ref=e324]
+              - paragraph [ref=e325]: Seamlessly restore subscriptions across devices.
+        - generic [ref=e329]:
+          - heading "Start Your Journey Today" [level=2] [ref=e330]
+          - paragraph [ref=e331]: Experience premium OB-GYN learning designed for postgraduate success.
+          - generic [ref=e332]:
+            - button "Get the App" [ref=e333] [cursor=pointer]:
+              - text: Get the App
+              - img [ref=e334]
+            - link "View Pricing" [ref=e338] [cursor=pointer]:
+              - /url: /pricing
+              - button "View Pricing" [ref=e339]
+    - contentinfo [ref=e340]:
+      - generic [ref=e341]:
+        - generic [ref=e342]:
+          - generic [ref=e343]:
+            - link "Maternal Mind" [ref=e344] [cursor=pointer]:
+              - /url: /
+              - img [ref=e345]
+              - generic [ref=e370]: Maternal Mind
+            - paragraph [ref=e371]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e372]:
+              - paragraph [ref=e373]: Stay updated
+              - generic [ref=e375]:
+                - textbox "Your email" [ref=e376]
+                - button [ref=e377] [cursor=pointer]:
+                  - img [ref=e378]
+            - generic [ref=e382]:
+              - link "Email" [ref=e383] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e384]
+              - link "LinkedIn" [ref=e387] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/maternal-mind
+                - img [ref=e388]
+              - link "X" [ref=e390] [cursor=pointer]:
+                - /url: https://x.com/maternalmindapp
+                - img [ref=e391]
+          - generic [ref=e393]:
+            - heading "Product" [level=3] [ref=e394]
+            - list [ref=e395]:
+              - listitem [ref=e396]:
+                - link "Features" [ref=e397] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e398]:
+                - link "How It Works" [ref=e399] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e400]:
+                - link "Pricing" [ref=e401] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e402]:
+                - link "For Institutions" [ref=e403] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e404]:
+            - heading "Resources" [level=3] [ref=e405]
+            - list [ref=e406]:
+              - listitem [ref=e407]:
+                - link "MRCOG Part 1" [ref=e408] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e409]:
+                - link "MRCOG Part 2" [ref=e410] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e411]:
+                - link "MRCOG Part 3" [ref=e412] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e413]:
+                - link "FCPS OB-GYN" [ref=e414] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e415]:
+                - link "OB-GYN MCQs" [ref=e416] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e417]:
+            - heading "Company" [level=3] [ref=e418]
+            - list [ref=e419]:
+              - listitem [ref=e420]:
+                - link "About" [ref=e421] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e422]:
+                - link "Support" [ref=e423] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e424]:
+                - link "Media Kit" [ref=e425] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e426]:
+            - heading "Legal" [level=3] [ref=e427]
+            - list [ref=e428]:
+              - listitem [ref=e429]:
+                - link "Terms of Service" [ref=e430] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e431]:
+                - link "Privacy Policy" [ref=e432] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e433]:
+                - link "Disclaimer" [ref=e434] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e436]:
+          - paragraph [ref=e437]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e438]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.
