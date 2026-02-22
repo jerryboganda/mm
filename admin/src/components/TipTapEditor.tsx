@@ -11,7 +11,6 @@ import Link from '@tiptap/extension-link';
 import Superscript from '@tiptap/extension-superscript';
 import Subscript from '@tiptap/extension-subscript';
 import TextAlign from '@tiptap/extension-text-align';
-import ImageExtension from '@tiptap/extension-image';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import {
@@ -19,7 +18,7 @@ import {
   List, ListOrdered, Quote, Code, Heading1, Heading2, Heading3,
   Minus, Link as LinkIcon, Superscript as SuperscriptIcon,
   Subscript as SubscriptIcon, AlignLeft, AlignCenter, AlignRight,
-  Image as ImageIcon, Table as TableIcon, Palette,
+  Table as TableIcon,
   ArrowRightFromLine, ArrowDownFromLine, Trash2,
 } from 'lucide-react';
 
@@ -167,7 +166,6 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
       Superscript,
       Subscript,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      ImageExtension,
       TextStyle,
       Color,
     ],
@@ -195,11 +193,6 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
     if (url === null) return;
     if (url === '') { editor.chain().focus().extendMarkRange('link').unsetLink().run(); return; }
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-  };
-
-  const addImage = () => {
-    const url = window.prompt('Image URL');
-    if (url) editor.chain().focus().setImage({ src: url }).run();
   };
 
   return (
@@ -269,12 +262,9 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
         </ToolbarButton>
         <div className="w-px h-5 bg-gray-300 mx-1" />
 
-        {/* Link & Image */}
+        {/* Link */}
         <ToolbarButton onClick={addLink} active={editor.isActive('link')} title="Insert Link">
           <LinkIcon className="w-4 h-4" />
-        </ToolbarButton>
-        <ToolbarButton onClick={addImage} title="Insert Image">
-          <ImageIcon className="w-4 h-4" />
         </ToolbarButton>
         <div className="w-px h-5 bg-gray-300 mx-1" />
 
