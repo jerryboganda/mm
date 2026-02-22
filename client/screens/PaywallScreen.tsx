@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { usePurchases } from "@/lib/purchases";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type PaywallScreenNavigationProp =
@@ -61,6 +62,7 @@ export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<PaywallScreenNavigationProp>();
   const { isSubscribed } = usePurchases();
+  const { theme } = useTheme();
 
   const handleContinue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -79,14 +81,10 @@ export default function PaywallScreen() {
           style={[styles.subscribedContainer, { paddingTop: insets.top + 60 }]}
         >
           <View style={styles.successIcon}>
-            <Feather
-              name="check-circle"
-              size={64}
-              color={Colors.dark.success}
-            />
+            <Feather name="check-circle" size={64} color={theme.success} />
           </View>
           <ThemedText type="h2" style={styles.successTitle}>
-            You're Premium!
+            You&apos;re Premium!
           </ThemedText>
           <ThemedText style={styles.successSubtitle}>
             Enjoy unlimited access to all Maternal Mind features.
@@ -125,22 +123,35 @@ export default function PaywallScreen() {
               <Feather name="award" size={40} color="#fff" />
             </LinearGradient>
           </View>
-          <ThemedText type="h1" style={styles.title}>
+          <ThemedText
+            type="h1"
+            style={[
+              styles.title,
+              { textShadowColor: `${theme.primary}66` }, // 40% opacity
+            ]}
+          >
             Go Premium
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText
+            style={[styles.subtitle, { color: theme.textSecondary }]}
+          >
             Unlock the full power of Maternal Mind and accelerate your medical
             education
           </ThemedText>
         </View>
 
         <View style={styles.benefitsSection}>
-          <ThemedText style={styles.sectionLabel}>PREMIUM BENEFITS</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            PREMIUM BENEFITS
+          </ThemedText>
           {premiumBenefits.map((benefit, index) => (
             <GlassCard key={index} style={styles.benefitCard}>
               <View style={styles.benefitIcon}>
                 <LinearGradient
-                  colors={[Colors.dark.primary, Colors.dark.primaryDark]}
+                  colors={[
+                    theme.primary,
+                    theme.primaryDark || theme.primary
+                  ]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -151,7 +162,12 @@ export default function PaywallScreen() {
                 <ThemedText type="h4" style={styles.benefitTitle}>
                   {benefit.title}
                 </ThemedText>
-                <ThemedText style={styles.benefitDescription}>
+                <ThemedText
+                  style={[
+                    styles.benefitDescription,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {benefit.description}
                 </ThemedText>
               </View>
@@ -169,10 +185,15 @@ export default function PaywallScreen() {
           />
 
           <View style={styles.restoreRow}>
-            <ThemedText style={styles.restoreLabel}>
+            <ThemedText
+              style={[styles.restoreLabel, { color: theme.textSecondary }]}
+            >
               Already a subscriber?
             </ThemedText>
-            <ThemedText style={styles.restoreLink} onPress={handleRestore}>
+            <ThemedText
+              style={[styles.restoreLink, { color: theme.primary }]}
+              onPress={handleRestore}
+            >
               Restore Purchases
             </ThemedText>
           </View>
@@ -206,10 +227,11 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     marginBottom: Spacing.sm,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 16,
   },
   subtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     paddingHorizontal: Spacing.lg,
     lineHeight: 22,
   },
@@ -219,8 +241,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   benefitCard: {
@@ -247,7 +269,6 @@ const styles = StyleSheet.create({
   },
   benefitDescription: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     lineHeight: 18,
   },
   ctaSection: {
@@ -263,12 +284,10 @@ const styles = StyleSheet.create({
   },
   restoreLabel: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     marginRight: Spacing.xs,
   },
   restoreLink: {
     fontSize: 13,
-    color: Colors.dark.primary,
     fontWeight: "600",
   },
   subscribedContainer: {
@@ -286,7 +305,6 @@ const styles = StyleSheet.create({
   },
   successSubtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
   },
   continueButton: {

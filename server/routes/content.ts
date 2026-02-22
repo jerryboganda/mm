@@ -17,9 +17,15 @@ router.get("/books", authMiddleware, async (req: AuthRequest, res) => {
     );
 
     // Group chapter data by book
-    const chaptersByBook = new Map<string, { count: number; topicCount: number }>();
+    const chaptersByBook = new Map<
+      string,
+      { count: number; topicCount: number }
+    >();
     for (const ch of allChapters) {
-      const existing = chaptersByBook.get(ch.bookId) || { count: 0, topicCount: 0 };
+      const existing = chaptersByBook.get(ch.bookId) || {
+        count: 0,
+        topicCount: 0,
+      };
       existing.count++;
       existing.topicCount += ch.topicCount;
       chaptersByBook.set(ch.bookId, existing);
@@ -28,12 +34,17 @@ router.get("/books", authMiddleware, async (req: AuthRequest, res) => {
     // For completed count, fetch all topics per book in parallel (2 queries total, not N^2)
     const booksWithProgress = await Promise.all(
       booksData.map(async (book) => {
-        const stats = chaptersByBook.get(book.id) || { count: 0, topicCount: 0 };
+        const stats = chaptersByBook.get(book.id) || {
+          count: 0,
+          topicCount: 0,
+        };
         let completedTopics = 0;
 
         if (stats.topicCount > 0) {
           const bookTopics = await storage.getTopicsByBook(book.id);
-          completedTopics = bookTopics.filter((t) => completedTopicIds.has(t.id)).length;
+          completedTopics = bookTopics.filter((t) =>
+            completedTopicIds.has(t.id),
+          ).length;
         }
 
         return {

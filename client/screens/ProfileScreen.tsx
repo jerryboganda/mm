@@ -20,7 +20,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type ProfileScreenNavigationProp =
@@ -32,6 +33,7 @@ export default function ProfileScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { user, logout } = useAuth();
+  const { theme } = useTheme();
 
   const handleLogout = () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
@@ -50,11 +52,11 @@ export default function ProfileScreen() {
   const getSubscriptionBadge = () => {
     switch (user?.subscriptionStatus) {
       case "active":
-        return { label: "Premium", color: Colors.dark.success };
+        return { label: "Premium", color: theme.success };
       case "expired":
-        return { label: "Expired", color: Colors.dark.error };
+        return { label: "Expired", color: theme.error };
       default:
-        return { label: "Free", color: Colors.dark.textSecondary };
+        return { label: "Free", color: theme.textSecondary };
     }
   };
 
@@ -106,15 +108,18 @@ export default function ProfileScreen() {
   ];
 
   // Admin-only items
-  const adminItems = user?.role === "admin" ? [
-    {
-      id: "admin-email",
-      title: "Email Settings",
-      subtitle: "Configure Brevo SMTP & test emails",
-      icon: "mail" as const,
-      onPress: () => navigation.navigate("AdminEmailSettings" as any),
-    },
-  ] : [];
+  const adminItems =
+    user?.role === "admin"
+      ? [
+        {
+          id: "admin-email",
+          title: "Email Settings",
+          subtitle: "Configure Brevo SMTP & test emails",
+          icon: "mail" as const,
+          onPress: () => navigation.navigate("AdminEmailSettings" as any),
+        },
+      ]
+      : [];
 
   return (
     <BackgroundGradient>
@@ -140,23 +145,37 @@ export default function ProfileScreen() {
           >
             <Image
               source={require("../../assets/images/default-avatar.png")}
-              style={styles.avatar}
+              style={[styles.avatar, { borderColor: theme.primary }]}
               resizeMode="cover"
             />
-            <View style={styles.editBadge}>
+            <View
+              style={[
+                styles.editBadge,
+                {
+                  backgroundColor: theme.primary,
+                  borderColor: theme.backgroundRoot,
+                },
+              ]}
+            >
               <Feather name="edit-2" size={12} color="#fff" />
             </View>
             <View
               style={[
                 styles.statusDot,
-                { backgroundColor: subscriptionBadge.color },
+                {
+                  backgroundColor: subscriptionBadge.color,
+                  borderColor: theme.backgroundRoot,
+                },
               ]}
             />
           </Pressable>
           <ThemedText type="h3" style={styles.userName} numberOfLines={1}>
             {user?.name || "Student"}
           </ThemedText>
-          <ThemedText style={styles.userEmail} numberOfLines={1}>
+          <ThemedText
+            style={[styles.userEmail, { color: theme.textSecondary }]}
+            numberOfLines={1}
+          >
             {user?.email || "student@example.com"}
           </ThemedText>
           <View
@@ -178,32 +197,44 @@ export default function ProfileScreen() {
 
         {user?.subscriptionStatus !== "active" ? (
           <GlassCard
-            style={styles.upgradeCard}
+            style={[styles.upgradeCard, { borderColor: theme.warning }]}
             onPress={() => navigation.navigate("Subscription")}
           >
             <View style={styles.upgradeContent}>
-              <View style={styles.upgradeIcon}>
-                <Feather name="zap" size={24} color={Colors.dark.warning} />
+              <View
+                style={[
+                  styles.upgradeIcon,
+                  { backgroundColor: `${theme.warning}33` },
+                ]}
+              >
+                <Feather name="zap" size={24} color={theme.warning} />
               </View>
               <View style={styles.upgradeText}>
                 <ThemedText type="h4" style={styles.upgradeTitle}>
                   Upgrade to Premium
                 </ThemedText>
-                <ThemedText style={styles.upgradeSubtitle}>
+                <ThemedText
+                  style={[
+                    styles.upgradeSubtitle,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   Unlock all content and features
                 </ThemedText>
               </View>
               <Feather
                 name="chevron-right"
                 size={24}
-                color={Colors.dark.textSecondary}
+                color={theme.textSecondary}
               />
             </View>
           </GlassCard>
         ) : null}
 
         <View style={styles.settingsSection}>
-          <ThemedText style={styles.sectionLabel}>SETTINGS</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            SETTINGS
+          </ThemedText>
           {settingsItems.map((item) => (
             <GlassCard
               key={item.id}
@@ -211,17 +242,13 @@ export default function ProfileScreen() {
               subtitle={item.subtitle}
               onPress={item.onPress}
               icon={
-                <Feather
-                  name={item.icon}
-                  size={20}
-                  color={Colors.dark.primary}
-                />
+                <Feather name={item.icon} size={20} color={theme.primary} />
               }
               rightElement={
                 <Feather
                   name="chevron-right"
                   size={20}
-                  color={Colors.dark.textSecondary}
+                  color={theme.textSecondary}
                 />
               }
               style={{ marginBottom: Spacing.md }}
@@ -232,7 +259,9 @@ export default function ProfileScreen() {
 
         {adminItems.length > 0 ? (
           <View style={styles.settingsSection}>
-            <ThemedText style={styles.sectionLabel}>ADMIN PANEL</ThemedText>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+              ADMIN PANEL
+            </ThemedText>
             {adminItems.map((item) => (
               <GlassCard
                 key={item.id}
@@ -240,17 +269,13 @@ export default function ProfileScreen() {
                 subtitle={item.subtitle}
                 onPress={item.onPress}
                 icon={
-                  <Feather
-                    name={item.icon}
-                    size={20}
-                    color={Colors.dark.warning}
-                  />
+                  <Feather name={item.icon} size={20} color={theme.warning} />
                 }
                 rightElement={
                   <Feather
                     name="chevron-right"
                     size={20}
-                    color={Colors.dark.textSecondary}
+                    color={theme.textSecondary}
                   />
                 }
                 style={{ marginBottom: Spacing.md }}
@@ -292,7 +317,6 @@ const styles = StyleSheet.create({
     height: 96,
     borderRadius: 48,
     borderWidth: 3,
-    borderColor: Colors.dark.primary,
   },
   statusDot: {
     position: "absolute",
@@ -302,7 +326,6 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 3,
-    borderColor: Colors.dark.backgroundRoot,
   },
   editBadge: {
     position: "absolute",
@@ -311,17 +334,14 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Colors.dark.primary,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: Colors.dark.backgroundRoot,
   },
   userName: {
     marginBottom: Spacing.xs,
   },
   userEmail: {
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.md,
   },
   subscriptionBadge: {
@@ -336,7 +356,6 @@ const styles = StyleSheet.create({
   },
   upgradeCard: {
     marginBottom: Spacing["2xl"],
-    borderColor: Colors.dark.warning,
     borderWidth: 1,
   },
   upgradeContent: {
@@ -347,7 +366,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: BorderRadius.md,
-    backgroundColor: "rgba(234,179,8,0.2)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.lg,
@@ -360,7 +378,6 @@ const styles = StyleSheet.create({
   },
   upgradeSubtitle: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   settingsSection: {
     marginBottom: Spacing["2xl"],
@@ -368,8 +385,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   logoutButton: {

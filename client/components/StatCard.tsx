@@ -36,10 +36,18 @@ export function StatCard({
       <View style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
         <Feather name={icon} size={20} color={color} />
       </View>
-      <ThemedText type="h2" style={[styles.value, { color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+      <ThemedText
+        type="h2"
+        style={[styles.value, { color }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
         {value}
       </ThemedText>
-      <ThemedText style={styles.label} numberOfLines={2}>{label}</ThemedText>
+      <ThemedText style={styles.label} numberOfLines={2}>
+        {label}
+      </ThemedText>
     </View>
   );
 }

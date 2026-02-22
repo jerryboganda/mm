@@ -16,7 +16,9 @@ export function HeaderTitle({ title }: HeaderTitleProps) {
         style={styles.icon}
         resizeMode="contain"
       />
-      <ThemedText style={styles.title} numberOfLines={1}>{title}</ThemedText>
+      <ThemedText style={styles.title} numberOfLines={1}>
+        {title}
+      </ThemedText>
     </View>
   );
 }

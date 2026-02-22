@@ -2,6 +2,7 @@ import React from "react";
 import {
   StyleSheet,
   Pressable,
+  StyleProp,
   ViewStyle,
   ActivityIndicator,
   Platform,
@@ -26,7 +27,7 @@ interface PrimaryButtonProps {
   loading?: boolean;
   icon?: keyof typeof Feather.glyphMap;
   iconPosition?: "left" | "right";
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   variant?: "primary" | "secondary" | "ghost" | "success" | "danger";
   size?: "default" | "large" | "small";
   testID?: string;

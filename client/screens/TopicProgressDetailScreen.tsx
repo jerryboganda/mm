@@ -318,8 +318,9 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#11a4d4",
     marginBottom: Spacing.lg,
   },
   chartCard: {

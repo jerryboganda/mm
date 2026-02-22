@@ -1,36 +1,51 @@
 import { useColorScheme } from "react-native";
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Colors } from "@/constants/theme";
 
 // Simple in-memory store for theme override (null = follow system)
-type ThemeMode = "light" | "dark" | "system";
-let themeOverride: ThemeMode = "system";
-const listeners = new Set<() => void>();
+export type ThemeMode = "light" | "dark" | "system";
 
-function subscribe(cb: () => void) {
-  listeners.add(cb);
-  return () => listeners.delete(cb);
-}
+const THEME_STORAGE_KEY = "@theme_mode";
 
-function getSnapshot() {
-  return themeOverride;
+// Global state to sync across hooks
+let currentMode: ThemeMode = "system";
+const listeners = new Set<(mode: ThemeMode) => void>();
+
+export function getThemeMode(): ThemeMode {
+  return currentMode;
 }
 
 export function setThemeMode(mode: ThemeMode) {
-  themeOverride = mode;
-  listeners.forEach((cb) => cb());
+  currentMode = mode;
+  AsyncStorage.setItem(THEME_STORAGE_KEY, mode).catch((err) =>
+    console.warn("Failed to save theme preference:", err),
+  );
+  listeners.forEach((cb) => cb(mode));
 }
 
-export function getThemeMode(): ThemeMode {
-  return themeOverride;
-}
+// Initialize from storage (fire and forget)
+AsyncStorage.getItem(THEME_STORAGE_KEY).then((saved) => {
+  if (saved && (saved === "light" || saved === "dark" || saved === "system")) {
+    setThemeMode(saved as ThemeMode);
+  }
+});
 
 export function useTheme() {
   const systemScheme = useColorScheme();
-  const override = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const [mode, setMode] = useState<ThemeMode>(currentMode);
+
+  useEffect(() => {
+    const listener = (newMode: ThemeMode) => setMode(newMode);
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
 
   const resolvedScheme =
-    override === "system" ? (systemScheme ?? "dark") : override;
+    mode === "system" ? systemScheme ?? "dark" : mode;
+
   const isDark = resolvedScheme === "dark";
   const theme = isDark ? Colors.dark : Colors.light;
 
@@ -41,7 +56,7 @@ export function useTheme() {
   return {
     theme,
     isDark,
-    themeMode: override,
+    themeMode: mode,
     setThemeMode,
     toggleTheme,
   };

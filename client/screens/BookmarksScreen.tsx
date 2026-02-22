@@ -106,8 +106,8 @@ export default function BookmarksScreen() {
             paddingBottom: insets.bottom + Spacing.xl,
           },
           (!bookmarks || bookmarks.length === 0) &&
-            !isLoading &&
-            styles.emptyList,
+          !isLoading &&
+          styles.emptyList,
         ]}
         scrollIndicatorInsets={{ bottom: insets.bottom }}
         refreshControl={
@@ -141,8 +141,9 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#11a4d4",
   },
   dateText: {
     fontSize: 11,

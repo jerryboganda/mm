@@ -11,7 +11,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type PurchaseSuccessScreenNavigationProp =
@@ -29,6 +30,7 @@ export default function PurchaseSuccessScreen() {
   const navigation = useNavigation<PurchaseSuccessScreenNavigationProp>();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const { theme } = useTheme();
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -72,7 +74,7 @@ export default function PurchaseSuccessScreen() {
           style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}
         >
           <LinearGradient
-            colors={[Colors.dark.success, "#16a34a"]}
+            colors={[theme.success, theme.successGlow || "#16a34a"]}
             style={styles.iconGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -85,34 +87,46 @@ export default function PurchaseSuccessScreen() {
           <ThemedText type="h1" style={styles.title}>
             Welcome to Premium!
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText
+            style={[styles.subtitle, { color: theme.textSecondary }]}
+          >
             Your subscription is now active. Enjoy unlimited access to all
             Maternal Mind features.
           </ThemedText>
         </Animated.View>
 
         <Animated.View style={[styles.featuresSection, { opacity: fadeAnim }]}>
-          <ThemedText style={styles.sectionLabel}>NOW UNLOCKED</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            NOW UNLOCKED
+          </ThemedText>
           <GlassCard style={styles.featuresCard}>
             {unlockFeatures.map((feature, index) => (
               <View
                 key={index}
                 style={[
                   styles.featureRow,
-                  index < unlockFeatures.length - 1 && styles.featureRowBorder,
+                  index < unlockFeatures.length - 1 && {
+                    borderBottomWidth: 1,
+                    borderBottomColor: theme.glassBorder,
+                  },
                 ]}
               >
-                <View style={styles.featureIcon}>
+                <View
+                  style={[
+                    styles.featureIcon,
+                    { backgroundColor: `${theme.success}15` },
+                  ]}
+                >
                   <Feather
                     name={feature.icon}
                     size={18}
-                    color={Colors.dark.success}
+                    color={theme.success}
                   />
                 </View>
                 <ThemedText style={styles.featureText}>
                   {feature.text}
                 </ThemedText>
-                <Feather name="check" size={18} color={Colors.dark.success} />
+                <Feather name="check" size={18} color={theme.success} />
               </View>
             ))}
           </GlassCard>
@@ -154,7 +168,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
     lineHeight: 22,
     paddingHorizontal: Spacing.md,
@@ -165,8 +178,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   featuresCard: {
@@ -178,15 +191,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: Spacing.lg,
   },
-  featureRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.glass,
-  },
   featureIcon: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: `${Colors.dark.success}15`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,

@@ -1,0 +1,17 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - img "Maternal Mind" [ref=e6]
+    - heading "Maternal Mind" [level=1] [ref=e7]
+    - paragraph [ref=e8]: Admin Panel Login
+  - generic [ref=e10]:
+    - generic [ref=e22]:
+      - img [ref=e23]
+      - text: Invalid email or password
+    - generic [ref=e11]:
+      - generic [ref=e12]: Email
+      - textbox "admin@example.com" [ref=e13]: second-invalid@example.com
+    - generic [ref=e14]:
+      - generic [ref=e15]: Password
+      - textbox "••••••••" [ref=e16]: wrongagain
+    - button "Sign In" [ref=e17] [cursor=pointer]
+  - paragraph [ref=e18]: Only administrators can access this panel.

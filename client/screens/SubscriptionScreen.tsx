@@ -19,7 +19,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { usePurchases } from "@/lib/purchases";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type SubscriptionScreenNavigationProp =
@@ -114,6 +115,7 @@ export default function SubscriptionScreen() {
   const navigation = useNavigation<SubscriptionScreenNavigationProp>();
   const { packages, loading, isSubscribed, purchase, restorePurchases } =
     usePurchases();
+  const { theme } = useTheme();
 
   const [selectedPackage, setSelectedPackage] =
     useState<PurchasesPackage | null>(null);
@@ -168,14 +170,10 @@ export default function SubscriptionScreen() {
           ]}
         >
           <View style={styles.successIcon}>
-            <Feather
-              name="check-circle"
-              size={64}
-              color={Colors.dark.success}
-            />
+            <Feather name="check-circle" size={64} color={theme.success} />
           </View>
           <ThemedText type="h2" style={styles.successTitle}>
-            You're Subscribed!
+            You&apos;re Subscribed!
           </ThemedText>
           <ThemedText style={styles.successSubtitle}>
             Enjoy full access to all Maternal Mind content and features.
@@ -194,8 +192,10 @@ export default function SubscriptionScreen() {
     return (
       <BackgroundGradient>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.dark.primary} />
-          <ThemedText style={styles.loadingText}>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <ThemedText
+            style={[styles.loadingText, { color: theme.textSecondary }]}
+          >
             Loading subscription options...
           </ThemedText>
         </View>
@@ -224,7 +224,9 @@ export default function SubscriptionScreen() {
           <ThemedText type="h2" style={styles.title}>
             Choose Your Plan
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText
+            style={[styles.subtitle, { color: theme.textSecondary }]}
+          >
             Unlock full access to all OB-GYN learning materials
           </ThemedText>
         </View>
@@ -232,79 +234,41 @@ export default function SubscriptionScreen() {
         <View style={styles.plansContainer}>
           {hasRevenueCatPackages
             ? packages.map((pkg) => {
-                const isSelected =
-                  selectedPackage?.identifier === pkg.identifier;
-                const isPopular =
-                  pkg.identifier.includes("quarterly") ||
-                  pkg.packageType === "THREE_MONTH";
+              const isSelected =
+                selectedPackage?.identifier === pkg.identifier;
+              const isPopular =
+                pkg.identifier.includes("quarterly") ||
+                pkg.packageType === "THREE_MONTH";
 
-                return (
-                  <Pressable
-                    key={pkg.identifier}
-                    onPress={() => {
-                      setSelectedPackage(pkg);
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    }}
-                    style={[
-                      styles.planCard,
-                      isSelected && styles.planCardSelected,
-                      isPopular && styles.planCardPopular,
-                    ]}
-                  >
-                    {isPopular ? (
-                      <View style={styles.popularBadge}>
-                        <ThemedText style={styles.popularText}>
-                          BEST VALUE
-                        </ThemedText>
-                      </View>
-                    ) : null}
-
-                    <View style={styles.planHeader}>
-                      <View
-                        style={[
-                          styles.radioOuter,
-                          isSelected && styles.radioOuterSelected,
-                        ]}
-                      >
-                        {isSelected ? <View style={styles.radioInner} /> : null}
-                      </View>
-                      <View style={styles.planInfo}>
-                        <ThemedText type="h4" style={styles.planName}>
-                          {pkg.product.title}
-                        </ThemedText>
-                        {pkg.product.description ? (
-                          <ThemedText
-                            style={styles.planDescription}
-                            numberOfLines={1}
-                          >
-                            {pkg.product.description}
-                          </ThemedText>
-                        ) : null}
-                      </View>
-                      <View style={styles.priceContainer}>
-                        <ThemedText type="h3" style={styles.price}>
-                          {pkg.product.priceString}
-                        </ThemedText>
-                      </View>
-                    </View>
-                  </Pressable>
-                );
-              })
-            : fallbackPlans.map((plan) => (
+              return (
                 <Pressable
-                  key={plan.id}
+                  key={pkg.identifier}
                   onPress={() => {
-                    setSelectedFallback(plan.id);
+                    setSelectedPackage(pkg);
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   }}
                   style={[
                     styles.planCard,
-                    selectedFallback === plan.id && styles.planCardSelected,
-                    plan.popular && styles.planCardPopular,
+                    {
+                      backgroundColor: theme.glass,
+                      borderColor: theme.glassBorder,
+                    },
+                    isSelected && {
+                      borderColor: theme.primary,
+                      backgroundColor: `${theme.primary}15`,
+                    },
+                    isPopular && {
+                      borderColor: theme.primary,
+                    },
                   ]}
                 >
-                  {plan.popular ? (
-                    <View style={styles.popularBadge}>
+                  {isPopular ? (
+                    <View
+                      style={[
+                        styles.popularBadge,
+                        { backgroundColor: theme.primary },
+                      ]}
+                    >
                       <ThemedText style={styles.popularText}>
                         BEST VALUE
                       </ThemedText>
@@ -315,43 +279,155 @@ export default function SubscriptionScreen() {
                     <View
                       style={[
                         styles.radioOuter,
-                        selectedFallback === plan.id &&
-                          styles.radioOuterSelected,
+                        { borderColor: theme.glassBorder },
+                        isSelected && { borderColor: theme.primary },
                       ]}
                     >
-                      {selectedFallback === plan.id ? (
-                        <View style={styles.radioInner} />
+                      {isSelected ? (
+                        <View
+                          style={[
+                            styles.radioInner,
+                            { backgroundColor: theme.primary },
+                          ]}
+                        />
                       ) : null}
                     </View>
                     <View style={styles.planInfo}>
                       <ThemedText type="h4" style={styles.planName}>
-                        {plan.name}
+                        {pkg.product.title}
                       </ThemedText>
-                      {plan.savings ? (
-                        <View style={styles.savingsBadge}>
-                          <ThemedText style={styles.savingsText}>
-                            {plan.savings}
-                          </ThemedText>
-                        </View>
+                      {pkg.product.description ? (
+                        <ThemedText
+                          style={[
+                            styles.planDescription,
+                            { color: theme.textSecondary },
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {pkg.product.description}
+                        </ThemedText>
                       ) : null}
                     </View>
                     <View style={styles.priceContainer}>
-                      <ThemedText type="h3" style={styles.price}>
-                        {plan.price}
-                      </ThemedText>
-                      <ThemedText style={styles.period}>
-                        {plan.period}
+                      <ThemedText
+                        type="h3"
+                        style={[styles.price, { color: theme.primary }]}
+                      >
+                        {pkg.product.priceString}
                       </ThemedText>
                     </View>
                   </View>
                 </Pressable>
-              ))}
+              );
+            })
+            : fallbackPlans.map((plan) => (
+              <Pressable
+                key={plan.id}
+                onPress={() => {
+                  setSelectedFallback(plan.id);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                style={[
+                  styles.planCard,
+                  {
+                    backgroundColor: theme.glass,
+                    borderColor: theme.glassBorder,
+                  },
+                  selectedFallback === plan.id && {
+                    borderColor: theme.primary,
+                    backgroundColor: `${theme.primary}15`,
+                  },
+                  plan.popular && {
+                    borderColor: theme.primary,
+                  },
+                ]}
+              >
+                {plan.popular ? (
+                  <View
+                    style={[
+                      styles.popularBadge,
+                      { backgroundColor: theme.primary },
+                    ]}
+                  >
+                    <ThemedText style={styles.popularText}>
+                      BEST VALUE
+                    </ThemedText>
+                  </View>
+                ) : null}
+
+                <View style={styles.planHeader}>
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      { borderColor: theme.glassBorder },
+                      selectedFallback === plan.id && {
+                        borderColor: theme.primary,
+                      },
+                    ]}
+                  >
+                    {selectedFallback === plan.id ? (
+                      <View
+                        style={[
+                          styles.radioInner,
+                          { backgroundColor: theme.primary },
+                        ]}
+                      />
+                    ) : null}
+                  </View>
+                  <View style={styles.planInfo}>
+                    <ThemedText type="h4" style={styles.planName}>
+                      {plan.name}
+                    </ThemedText>
+                    {plan.savings ? (
+                      <View
+                        style={[
+                          styles.savingsBadge,
+                          { backgroundColor: `${theme.success}33` },
+                        ]}
+                      >
+                        <ThemedText
+                          style={[
+                            styles.savingsText,
+                            { color: theme.success },
+                          ]}
+                        >
+                          {plan.savings}
+                        </ThemedText>
+                      </View>
+                    ) : null}
+                  </View>
+                  <View style={styles.priceContainer}>
+                    <ThemedText
+                      type="h3"
+                      style={[styles.price, { color: theme.primary }]}
+                    >
+                      {plan.price}
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.period,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
+                      {plan.period}
+                    </ThemedText>
+                  </View>
+                </View>
+              </Pressable>
+            ))}
         </View>
 
         {!hasRevenueCatPackages && Platform.OS !== "web" ? (
-          <View style={styles.previewNotice}>
-            <Feather name="info" size={16} color={Colors.dark.primary} />
-            <ThemedText style={styles.previewText}>
+          <View
+            style={[
+              styles.previewNotice,
+              { backgroundColor: `${theme.primary}1A` },
+            ]}
+          >
+            <Feather name="info" size={16} color={theme.primary} />
+            <ThemedText
+              style={[styles.previewText, { color: theme.primary }]}
+            >
               Running in preview mode. Configure RevenueCat to enable real
               purchases.
             </ThemedText>
@@ -359,11 +435,18 @@ export default function SubscriptionScreen() {
         ) : null}
 
         <View style={styles.featuresSection}>
-          <ThemedText style={styles.sectionLabel}>INCLUDED FEATURES</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            INCLUDED FEATURES
+          </ThemedText>
           {selectedPlanFeatures.map((feature, index) => (
             <View key={index} style={styles.featureRow}>
-              <View style={styles.featureIcon}>
-                <Feather name="check" size={16} color={Colors.dark.success} />
+              <View
+                style={[
+                  styles.featureIcon,
+                  { backgroundColor: `${theme.success}26` },
+                ]}
+              >
+                <Feather name="check" size={16} color={theme.success} />
               </View>
               <ThemedText style={styles.featureText}>{feature}</ThemedText>
             </View>
@@ -389,15 +472,17 @@ export default function SubscriptionScreen() {
           disabled={restoring}
         >
           {restoring ? (
-            <ActivityIndicator size="small" color={Colors.dark.primary} />
+            <ActivityIndicator size="small" color={theme.primary} />
           ) : (
-            <ThemedText style={styles.restoreText}>
+            <ThemedText
+              style={[styles.restoreText, { color: theme.primary }]}
+            >
               Restore Purchases
             </ThemedText>
           )}
         </Pressable>
 
-        <ThemedText style={styles.legalText}>
+        <ThemedText style={[styles.legalText, { color: theme.textMuted }]}>
           Subscription will auto-renew unless cancelled at least 24 hours before
           the end of the current period. By subscribing, you agree to our Terms
           of Service and Privacy Policy.
@@ -424,33 +509,22 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
   },
   plansContainer: {
     marginBottom: Spacing.xl,
   },
   planCard: {
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
     position: "relative",
     overflow: "hidden",
   },
-  planCardSelected: {
-    borderColor: Colors.dark.primary,
-    backgroundColor: "rgba(17,164,212,0.08)",
-  },
-  planCardPopular: {
-    borderColor: Colors.dark.primary,
-  },
   popularBadge: {
     position: "absolute",
     top: 0,
     right: 0,
-    backgroundColor: Colors.dark.primary,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     borderBottomLeftRadius: BorderRadius.md,
@@ -470,19 +544,14 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: Colors.dark.glassBorder,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
-  },
-  radioOuterSelected: {
-    borderColor: Colors.dark.primary,
   },
   radioInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: Colors.dark.primary,
   },
   planInfo: {
     flex: 1,
@@ -492,12 +561,10 @@ const styles = StyleSheet.create({
   },
   planDescription: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
     marginTop: 2,
   },
   savingsBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(34,197,94,0.2)",
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
     borderRadius: BorderRadius.xs,
@@ -506,22 +573,17 @@ const styles = StyleSheet.create({
   savingsText: {
     fontSize: 11,
     fontWeight: "600",
-    color: Colors.dark.success,
   },
   priceContainer: {
     alignItems: "flex-end",
   },
-  price: {
-    color: Colors.dark.primary,
-  },
+  price: {},
   period: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
   },
   previewNotice: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(17,164,212,0.1)",
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginBottom: Spacing.xl,
@@ -529,7 +591,6 @@ const styles = StyleSheet.create({
   previewText: {
     flex: 1,
     fontSize: 13,
-    color: Colors.dark.primary,
     marginLeft: Spacing.sm,
   },
   featuresSection: {
@@ -538,8 +599,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   featureRow: {
@@ -551,7 +612,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: BorderRadius.full,
-    backgroundColor: "rgba(34,197,94,0.15)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -570,12 +630,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   restoreText: {
-    color: Colors.dark.primary,
     fontSize: 14,
   },
   legalText: {
     fontSize: 11,
-    color: Colors.dark.textMuted,
     textAlign: "center",
     lineHeight: 16,
   },
@@ -586,7 +644,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: Spacing.lg,
-    color: Colors.dark.textSecondary,
   },
   subscribedContainer: {
     flex: 1,
@@ -603,7 +660,6 @@ const styles = StyleSheet.create({
   },
   successSubtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
   },
   continueButton: {

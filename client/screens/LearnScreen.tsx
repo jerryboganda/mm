@@ -14,7 +14,8 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { EmptyState } from "@/components/EmptyState";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 
 type LearnScreenNavigationProp = NativeStackNavigationProp<
@@ -38,6 +39,7 @@ export default function LearnScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<LearnScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
+  const { theme } = useTheme();
 
   const {
     data: books,
@@ -64,23 +66,25 @@ export default function LearnScreen() {
           bookTitle: item.title,
         })
       }
-      icon={<Feather name="book-open" size={24} color={Colors.dark.primary} />}
+      icon={<Feather name="book-open" size={24} color={theme.primary} />}
       rightElement={
         <View
           style={[
             styles.badge,
-            item.isPremium ? styles.premiumBadge : styles.freeBadge,
+            item.isPremium
+              ? { backgroundColor: "rgba(251,191,36,0.15)" }
+              : { backgroundColor: `${theme.success}26` },
           ]}
         >
           <Feather
             name={item.isPremium ? "star" : "unlock"}
             size={10}
-            color={item.isPremium ? "#fbbf24" : Colors.dark.success}
+            color={item.isPremium ? "#fbbf24" : theme.success}
           />
           <ThemedText
             style={[
               styles.badgeText,
-              item.isPremium ? styles.premiumText : styles.freeText,
+              { color: item.isPremium ? "#fbbf24" : theme.success },
             ]}
           >
             {item.isPremium ? "Premium" : "Free"}
@@ -92,7 +96,7 @@ export default function LearnScreen() {
     >
       <View style={styles.progressContainer}>
         <ProgressBar progress={item.progress} height={6} />
-        <ThemedText style={styles.progressText}>
+        <ThemedText style={[styles.progressText, { color: theme.textSecondary }]}>
           {item.progress}% Complete
         </ThemedText>
       </View>
@@ -119,8 +123,8 @@ export default function LearnScreen() {
     return (
       <BackgroundGradient>
         <View style={[styles.centered, { paddingTop: headerHeight }]}>
-          <Feather name="alert-circle" size={48} color={Colors.dark.error} />
-          <ThemedText style={styles.errorText}>
+          <Feather name="alert-circle" size={48} color={theme.error} />
+          <ThemedText style={[styles.errorText, { color: theme.textSecondary }]}>
             Failed to load content
           </ThemedText>
         </View>
@@ -147,12 +151,14 @@ export default function LearnScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <ThemedText style={styles.sectionLabel}>CONTENT LIBRARY</ThemedText>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+              CONTENT LIBRARY
+            </ThemedText>
           </View>
         }
         ListEmptyComponent={isLoading ? renderLoading() : renderEmpty()}
@@ -174,15 +180,14 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
   },
   progressContainer: {
     marginTop: Spacing.md,
   },
   progressText: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
     marginTop: Spacing.xs,
   },
   loadingContainer: {
@@ -194,7 +199,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   errorText: {
-    color: Colors.dark.textSecondary,
     marginTop: Spacing.md,
   },
   badge: {
@@ -204,21 +208,9 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     borderRadius: 12,
   },
-  premiumBadge: {
-    backgroundColor: "rgba(251,191,36,0.15)",
-  },
-  freeBadge: {
-    backgroundColor: "rgba(34,197,94,0.15)",
-  },
   badgeText: {
     fontSize: 10,
     fontWeight: "600",
     marginLeft: 4,
-  },
-  premiumText: {
-    color: "#fbbf24",
-  },
-  freeText: {
-    color: Colors.dark.success,
   },
 });

@@ -32,7 +32,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 280,
+          "imageWidth": 400,
           "resizeMode": "contain",
           "backgroundColor": "#0c1e2e",
           "dark": {
@@ -56,9 +56,8 @@
     },
     "extra": {
       "eas": {
-        "projectId": "fc2a8779-9dbb-407c-9622-d02c88e300de"
+        "projectId": "2c191eaa-6718-4a78-9c97-4d7a4e97af9e"
       }
-    },
-    "owner": "egjerrys-organization"
+    }
   }
 }

@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(255,255,255,0.05)",
     borderRadius: BorderRadius.md,
     borderWidth: 1,
     borderColor: Colors.dark.glassBorder,
@@ -157,10 +157,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
   },
   inputContainerFocused: {
-    borderColor: Colors.dark.primary,
-    shadowColor: Colors.dark.primary,
+    borderColor: "rgba(17,164,212,0.4)",
+    shadowColor: "#11a4d4",
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },

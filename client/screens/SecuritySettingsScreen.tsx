@@ -20,13 +20,15 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { apiRequest } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function SecuritySettingsScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation();
   const { logout } = useAuth();
+  const { theme } = useTheme();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -130,17 +132,23 @@ export default function SecuritySettingsScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>CHANGE PASSWORD</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            CHANGE PASSWORD
+          </ThemedText>
 
           <GlassCard style={styles.inputCard}>
-            <ThemedText style={styles.inputLabel}>Current Password</ThemedText>
+            <ThemedText
+              style={[styles.inputLabel, { color: theme.textSecondary }]}
+            >
+              Current Password
+            </ThemedText>
             <View style={styles.inputRow}>
               <TextInput
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
-                style={styles.input}
+                style={[styles.input, { color: theme.text }]}
                 placeholder="Enter current password"
-                placeholderTextColor={Colors.dark.textMuted}
+                placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showCurrentPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -149,21 +157,25 @@ export default function SecuritySettingsScreen() {
               <Feather
                 name={showCurrentPassword ? "eye-off" : "eye"}
                 size={20}
-                color={Colors.dark.textMuted}
+                color={theme.textMuted}
                 onPress={() => setShowCurrentPassword(!showCurrentPassword)}
               />
             </View>
           </GlassCard>
 
           <GlassCard style={styles.inputCard}>
-            <ThemedText style={styles.inputLabel}>New Password</ThemedText>
+            <ThemedText
+              style={[styles.inputLabel, { color: theme.textSecondary }]}
+            >
+              New Password
+            </ThemedText>
             <View style={styles.inputRow}>
               <TextInput
                 value={newPassword}
                 onChangeText={setNewPassword}
-                style={styles.input}
+                style={[styles.input, { color: theme.text }]}
                 placeholder="Enter new password"
-                placeholderTextColor={Colors.dark.textMuted}
+                placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showNewPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -172,23 +184,25 @@ export default function SecuritySettingsScreen() {
               <Feather
                 name={showNewPassword ? "eye-off" : "eye"}
                 size={20}
-                color={Colors.dark.textMuted}
+                color={theme.textMuted}
                 onPress={() => setShowNewPassword(!showNewPassword)}
               />
             </View>
           </GlassCard>
 
           <GlassCard style={styles.inputCard}>
-            <ThemedText style={styles.inputLabel}>
+            <ThemedText
+              style={[styles.inputLabel, { color: theme.textSecondary }]}
+            >
               Confirm New Password
             </ThemedText>
             <View style={styles.inputRow}>
               <TextInput
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
-                style={styles.input}
+                style={[styles.input, { color: theme.text }]}
                 placeholder="Confirm new password"
-                placeholderTextColor={Colors.dark.textMuted}
+                placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showConfirmPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -197,7 +211,7 @@ export default function SecuritySettingsScreen() {
               <Feather
                 name={showConfirmPassword ? "eye-off" : "eye"}
                 size={20}
-                color={Colors.dark.textMuted}
+                color={theme.textMuted}
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
               />
             </View>
@@ -217,24 +231,31 @@ export default function SecuritySettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
             SESSION MANAGEMENT
           </ThemedText>
 
           <GlassCard style={styles.sessionCard}>
             <View style={styles.sessionRow}>
-              <View style={styles.sessionIcon}>
+              <View
+                style={[
+                  styles.sessionIcon,
+                  { backgroundColor: `${theme.warning}15` },
+                ]}
+              >
                 <Feather
                   name="smartphone"
                   size={20}
-                  color={Colors.dark.warning}
+                  color={theme.warning}
                 />
               </View>
               <View style={styles.sessionContent}>
                 <ThemedText style={styles.sessionTitle}>
                   Logout All Devices
                 </ThemedText>
-                <ThemedText style={styles.sessionSubtitle}>
+                <ThemedText
+                  style={[styles.sessionSubtitle, { color: theme.textSecondary }]}
+                >
                   Sign out from all devices including this one
                 </ThemedText>
               </View>
@@ -250,14 +271,19 @@ export default function SecuritySettingsScreen() {
             onPress={handleLogoutAll}
             variant="ghost"
             disabled={logoutAllMutation.isPending}
-            style={styles.logoutButton}
+            style={{ ...styles.logoutButton, borderColor: theme.error }}
             testID="button-logout-all"
           />
         </View>
 
-        <View style={styles.infoSection}>
-          <Feather name="info" size={16} color={Colors.dark.textMuted} />
-          <ThemedText style={styles.infoText}>
+        <View
+          style={[
+            styles.infoSection,
+            { backgroundColor: theme.glass },
+          ]}
+        >
+          <Feather name="info" size={16} color={theme.textMuted} />
+          <ThemedText style={[styles.infoText, { color: theme.textMuted }]}>
             Keep your account secure by using a strong password and logging out
             of unused devices.
           </ThemedText>
@@ -280,8 +306,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   inputCard: {
@@ -291,7 +317,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 12,
     fontWeight: "500",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.sm,
   },
   inputRow: {
@@ -301,7 +326,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: Colors.dark.text,
     padding: 0,
     fontFamily: "Inter_400Regular",
   },
@@ -320,7 +344,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: `${Colors.dark.warning}15`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -335,23 +358,19 @@ const styles = StyleSheet.create({
   },
   sessionSubtitle: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   logoutButton: {
-    borderColor: Colors.dark.error,
     borderWidth: 1,
   },
   infoSection: {
     flexDirection: "row",
     alignItems: "flex-start",
     padding: Spacing.md,
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.md,
   },
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: Colors.dark.textMuted,
     marginLeft: Spacing.sm,
     lineHeight: 18,
   },

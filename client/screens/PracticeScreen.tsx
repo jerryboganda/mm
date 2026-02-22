@@ -12,7 +12,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { StatCard } from "@/components/StatCard";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type PracticeScreenNavigationProp =
@@ -29,6 +30,7 @@ export default function PracticeScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<PracticeScreenNavigationProp>();
+  const { theme } = useTheme();
 
   const { data: stats } = useQuery<QuizStats>({
     queryKey: ["/api/quiz/stats"],
@@ -40,21 +42,21 @@ export default function PracticeScreen() {
       title: "Topic Quiz",
       description: "Practice questions from a specific topic",
       icon: "book" as const,
-      color: Colors.dark.primary,
+      color: theme.primary,
     },
     {
       id: "mixed",
       title: "Mixed Quiz",
       description: "Random questions from all topics",
       icon: "shuffle" as const,
-      color: Colors.dark.info,
+      color: "#3b82f6", // Info color usually
     },
     {
       id: "wrong",
       title: "Wrong Questions",
       description: "Retry questions you got wrong",
       icon: "rotate-ccw" as const,
-      color: Colors.dark.error,
+      color: theme.error,
       disabled: !stats?.wrongQuestionsCount,
     },
     {
@@ -62,7 +64,7 @@ export default function PracticeScreen() {
       title: "Exam Simulation",
       description: "Timed exam with 30 questions, no going back",
       icon: "award" as const,
-      color: Colors.dark.warning,
+      color: theme.warning,
     },
   ];
 
@@ -84,14 +86,14 @@ export default function PracticeScreen() {
             label="Total Attempts"
             value={stats?.totalAttempts || 0}
             icon="activity"
-            color={Colors.dark.primary}
+            color={theme.primary}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Avg Score"
             value={`${stats?.averageScore || 0}%`}
             icon="trending-up"
-            color={Colors.dark.success}
+            color={theme.success}
           />
         </View>
 
@@ -136,7 +138,7 @@ export default function PracticeScreen() {
               <Feather
                 name="settings"
                 size={24}
-                color={Colors.dark.textSecondary}
+                color={theme.textSecondary}
               />
             }
             testID="card-quiz-settings"
@@ -164,8 +166,9 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#11a4d4",
     marginBottom: Spacing.lg,
   },
 });

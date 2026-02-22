@@ -9,7 +9,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface OfflineScreenProps {
   onRetry?: () => void;
@@ -17,6 +18,7 @@ interface OfflineScreenProps {
 
 export default function OfflineScreen({ onRetry }: OfflineScreenProps) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   const handleRetry = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -37,7 +39,7 @@ export default function OfflineScreen({ onRetry }: OfflineScreenProps) {
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <LinearGradient
-              colors={[Colors.dark.textMuted, Colors.dark.textSecondary]}
+              colors={[theme.textMuted, theme.textSecondary]}
               style={styles.iconGradient}
             >
               <Feather name="wifi-off" size={48} color="#fff" />
@@ -48,9 +50,11 @@ export default function OfflineScreen({ onRetry }: OfflineScreenProps) {
             No Internet Connection
           </ThemedText>
 
-          <ThemedText style={styles.description}>
-            It looks like you're offline. Please check your internet connection
-            and try again.
+          <ThemedText
+            style={[styles.description, { color: theme.textSecondary }]}
+          >
+            It looks like you&apos;re offline. Please check your internet
+            connection and try again.
           </ThemedText>
 
           <GlassCard style={styles.tipsCard}>
@@ -59,26 +63,34 @@ export default function OfflineScreen({ onRetry }: OfflineScreenProps) {
             </ThemedText>
             <View style={styles.tipsList}>
               <View style={styles.tipItem}>
-                <Feather name="check" size={16} color={Colors.dark.primary} />
-                <ThemedText style={styles.tipText}>
+                <Feather name="check" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.tipText, { color: theme.textSecondary }]}
+                >
                   Check if Wi-Fi or mobile data is enabled
                 </ThemedText>
               </View>
               <View style={styles.tipItem}>
-                <Feather name="check" size={16} color={Colors.dark.primary} />
-                <ThemedText style={styles.tipText}>
+                <Feather name="check" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.tipText, { color: theme.textSecondary }]}
+                >
                   Move closer to your Wi-Fi router
                 </ThemedText>
               </View>
               <View style={styles.tipItem}>
-                <Feather name="check" size={16} color={Colors.dark.primary} />
-                <ThemedText style={styles.tipText}>
+                <Feather name="check" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.tipText, { color: theme.textSecondary }]}
+                >
                   Try toggling airplane mode on and off
                 </ThemedText>
               </View>
               <View style={styles.tipItem}>
-                <Feather name="check" size={16} color={Colors.dark.primary} />
-                <ThemedText style={styles.tipText}>
+                <Feather name="check" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.tipText, { color: theme.textSecondary }]}
+                >
                   Restart your device if the issue persists
                 </ThemedText>
               </View>
@@ -126,7 +138,6 @@ const styles = StyleSheet.create({
   },
   description: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
     paddingHorizontal: Spacing.xl,
     lineHeight: 22,
@@ -150,7 +161,6 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     lineHeight: 20,
   },
   retryButton: {

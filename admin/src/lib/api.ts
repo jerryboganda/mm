@@ -11,6 +11,11 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${url}`, { ...options, headers });
 
   if (res.status === 401) {
+    if (url === '/auth/login') {
+      const loginBody = await res.json().catch(() => ({ message: 'Invalid email or password' }));
+      throw new Error(loginBody.message || 'Invalid email or password');
+    }
+
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     window.location.href = '/admin/login';

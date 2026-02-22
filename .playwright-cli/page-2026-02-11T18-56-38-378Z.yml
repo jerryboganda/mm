@@ -1,0 +1,209 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - img [ref=e6]
+    - generic [ref=e32]:
+      - heading "Maternal Mind" [level=1] [ref=e33]
+      - paragraph [ref=e34]: OB-GYN Excellence
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e88]:
+          - link "Resources MRCOG Part 1" [ref=e90] [cursor=pointer]:
+            - /url: /resources
+            - text: Resources
+            - img [ref=e91]
+            - text: MRCOG Part 1
+          - generic [ref=e93]:
+            - img [ref=e95]
+            - generic [ref=e98]:
+              - heading "MRCOG Part 1" [level=1] [ref=e99]
+              - paragraph [ref=e100]: Foundation Sciences for Obstetrics & Gynaecology
+          - paragraph [ref=e101]: Comprehensive preparation for the MRCOG Part 1 examination covering basic sciences, anatomy, physiology, pathology, and pharmacology relevant to Obstetrics and Gynaecology.
+        - generic [ref=e103]:
+          - generic [ref=e105]:
+            - heading "Study Strategy" [level=2] [ref=e106]:
+              - img [ref=e107]
+              - text: Study Strategy
+            - list [ref=e109]:
+              - listitem [ref=e110]:
+                - img [ref=e111]
+                - generic [ref=e114]: Start with anatomy and embryology — they form the foundation for clinical understanding
+              - listitem [ref=e115]:
+                - img [ref=e116]
+                - generic [ref=e119]: Focus on high-yield topics like physiology of pregnancy and pharmacology of common drugs
+              - listitem [ref=e120]:
+                - img [ref=e121]
+                - generic [ref=e124]: Use spaced repetition with MCQs to consolidate basic science knowledge
+              - listitem [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e129]: Dedicate time to endocrinology and the menstrual cycle — frequently tested areas
+              - listitem [ref=e130]:
+                - img [ref=e131]
+                - generic [ref=e134]: Create a structured study timetable covering all syllabus domains
+          - generic [ref=e136]:
+            - heading "How Maternal Mind Helps" [level=2] [ref=e137]:
+              - img [ref=e138]
+              - text: How Maternal Mind Helps
+            - list [ref=e142]:
+              - listitem [ref=e143]:
+                - img [ref=e145]
+                - generic [ref=e148]: Structured content library organised by Part 1 syllabus topics
+              - listitem [ref=e149]:
+                - img [ref=e151]
+                - generic [ref=e154]: Topic-specific MCQ practice mirroring exam question styles
+              - listitem [ref=e155]:
+                - img [ref=e157]
+                - generic [ref=e160]: Progress analytics to track readiness across all domains
+              - listitem [ref=e161]:
+                - img [ref=e163]
+                - generic [ref=e166]: Bookmark system for quick revision of challenging topics
+              - listitem [ref=e167]:
+                - img [ref=e169]
+                - generic [ref=e172]: Wrong-questions mode to target areas needing improvement
+            - button "Get Started" [ref=e174] [cursor=pointer]:
+              - text: Get Started
+              - img [ref=e175]
+          - generic [ref=e180]:
+            - heading "Frequently Asked Questions" [level=2] [ref=e181]
+            - generic [ref=e182]:
+              - heading "What is the pass rate for MRCOG Part 1?" [level=3] [ref=e184]:
+                - button "What is the pass rate for MRCOG Part 1?" [ref=e185] [cursor=pointer]:
+                  - text: What is the pass rate for MRCOG Part 1?
+                  - img [ref=e186]
+              - heading "How long should I prepare for Part 1?" [level=3] [ref=e189]:
+                - button "How long should I prepare for Part 1?" [ref=e190] [cursor=pointer]:
+                  - text: How long should I prepare for Part 1?
+                  - img [ref=e191]
+              - heading "Does Maternal Mind cover the complete Part 1 syllabus?" [level=3] [ref=e194]:
+                - button "Does Maternal Mind cover the complete Part 1 syllabus?" [ref=e195] [cursor=pointer]:
+                  - text: Does Maternal Mind cover the complete Part 1 syllabus?
+                  - img [ref=e196]
+          - generic [ref=e199]:
+            - heading "Related Resources" [level=3] [ref=e200]
+            - generic [ref=e201]:
+              - link "MRCOG Part 2 Preparation" [ref=e202] [cursor=pointer]:
+                - /url: /resources/mrcog-part-2
+                - button "MRCOG Part 2 Preparation" [ref=e203]:
+                  - text: MRCOG Part 2 Preparation
+                  - img [ref=e204]
+              - link "MRCOG Part 3 Preparation" [ref=e206] [cursor=pointer]:
+                - /url: /resources/mrcog-part-3
+                - button "MRCOG Part 3 Preparation" [ref=e207]:
+                  - text: MRCOG Part 3 Preparation
+                  - img [ref=e208]
+              - link "OB-GYN MCQ Practice" [ref=e210] [cursor=pointer]:
+                - /url: /resources/obgyn-mcqs
+                - button "OB-GYN MCQ Practice" [ref=e211]:
+                  - text: OB-GYN MCQ Practice
+                  - img [ref=e212]
+    - contentinfo [ref=e214]:
+      - generic [ref=e215]:
+        - generic [ref=e216]:
+          - generic [ref=e217]:
+            - link "Maternal Mind" [ref=e218] [cursor=pointer]:
+              - /url: /
+              - img [ref=e219]
+              - generic [ref=e244]: Maternal Mind
+            - paragraph [ref=e245]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e246]:
+              - paragraph [ref=e247]: Stay updated
+              - generic [ref=e249]:
+                - textbox "Your email" [ref=e250]
+                - button [ref=e251] [cursor=pointer]:
+                  - img [ref=e252]
+            - generic [ref=e256]:
+              - link "Email" [ref=e257] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e258]
+              - link "LinkedIn" [ref=e261] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/maternal-mind
+                - img [ref=e262]
+              - link "X" [ref=e264] [cursor=pointer]:
+                - /url: https://x.com/maternalmindapp
+                - img [ref=e265]
+          - generic [ref=e267]:
+            - heading "Product" [level=3] [ref=e268]
+            - list [ref=e269]:
+              - listitem [ref=e270]:
+                - link "Features" [ref=e271] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e272]:
+                - link "How It Works" [ref=e273] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e274]:
+                - link "Pricing" [ref=e275] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e276]:
+                - link "For Institutions" [ref=e277] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e278]:
+            - heading "Resources" [level=3] [ref=e279]
+            - list [ref=e280]:
+              - listitem [ref=e281]:
+                - link "MRCOG Part 1" [ref=e282] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e283]:
+                - link "MRCOG Part 2" [ref=e284] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e285]:
+                - link "MRCOG Part 3" [ref=e286] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e287]:
+                - link "FCPS OB-GYN" [ref=e288] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e289]:
+                - link "OB-GYN MCQs" [ref=e290] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e291]:
+            - heading "Company" [level=3] [ref=e292]
+            - list [ref=e293]:
+              - listitem [ref=e294]:
+                - link "About" [ref=e295] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e296]:
+                - link "Support" [ref=e297] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e298]:
+                - link "Media Kit" [ref=e299] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e300]:
+            - heading "Legal" [level=3] [ref=e301]
+            - list [ref=e302]:
+              - listitem [ref=e303]:
+                - link "Terms of Service" [ref=e304] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e305]:
+                - link "Privacy Policy" [ref=e306] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e307]:
+                - link "Disclaimer" [ref=e308] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e310]:
+          - paragraph [ref=e311]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e312]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.

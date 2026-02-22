@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { StyleSheet, View, Pressable, Animated } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -12,7 +12,8 @@ import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { OptionButton } from "@/components/OptionButton";
 import { apiRequest, queryClient } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ReviewQuestion {
   reviewId: string;
@@ -28,36 +29,10 @@ interface ReviewResponse {
   questions: ReviewQuestion[];
 }
 
-const QUALITY_OPTIONS = [
-  {
-    value: 0,
-    label: "No Clue",
-    color: Colors.dark.error,
-    icon: "x-circle",
-  },
-  {
-    value: 2,
-    label: "Hard",
-    color: Colors.dark.warning,
-    icon: "alert-circle",
-  },
-  {
-    value: 4,
-    label: "Good",
-    color: Colors.dark.info,
-    icon: "check-circle",
-  },
-  {
-    value: 5,
-    label: "Easy",
-    color: Colors.dark.success,
-    icon: "star",
-  },
-] as const;
-
 export default function SpacedReviewScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const { theme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -70,6 +45,33 @@ export default function SpacedReviewScreen() {
   });
   const [isComplete, setIsComplete] = useState(false);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  const QUALITY_OPTIONS = [
+    {
+      value: 0,
+      label: "No Clue",
+      color: theme.error,
+      icon: "x-circle",
+    },
+    {
+      value: 2,
+      label: "Hard",
+      color: theme.warning,
+      icon: "alert-circle",
+    },
+    {
+      value: 4,
+      label: "Good",
+      color: theme.info,
+      icon: "check-circle",
+    },
+    {
+      value: 5,
+      label: "Easy",
+      color: theme.success,
+      icon: "star",
+    },
+  ] as const;
 
   const { data, isLoading } = useQuery<ReviewResponse>({
     queryKey: ["/api/reviews/due"],
@@ -167,13 +169,15 @@ export default function SpacedReviewScreen() {
             <Feather
               name="check-circle"
               size={64}
-              color={Colors.dark.success}
+              color={theme.success}
             />
           </View>
           <ThemedText type="h2" style={styles.emptyTitle}>
             All Caught Up!
           </ThemedText>
-          <ThemedText style={styles.emptySubtitle}>
+          <ThemedText
+            style={[styles.emptySubtitle, { color: theme.textSecondary }]}
+          >
             No reviews due right now. Keep studying and your review cards will
             appear here automatically.
           </ThemedText>
@@ -194,47 +198,65 @@ export default function SpacedReviewScreen() {
       <BackgroundGradient>
         <View style={[styles.emptyContainer, { paddingTop: insets.top + 60 }]}>
           <View style={styles.emptyIcon}>
-            <Feather name="award" size={64} color={Colors.dark.primary} />
+            <Feather name="award" size={64} color={theme.primary} />
           </View>
           <ThemedText type="h2" style={styles.emptyTitle}>
             Review Complete!
           </ThemedText>
-          <ThemedText style={styles.emptySubtitle}>
+          <ThemedText
+            style={[styles.emptySubtitle, { color: theme.textSecondary }]}
+          >
             You reviewed {sessionStats.reviewed} cards this session.
           </ThemedText>
 
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <ThemedText
-                style={[styles.statValue, { color: Colors.dark.success }]}
+                style={[styles.statValue, { color: theme.success }]}
               >
                 {sessionStats.easy}
               </ThemedText>
-              <ThemedText style={styles.statLabel}>Easy</ThemedText>
+              <ThemedText
+                style={[styles.statLabel, { color: theme.textSecondary }]}
+              >
+                Easy
+              </ThemedText>
             </View>
             <View style={styles.statItem}>
               <ThemedText
-                style={[styles.statValue, { color: Colors.dark.info }]}
+                style={[styles.statValue, { color: theme.info }]}
               >
                 {sessionStats.good}
               </ThemedText>
-              <ThemedText style={styles.statLabel}>Good</ThemedText>
+              <ThemedText
+                style={[styles.statLabel, { color: theme.textSecondary }]}
+              >
+                Good
+              </ThemedText>
             </View>
             <View style={styles.statItem}>
               <ThemedText
-                style={[styles.statValue, { color: Colors.dark.warning }]}
+                style={[styles.statValue, { color: theme.warning }]}
               >
                 {sessionStats.hard}
               </ThemedText>
-              <ThemedText style={styles.statLabel}>Hard</ThemedText>
+              <ThemedText
+                style={[styles.statLabel, { color: theme.textSecondary }]}
+              >
+                Hard
+              </ThemedText>
             </View>
             <View style={styles.statItem}>
               <ThemedText
-                style={[styles.statValue, { color: Colors.dark.error }]}
+                style={[styles.statValue, { color: theme.error }]}
               >
                 {sessionStats.again}
               </ThemedText>
-              <ThemedText style={styles.statLabel}>Again</ThemedText>
+              <ThemedText
+                style={[styles.statLabel, { color: theme.textSecondary }]}
+              >
+                Again
+              </ThemedText>
             </View>
           </View>
 
@@ -294,10 +316,12 @@ export default function SpacedReviewScreen() {
             onPress={() => navigation.goBack()}
             style={styles.closeButton}
           >
-            <Feather name="x" size={24} color={Colors.dark.text} />
+            <Feather name="x" size={24} color={theme.text} />
           </Pressable>
           <View style={styles.headerCenter}>
-            <ThemedText style={styles.counterText}>
+            <ThemedText
+              style={[styles.counterText, { color: theme.textSecondary }]}
+            >
               {currentIndex + 1} / {questions.length}
             </ThemedText>
           </View>
@@ -305,17 +329,36 @@ export default function SpacedReviewScreen() {
         </View>
 
         {/* Progress Bar */}
-        <View style={styles.progressBar}>
+        <View style={[styles.progressBar, { backgroundColor: theme.glass }]}>
           <View
-            style={[styles.progressFill, { width: `${progress * 100}%` }]}
+            style={[
+              styles.progressFill,
+              { width: `${progress * 100}%`, backgroundColor: theme.primary },
+            ]}
           />
         </View>
 
         {/* Card */}
-        <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
+        <Animated.View
+          style={[
+            styles.card,
+            {
+              backgroundColor: theme.glass,
+              borderColor: theme.glassBorder,
+              opacity: fadeAnim,
+            },
+          ]}
+        >
           {currentQuestion?.difficulty && (
-            <View style={styles.difficultyBadge}>
-              <ThemedText style={styles.difficultyText}>
+            <View
+              style={[
+                styles.difficultyBadge,
+                { backgroundColor: `${theme.purple}26` },
+              ]}
+            >
+              <ThemedText
+                style={[styles.difficultyText, { color: theme.purple }]}
+              >
                 {currentQuestion.difficulty}
               </ThemedText>
             </View>
@@ -347,15 +390,28 @@ export default function SpacedReviewScreen() {
               style={{ marginTop: Spacing.lg }}
             />
           ) : (
-            <View style={styles.qualityContainer}>
-              <ThemedText style={styles.qualityLabel}>
+            <View
+              style={[
+                styles.qualityContainer,
+                { borderTopColor: theme.glassBorder },
+              ]}
+            >
+              <ThemedText
+                style={[styles.qualityLabel, { color: theme.textSecondary }]}
+              >
                 How well did you know this?
               </ThemedText>
               <View style={styles.qualityButtons}>
                 {QUALITY_OPTIONS.map((opt) => (
                   <Pressable
                     key={opt.value}
-                    style={[styles.qualityButton, { borderColor: opt.color }]}
+                    style={[
+                      styles.qualityButton,
+                      {
+                        borderColor: opt.color,
+                        backgroundColor: theme.glass,
+                      },
+                    ]}
                     onPress={() => handleQualityRating(opt.value)}
                   >
                     <Feather
@@ -381,18 +437,18 @@ export default function SpacedReviewScreen() {
             <Feather
               name="repeat"
               size={14}
-              color={Colors.dark.textSecondary}
+              color={theme.textSecondary}
             />
-            <ThemedText style={styles.reviewInfoText}>
+            <ThemedText
+              style={[styles.reviewInfoText, { color: theme.textSecondary }]}
+            >
               {currentQuestion.repetitions === 0
                 ? "First review"
-                : `Reviewed ${currentQuestion.repetitions} time${
-                    currentQuestion.repetitions > 1 ? "s" : ""
-                  }`}
+                : `Reviewed ${currentQuestion.repetitions} time${currentQuestion.repetitions > 1 ? "s" : ""
+                }`}
               {currentQuestion.interval > 0
-                ? ` Â· Next in ${currentQuestion.interval} day${
-                    currentQuestion.interval > 1 ? "s" : ""
-                  }`
+                ? ` · Next in ${currentQuestion.interval} day${currentQuestion.interval > 1 ? "s" : ""
+                }`
                 : ""}
             </ThemedText>
           </View>
@@ -424,40 +480,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   counterText: {
-    color: Colors.dark.textSecondary,
     fontSize: 15,
     fontWeight: "600",
   },
   progressBar: {
     height: 4,
-    backgroundColor: Colors.dark.glass,
     borderRadius: 2,
     marginBottom: Spacing.xl,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    backgroundColor: Colors.dark.primary,
     borderRadius: 2,
   },
   card: {
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius["2xl"],
     padding: Spacing.xl,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
   difficultyBadge: {
     alignSelf: "flex-start",
     paddingVertical: 4,
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.full,
-    backgroundColor: "rgba(139,92,246,0.15)",
     marginBottom: Spacing.md,
   },
   difficultyText: {
     fontSize: 12,
-    color: Colors.dark.purple,
     fontWeight: "600",
     textTransform: "capitalize",
   },
@@ -472,11 +521,9 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xl,
     paddingTop: Spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: Colors.dark.glassBorder,
   },
   qualityLabel: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     fontSize: 14,
     fontWeight: "600",
     marginBottom: Spacing.md,
@@ -492,7 +539,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    backgroundColor: Colors.dark.glass,
   },
   qualityButtonText: {
     fontSize: 11,
@@ -507,7 +553,6 @@ const styles = StyleSheet.create({
     gap: Spacing.xs,
   },
   reviewInfoText: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
   },
   emptyContainer: {
@@ -525,7 +570,6 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     lineHeight: 22,
   },
   statsRow: {
@@ -544,7 +588,6 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     marginTop: 4,
   },
 });

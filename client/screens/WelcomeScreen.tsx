@@ -7,7 +7,8 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const { width, height } = Dimensions.get("window");
@@ -18,14 +19,15 @@ type WelcomeScreenNavigationProp =
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
+  const { theme, isDark } = useTheme();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <LinearGradient
         colors={[
-          Colors.dark.backgroundRoot,
-          "#0a1518",
-          Colors.dark.backgroundRoot,
+          theme.backgroundRoot,
+          isDark ? "#0a1518" : "#E0F7FA", // Dark: dark teal/black, Light: light cyan
+          theme.backgroundRoot,
         ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
@@ -41,49 +43,100 @@ export default function WelcomeScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText style={styles.tagline}>
+          <ThemedText style={[styles.tagline, { color: theme.textSecondary }]}>
             Master OB-GYN with confidence
           </ThemedText>
         </View>
 
-        <View style={styles.featureList}>
-          <View style={styles.featureItem}>
-            <View style={styles.featureIcon}>
+        <View style={[styles.featureList, { gap: Spacing.lg }]}>
+          <View
+            style={[
+              styles.featureItem,
+              {
+                backgroundColor: isDark
+                  ? "rgba(17,164,212,0.08)"
+                  : "rgba(17,164,212,0.05)",
+                borderColor: isDark
+                  ? "rgba(17,164,212,0.15)"
+                  : "rgba(17,164,212,0.1)",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.featureIcon,
+                { backgroundColor: "rgba(17,164,212,0.15)" },
+              ]}
+            >
               <ThemedText style={styles.featureEmoji}>{"📚"}</ThemedText>
             </View>
             <View style={styles.featureText}>
               <ThemedText type="body" style={styles.featureTitle}>
                 Comprehensive Content
               </ThemedText>
-              <ThemedText style={styles.featureDesc}>
+              <ThemedText style={[styles.featureDesc, { color: theme.textSecondary }]}>
                 Learn from structured textbook chapters
               </ThemedText>
             </View>
           </View>
 
-          <View style={styles.featureItem}>
-            <View style={styles.featureIcon}>
+          <View
+            style={[
+              styles.featureItem,
+              {
+                backgroundColor: isDark
+                  ? "rgba(17,164,212,0.08)"
+                  : "rgba(17,164,212,0.05)",
+                borderColor: isDark
+                  ? "rgba(17,164,212,0.15)"
+                  : "rgba(17,164,212,0.1)",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.featureIcon,
+                { backgroundColor: "rgba(17,164,212,0.15)" },
+              ]}
+            >
               <ThemedText style={styles.featureEmoji}>{"🎯"}</ThemedText>
             </View>
             <View style={styles.featureText}>
               <ThemedText type="body" style={styles.featureTitle}>
                 Practice Quizzes
               </ThemedText>
-              <ThemedText style={styles.featureDesc}>
+              <ThemedText style={[styles.featureDesc, { color: theme.textSecondary }]}>
                 Test your knowledge with MCQs
               </ThemedText>
             </View>
           </View>
 
-          <View style={styles.featureItem}>
-            <View style={styles.featureIcon}>
+          <View
+            style={[
+              styles.featureItem,
+              {
+                backgroundColor: isDark
+                  ? "rgba(17,164,212,0.08)"
+                  : "rgba(17,164,212,0.05)",
+                borderColor: isDark
+                  ? "rgba(17,164,212,0.15)"
+                  : "rgba(17,164,212,0.1)",
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.featureIcon,
+                { backgroundColor: "rgba(17,164,212,0.15)" },
+              ]}
+            >
               <ThemedText style={styles.featureEmoji}>{"📊"}</ThemedText>
             </View>
             <View style={styles.featureText}>
               <ThemedText type="body" style={styles.featureTitle}>
                 Track Progress
               </ThemedText>
-              <ThemedText style={styles.featureDesc}>
+              <ThemedText style={[styles.featureDesc, { color: theme.textSecondary }]}>
                 Monitor your learning journey
               </ThemedText>
             </View>
@@ -118,7 +171,6 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.backgroundRoot,
   },
   content: {
     flex: 1,
@@ -136,7 +188,6 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 16,
-    color: Colors.dark.textSecondary,
     textAlign: "center",
   },
   featureList: {
@@ -145,17 +196,14 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(17,164,212,0.08)",
     borderRadius: 16,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: "rgba(17,164,212,0.15)",
   },
   featureIcon: {
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: "rgba(17,164,212,0.15)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.lg,
@@ -172,7 +220,6 @@ const styles = StyleSheet.create({
   },
   featureDesc: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   buttonSection: {
     paddingHorizontal: Spacing.xl,

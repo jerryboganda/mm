@@ -13,7 +13,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { ProgressBar } from "@/components/ProgressBar";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 
 type ChaptersScreenNavigationProp = NativeStackNavigationProp<
@@ -39,6 +40,7 @@ export default function ChaptersScreen() {
   const route = useRoute<ChaptersScreenRouteProp>();
   const { bookId, bookTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
+  const { theme } = useTheme();
 
   const {
     data: chapters,
@@ -65,7 +67,7 @@ export default function ChaptersScreen() {
           bookId,
         })
       }
-      icon={<ThemedText style={styles.chapterNumber}>{item.order}</ThemedText>}
+      icon={<ThemedText style={[styles.chapterNumber, { color: theme.primary }]}>{item.order}</ThemedText>}
       testID={`card-chapter-${item.id}`}
       style={{ marginBottom: Spacing.md }}
     >
@@ -101,13 +103,13 @@ export default function ChaptersScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
         ListHeaderComponent={
           <View style={styles.header}>
             <ThemedText style={styles.sectionLabel}>CHAPTERS</ThemedText>
-            <ThemedText type="small" style={styles.bookTitle}>
+            <ThemedText type="small" style={[styles.bookTitle, { color: theme.textSecondary }]}>
               {bookTitle}
             </ThemedText>
           </View>
@@ -128,17 +130,16 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#11a4d4",
   },
   bookTitle: {
-    color: Colors.dark.textSecondary,
     marginTop: Spacing.xs,
   },
   chapterNumber: {
     fontSize: 18,
     fontWeight: "700",
-    color: Colors.dark.primary,
   },
   progressContainer: {
     marginTop: Spacing.md,

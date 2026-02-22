@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -23,10 +24,15 @@ import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { ImageViewer } from "@/components/ImageViewer";
 import { apiRequest, queryClient } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type TopicReaderRouteProp = RouteProp<RootStackParamList, "TopicReader">;
+type TopicReaderNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "TopicReader"
+>;
 
 interface ContentBlock {
   id: string;
@@ -52,13 +58,14 @@ interface TopicDetail {
 export default function TopicReaderScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const navigation = useNavigation();
+  const navigation = useNavigation<TopicReaderNavigationProp>();
   const route = useRoute<TopicReaderRouteProp>();
   const { topicId, topicTitle } = route.params;
   const [viewerImage, setViewerImage] = useState<string | null>(null);
   const [reportVisible, setReportVisible] = useState(false);
   const [reportType, setReportType] = useState<string>("factual_error");
   const [reportDescription, setReportDescription] = useState("");
+  const { theme } = useTheme();
 
   const { data: topic, isLoading } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
@@ -122,7 +129,10 @@ export default function TopicReaderScreen() {
         );
       case "text":
         return (
-          <ThemedText key={block.id} style={styles.paragraph}>
+          <ThemedText
+            key={block.id}
+            style={[styles.paragraph, { color: theme.textSecondary }]}
+          >
             {block.content}
           </ThemedText>
         );
@@ -130,7 +140,7 @@ export default function TopicReaderScreen() {
         return (
           <Pressable
             key={block.id}
-            style={styles.imageContainer}
+            style={[styles.imageContainer, { borderColor: theme.glassBorder }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setViewerImage(block.content);
@@ -148,11 +158,26 @@ export default function TopicReaderScreen() {
         );
       case "note":
         return (
-          <View key={block.id} style={styles.noteContainer}>
+          <View
+            key={block.id}
+            style={[
+              styles.noteContainer,
+              {
+                backgroundColor: `${theme.purple || "#a855f7"}1A`,
+                borderLeftColor: theme.purple || "#a855f7",
+              },
+            ]}
+          >
             <View style={styles.noteIcon}>
-              <Feather name="info" size={16} color={Colors.dark.purple} />
+              <Feather
+                name="info"
+                size={16}
+                color={theme.purple || "#a855f7"}
+              />
             </View>
-            <ThemedText style={styles.noteText}>{block.content}</ThemedText>
+            <ThemedText style={[styles.noteText, { color: theme.text }]}>
+              {block.content}
+            </ThemedText>
           </View>
         );
       default:
@@ -225,9 +250,7 @@ export default function TopicReaderScreen() {
               name="bookmark"
               size={24}
               color={
-                topic?.isBookmarked
-                  ? Colors.dark.primary
-                  : Colors.dark.textSecondary
+                topic?.isBookmarked ? theme.primary : theme.textSecondary
               }
               style={{
                 opacity: topic?.isBookmarked ? 1 : 0.6,
@@ -242,7 +265,7 @@ export default function TopicReaderScreen() {
                   width: 8,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor: Colors.dark.primary,
+                  backgroundColor: theme.primary,
                 }}
               />
             )}
@@ -256,7 +279,7 @@ export default function TopicReaderScreen() {
             <Feather
               name="flag"
               size={22}
-              color={Colors.dark.textSecondary}
+              color={theme.textSecondary}
               style={{ opacity: 0.6 }}
             />
           </Pressable>
@@ -265,43 +288,111 @@ export default function TopicReaderScreen() {
         {topic?.blocks?.map(renderBlock)}
 
         {/* Content metadata: last updated, author, references */}
-        {(topic?.updatedAt || topic?.author || topic?.source || topic?.references) && (
-          <View style={styles.metadataSection}>
-            {(topic?.updatedAt || topic?.author) && (
-              <View style={styles.metadataRow}>
-                {topic?.updatedAt && (
-                  <View style={styles.metaBadge}>
-                    <Feather name="clock" size={12} color={Colors.dark.textMuted} />
-                    <ThemedText style={styles.metaBadgeText}>
-                      Updated {new Date(topic.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        {(topic?.updatedAt ||
+          topic?.author ||
+          topic?.source ||
+          topic?.references) && (
+            <View
+              style={[
+                styles.metadataSection,
+                { borderTopColor: theme.glassBorder },
+              ]}
+            >
+              {(topic?.updatedAt || topic?.author) && (
+                <View style={styles.metadataRow}>
+                  {topic?.updatedAt && (
+                    <View
+                      style={[
+                        styles.metaBadge,
+                        {
+                          backgroundColor: theme.glass,
+                          borderColor: theme.glassBorder,
+                        },
+                      ]}
+                    >
+                      <Feather name="clock" size={12} color={theme.textMuted} />
+                      <ThemedText
+                        style={[
+                          styles.metaBadgeText,
+                          { color: theme.textMuted },
+                        ]}
+                      >
+                        Updated{" "}
+                        {new Date(topic.updatedAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </ThemedText>
+                    </View>
+                  )}
+                  {topic?.author && (
+                    <View
+                      style={[
+                        styles.metaBadge,
+                        {
+                          backgroundColor: theme.glass,
+                          borderColor: theme.glassBorder,
+                        },
+                      ]}
+                    >
+                      <Feather name="user" size={12} color={theme.textMuted} />
+                      <ThemedText
+                        style={[
+                          styles.metaBadgeText,
+                          { color: theme.textMuted },
+                        ]}
+                      >
+                        {topic.author}
+                      </ThemedText>
+                    </View>
+                  )}
+                </View>
+              )}
+              {topic?.references && (
+                <View
+                  style={[
+                    styles.referencesBox,
+                    {
+                      backgroundColor: `${theme.primary}15`,
+                      borderColor: `${theme.primary}26`,
+                    },
+                  ]}
+                >
+                  <View style={styles.referencesHeader}>
+                    <Feather
+                      name="book-open"
+                      size={14}
+                      color={theme.primary}
+                    />
+                    <ThemedText
+                      style={[styles.referencesTitle, { color: theme.primary }]}
+                    >
+                      References
                     </ThemedText>
                   </View>
-                )}
-                {topic?.author && (
-                  <View style={styles.metaBadge}>
-                    <Feather name="user" size={12} color={Colors.dark.textMuted} />
-                    <ThemedText style={styles.metaBadgeText}>{topic.author}</ThemedText>
-                  </View>
-                )}
-              </View>
-            )}
-            {topic?.references && (
-              <View style={styles.referencesBox}>
-                <View style={styles.referencesHeader}>
-                  <Feather name="book-open" size={14} color={Colors.dark.primary} />
-                  <ThemedText style={styles.referencesTitle}>References</ThemedText>
+                  <ThemedText
+                    style={[
+                      styles.referencesText,
+                      { color: theme.textSecondary },
+                    ]}
+                  >
+                    {topic.references}
+                  </ThemedText>
                 </View>
-                <ThemedText style={styles.referencesText}>{topic.references}</ThemedText>
-              </View>
-            )}
-            {topic?.source && (
-              <View style={styles.sourceRow}>
-                <Feather name="link" size={12} color={Colors.dark.textMuted} />
-                <ThemedText style={styles.sourceText}>Source: {topic.source}</ThemedText>
-              </View>
-            )}
-          </View>
-        )}
+              )}
+              {topic?.source && (
+                <View style={styles.sourceRow}>
+                  <Feather name="link" size={12} color={theme.textMuted} />
+                  <ThemedText
+                    style={[styles.sourceText, { color: theme.textMuted }]}
+                  >
+                    Source: {topic.source}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          )}
 
         {!topic?.isCompleted ? (
           <PrimaryButton
@@ -312,13 +403,18 @@ export default function TopicReaderScreen() {
             style={styles.completeButton}
           />
         ) : (
-          <View style={styles.completedBadge}>
-            <Feather
-              name="check-circle"
-              size={20}
-              color={Colors.dark.success}
-            />
-            <ThemedText style={styles.completedText}>Completed</ThemedText>
+          <View
+            style={[
+              styles.completedBadge,
+              { backgroundColor: `${theme.success}1A` },
+            ]}
+          >
+            <Feather name="check-circle" size={20} color={theme.success} />
+            <ThemedText
+              style={[styles.completedText, { color: theme.success }]}
+            >
+              Completed
+            </ThemedText>
           </View>
         )}
       </ScrollView>
@@ -328,21 +424,38 @@ export default function TopicReaderScreen() {
       >
         {topic?.previousTopicId ? (
           <Pressable
-            style={styles.navButton}
+            style={[
+              styles.navButton,
+              { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+            ]}
             onPress={() =>
-              navigation.setParams({ topicId: topic.previousTopicId })
+              navigation.replace("TopicReader", {
+                topicId: topic.previousTopicId!,
+                topicTitle: topic?.title || topicTitle,
+              })
             }
           >
-            <Feather name="chevron-left" size={24} color={Colors.dark.text} />
-            <ThemedText style={styles.navButtonText}>Previous</ThemedText>
+            <Feather name="chevron-left" size={24} color={theme.text} />
+            <ThemedText style={[styles.navButtonText, { color: theme.text }]}>
+              Previous
+            </ThemedText>
           </Pressable>
         ) : (
           <View style={styles.navButtonPlaceholder} />
         )}
         {topic?.nextTopicId ? (
           <Pressable
-            style={[styles.navButton, styles.navButtonPrimary]}
-            onPress={() => navigation.setParams({ topicId: topic.nextTopicId })}
+            style={[
+              styles.navButton,
+              styles.navButtonPrimary,
+              { backgroundColor: theme.primary, borderColor: theme.primary },
+            ]}
+            onPress={() =>
+              navigation.replace("TopicReader", {
+                topicId: topic.nextTopicId!,
+                topicTitle: topic?.title || topicTitle,
+              })
+            }
           >
             <ThemedText style={styles.navButtonTextPrimary}>
               Next Topic
@@ -370,17 +483,24 @@ export default function TopicReaderScreen() {
           onPress={() => setReportVisible(false)}
         >
           <Pressable
-            style={styles.modalContent}
+            style={[
+              styles.modalContent,
+              { backgroundColor: theme.backgroundElevated },
+            ]}
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
               <ThemedText type="h3">Report an Error</ThemedText>
               <Pressable onPress={() => setReportVisible(false)}>
-                <Feather name="x" size={24} color={Colors.dark.text} />
+                <Feather name="x" size={24} color={theme.text} />
               </Pressable>
             </View>
 
-            <ThemedText style={styles.modalLabel}>Error Type</ThemedText>
+            <ThemedText
+              style={[styles.modalLabel, { color: theme.textSecondary }]}
+            >
+              Error Type
+            </ThemedText>
             <View style={styles.reportTypeRow}>
               {[
                 { value: "factual_error", label: "Factual" },
@@ -392,15 +512,25 @@ export default function TopicReaderScreen() {
                   key={opt.value}
                   style={[
                     styles.reportTypeChip,
-                    reportType === opt.value && styles.reportTypeChipActive,
+                    {
+                      borderColor: theme.glassBorder,
+                      backgroundColor: theme.glass,
+                    },
+                    reportType === opt.value && {
+                      borderColor: theme.primary,
+                      backgroundColor: `${theme.primary}26`,
+                    },
                   ]}
                   onPress={() => setReportType(opt.value)}
                 >
                   <ThemedText
                     style={[
                       styles.reportTypeChipText,
-                      reportType === opt.value &&
-                        styles.reportTypeChipTextActive,
+                      { color: theme.textSecondary },
+                      reportType === opt.value && {
+                        color: theme.primary,
+                        fontWeight: "600",
+                      },
                     ]}
                   >
                     {opt.label}
@@ -409,11 +539,22 @@ export default function TopicReaderScreen() {
               ))}
             </View>
 
-            <ThemedText style={styles.modalLabel}>Description</ThemedText>
+            <ThemedText
+              style={[styles.modalLabel, { color: theme.textSecondary }]}
+            >
+              Description
+            </ThemedText>
             <TextInput
-              style={styles.reportInput}
+              style={[
+                styles.reportInput,
+                {
+                  backgroundColor: theme.glass,
+                  borderColor: theme.glassBorder,
+                  color: theme.text,
+                },
+              ]}
               placeholder="Describe the error..."
-              placeholderTextColor={Colors.dark.textSecondary}
+              placeholderTextColor={theme.textSecondary}
               multiline
               numberOfLines={4}
               value={reportDescription}
@@ -463,14 +604,12 @@ const styles = StyleSheet.create({
   paragraph: {
     marginBottom: Spacing.lg,
     lineHeight: 26,
-    color: Colors.dark.textSecondary,
   },
   imageContainer: {
     marginVertical: Spacing.lg,
     borderRadius: BorderRadius.xl,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
   image: {
     width: "100%",
@@ -489,12 +628,10 @@ const styles = StyleSheet.create({
   },
   noteContainer: {
     flexDirection: "row",
-    backgroundColor: "rgba(168,85,247,0.1)",
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
     marginVertical: Spacing.md,
     borderLeftWidth: 3,
-    borderLeftColor: Colors.dark.purple,
   },
   noteIcon: {
     marginRight: Spacing.md,
@@ -502,7 +639,6 @@ const styles = StyleSheet.create({
   },
   noteText: {
     flex: 1,
-    color: Colors.dark.text,
     lineHeight: 22,
   },
   completeButton: {
@@ -514,12 +650,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: Spacing["2xl"],
     padding: Spacing.lg,
-    backgroundColor: "rgba(34,197,94,0.1)",
     borderRadius: BorderRadius.lg,
   },
   completedText: {
     marginLeft: Spacing.sm,
-    color: Colors.dark.success,
     fontWeight: "600",
   },
   floatingNav: {
@@ -534,21 +668,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
   navButtonPrimary: {
-    backgroundColor: Colors.dark.primary,
-    borderColor: Colors.dark.primary,
+    // Primary styles handled inline for dynamic support
   },
   navButtonPlaceholder: {
     flex: 1,
   },
   navButtonText: {
     marginLeft: Spacing.xs,
-    color: Colors.dark.text,
   },
   navButtonTextPrimary: {
     marginRight: Spacing.xs,
@@ -561,7 +691,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: Colors.dark.card,
     borderTopLeftRadius: BorderRadius["2xl"],
     borderTopRightRadius: BorderRadius["2xl"],
     padding: Spacing.xl,
@@ -574,7 +703,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   modalLabel: {
-    color: Colors.dark.textSecondary,
     fontSize: 14,
     fontWeight: "600",
     marginBottom: Spacing.sm,
@@ -589,28 +717,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
-    backgroundColor: Colors.dark.glass,
-  },
-  reportTypeChipActive: {
-    borderColor: Colors.dark.primary,
-    backgroundColor: "rgba(139,92,246,0.15)",
   },
   reportTypeChipText: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
-  },
-  reportTypeChipTextActive: {
-    color: Colors.dark.primary,
-    fontWeight: "600",
   },
   reportInput: {
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     padding: Spacing.md,
-    color: Colors.dark.text,
     fontSize: 15,
     minHeight: 100,
   },
@@ -618,7 +732,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing["2xl"],
     paddingTop: Spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: Colors.dark.glassBorder,
   },
   metadataRow: {
     flexDirection: "row",
@@ -630,23 +743,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: Colors.dark.glass,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
   metaBadgeText: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
   },
   referencesBox: {
-    backgroundColor: "rgba(17,164,212,0.08)",
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: "rgba(17,164,212,0.15)",
     marginBottom: Spacing.md,
   },
   referencesHeader: {
@@ -658,12 +766,10 @@ const styles = StyleSheet.create({
   referencesTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.dark.primary,
   },
   referencesText: {
     fontSize: 13,
     lineHeight: 20,
-    color: Colors.dark.textSecondary,
   },
   sourceRow: {
     flexDirection: "row",
@@ -672,6 +778,5 @@ const styles = StyleSheet.create({
   },
   sourceText: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
   },
 });

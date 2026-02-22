@@ -36,7 +36,9 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
     }
 
     // Batch-fetch all unique topic titles instead of N+1 queries
-    const uniqueTopicIds = [...new Set(filteredAttempts.map((a) => a.topicId).filter(Boolean))] as string[];
+    const uniqueTopicIds = [
+      ...new Set(filteredAttempts.map((a) => a.topicId).filter(Boolean)),
+    ] as string[];
     const topicTitleMap = new Map<string, string>();
     for (const tid of uniqueTopicIds) {
       const topic = await storage.getTopic(tid);
@@ -90,18 +92,18 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
     const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
 
     const questionsWithDetails = questionIds.map((qId) => {
-        const mcq = mcqMap.get(qId);
-        const answerInfo = answersData[qId];
-        return {
-          id: qId,
-          question: mcq?.question || "Question not found",
-          options: mcq?.options || [],
-          selectedAnswer: answerInfo.selected,
-          correctAnswer: answerInfo.correct,
-          isCorrect: answerInfo.isCorrect,
-          explanation: mcq?.explanation || "",
-        };
-      });
+      const mcq = mcqMap.get(qId);
+      const answerInfo = answersData[qId];
+      return {
+        id: qId,
+        question: mcq?.question || "Question not found",
+        options: mcq?.options || [],
+        selectedAnswer: answerInfo.selected,
+        correctAnswer: answerInfo.correct,
+        isCorrect: answerInfo.isCorrect,
+        explanation: mcq?.explanation || "",
+      };
+    });
 
     res.json({
       id: attempt.id,

@@ -9,7 +9,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface MaintenanceScreenProps {
   message?: string;
@@ -23,6 +24,7 @@ export default function MaintenanceScreen({
   onRefresh,
 }: MaintenanceScreenProps) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   const handleRefresh = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -43,7 +45,7 @@ export default function MaintenanceScreen({
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <LinearGradient
-              colors={[Colors.dark.primary, Colors.dark.primaryDark]}
+              colors={[theme.primary, theme.primaryDark || theme.primary]}
               style={styles.iconGradient}
             >
               <Feather name="tool" size={48} color="#fff" />
@@ -54,17 +56,26 @@ export default function MaintenanceScreen({
             Under Maintenance
           </ThemedText>
 
-          <ThemedText style={styles.description}>{message}</ThemedText>
+          <ThemedText
+            style={[styles.description, { color: theme.textSecondary }]}
+          >
+            {message}
+          </ThemedText>
 
           {estimatedTime ? (
             <GlassCard style={styles.timeCard}>
               <View style={styles.timeContent}>
-                <Feather name="clock" size={24} color={Colors.dark.primary} />
+                <Feather name="clock" size={24} color={theme.primary} />
                 <View style={styles.timeText}>
-                  <ThemedText style={styles.timeLabel}>
+                  <ThemedText
+                    style={[styles.timeLabel, { color: theme.textMuted }]}
+                  >
                     Estimated Completion
                   </ThemedText>
-                  <ThemedText type="h4" style={styles.timeValue}>
+                  <ThemedText
+                    type="h4"
+                    style={[styles.timeValue, { color: theme.primary }]}
+                  >
                     {estimatedTime}
                   </ThemedText>
                 </View>
@@ -74,28 +85,30 @@ export default function MaintenanceScreen({
 
           <GlassCard style={styles.infoCard}>
             <ThemedText type="h4" style={styles.infoTitle}>
-              What's Happening?
+              What&apos;s Happening?
             </ThemedText>
             <View style={styles.infoList}>
               <View style={styles.infoItem}>
-                <Feather name="server" size={16} color={Colors.dark.primary} />
-                <ThemedText style={styles.infoText}>
+                <Feather name="server" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.infoText, { color: theme.textSecondary }]}
+                >
                   Server upgrades and optimizations
                 </ThemedText>
               </View>
               <View style={styles.infoItem}>
-                <Feather
-                  name="database"
-                  size={16}
-                  color={Colors.dark.primary}
-                />
-                <ThemedText style={styles.infoText}>
+                <Feather name="database" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.infoText, { color: theme.textSecondary }]}
+                >
                   Database maintenance for better performance
                 </ThemedText>
               </View>
               <View style={styles.infoItem}>
-                <Feather name="shield" size={16} color={Colors.dark.primary} />
-                <ThemedText style={styles.infoText}>
+                <Feather name="shield" size={16} color={theme.primary} />
+                <ThemedText
+                  style={[styles.infoText, { color: theme.textSecondary }]}
+                >
                   Security updates to keep your data safe
                 </ThemedText>
               </View>
@@ -104,9 +117,11 @@ export default function MaintenanceScreen({
 
           <GlassCard style={styles.noteCard}>
             <View style={styles.noteContent}>
-              <Feather name="info" size={20} color={Colors.dark.info} />
-              <ThemedText style={styles.noteText}>
-                Your progress and data are safe. We'll be back shortly!
+              <Feather name="info" size={20} color={theme.info || theme.primary} />
+              <ThemedText
+                style={[styles.noteText, { color: theme.textSecondary }]}
+              >
+                Your progress and data are safe. We&apos;ll be back shortly!
               </ThemedText>
             </View>
           </GlassCard>
@@ -152,7 +167,6 @@ const styles = StyleSheet.create({
   },
   description: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.xl,
     paddingHorizontal: Spacing.lg,
     lineHeight: 22,
@@ -172,11 +186,8 @@ const styles = StyleSheet.create({
   },
   timeLabel: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
   },
-  timeValue: {
-    color: Colors.dark.primary,
-  },
+  timeValue: {},
   infoCard: {
     width: "100%",
     padding: Spacing.xl,
@@ -196,7 +207,6 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     lineHeight: 20,
   },
   noteCard: {
@@ -212,7 +222,6 @@ const styles = StyleSheet.create({
   noteText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     lineHeight: 20,
   },
   refreshButton: {

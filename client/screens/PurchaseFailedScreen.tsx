@@ -18,7 +18,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type PurchaseFailedScreenRouteProp = RouteProp<
@@ -52,6 +53,7 @@ export default function PurchaseFailedScreen() {
   const route = useRoute<PurchaseFailedScreenRouteProp>();
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const { theme } = useTheme();
 
   const errorMessage =
     route.params?.errorMessage || "Something went wrong with your purchase";
@@ -100,7 +102,9 @@ export default function PurchaseFailedScreen() {
 
   const handleContact = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL("mailto:support@maternalmind.com.pk?subject=Purchase%20Issue");
+    Linking.openURL(
+      "mailto:support@maternalmind.com.pk?subject=Purchase%20Issue",
+    );
   };
 
   const handleCancel = () => {
@@ -128,8 +132,13 @@ export default function PurchaseFailedScreen() {
             { transform: [{ translateX: shakeAnim }] },
           ]}
         >
-          <View style={styles.iconCircle}>
-            <Feather name="x" size={48} color={Colors.dark.error} />
+          <View
+            style={[
+              styles.iconCircle,
+              { backgroundColor: `${theme.error}15` },
+            ]}
+          >
+            <Feather name="x" size={48} color={theme.error} />
           </View>
         </Animated.View>
 
@@ -137,27 +146,44 @@ export default function PurchaseFailedScreen() {
           Purchase Failed
         </ThemedText>
 
-        <View style={styles.errorBox}>
-          <Feather name="alert-triangle" size={16} color={Colors.dark.error} />
-          <ThemedText style={styles.errorText}>{errorMessage}</ThemedText>
+        <View
+          style={[
+            styles.errorBox,
+            { backgroundColor: `${theme.error}15` },
+          ]}
+        >
+          <Feather name="alert-triangle" size={16} color={theme.error} />
+          <ThemedText style={[styles.errorText, { color: theme.error }]}>
+            {errorMessage}
+          </ThemedText>
         </View>
 
         <Animated.View style={[styles.issuesSection, { opacity: fadeAnim }]}>
-          <ThemedText style={styles.sectionLabel}>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
             POSSIBLE SOLUTIONS
           </ThemedText>
           {commonIssues.map((issue, index) => (
             <GlassCard key={index} style={styles.issueCard}>
-              <View style={styles.issueIcon}>
+              <View
+                style={[
+                  styles.issueIcon,
+                  { backgroundColor: `${theme.warning}15` },
+                ]}
+              >
                 <Feather
                   name={issue.icon}
                   size={18}
-                  color={Colors.dark.warning}
+                  color={theme.warning}
                 />
               </View>
               <View style={styles.issueContent}>
                 <ThemedText style={styles.issueTitle}>{issue.title}</ThemedText>
-                <ThemedText style={styles.issueDescription}>
+                <ThemedText
+                  style={[
+                    styles.issueDescription,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {issue.description}
                 </ThemedText>
               </View>
@@ -175,12 +201,20 @@ export default function PurchaseFailedScreen() {
           />
 
           <Pressable onPress={handleContact} style={styles.helpButton}>
-            <Feather name="mail" size={18} color={Colors.dark.primary} />
-            <ThemedText style={styles.helpText}>Contact Support</ThemedText>
+            <Feather name="mail" size={18} color={theme.primary} />
+            <ThemedText
+              style={[styles.helpText, { color: theme.primary }]}
+            >
+              Contact Support
+            </ThemedText>
           </Pressable>
 
           <Pressable onPress={handleCancel} style={styles.cancelButton}>
-            <ThemedText style={styles.cancelText}>Cancel</ThemedText>
+            <ThemedText
+              style={[styles.cancelText, { color: theme.textMuted }]}
+            >
+              Cancel
+            </ThemedText>
           </Pressable>
         </Animated.View>
       </View>
@@ -201,7 +235,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${Colors.dark.error}15`,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -212,7 +245,6 @@ const styles = StyleSheet.create({
   errorBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: `${Colors.dark.error}15`,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginBottom: Spacing["2xl"],
@@ -220,7 +252,6 @@ const styles = StyleSheet.create({
   errorText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.error,
     marginLeft: Spacing.sm,
   },
   issuesSection: {
@@ -229,8 +260,8 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   issueCard: {
@@ -243,7 +274,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: `${Colors.dark.warning}15`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -258,7 +288,6 @@ const styles = StyleSheet.create({
   },
   issueDescription: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   ctaSection: {
     marginTop: Spacing["2xl"],
@@ -275,7 +304,6 @@ const styles = StyleSheet.create({
   },
   helpText: {
     fontSize: 15,
-    color: Colors.dark.primary,
     fontWeight: "500",
     marginLeft: Spacing.sm,
   },
@@ -285,6 +313,5 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 14,
-    color: Colors.dark.textMuted,
   },
 });

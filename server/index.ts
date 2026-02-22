@@ -102,27 +102,21 @@ function setupHealthCheck(app: express.Application) {
 function setupBodyParsing(app: express.Application) {
   app.use(
     express.json({
-      limit: '5mb',
+      limit: "5mb",
       verify: (req, _res, buf) => {
         req.rawBody = buf;
       },
     }),
   );
 
-  app.use(express.urlencoded({ extended: false, limit: '5mb' }));
+  app.use(express.urlencoded({ extended: false, limit: "5mb" }));
 }
 
 function setupRequestLogging(app: express.Application) {
   app.use((req, res, next) => {
     const start = Date.now();
     const path = req.path;
-    let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
-
-    const originalResJson = res.json;
-    res.json = function (bodyJson, ...args) {
-      capturedJsonResponse = bodyJson;
-      return originalResJson.apply(res, [bodyJson, ...args]);
-    };
+    const requestId = (req as any).id;
 
     res.on("finish", () => {
       if (!path.startsWith("/api")) return;
@@ -130,8 +124,8 @@ function setupRequestLogging(app: express.Application) {
       const duration = Date.now() - start;
 
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      if (requestId) {
+        logLine += ` [reqId=${requestId}]`;
       }
 
       if (logLine.length > 80) {

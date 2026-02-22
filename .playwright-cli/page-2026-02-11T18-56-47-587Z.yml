@@ -1,0 +1,263 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - img [ref=e6]
+    - generic [ref=e32]:
+      - heading "Maternal Mind" [level=1] [ref=e33]
+      - paragraph [ref=e34]: OB-GYN Excellence
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: Media Kit
+          - heading "Press & Brand Resources" [level=1] [ref=e90]:
+            - text: Press & Brand
+            - generic [ref=e91]: Resources
+          - paragraph [ref=e92]: Download brand assets, view our colour palette, and access guidelines for featuring Maternal Mind in press and media.
+        - generic [ref=e97]:
+          - img [ref=e99]
+          - generic [ref=e103]:
+            - heading "Maternal Mind" [level=2] [ref=e104]
+            - paragraph [ref=e105]: Maternal Mind is a premium mobile-first educational platform for postgraduate doctors in Obstetrics and Gynaecology. It provides structured learning content, exam-focused MCQs, and intelligent progress analytics for MRCOG, FCPS, and OB-GYN trainees worldwide.
+            - generic [ref=e106]:
+              - generic [ref=e107]: Medical Education
+              - generic [ref=e108]: OB-GYN
+              - generic [ref=e109]: EdTech
+              - generic [ref=e110]: Exam Preparation
+        - generic [ref=e112]:
+          - generic [ref=e114]:
+            - generic [ref=e115]: Brand Assets
+            - heading "Logo & Identity" [level=2] [ref=e116]
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - generic [ref=e121]:
+                - img [ref=e123]
+                - generic [ref=e127]: Maternal Mind
+              - generic [ref=e128]:
+                - generic [ref=e129]: Logo - Dark Background
+                - img [ref=e130]
+            - generic [ref=e133]:
+              - generic [ref=e135]:
+                - img [ref=e137]
+                - generic [ref=e141]: Maternal Mind
+              - generic [ref=e142]:
+                - generic [ref=e143]: Logo - Light Background
+                - img [ref=e144]
+            - generic [ref=e147]:
+              - img [ref=e151]
+              - generic [ref=e155]:
+                - generic [ref=e156]: Logo Mark Only
+                - img [ref=e157]
+        - generic [ref=e161]:
+          - generic [ref=e163]:
+            - generic [ref=e164]: Colour Palette
+            - heading "Brand Colours" [level=2] [ref=e165]
+          - generic [ref=e167]:
+            - generic [ref=e170] [cursor=pointer]:
+              - generic [ref=e171]:
+                - generic [ref=e172]: Primary Cyan
+                - img [ref=e173]
+              - paragraph [ref=e176]: "#11a4d4"
+              - paragraph [ref=e177]: Primary brand, glows, buttons
+            - generic [ref=e180] [cursor=pointer]:
+              - generic [ref=e181]:
+                - generic [ref=e182]: Deep Teal
+                - img [ref=e183]
+              - paragraph [ref=e186]: "#0c7fa6"
+              - paragraph [ref=e187]: Hover states, borders
+            - generic [ref=e190] [cursor=pointer]:
+              - generic [ref=e191]:
+                - generic [ref=e192]: Background Void
+                - img [ref=e193]
+              - paragraph [ref=e196]: "#101d22"
+              - paragraph [ref=e197]: Primary background
+            - generic [ref=e200] [cursor=pointer]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: Surface Dark
+                - img [ref=e203]
+              - paragraph [ref=e206]: "#152228"
+              - paragraph [ref=e207]: Card surfaces
+            - generic [ref=e210] [cursor=pointer]:
+              - generic [ref=e211]:
+                - generic [ref=e212]: Success
+                - img [ref=e213]
+              - paragraph [ref=e216]: "#22c55e"
+              - paragraph [ref=e217]: Success states
+            - generic [ref=e220] [cursor=pointer]:
+              - generic [ref=e221]:
+                - generic [ref=e222]: Warning
+                - img [ref=e223]
+              - paragraph [ref=e226]: "#eab308"
+              - paragraph [ref=e227]: Warning states
+            - generic [ref=e230] [cursor=pointer]:
+              - generic [ref=e231]:
+                - generic [ref=e232]: Error
+                - img [ref=e233]
+              - paragraph [ref=e236]: "#ef4444"
+              - paragraph [ref=e237]: Error states
+            - generic [ref=e240] [cursor=pointer]:
+              - generic [ref=e241]:
+                - generic [ref=e242]: Purple Accent
+                - img [ref=e243]
+              - paragraph [ref=e246]: "#a855f7"
+              - paragraph [ref=e247]: Secondary accent
+        - generic [ref=e249]:
+          - generic [ref=e251]:
+            - generic [ref=e252]: Typography
+            - heading "Typeface" [level=2] [ref=e253]
+          - generic [ref=e256]:
+            - generic [ref=e257]:
+              - heading "Primary Font" [level=3] [ref=e258]
+              - paragraph [ref=e259]: Inter
+              - paragraph [ref=e260]: Used for all headings, body text, and UI elements. Clean, legible, and professional at all sizes.
+            - generic [ref=e261]:
+              - heading "Type Scale" [level=3] [ref=e262]
+              - generic [ref=e263]:
+                - paragraph [ref=e264]: H1 — 32px Light
+                - paragraph [ref=e265]: H2 — 24px Semibold
+                - paragraph [ref=e266]: H3 — 20px Medium
+                - paragraph [ref=e267]: Body — 16px Regular
+                - paragraph [ref=e268]: Caption — 14px
+                - paragraph [ref=e269]: Label — 12px Medium
+        - generic [ref=e271]:
+          - generic [ref=e273]:
+            - generic [ref=e274]: Guidelines
+            - heading "Usage Guidelines" [level=2] [ref=e275]
+          - generic [ref=e278]:
+            - generic [ref=e279]:
+              - img [ref=e280]
+              - generic [ref=e283]: Use the full 'Maternal Mind' name in first reference; 'MM' abbreviation is acceptable in subsequent references.
+            - generic [ref=e284]:
+              - img [ref=e285]
+              - generic [ref=e288]: Always maintain clear space around the logo equal to the height of the stethoscope icon.
+            - generic [ref=e289]:
+              - img [ref=e290]
+              - generic [ref=e293]: The logo must appear on dark backgrounds (#101d22 or darker) or light backgrounds (#f0f4f5 or lighter).
+            - generic [ref=e294]:
+              - img [ref=e295]
+              - generic [ref=e298]: Do not alter logo colours, proportions, or add effects not specified in these guidelines.
+            - generic [ref=e299]:
+              - img [ref=e300]
+              - generic [ref=e303]: When describing Maternal Mind, use 'educational platform' — never 'medical advice tool' or similar.
+            - generic [ref=e304]:
+              - img [ref=e305]
+              - generic [ref=e308]: For press inquiries, contact press@maternalmind.app.
+        - generic [ref=e312]:
+          - generic [ref=e313]:
+            - paragraph [ref=e314]: Press Contact
+            - paragraph [ref=e315]: press@maternalmind.app
+          - link "Contact Press Team" [ref=e316] [cursor=pointer]:
+            - /url: mailto:press@maternalmind.app
+            - button "Contact Press Team" [ref=e317]:
+              - text: Contact Press Team
+              - img [ref=e318]
+    - contentinfo [ref=e324]:
+      - generic [ref=e325]:
+        - generic [ref=e326]:
+          - generic [ref=e327]:
+            - link "Maternal Mind" [ref=e328] [cursor=pointer]:
+              - /url: /
+              - img [ref=e329]
+              - generic [ref=e354]: Maternal Mind
+            - paragraph [ref=e355]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e356]:
+              - paragraph [ref=e357]: Stay updated
+              - generic [ref=e359]:
+                - textbox "Your email" [ref=e360]
+                - button [ref=e361] [cursor=pointer]:
+                  - img [ref=e362]
+            - generic [ref=e366]:
+              - link "Email" [ref=e367] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e368]
+              - link "LinkedIn" [ref=e371] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/maternal-mind
+                - img [ref=e372]
+              - link "X" [ref=e374] [cursor=pointer]:
+                - /url: https://x.com/maternalmindapp
+                - img [ref=e375]
+          - generic [ref=e377]:
+            - heading "Product" [level=3] [ref=e378]
+            - list [ref=e379]:
+              - listitem [ref=e380]:
+                - link "Features" [ref=e381] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e382]:
+                - link "How It Works" [ref=e383] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e384]:
+                - link "Pricing" [ref=e385] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e386]:
+                - link "For Institutions" [ref=e387] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e388]:
+            - heading "Resources" [level=3] [ref=e389]
+            - list [ref=e390]:
+              - listitem [ref=e391]:
+                - link "MRCOG Part 1" [ref=e392] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e393]:
+                - link "MRCOG Part 2" [ref=e394] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e395]:
+                - link "MRCOG Part 3" [ref=e396] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e397]:
+                - link "FCPS OB-GYN" [ref=e398] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e399]:
+                - link "OB-GYN MCQs" [ref=e400] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e401]:
+            - heading "Company" [level=3] [ref=e402]
+            - list [ref=e403]:
+              - listitem [ref=e404]:
+                - link "About" [ref=e405] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e406]:
+                - link "Support" [ref=e407] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e408]:
+                - link "Media Kit" [ref=e409] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e410]:
+            - heading "Legal" [level=3] [ref=e411]
+            - list [ref=e412]:
+              - listitem [ref=e413]:
+                - link "Terms of Service" [ref=e414] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e415]:
+                - link "Privacy Policy" [ref=e416] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e417]:
+                - link "Disclaimer" [ref=e418] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e420]:
+          - paragraph [ref=e421]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e422]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.

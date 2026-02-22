@@ -1,0 +1,49 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e7]:
+  - generic:
+    - generic:
+      - generic:
+        - link "Login, back" [ref=e9] [cursor=pointer]:
+          - /url: /Login
+        - generic:
+          - heading [level=1]
+  - generic [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e26]: Create Account
+      - generic [ref=e27]: Start your OB-GYN learning journey
+    - generic [ref=e28]:
+      - generic [ref=e30] [cursor=pointer]:
+        - generic [ref=e32]: 
+        - generic [ref=e33]:
+          - generic:
+            - generic: Full Name
+          - textbox [ref=e34]
+      - generic [ref=e36] [cursor=pointer]:
+        - generic [ref=e38]: 
+        - generic [ref=e39]:
+          - generic:
+            - generic: Email
+          - textbox [ref=e40]
+      - generic [ref=e42] [cursor=pointer]:
+        - generic [ref=e44]: 
+        - generic [ref=e45]:
+          - generic:
+            - generic: Password
+          - textbox [ref=e46]
+        - generic [ref=e48]: 
+      - generic [ref=e50] [cursor=pointer]:
+        - generic [ref=e52]: 
+        - generic [ref=e53]:
+          - generic:
+            - generic: Confirm Password
+          - textbox [ref=e54]
+        - generic [ref=e56]: 
+      - button "Create Account" [ref=e57] [cursor=pointer]:
+        - generic [ref=e59]: Create Account
+        - generic [ref=e60]: 
+    - generic [ref=e61]:
+      - generic [ref=e62]: Already have an account?
+      - generic [ref=e64] [cursor=pointer]: Sign In
+```

@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { StatCard } from "@/components/StatCard";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type QuizResultsRouteProp = RouteProp<RootStackParamList, "QuizResults">;
@@ -45,6 +46,7 @@ export default function QuizResultsScreen() {
   const navigation = useNavigation<QuizResultsNavigationProp>();
   const route = useRoute<QuizResultsRouteProp>();
   const { resultId } = route.params;
+  const { theme } = useTheme();
 
   const { data: result } = useQuery<QuizResult>({
     queryKey: ["/api/quiz/results", resultId],
@@ -82,14 +84,14 @@ export default function QuizResultsScreen() {
           <View
             style={[
               styles.scoreCircle,
-              isHighScore && styles.scoreCircleSuccess,
+              isHighScore && { shadowColor: theme.success },
             ]}
           >
             <LinearGradient
               colors={
                 isHighScore
-                  ? [Colors.dark.success, "#16a34a"]
-                  : [Colors.dark.primary, Colors.dark.primaryDark]
+                  ? [theme.success, theme.successGlow || "#16a34a"]
+                  : [theme.primary, theme.primaryDark || theme.text]
               }
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0 }}
@@ -104,7 +106,9 @@ export default function QuizResultsScreen() {
           <ThemedText type="h2" style={styles.resultTitle}>
             {isHighScore ? "Excellent Work!" : "Keep Practicing!"}
           </ThemedText>
-          <ThemedText style={styles.resultSubtitle}>
+          <ThemedText
+            style={[styles.resultSubtitle, { color: theme.textSecondary }]}
+          >
             {isHighScore
               ? "You've mastered this topic!"
               : "Review your answers and try again."}
@@ -116,33 +120,37 @@ export default function QuizResultsScreen() {
             label="Correct"
             value={result?.correctCount || 0}
             icon="check-circle"
-            color={Colors.dark.success}
+            color={theme.success}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Wrong"
             value={result?.wrongCount || 0}
             icon="x-circle"
-            color={Colors.dark.error}
+            color={theme.error}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Time"
             value={formatTime(result?.timeTaken || 0)}
             icon="clock"
-            color={Colors.dark.info}
+            color={theme.textMuted}
           />
         </View>
 
         <View style={styles.reviewSection}>
-          <ThemedText style={styles.sectionLabel}>ANSWER REVIEW</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            ANSWER REVIEW
+          </ThemedText>
           {result?.questions.map((q, index) => (
             <GlassCard
               key={q.id}
               active={false}
               style={[
                 styles.questionCard,
-                q.isCorrect ? styles.questionCorrect : styles.questionWrong,
+                q.isCorrect
+                  ? { borderColor: `${theme.success}4D` }
+                  : { borderColor: `${theme.error}4D` },
               ]}
             >
               <View style={styles.questionHeader}>
@@ -151,8 +159,8 @@ export default function QuizResultsScreen() {
                     styles.questionBadge,
                     {
                       backgroundColor: q.isCorrect
-                        ? Colors.dark.success
-                        : Colors.dark.error,
+                        ? theme.success
+                        : theme.error,
                     },
                   ]}
                 >
@@ -162,20 +170,26 @@ export default function QuizResultsScreen() {
                     color="#fff"
                   />
                 </View>
-                <ThemedText style={styles.questionIndex}>
+                <ThemedText
+                  style={[styles.questionIndex, { color: theme.textSecondary }]}
+                >
                   Q{index + 1}
                 </ThemedText>
               </View>
-              <ThemedText style={styles.questionText} numberOfLines={4}>{q.question}</ThemedText>
+              <ThemedText style={styles.questionText} numberOfLines={4}>
+                {q.question}
+              </ThemedText>
               <View style={styles.answerRow}>
-                <ThemedText style={styles.answerLabel}>Your answer:</ThemedText>
+                <ThemedText
+                  style={[styles.answerLabel, { color: theme.textSecondary }]}
+                >
+                  Your answer:
+                </ThemedText>
                 <ThemedText
                   style={[
                     styles.answerValue,
                     {
-                      color: q.isCorrect
-                        ? Colors.dark.success
-                        : Colors.dark.error,
+                      color: q.isCorrect ? theme.success : theme.error,
                     },
                   ]}
                 >
@@ -184,19 +198,31 @@ export default function QuizResultsScreen() {
               </View>
               {!q.isCorrect ? (
                 <View style={styles.answerRow}>
-                  <ThemedText style={styles.answerLabel}>
+                  <ThemedText
+                    style={[styles.answerLabel, { color: theme.textSecondary }]}
+                  >
                     Correct answer:
                   </ThemedText>
                   <ThemedText
-                    style={[styles.answerValue, { color: Colors.dark.success }]}
+                    style={[styles.answerValue, { color: theme.success }]}
                   >
                     {q.correctAnswer}
                   </ThemedText>
                 </View>
               ) : null}
-              <View style={styles.explanationBox}>
-                <Feather name="info" size={14} color={Colors.dark.primary} />
-                <ThemedText style={styles.explanationText}>
+              <View
+                style={[
+                  styles.explanationBox,
+                  { backgroundColor: `${theme.primary}1A` },
+                ]}
+              >
+                <Feather name="info" size={14} color={theme.primary} />
+                <ThemedText
+                  style={[
+                    styles.explanationText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {q.explanation}
                 </ThemedText>
               </View>
@@ -215,7 +241,10 @@ export default function QuizResultsScreen() {
             title="Retry Quiz"
             onPress={() => navigation.goBack()}
             variant="secondary"
-            style={styles.retryButton}
+            style={[
+              styles.retryButton,
+              { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+            ]}
             testID="button-retry-quiz"
           />
         </View>
@@ -250,9 +279,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["2xl"],
     ...Shadows.glow,
   },
-  scoreCircleSuccess: {
-    shadowColor: Colors.dark.success,
-  },
   scoreValue: {
     color: "#fff",
     fontSize: 40,
@@ -269,7 +295,6 @@ const styles = StyleSheet.create({
   },
   resultSubtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
   },
   statsRow: {
     flexDirection: "row",
@@ -281,19 +306,13 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
-    letterSpacing: 1.5,
-    color: Colors.dark.textMuted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
   questionCard: {
     marginBottom: Spacing.md,
     padding: Spacing.lg,
-  },
-  questionCorrect: {
-    borderColor: "rgba(34,197,94,0.3)",
-  },
-  questionWrong: {
-    borderColor: "rgba(239,68,68,0.3)",
   },
   questionHeader: {
     flexDirection: "row",
@@ -311,7 +330,6 @@ const styles = StyleSheet.create({
   questionIndex: {
     fontSize: 12,
     fontWeight: "600",
-    color: Colors.dark.textSecondary,
   },
   questionText: {
     fontSize: 15,
@@ -324,7 +342,6 @@ const styles = StyleSheet.create({
   },
   answerLabel: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     marginRight: Spacing.sm,
   },
   answerValue: {
@@ -334,7 +351,6 @@ const styles = StyleSheet.create({
   },
   explanationBox: {
     flexDirection: "row",
-    backgroundColor: "rgba(17,164,212,0.1)",
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginTop: Spacing.md,
@@ -343,7 +359,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     lineHeight: 20,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.sm,
   },
   actionsSection: {
@@ -351,8 +366,6 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: Spacing.md,
-    backgroundColor: Colors.dark.glass,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
 });

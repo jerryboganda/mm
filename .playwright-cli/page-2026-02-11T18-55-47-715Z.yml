@@ -1,0 +1,152 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - img [ref=e6]
+    - generic [ref=e32]:
+      - heading "Maternal Mind" [level=1] [ref=e33]
+      - paragraph [ref=e34]: OB-GYN Excellence
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: Legal
+          - heading "Legal Information" [level=1] [ref=e90]
+          - paragraph [ref=e91]: Transparency and responsibility are core to Maternal Mind. Review our legal documentation below.
+        - generic [ref=e93]:
+          - 'link "Terms of Service Terms governing your use of the Maternal Mind platform. Last updated: January 2026" [ref=e95] [cursor=pointer]':
+            - /url: /legal/terms
+            - generic [ref=e97]:
+              - img [ref=e99]
+              - generic [ref=e102]:
+                - heading "Terms of Service" [level=3] [ref=e103]
+                - paragraph [ref=e104]: Terms governing your use of the Maternal Mind platform.
+                - paragraph [ref=e105]: "Last updated: January 2026"
+              - img [ref=e106]
+          - 'link "Privacy Policy How we collect, use, and protect your personal data. Last updated: January 2026" [ref=e109] [cursor=pointer]':
+            - /url: /legal/privacy
+            - generic [ref=e111]:
+              - img [ref=e113]
+              - generic [ref=e115]:
+                - heading "Privacy Policy" [level=3] [ref=e116]
+                - paragraph [ref=e117]: How we collect, use, and protect your personal data.
+                - paragraph [ref=e118]: "Last updated: January 2026"
+              - img [ref=e119]
+          - 'link "Medical Disclaimer Important information about the educational nature of our content. Last updated: January 2026" [ref=e122] [cursor=pointer]':
+            - /url: /legal/disclaimer
+            - generic [ref=e124]:
+              - img [ref=e126]
+              - generic [ref=e128]:
+                - heading "Medical Disclaimer" [level=3] [ref=e129]
+                - paragraph [ref=e130]: Important information about the educational nature of our content.
+                - paragraph [ref=e131]: "Last updated: January 2026"
+              - img [ref=e132]
+    - contentinfo [ref=e134]:
+      - generic [ref=e135]:
+        - generic [ref=e136]:
+          - generic [ref=e137]:
+            - link "Maternal Mind" [ref=e138] [cursor=pointer]:
+              - /url: /
+              - img [ref=e139]
+              - generic [ref=e164]: Maternal Mind
+            - paragraph [ref=e165]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e166]:
+              - paragraph [ref=e167]: Stay updated
+              - generic [ref=e169]:
+                - textbox "Your email" [ref=e170]
+                - button [ref=e171] [cursor=pointer]:
+                  - img [ref=e172]
+            - generic [ref=e176]:
+              - link "Email" [ref=e177] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e178]
+              - link "LinkedIn" [ref=e181] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/maternal-mind
+                - img [ref=e182]
+              - link "X" [ref=e184] [cursor=pointer]:
+                - /url: https://x.com/maternalmindapp
+                - img [ref=e185]
+          - generic [ref=e187]:
+            - heading "Product" [level=3] [ref=e188]
+            - list [ref=e189]:
+              - listitem [ref=e190]:
+                - link "Features" [ref=e191] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e192]:
+                - link "How It Works" [ref=e193] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e194]:
+                - link "Pricing" [ref=e195] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e196]:
+                - link "For Institutions" [ref=e197] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e198]:
+            - heading "Resources" [level=3] [ref=e199]
+            - list [ref=e200]:
+              - listitem [ref=e201]:
+                - link "MRCOG Part 1" [ref=e202] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e203]:
+                - link "MRCOG Part 2" [ref=e204] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e205]:
+                - link "MRCOG Part 3" [ref=e206] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e207]:
+                - link "FCPS OB-GYN" [ref=e208] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e209]:
+                - link "OB-GYN MCQs" [ref=e210] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e211]:
+            - heading "Company" [level=3] [ref=e212]
+            - list [ref=e213]:
+              - listitem [ref=e214]:
+                - link "About" [ref=e215] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e216]:
+                - link "Support" [ref=e217] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e218]:
+                - link "Media Kit" [ref=e219] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e220]:
+            - heading "Legal" [level=3] [ref=e221]
+            - list [ref=e222]:
+              - listitem [ref=e223]:
+                - link "Terms of Service" [ref=e224] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e225]:
+                - link "Privacy Policy" [ref=e226] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e227]:
+                - link "Disclaimer" [ref=e228] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e230]:
+          - paragraph [ref=e231]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e232]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.

@@ -10,6 +10,7 @@ import * as Haptics from "expo-haptics";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface OptionButtonProps {
   label: string;
@@ -37,6 +38,7 @@ export function OptionButton({
   testID,
 }: OptionButtonProps) {
   const scale = useSharedValue(1);
+  const { theme } = useTheme();
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -60,17 +62,17 @@ export function OptionButton({
   };
 
   const getBorderColor = () => {
-    if (correct) return Colors.dark.success;
-    if (incorrect) return Colors.dark.error;
-    if (selected) return Colors.dark.primary;
-    return Colors.dark.glassBorder;
+    if (correct) return theme.success;
+    if (incorrect) return theme.error;
+    if (selected) return theme.primary;
+    return theme.glassBorder;
   };
 
   const getBackgroundColor = () => {
     if (correct) return "rgba(34,197,94,0.1)";
     if (incorrect) return "rgba(239,68,68,0.1)";
     if (selected) return "rgba(17,164,212,0.1)";
-    return Colors.dark.glass;
+    return theme.glass;
   };
 
   return (
@@ -102,15 +104,25 @@ export function OptionButton({
         style={[
           styles.labelContainer,
           {
-            backgroundColor: selected ? Colors.dark.primary : Colors.dark.glass,
+            backgroundColor: selected
+              ? theme.primary
+              : "rgba(255,255,255,0.08)",
           },
         ]}
       >
-        <ThemedText style={[styles.label, selected && { color: "#fff" }]}>
+        <ThemedText
+          style={[
+            styles.label,
+            { color: theme.text },
+            selected && { color: "#fff" },
+          ]}
+        >
           {label}
         </ThemedText>
       </View>
-      <ThemedText style={styles.text}>{text}</ThemedText>
+      <ThemedText style={[styles.text, { color: theme.text }]} numberOfLines={4}>
+        {text}
+      </ThemedText>
     </AnimatedPressable>
   );
 }
@@ -123,6 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
     marginBottom: Spacing.md,
+    minHeight: 56,
   },
   disabled: {
     opacity: 0.6,
@@ -137,12 +150,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
-    color: Colors.dark.text,
+    fontWeight: "700",
   },
   text: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
   },
 });

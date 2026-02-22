@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  View,
-  Animated,
-  Easing,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, View, Animated, Easing } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -18,7 +12,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { usePurchases } from "@/lib/purchases";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Colors, Spacing } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type RestorePurchasesScreenNavigationProp =
@@ -29,7 +23,7 @@ type RestoreStatus = "idle" | "restoring" | "success" | "not_found" | "error";
 export default function RestorePurchasesScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<RestorePurchasesScreenNavigationProp>();
-  const { restorePurchases, isSubscribed } = usePurchases();
+  const { restorePurchases } = usePurchases();
   const [status, setStatus] = useState<RestoreStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -163,14 +157,14 @@ export default function RestorePurchasesScreen() {
               No Purchases Found
             </ThemedText>
             <ThemedText style={styles.statusSubtitle}>
-              We couldn't find any previous purchases associated with your
+              We couldn&apos;t find any previous purchases associated with your
               account
             </ThemedText>
             <GlassCard style={styles.helpCard}>
               <Feather name="info" size={18} color={Colors.dark.info} />
               <ThemedText style={styles.helpText}>
-                Make sure you're signed in with the same account you used for
-                the original purchase
+                Make sure you&apos;re signed in with the same account you used
+                for the original purchase
               </ThemedText>
             </GlassCard>
             <PrimaryButton
@@ -227,8 +221,8 @@ export default function RestorePurchasesScreen() {
               Restore Purchases
             </ThemedText>
             <ThemedText style={styles.subtitle}>
-              If you've previously subscribed to Maternal Mind Premium, you can
-              restore your subscription here
+              If you&apos;ve previously subscribed to Maternal Mind Premium, you
+              can restore your subscription here
             </ThemedText>
 
             <GlassCard style={styles.infoCard}>

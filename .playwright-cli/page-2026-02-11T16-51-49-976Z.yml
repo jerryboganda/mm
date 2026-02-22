@@ -1,0 +1,193 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - img [ref=e6]
+    - generic [ref=e32]:
+      - heading "Maternal Mind" [level=1] [ref=e33]
+      - paragraph [ref=e34]: OB-GYN Excellence
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: Support
+          - heading "How Can We Help You?" [level=1] [ref=e90]:
+            - text: How Can We
+            - generic [ref=e91]: Help You?
+          - paragraph [ref=e92]: Our team is here to help you get the most from Maternal Mind. Browse common issues below or reach out directly.
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - img [ref=e98]
+            - heading "Email Support" [level=3] [ref=e101]
+            - paragraph [ref=e102]: support@maternalmind.app
+            - paragraph [ref=e103]: Response within 24 hours
+          - generic [ref=e104]:
+            - img [ref=e105]
+            - heading "Support Hours" [level=3] [ref=e108]
+            - paragraph [ref=e109]: Monday - Friday
+            - paragraph [ref=e110]: 9:00 AM - 5:00 PM GMT
+          - generic [ref=e111]:
+            - img [ref=e112]
+            - heading "System Status" [level=3] [ref=e114]
+            - paragraph [ref=e115]: All Systems Operational
+            - paragraph [ref=e116]: "Last checked: Today"
+        - generic [ref=e118]:
+          - generic [ref=e120]:
+            - generic [ref=e121]: Troubleshooting
+            - heading "Common Questions" [level=2] [ref=e122]
+          - generic [ref=e125]:
+            - heading "I cannot sign in to my account" [level=3] [ref=e127]:
+              - button "I cannot sign in to my account" [ref=e128] [cursor=pointer]:
+                - text: I cannot sign in to my account
+                - img [ref=e129]
+            - heading "My subscription is not showing as active" [level=3] [ref=e132]:
+              - button "My subscription is not showing as active" [ref=e133] [cursor=pointer]:
+                - text: My subscription is not showing as active
+                - img [ref=e134]
+            - heading "Content is not loading or displays errors" [level=3] [ref=e137]:
+              - button "Content is not loading or displays errors" [ref=e138] [cursor=pointer]:
+                - text: Content is not loading or displays errors
+                - img [ref=e139]
+            - heading "How do I download content for offline use?" [level=3] [ref=e142]:
+              - button "How do I download content for offline use?" [ref=e143] [cursor=pointer]:
+                - text: How do I download content for offline use?
+                - img [ref=e144]
+            - heading "I found an error in the content" [level=3] [ref=e147]:
+              - button "I found an error in the content" [ref=e148] [cursor=pointer]:
+                - text: I found an error in the content
+                - img [ref=e149]
+            - heading "How do I cancel my subscription?" [level=3] [ref=e152]:
+              - button "How do I cancel my subscription?" [ref=e153] [cursor=pointer]:
+                - text: How do I cancel my subscription?
+                - img [ref=e154]
+        - generic [ref=e157]:
+          - generic [ref=e159]:
+            - generic [ref=e160]: Contact
+            - heading "Send Us a Message" [level=2] [ref=e161]
+            - paragraph [ref=e162]: Cannot find an answer? Contact us directly and we will respond within 24 hours.
+          - generic [ref=e165]:
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - generic [ref=e168]: Name
+                - textbox "Your name" [ref=e169]
+              - generic [ref=e170]:
+                - generic [ref=e171]: Email
+                - textbox "you@example.com" [ref=e172]
+            - generic [ref=e173]:
+              - generic [ref=e174]: Subject
+              - textbox "How can we help?" [ref=e175]
+            - generic [ref=e176]:
+              - generic [ref=e177]: Message
+              - textbox "Describe your issue or question in detail..." [ref=e178]
+            - button "Send Message" [ref=e179] [cursor=pointer]:
+              - text: Send Message
+              - img [ref=e180]
+    - contentinfo [ref=e184]:
+      - generic [ref=e185]:
+        - generic [ref=e186]:
+          - generic [ref=e187]:
+            - link "Maternal Mind" [ref=e188] [cursor=pointer]:
+              - /url: /
+              - img [ref=e189]
+              - generic [ref=e214]: Maternal Mind
+            - paragraph [ref=e215]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e216]:
+              - paragraph [ref=e217]: Stay updated
+              - generic [ref=e218]:
+                - textbox "Your email" [ref=e219]
+                - button [ref=e220] [cursor=pointer]:
+                  - img [ref=e221]
+            - generic [ref=e225]:
+              - link "Email" [ref=e226] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e227]
+              - link "LinkedIn" [ref=e230] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e231]
+              - link "X" [ref=e233] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=e234]
+          - generic [ref=e236]:
+            - heading "Product" [level=3] [ref=e237]
+            - list [ref=e238]:
+              - listitem [ref=e239]:
+                - link "Features" [ref=e240] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e241]:
+                - link "How It Works" [ref=e242] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e243]:
+                - link "Pricing" [ref=e244] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e245]:
+                - link "For Institutions" [ref=e246] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e247]:
+            - heading "Resources" [level=3] [ref=e248]
+            - list [ref=e249]:
+              - listitem [ref=e250]:
+                - link "MRCOG Part 1" [ref=e251] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e252]:
+                - link "MRCOG Part 2" [ref=e253] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e254]:
+                - link "MRCOG Part 3" [ref=e255] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e256]:
+                - link "FCPS OB-GYN" [ref=e257] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e258]:
+                - link "OB-GYN MCQs" [ref=e259] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e260]:
+            - heading "Company" [level=3] [ref=e261]
+            - list [ref=e262]:
+              - listitem [ref=e263]:
+                - link "About" [ref=e264] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e265]:
+                - link "Support" [ref=e266] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e267]:
+                - link "Media Kit" [ref=e268] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e269]:
+            - heading "Legal" [level=3] [ref=e270]
+            - list [ref=e271]:
+              - listitem [ref=e272]:
+                - link "Terms of Service" [ref=e273] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e274]:
+                - link "Privacy Policy" [ref=e275] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e276]:
+                - link "Disclaimer" [ref=e277] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e279]:
+          - paragraph [ref=e280]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e281]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.

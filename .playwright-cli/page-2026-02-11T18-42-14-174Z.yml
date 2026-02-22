@@ -1,0 +1,294 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e40]:
+    - navigation [ref=e41]:
+      - generic [ref=e43]:
+        - link "Maternal Mind" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - generic [ref=e70]: Maternal Mind
+        - generic [ref=e71]:
+          - link "Features" [ref=e72] [cursor=pointer]:
+            - /url: /features
+          - link "How It Works" [ref=e73] [cursor=pointer]:
+            - /url: /how-it-works
+          - link "Pricing" [ref=e74] [cursor=pointer]:
+            - /url: /pricing
+          - link "For Institutions" [ref=e75] [cursor=pointer]:
+            - /url: /institutions
+          - link "Resources" [ref=e76] [cursor=pointer]:
+            - /url: /resources
+          - link "About" [ref=e77] [cursor=pointer]:
+            - /url: /about
+        - generic [ref=e78]:
+          - link "Support" [ref=e79] [cursor=pointer]:
+            - /url: /support
+            - button "Support" [ref=e80]
+          - button "Get the App" [ref=e81] [cursor=pointer]: Get the App
+    - main [ref=e84]:
+      - generic [ref=e85]:
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e90]: Premium Medical Education
+            - heading "Maternal Mind Premium OB-GYN Learning for Postgraduate Doctors" [level=1] [ref=e92]:
+              - text: Maternal Mind
+              - generic [ref=e93]: Premium OB-GYN Learning
+              - generic [ref=e94]: for Postgraduate Doctors
+            - paragraph [ref=e96]: Structured content, exam-focused MCQs, and intelligent progress analytics. Built for MRCOG, FCPS, and OB-GYN trainees who demand precision.
+            - generic [ref=e97]:
+              - generic [ref=e98]:
+                - button "Get the App" [ref=e99] [cursor=pointer]:
+                  - text: Get the App
+                  - img [ref=e100]
+                - button "Join Waitlist" [active] [ref=e104] [cursor=pointer]
+                - link "Request Institutional Access" [ref=e105] [cursor=pointer]:
+                  - /url: /institutions
+                  - button "Request Institutional Access" [ref=e106]
+              - generic [ref=e460]:
+                - textbox "Enter your email" [ref=e461]
+                - button "Submit" [ref=e462] [cursor=pointer]: Submit
+              - link "Explore Features" [ref=e107] [cursor=pointer]:
+                - /url: /features
+                - text: Explore Features
+                - img [ref=e108]
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - img [ref=e116]
+              - generic [ref=e118]:
+                - paragraph [ref=e119]: Structured Library
+                - paragraph [ref=e120]: Books, chapters, topics
+            - generic [ref=e121]:
+              - img [ref=e123]
+              - generic [ref=e133]:
+                - paragraph [ref=e134]: Smart MCQs
+                - paragraph [ref=e135]: Multiple practice modes
+            - generic [ref=e136]:
+              - img [ref=e138]
+              - generic [ref=e140]:
+                - paragraph [ref=e141]: Progress Analytics
+                - paragraph [ref=e142]: Track your growth
+        - generic [ref=e144]:
+          - generic [ref=e146]:
+            - generic [ref=e147]: Product Tour
+            - heading "Everything You Need to Excel" [level=2] [ref=e148]
+            - paragraph [ref=e149]: From structured learning to progress tracking, every feature is designed for clinical precision.
+          - generic [ref=e151]:
+            - button "Learn" [ref=e152] [cursor=pointer]:
+              - img [ref=e153]
+              - text: Learn
+            - button "Practice" [ref=e155] [cursor=pointer]:
+              - img [ref=e156]
+              - text: Practice
+            - button "Progress" [ref=e166] [cursor=pointer]:
+              - img [ref=e167]
+              - text: Progress
+            - button "Profile" [ref=e169] [cursor=pointer]:
+              - img [ref=e170]
+              - text: Profile
+            - button "Subscribe" [ref=e173] [cursor=pointer]:
+              - img [ref=e174]
+              - text: Subscribe
+          - generic [ref=e176]:
+            - generic [ref=e177]:
+              - generic [ref=e178]:
+                - heading "Structured Medical Content" [level=3] [ref=e179]
+                - paragraph [ref=e180]: Navigate a carefully organized library of OB-GYN knowledge, structured from Books to Chapters to Topics for clear, systematic learning.
+              - list [ref=e181]:
+                - listitem [ref=e182]:
+                  - img [ref=e184]
+                  - generic [ref=e186]: Evidence-based explanations aligned to exam syllabi
+                - listitem [ref=e187]:
+                  - img [ref=e189]
+                  - generic [ref=e191]: "Hierarchical content: Books, Chapters, Topics"
+                - listitem [ref=e192]:
+                  - img [ref=e194]
+                  - generic [ref=e196]: Bookmark and revisit key topics anytime
+            - generic [ref=e198]:
+              - generic [ref=e203]: Maternal Mind
+              - generic [ref=e204]:
+                - generic [ref=e205]:
+                  - img [ref=e206]
+                  - generic [ref=e209]:
+                    - paragraph [ref=e210]: Obstetrics
+                    - paragraph [ref=e211]: 24 Chapters
+                  - img [ref=e212]
+                - generic [ref=e214]:
+                  - img [ref=e215]
+                  - generic [ref=e218]:
+                    - paragraph [ref=e219]: Gynaecology
+                    - paragraph [ref=e220]: 18 Chapters
+                  - img [ref=e221]
+                - generic [ref=e223]:
+                  - img [ref=e224]
+                  - generic [ref=e227]:
+                    - paragraph [ref=e228]: Reproductive Medicine
+                    - paragraph [ref=e229]: 12 Chapters
+                  - img [ref=e230]
+        - generic [ref=e233]:
+          - generic [ref=e235]:
+            - generic [ref=e236]: By the Numbers
+            - heading "Built for Serious Learners" [level=2] [ref=e237]
+          - generic [ref=e239]:
+            - generic [ref=e240]:
+              - img [ref=e241]
+              - paragraph [ref=e243]:
+                - generic [ref=e244]: 0+
+              - paragraph [ref=e245]: Topics Covered
+            - generic [ref=e246]:
+              - img [ref=e247]
+              - paragraph [ref=e257]:
+                - generic [ref=e258]: 0+
+              - paragraph [ref=e259]: Practice MCQs
+            - generic [ref=e260]:
+              - img [ref=e261]
+              - paragraph [ref=e264]:
+                - generic [ref=e265]: 0+
+              - paragraph [ref=e266]: Study Hours Tracked
+            - generic [ref=e267]:
+              - img [ref=e268]
+              - paragraph [ref=e271]:
+                - generic [ref=e272]: 0%
+              - paragraph [ref=e273]: Pass Rate Improvement
+        - generic [ref=e275]:
+          - generic [ref=e277]:
+            - generic [ref=e278]: Trust & Responsibility
+            - heading "Built with Clinical Rigour" [level=2] [ref=e279]
+            - paragraph [ref=e280]: Every piece of content is developed with evidence-based methodology and reviewed for clinical accuracy.
+          - generic [ref=e282]:
+            - generic [ref=e283]:
+              - img [ref=e285]
+              - heading "Educational Use Only" [level=3] [ref=e287]
+              - paragraph [ref=e288]: Content is designed for exam preparation and continuous professional development. Not intended as clinical guidance.
+            - generic [ref=e289]:
+              - img [ref=e291]
+              - heading "Privacy First" [level=3] [ref=e294]
+              - paragraph [ref=e295]: Your learning data is encrypted and never shared. We follow strict data protection standards for your peace of mind.
+            - generic [ref=e296]:
+              - img [ref=e298]
+              - heading "Cited Explanations" [level=3] [ref=e301]
+              - paragraph [ref=e302]: Answers reference established guidelines and peer-reviewed sources, helping you build evidence-based clinical reasoning.
+          - generic [ref=e304]:
+            - img [ref=e305]
+            - paragraph [ref=e307]: "Important: Maternal Mind is an educational resource for postgraduate medical learning. It does not provide medical advice, diagnosis, or treatment recommendations. Always consult qualified healthcare professionals for clinical decisions."
+        - generic [ref=e309]:
+          - generic [ref=e311]:
+            - generic [ref=e312]: Testimonials
+            - heading "Trusted by Medical Professionals" [level=2] [ref=e313]
+          - generic [ref=e315]:
+            - generic [ref=e316]:
+              - generic [ref=e317]:
+                - img [ref=e319]
+                - generic [ref=e322]:
+                  - paragraph [ref=e323]: Dr. Aisha Khan
+                  - paragraph [ref=e324]: MRCOG Part 2 Candidate
+              - paragraph [ref=e325]: "\"The structured approach to learning has transformed my preparation. The MCQ practice mode with detailed explanations is exactly what I needed for my MRCOG Part 2.\""
+            - generic [ref=e326]:
+              - generic [ref=e327]:
+                - img [ref=e329]
+                - generic [ref=e332]:
+                  - paragraph [ref=e333]: Dr. James Osei
+                  - paragraph [ref=e334]: OB-GYN Registrar
+              - paragraph [ref=e335]: "\"Maternal Mind fills a real gap in postgraduate medical education. The progress analytics help me identify weak areas quickly, and the content is clinically accurate.\""
+            - generic [ref=e336]:
+              - generic [ref=e337]:
+                - img [ref=e339]
+                - generic [ref=e342]:
+                  - paragraph [ref=e343]: Dr. Fatima Raza
+                  - paragraph [ref=e344]: FCPS Trainee, Obstetrics
+              - paragraph [ref=e345]: "\"As an FCPS trainee, finding quality study material was always challenging. Maternal Mind provides everything in one place with a beautiful, distraction-free interface.\""
+        - generic [ref=e349]:
+          - heading "Ready to Elevate Your Learning?" [level=2] [ref=e350]
+          - paragraph [ref=e351]: Join thousands of OB-GYN professionals who are advancing their careers with structured, exam-focused preparation.
+          - generic [ref=e352]:
+            - button "Get the App" [ref=e353] [cursor=pointer]:
+              - text: Get the App
+              - img [ref=e354]
+            - link "View Pricing" [ref=e358] [cursor=pointer]:
+              - /url: /pricing
+              - button "View Pricing" [ref=e359]
+    - contentinfo [ref=e360]:
+      - generic [ref=e361]:
+        - generic [ref=e362]:
+          - generic [ref=e363]:
+            - link "Maternal Mind" [ref=e364] [cursor=pointer]:
+              - /url: /
+              - img [ref=e365]
+              - generic [ref=e390]: Maternal Mind
+            - paragraph [ref=e391]: Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+            - generic [ref=e392]:
+              - paragraph [ref=e393]: Stay updated
+              - generic [ref=e395]:
+                - textbox "Your email" [ref=e396]
+                - button [ref=e397] [cursor=pointer]:
+                  - img [ref=e398]
+            - generic [ref=e402]:
+              - link "Email" [ref=e403] [cursor=pointer]:
+                - /url: mailto:support@maternalmind.app
+                - img [ref=e404]
+              - link "LinkedIn" [ref=e407] [cursor=pointer]:
+                - /url: https://www.linkedin.com/company/maternal-mind
+                - img [ref=e408]
+              - link "X" [ref=e410] [cursor=pointer]:
+                - /url: https://x.com/maternalmindapp
+                - img [ref=e411]
+          - generic [ref=e413]:
+            - heading "Product" [level=3] [ref=e414]
+            - list [ref=e415]:
+              - listitem [ref=e416]:
+                - link "Features" [ref=e417] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e418]:
+                - link "How It Works" [ref=e419] [cursor=pointer]:
+                  - /url: /how-it-works
+              - listitem [ref=e420]:
+                - link "Pricing" [ref=e421] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e422]:
+                - link "For Institutions" [ref=e423] [cursor=pointer]:
+                  - /url: /institutions
+          - generic [ref=e424]:
+            - heading "Resources" [level=3] [ref=e425]
+            - list [ref=e426]:
+              - listitem [ref=e427]:
+                - link "MRCOG Part 1" [ref=e428] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-1
+              - listitem [ref=e429]:
+                - link "MRCOG Part 2" [ref=e430] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-2
+              - listitem [ref=e431]:
+                - link "MRCOG Part 3" [ref=e432] [cursor=pointer]:
+                  - /url: /resources/mrcog-part-3
+              - listitem [ref=e433]:
+                - link "FCPS OB-GYN" [ref=e434] [cursor=pointer]:
+                  - /url: /resources/fcps-obgyn
+              - listitem [ref=e435]:
+                - link "OB-GYN MCQs" [ref=e436] [cursor=pointer]:
+                  - /url: /resources/obgyn-mcqs
+          - generic [ref=e437]:
+            - heading "Company" [level=3] [ref=e438]
+            - list [ref=e439]:
+              - listitem [ref=e440]:
+                - link "About" [ref=e441] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e442]:
+                - link "Support" [ref=e443] [cursor=pointer]:
+                  - /url: /support
+              - listitem [ref=e444]:
+                - link "Media Kit" [ref=e445] [cursor=pointer]:
+                  - /url: /media
+          - generic [ref=e446]:
+            - heading "Legal" [level=3] [ref=e447]
+            - list [ref=e448]:
+              - listitem [ref=e449]:
+                - link "Terms of Service" [ref=e450] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e451]:
+                - link "Privacy Policy" [ref=e452] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e453]:
+                - link "Disclaimer" [ref=e454] [cursor=pointer]:
+                  - /url: /legal/disclaimer
+        - generic [ref=e456]:
+          - paragraph [ref=e457]: © 2026 Maternal Mind. All rights reserved.
+          - paragraph [ref=e458]: For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.

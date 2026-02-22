@@ -1,4 +1,4 @@
-﻿import { Router } from "express";
+import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
 

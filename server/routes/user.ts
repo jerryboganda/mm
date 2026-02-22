@@ -103,7 +103,9 @@ router.get(
 router.get("/bookmarks", authMiddleware, async (req: AuthRequest, res) => {
   try {
     // Single JOIN query instead of N+1 individual lookups
-    const bookmarksWithDetails = await storage.getBookmarksWithDetails(req.userId!);
+    const bookmarksWithDetails = await storage.getBookmarksWithDetails(
+      req.userId!,
+    );
 
     res.json(
       bookmarksWithDetails.map((b) => ({

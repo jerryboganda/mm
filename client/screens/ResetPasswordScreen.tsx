@@ -12,7 +12,8 @@ import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { getApiUrl } from "@/lib/query-client";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { Feather } from "@expo/vector-icons";
 
@@ -29,6 +30,7 @@ export default function ResetPasswordScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const route = useRoute<ResetPasswordScreenRouteProp>();
+  const { theme } = useTheme();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -41,18 +43,25 @@ export default function ResetPasswordScreen() {
   const [token, setToken] = useState("");
 
   useEffect(() => {
+    let mounted = true;
+
     const tokenFromRoute = route.params?.token;
     if (tokenFromRoute) {
       setToken(tokenFromRoute);
     } else {
-      const url = Linking.useURL();
-      if (url) {
+      Linking.getInitialURL().then((url) => {
+        if (!mounted || !url) return;
         const parsed = Linking.parse(url);
-        if (parsed.queryParams?.token) {
-          setToken(parsed.queryParams.token as string);
+        const deepLinkToken = parsed.queryParams?.token;
+        if (typeof deepLinkToken === "string") {
+          setToken(deepLinkToken);
         }
-      }
+      });
     }
+
+    return () => {
+      mounted = false;
+    };
   }, [route.params]);
 
   const validate = () => {
@@ -131,17 +140,17 @@ export default function ResetPasswordScreen() {
           ]}
         >
           <View style={styles.successContainer}>
-            <View style={styles.successIcon}>
+            <View style={[styles.successIcon, { backgroundColor: theme.glass }]}>
               <Feather
                 name="check-circle"
                 size={48}
-                color={Colors.dark.primary}
+                color={theme.primary}
               />
             </View>
             <ThemedText type="h2" style={styles.successTitle}>
               Password Reset!
             </ThemedText>
-            <ThemedText style={styles.successMessage}>
+            <ThemedText style={[styles.successMessage, { color: theme.textSecondary }]}>
               Your password has been successfully reset. You can now sign in
               with your new password.
             </ThemedText>
@@ -177,7 +186,7 @@ export default function ResetPasswordScreen() {
           <ThemedText type="h1" style={styles.title}>
             Reset Password
           </ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
             Enter your new password below
           </ThemedText>
         </View>
@@ -218,11 +227,11 @@ export default function ResetPasswordScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={styles.footerText}>
+          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
             Remember your password?{" "}
           </ThemedText>
           <ThemedText
-            style={styles.linkText}
+            style={[styles.linkText, { color: theme.primary }]}
             onPress={() => navigation.navigate("Login")}
           >
             Sign In
@@ -258,12 +267,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   title: {
-    color: Colors.dark.text,
     marginBottom: Spacing.sm,
     textAlign: "center",
   },
   subtitle: {
-    color: Colors.dark.textSecondary,
     textAlign: "center",
     fontSize: 15,
     lineHeight: 22,
@@ -281,11 +288,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    color: Colors.dark.textSecondary,
     fontSize: 14,
   },
   linkText: {
-    color: Colors.dark.primary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -297,18 +302,15 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: Colors.dark.glass,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: Spacing.xl,
   },
   successTitle: {
-    color: Colors.dark.text,
     marginBottom: Spacing.md,
     textAlign: "center",
   },
   successMessage: {
-    color: Colors.dark.textSecondary,
     textAlign: "center",
     fontSize: 15,
     lineHeight: 24,

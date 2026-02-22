@@ -9,7 +9,8 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface ErrorScreenProps {
   title?: string;
@@ -27,6 +28,7 @@ export default function ErrorScreen({
   onGoBack,
 }: ErrorScreenProps) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   const handleRetry = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -52,7 +54,7 @@ export default function ErrorScreen({
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <LinearGradient
-              colors={[Colors.dark.error, "#dc2626"]}
+              colors={[theme.error, theme.errorDark || "#dc2626"]}
               style={styles.iconGradient}
             >
               <Feather name="alert-circle" size={48} color="#fff" />
@@ -63,23 +65,35 @@ export default function ErrorScreen({
             {title}
           </ThemedText>
 
-          <ThemedText style={styles.description}>{message}</ThemedText>
+          <ThemedText
+            style={[styles.description, { color: theme.textSecondary }]}
+          >
+            {message}
+          </ThemedText>
 
           {errorCode ? (
             <GlassCard style={styles.errorCodeCard}>
               <View style={styles.errorCodeContent}>
-                <ThemedText style={styles.errorCodeLabel}>
+                <ThemedText
+                  style={[styles.errorCodeLabel, { color: theme.textMuted }]}
+                >
                   Error Code
                 </ThemedText>
-                <ThemedText style={styles.errorCode}>{errorCode}</ThemedText>
+                <ThemedText
+                  style={[styles.errorCode, { color: theme.error }]}
+                >
+                  {errorCode}
+                </ThemedText>
               </View>
             </GlassCard>
           ) : null}
 
           <GlassCard style={styles.helpCard}>
             <View style={styles.helpContent}>
-              <Feather name="info" size={20} color={Colors.dark.info} />
-              <ThemedText style={styles.helpText}>
+              <Feather name="info" size={20} color={theme.info || theme.primary} />
+              <ThemedText
+                style={[styles.helpText, { color: theme.textSecondary }]}
+              >
                 If this problem persists, please contact our support team with
                 the error details above.
               </ThemedText>
@@ -139,7 +153,6 @@ const styles = StyleSheet.create({
   },
   description: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.xl,
     paddingHorizontal: Spacing.xl,
     lineHeight: 22,
@@ -154,13 +167,11 @@ const styles = StyleSheet.create({
   },
   errorCodeLabel: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
     marginBottom: Spacing.xs,
   },
   errorCode: {
     fontSize: 16,
     fontWeight: "600",
-    color: Colors.dark.error,
     fontFamily: "monospace",
   },
   helpCard: {
@@ -176,7 +187,6 @@ const styles = StyleSheet.create({
   helpText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     lineHeight: 20,
   },
   buttonContainer: {

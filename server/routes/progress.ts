@@ -3,7 +3,10 @@ import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
 
 /** Calculate study streak: consecutive days (from today backwards) that had quiz activity or topic views */
-function calculateStudyStreak(attempts: { createdAt: Date }[], recentActivity: { viewedAt: Date }[]): number {
+function calculateStudyStreak(
+  attempts: { createdAt: Date }[],
+  recentActivity: { viewedAt: Date }[],
+): number {
   // Collect all unique activity dates (YYYY-MM-DD)
   const activeDays = new Set<string>();
   for (const a of attempts) {
@@ -38,16 +41,20 @@ const router = Router();
 router.get("/", authMiddleware, async (req: AuthRequest, res) => {
   try {
     // Fetch all needed data in parallel
-    const [stats, attempts, userProgressData, allChapters, recentActivity] = await Promise.all([
-      storage.getQuizStats(req.userId!),
-      storage.getQuizAttempts(req.userId!),
-      storage.getUserProgress(req.userId!),
-      storage.getAllChaptersGroupedByBook(),
-      storage.getRecentActivity(req.userId!, 365),
-    ]);
+    const [stats, attempts, userProgressData, allChapters, recentActivity] =
+      await Promise.all([
+        storage.getQuizStats(req.userId!),
+        storage.getQuizAttempts(req.userId!),
+        storage.getUserProgress(req.userId!),
+        storage.getAllChaptersGroupedByBook(),
+        storage.getRecentActivity(req.userId!, 365),
+      ]);
 
     // Total topics from chapter LEFT JOIN counts
-    const totalTopics = allChapters.reduce((sum, ch) => sum + Number(ch.topicCount), 0);
+    const totalTopics = allChapters.reduce(
+      (sum, ch) => sum + Number(ch.topicCount),
+      0,
+    );
     const completedTopicIds = new Set(
       userProgressData.filter((p) => p.isCompleted).map((p) => p.topicId),
     );
@@ -72,7 +79,8 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
     if (topicIdsWithAttempts.length > 0) {
       for (const [topicId, topicAttempts] of attemptsByTopic) {
         const avgScore = Math.round(
-          topicAttempts.reduce((sum, a) => sum + a.score, 0) / topicAttempts.length,
+          topicAttempts.reduce((sum, a) => sum + a.score, 0) /
+            topicAttempts.length,
         );
         // Use topicId as fallback title; actual title added below
         topicProgressMap.set(topicId, {

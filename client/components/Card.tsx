@@ -91,7 +91,11 @@ export function Card({
         </ThemedText>
       ) : null}
       {description ? (
-        <ThemedText type="small" style={styles.cardDescription} numberOfLines={3}>
+        <ThemedText
+          type="small"
+          style={styles.cardDescription}
+          numberOfLines={3}
+        >
           {description}
         </ThemedText>
       ) : null}
