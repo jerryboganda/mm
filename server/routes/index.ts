@@ -18,7 +18,7 @@ import adminAnnouncementsRoutes from "./admin-announcements";
 // General API rate limits (per IP)
 const generalLimiter = rateLimiter(120, 60_000); // 120 requests/min for content browsing
 const quizLimiter = rateLimiter(30, 60_000); // 30 requests/min for quiz operations
-const adminLimiter = rateLimiter(60, 60_000); // 60 requests/min for admin operations
+const adminLimiter = rateLimiter(600, 60_000); // 600 requests/min for admin operations (bulk saves need headroom)
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/auth", authRoutes);
