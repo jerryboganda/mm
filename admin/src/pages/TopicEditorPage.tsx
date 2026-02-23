@@ -2,9 +2,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import TipTapEditor from '../components/TipTapEditor';
+import MermaidEditor from '../components/MermaidEditor';
 import {
   Plus, Trash2, Save, ArrowLeft, Loader2, AlertCircle,
   GripVertical, ChevronUp, ChevronDown, Type, Code, Image,
+  GitBranch,
 } from 'lucide-react';
 
 interface ContentBlock {
@@ -22,7 +24,7 @@ interface TopicDetail {
   chapterId: string;
 }
 
-type BlockType = 'text' | 'heading' | 'code' | 'image' | 'html';
+type BlockType = 'text' | 'heading' | 'code' | 'image' | 'html' | 'diagram';
 
 const BLOCK_TYPES: { value: BlockType; label: string; icon: any }[] = [
   { value: 'text', label: 'Rich Text', icon: Type },
@@ -30,6 +32,7 @@ const BLOCK_TYPES: { value: BlockType; label: string; icon: any }[] = [
   { value: 'code', label: 'Code', icon: Code },
   { value: 'image', label: 'Image', icon: Image },
   { value: 'html', label: 'HTML', icon: Code },
+  { value: 'diagram', label: 'Flowchart / Diagram', icon: GitBranch },
 ];
 
 export default function TopicEditorPage() {
@@ -105,19 +108,22 @@ export default function TopicEditorPage() {
     setSaving(true);
     setError('');
     try {
-      // Save each block content
-      for (const block of localBlocks) {
-        const original = blocks.find((b) => b.id === block.id);
-        if (!original || original.content !== block.content) {
-          await api.put(`/admin/content/blocks/${block.id}`, {
-            content: block.content,
-            type: block.type,
-          });
-        }
-      }
-      // Reorder
+      // Collect only changed blocks
+      const changedBlocks = localBlocks
+        .filter((block) => {
+          const original = blocks.find((b) => b.id === block.id);
+          return !original || original.content !== block.content || original.type !== block.type;
+        })
+        .map((b) => ({ id: b.id, content: b.content, type: b.type }));
+
       const orderedIds = localBlocks.map((b) => b.id);
-      await api.post('/admin/content/blocks/reorder', { topicId, orderedIds });
+
+      // Single batch request instead of N+1 calls
+      await api.post('/admin/content/blocks/batch-save', {
+        blocks: changedBlocks,
+        topicId,
+        orderedIds,
+      });
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -192,6 +198,11 @@ export default function TopicEditorPage() {
                   content={block.content}
                   onChange={(html) => updateBlock(block.id, html)}
                   placeholder="Write content here…"
+                />
+              ) : block.type === 'diagram' ? (
+                <MermaidEditor
+                  content={block.content}
+                  onChange={(code) => updateBlock(block.id, code)}
                 />
               ) : block.type === 'image' ? (
                 <div className="p-4 space-y-2">

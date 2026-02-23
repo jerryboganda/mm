@@ -618,9 +618,13 @@ class WebhookController extends Controller
             $campaignContact->meta_billable = (int) ((bool) $pricing['billable']);
         }
         if ($errors) {
+            $errorDetails = $errors['error_data']['details'] ?? $errors['message'] ?? $campaignContact->meta_error_details;
+            if (is_array($errorDetails)) {
+                $errorDetails = json_encode($errorDetails);
+            }
             $campaignContact->meta_error_code = (string) ($errors['code'] ?? $campaignContact->meta_error_code);
             $campaignContact->meta_error_title = (string) ($errors['title'] ?? $campaignContact->meta_error_title);
-            $campaignContact->meta_error_details = (string) ($errors['message'] ?? $campaignContact->meta_error_details);
+            $campaignContact->meta_error_details = (string) $errorDetails;
         }
     }
 

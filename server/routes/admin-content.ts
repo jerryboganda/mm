@@ -70,8 +70,8 @@ const topicSchema = z.object({
 
 const contentBlockSchema = z.object({
   topicId: z.string().min(1, "Topic ID is required"),
-  type: z.enum(["text", "heading", "image", "note"]),
-  content: z.string().min(1, "Content is required"),
+  type: z.enum(["text", "heading", "image", "note", "html", "code", "diagram"]),
+  content: z.string().default(""),
   order: z.number().int().optional(),
 });
 
@@ -454,6 +454,47 @@ router.post("/blocks/reorder", async (req: AuthRequest, res) => {
   try {
     await adminReorderContentBlocks(req.body.topicId, req.body.orderedIds);
     res.json({ message: "Blocks reordered" });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Batch update multiple blocks + reorder in a single request
+router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
+  try {
+    const { blocks, topicId, orderedIds } = req.body as {
+      blocks: { id: string; content: string; type: string }[];
+      topicId: string;
+      orderedIds: string[];
+    };
+
+    if (!topicId || !Array.isArray(orderedIds)) {
+      return res.status(400).json({ message: "topicId and orderedIds are required" });
+    }
+
+    // Update each changed block
+    const results = [];
+    for (const block of blocks || []) {
+      if (!block.id) continue;
+      const cb = await adminUpdateContentBlock(block.id, {
+        content: block.content,
+        type: block.type,
+      });
+      if (cb) results.push(cb);
+    }
+
+    // Reorder
+    await adminReorderContentBlocks(topicId, orderedIds);
+
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "update",
+      entityType: "content_block",
+      entityId: topicId,
+      details: `Batch saved ${results.length} blocks`,
+    });
+
+    res.json({ message: "Batch save complete", updated: results.length });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }

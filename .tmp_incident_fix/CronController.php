@@ -17,6 +17,7 @@ use App\Models\GroupExtractionJob;
 use App\Models\Message;
 use App\Models\PlanPurchase;
 use App\Models\WhatsappAccount;
+use App\Lib\WhatsApp\WhatsAppLib;
 use App\Services\CampaignLifecycleService;
 use App\Services\GroupExtraction\GroupExtractionProcessorService;
 use App\Services\MetaWebhookSyncService;
@@ -262,6 +263,7 @@ class CronController extends Controller
 
         $contactsQuery->chunkById(200, function ($contacts) {
             Log::info('campaignMessage batch', ['count' => $contacts->count()]);
+            $whatsAppLib = new WhatsAppLib();
             foreach ($contacts as $contact) {
 
                 $campaign = $contact->campaign;
@@ -361,17 +363,15 @@ class CronController extends Controller
                             'parameters' => $headerParams
                         ];
                     } elseif ($template->header_format === 'IMAGE' && !empty($template->header_media)) {
-                        $components[] = [
-                            'type' => 'header',
-                            'parameters' => [
-                                [
-                                    'type' => 'image',
-                                    'image' => [
-                                        'link' => url(getFilePath('templateHeader') . '/' . $template->header_media)
-                                    ]
-                                ]
-                            ]
-                        ];
+                        $headerComponent = $whatsAppLib->buildTemplateImageHeaderComponent($template, $connectedWhatsapp);
+                        if (!$headerComponent) {
+                            $this->markCampaignContactFailed($campaign, $contact, 'template_header_media_unavailable', [
+                                'template_id' => (int) ($template->id ?? 0),
+                                'template_media' => (string) $template->header_media,
+                            ], true);
+                            continue;
+                        }
+                        $components[] = $headerComponent;
                     }
                 }
 

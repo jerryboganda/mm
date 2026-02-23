@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import RenderHtml from "react-native-render-html";
+import { MermaidDiagram } from "@/components/MermaidDiagram";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -38,7 +39,7 @@ type TopicReaderNavigationProp = NativeStackNavigationProp<
 
 interface ContentBlock {
   id: string;
-  type: "text" | "image" | "note" | "heading" | "html" | "code";
+  type: "text" | "image" | "note" | "heading" | "html" | "code" | "diagram";
   content: string;
   order: number;
 }
@@ -295,6 +296,14 @@ export default function TopicReaderScreen() {
               {block.content}
             </ThemedText>
           </View>
+        );
+      case "diagram":
+        return (
+          <MermaidDiagram
+            key={block.id}
+            code={block.content}
+            width={contentWidth}
+          />
         );
       default:
         return null;

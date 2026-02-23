@@ -1,0 +1,29 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1602000194136900",
+      "changes": [
+        {
+          "field": "messages",
+          "value": {
+            "statuses": [
+              {
+                "id": "wamid.HBgMOTIzMDE5MTYzNjA5FQIAERgSQTkzNEZEODc0RkVDRjYzOTI4AA==",
+                "status": "failed",
+                "timestamp": "1771791488",
+                "errors": [
+                  {
+                    "code": 131053,
+                    "title": "Media upload error",
+                    "message": "Media upload error"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
