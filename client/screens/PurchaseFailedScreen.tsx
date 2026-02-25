@@ -13,6 +13,7 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useQuery } from "@tanstack/react-query";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
@@ -20,6 +21,7 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
+import { apiRequest } from "@/lib/query-client";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type PurchaseFailedScreenRouteProp = RouteProp<
@@ -47,6 +49,8 @@ const commonIssues = [
   },
 ];
 
+const DEFAULT_SUPPORT_EMAIL = "support@maternalmind.com.pk";
+
 export default function PurchaseFailedScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<PurchaseFailedScreenNavigationProp>();
@@ -54,6 +58,18 @@ export default function PurchaseFailedScreen() {
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { theme } = useTheme();
+  const { data: supportContactSettings } = useQuery<{ supportEmail: string }>({
+    queryKey: ["/api/support/contact"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/support/contact");
+      return response.json();
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
+  });
+  const supportEmail =
+    supportContactSettings?.supportEmail || DEFAULT_SUPPORT_EMAIL;
 
   const errorMessage =
     route.params?.errorMessage || "Something went wrong with your purchase";
@@ -102,9 +118,7 @@ export default function PurchaseFailedScreen() {
 
   const handleContact = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL(
-      "mailto:support@maternalmind.com.pk?subject=Purchase%20Issue",
-    );
+    Linking.openURL(`mailto:${supportEmail}?subject=Purchase%20Issue`);
   };
 
   const handleCancel = () => {

@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TextStyle, StyleProp } from "react-native";
 import { Colors } from "@/constants/theme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 interface SectionLabelProps {
     children: string;
@@ -12,7 +13,8 @@ interface SectionLabelProps {
  * uppercase, tracking-widest, cyan accent, 12px medium weight.
  */
 export function SectionLabel({ children, style }: SectionLabelProps) {
-    return <Text style={[styles.label, style]}>{children}</Text>;
+    const { resolveText } = useMobileContent();
+    return <Text style={[styles.label, style]}>{resolveText(children)}</Text>;
 }
 
 const styles = StyleSheet.create({

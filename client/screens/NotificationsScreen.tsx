@@ -17,6 +17,7 @@ import * as Haptics from "expo-haptics";
 
 import { useTheme } from "@/hooks/useTheme";
 import { Spacing, BorderRadius, Typography, ThemeColors } from "@/constants/theme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 type Announcement = {
   id: string;
@@ -53,7 +54,7 @@ function getTypeColor(type: Announcement["type"], theme: ThemeColors) {
   }
 }
 
-function formatTimeAgo(dateString: string): string {
+function formatTimeAgo(dateString: string, t: (value: string) => string): string {
   const now = new Date();
   const date = new Date(dateString);
   const diffMs = now.getTime() - date.getTime();
@@ -61,15 +62,17 @@ function formatTimeAgo(dateString: string): string {
   const diffHours = Math.floor(diffMs / 3600000);
   const diffDays = Math.floor(diffMs / 86400000);
 
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 60) return `${diffMins}${t("m ago")}`;
+  if (diffHours < 24) return `${diffHours}${t("h ago")}`;
+  if (diffDays === 1) return t("Yesterday");
+  if (diffDays < 7) return `${diffDays}${t("d ago")}`;
   return date.toLocaleDateString();
 }
 
 function AnnouncementCard({ item }: { item: Announcement }) {
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
   const typeColor = getTypeColor(item.type, theme);
   const typeIcon = getTypeIcon(item.type);
 
@@ -113,7 +116,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           {item.message}
         </Text>
         <Text style={[styles.cardTime, { color: theme.textMuted }]}>
-          {formatTimeAgo(item.createdAt)}
+          {formatTimeAgo(item.createdAt, t)}
         </Text>
       </View>
     </Pressable>
@@ -125,6 +128,8 @@ export default function NotificationsScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
   const [refreshing, setRefreshing] = React.useState(false);
 
   const {
@@ -174,8 +179,8 @@ export default function NotificationsScreen() {
         unreadCount > 0 ? (
           <View style={styles.headerSection}>
             <Text style={[styles.unreadLabel, { color: theme.primary }]}>
-              {unreadCount} new{" "}
-              {unreadCount === 1 ? "announcement" : "announcements"}
+              {unreadCount} {t("new")}{" "}
+              {unreadCount === 1 ? t("announcement") : t("announcements")}
             </Text>
           </View>
         ) : null
@@ -184,10 +189,10 @@ export default function NotificationsScreen() {
         <View style={styles.emptyContainer}>
           <Feather name="bell-off" size={48} color={theme.textMuted} />
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
-            No Announcements
+            {t("No Announcements")}
           </Text>
           <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
-            Check back later for updates from your professors
+            {t("Check back later for updates from your professors")}
           </Text>
         </View>
       }

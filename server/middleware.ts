@@ -13,6 +13,16 @@ export interface AuthRequest extends Request {
   userRole?: string;
 }
 
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+}
+
+interface RateLimiterOptions {
+  keyPrefix?: string;
+  keyGenerator?: (req: Request) => string;
+}
+
 function verifyToken(token: string): { userId: string } | null {
   try {
     return jwt.verify(token, JWT_SECRET) as { userId: string };
@@ -42,7 +52,33 @@ export async function authMiddleware(
 }
 
 // Rate limiting using in-memory store (use Redis in production for multi-instance)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const rateLimitStore = new Map<string, RateLimitEntry>();
+let rateLimiterSequence = 0;
+
+function getHeaderValue(value: string | string[] | undefined): string | null {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+  if (Array.isArray(value) && value[0]?.trim()) {
+    return value[0].trim();
+  }
+  return null;
+}
+
+export function getRateLimitClientId(req: Request): string {
+  // Prefer forwarded headers when present (common behind reverse proxies/load balancers).
+  const forwardedFor = getHeaderValue(req.headers["x-forwarded-for"]);
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  const realIp = getHeaderValue(req.headers["x-real-ip"]);
+  if (realIp) {
+    return realIp;
+  }
+
+  return req.ip || req.socket.remoteAddress || "unknown";
+}
 
 // Periodically clean up expired entries to prevent memory leak
 setInterval(() => {
@@ -54,9 +90,17 @@ setInterval(() => {
   }
 }, 60_000); // Cleanup every minute
 
-export function rateLimiter(maxRequests: number, windowMs: number) {
+export function rateLimiter(
+  maxRequests: number,
+  windowMs: number,
+  options: RateLimiterOptions = {},
+) {
+  const limiterId = options.keyPrefix || `limiter_${++rateLimiterSequence}`;
+  const keyGenerator = options.keyGenerator || getRateLimitClientId;
+
   return (req: Request, res: Response, next: NextFunction) => {
-    const key = req.ip || req.socket.remoteAddress || "unknown";
+    const identifier = keyGenerator(req)?.trim() || "unknown";
+    const key = `${limiterId}:${identifier}`;
     const now = Date.now();
     const entry = rateLimitStore.get(key);
 

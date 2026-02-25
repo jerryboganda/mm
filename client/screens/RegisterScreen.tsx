@@ -3,6 +3,7 @@ import { StyleSheet, View, Image, Pressable, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
@@ -22,6 +23,7 @@ type RegisterScreenNavigationProp = NativeStackNavigationProp<
 
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { register } = useAuth();
   const { theme, isDark } = useTheme();
@@ -37,6 +39,10 @@ export default function RegisterScreen() {
     password?: string;
     confirmPassword?: string;
   }>({});
+  const authTopPadding = Math.max(
+    insets.top + Spacing["6xl"],
+    headerHeight + Spacing["2xl"],
+  );
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -94,7 +100,7 @@ export default function RegisterScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing["4xl"],
+            paddingTop: authTopPadding,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -175,11 +181,16 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.footerText, { color: theme.textSecondary }]}
+          >
             Already have an account?
           </ThemedText>
           <Pressable onPress={() => navigation.navigate("Login")}>
-            <ThemedText style={[styles.signInLink, { color: theme.primary }]}> Sign In</ThemedText>
+            <ThemedText style={[styles.signInLink, { color: theme.primary }]}>
+              {" "}
+              Sign In
+            </ThemedText>
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
@@ -231,8 +242,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: Spacing["2xl"],
   },
-  footerText: {
-  },
+  footerText: {},
   signInLink: {
     fontWeight: "600",
   },

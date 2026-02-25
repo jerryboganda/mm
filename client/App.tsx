@@ -25,6 +25,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth";
 import { PurchasesProvider } from "@/lib/purchases";
 import { NetworkProvider } from "@/lib/network";
+import { MobileContentProvider } from "@/lib/mobile-content";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
 import { Colors } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -144,14 +145,16 @@ export default function App() {
         <AuthProvider>
           <PurchasesProvider>
             <NetworkProvider>
-              <SafeAreaProvider>
-                <GestureHandlerRootView style={styles.root}>
-                  <KeyboardProvider>
-                    <AppContent />
-                    <StatusBar style="auto" />
-                  </KeyboardProvider>
-                </GestureHandlerRootView>
-              </SafeAreaProvider>
+              <MobileContentProvider>
+                <SafeAreaProvider>
+                  <GestureHandlerRootView style={styles.root}>
+                    <KeyboardProvider>
+                      <AppContent />
+                      <StatusBar style="auto" />
+                    </KeyboardProvider>
+                  </GestureHandlerRootView>
+                </SafeAreaProvider>
+              </MobileContentProvider>
             </NetworkProvider>
           </PurchasesProvider>
         </AuthProvider>

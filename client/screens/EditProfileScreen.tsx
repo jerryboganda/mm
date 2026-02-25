@@ -23,6 +23,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
+import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -34,6 +35,8 @@ export default function EditProfileScreen() {
   const queryClient = useQueryClient();
   const { user, refreshUser } = useAuth();
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   const [name, setName] = useState(user?.name || "");
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -177,7 +180,7 @@ export default function EditProfileScreen() {
               value={name}
               onChangeText={setName}
               style={[styles.input, { color: theme.text }]}
-              placeholder="Enter your name"
+              placeholder={t("Enter your name")}
               placeholderTextColor={theme.textMuted}
               autoCapitalize="words"
               autoCorrect={false}

@@ -1,6 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
+import { useMobileContent } from "@/lib/mobile-content";
 
 import PracticeScreen from "@/screens/PracticeScreen";
 
@@ -12,6 +13,8 @@ const Stack = createNativeStackNavigator<PracticeStackParamList>();
 
 export default function PracticeStackNavigator() {
   const screenOptions = useScreenOptions();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   return (
     <Stack.Navigator screenOptions={screenOptions}>
@@ -19,7 +22,7 @@ export default function PracticeStackNavigator() {
         name="PracticeHome"
         component={PracticeScreen}
         options={{
-          headerTitle: "Practice",
+          headerTitle: t("Practice"),
         }}
       />
     </Stack.Navigator>

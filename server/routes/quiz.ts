@@ -1,73 +1,14 @@
 import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
+import {
+  getOptionTextByLabel,
+  normalizeOptions,
+  resolveAnswerLabel,
+  resolveCorrectLabel,
+} from "../lib/mcq-options";
 
 const router = Router();
-
-/**
- * Normalize MCQ options from various DB formats into a consistent { label, text }[] array.
- * Handles:
- *   - Flat string array from seed data: ["text1", "text2", ...]
- *   - Keyed object from admin panel: { "A": "text", "B": "text", ... }
- *   - Already-normalized array: [{ label: "A", text: "..." }, ...]
- */
-function normalizeOptions(
-  rawOptions: any,
-): { label: string; text: string }[] {
-  const labels = ["A", "B", "C", "D", "E", "F"];
-
-  if (Array.isArray(rawOptions)) {
-    return rawOptions.map((opt: any, i: number) => {
-      if (typeof opt === "string") {
-        return { label: labels[i] || String.fromCharCode(65 + i), text: opt };
-      }
-      if (typeof opt === "object" && opt !== null && opt.label && opt.text) {
-        return opt;
-      }
-      return {
-        label: labels[i] || String.fromCharCode(65 + i),
-        text: String(opt),
-      };
-    });
-  }
-
-  if (typeof rawOptions === "object" && rawOptions !== null) {
-    return Object.entries(rawOptions)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, value]) => ({
-        label: key,
-        text: value as string,
-      }));
-  }
-
-  return [];
-}
-
-/**
- * Resolve a correctAnswer value to its label (A-F).
- * Handles both label-based ("A") and text-based ("Ampulla of the fallopian tube") formats.
- */
-function resolveCorrectLabel(
-  correctAnswer: string,
-  rawOptions: any,
-): string {
-  // Already a single-letter label
-  if (/^[A-F]$/i.test(correctAnswer)) return correctAnswer.toUpperCase();
-
-  // correctAnswer is full text — find matching option label
-  const normalized = normalizeOptions(rawOptions);
-  const match = normalized.find((opt) => opt.text === correctAnswer);
-  return match ? match.label : correctAnswer;
-}
-
-/**
- * Get the human-readable text for an option given its label.
- */
-function getOptionTextByLabel(label: string, rawOptions: any): string {
-  const normalized = normalizeOptions(rawOptions);
-  const match = normalized.find((opt) => opt.label === label);
-  return match ? match.text : label;
-}
 
 router.get("/stats", authMiddleware, async (req: AuthRequest, res) => {
   try {
@@ -158,25 +99,22 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
     for (const [mcqId, selectedAnswer] of answerEntries) {
       const mcq = mcqMap.get(mcqId);
       if (mcq) {
-        // Resolve correctAnswer to a label for proper comparison
-        const correctLabel = resolveCorrectLabel(
-          mcq.correctAnswer,
-          mcq.options,
-        );
-        const isCorrect = selectedAnswer === correctLabel;
-        if (isCorrect) correctCount++;
+        const selectedLabel = resolveAnswerLabel(selectedAnswer, mcq.options);
+        const correctLabel = resolveCorrectLabel(mcq.correctAnswer, mcq.options);
+        const isNormalizedCorrect = selectedLabel === correctLabel;
+        if (isNormalizedCorrect) correctCount++;
 
         // Store human-readable text for results display
-        const selectedText = getOptionTextByLabel(
-          selectedAnswer,
-          mcq.options,
-        );
+        const selectedText =
+          getOptionTextByLabel(selectedLabel, mcq.options) || selectedAnswer;
         const correctText = getOptionTextByLabel(correctLabel, mcq.options);
 
         detailedAnswers[mcqId] = {
-          selected: selectedText,
-          correct: correctText,
-          isCorrect,
+          selected: selectedLabel,
+          correct: correctLabel,
+          selectedText,
+          correctText,
+          isCorrect: isNormalizedCorrect,
           explanation: mcq.explanation,
         };
       }
@@ -227,12 +165,26 @@ router.get(
       const questions = mcqIds.map((mcqId) => {
         const mcq = mcqMap.get(mcqId);
         const answer = answers[mcqId];
+        const selectedLabel = resolveAnswerLabel(
+          String(answer?.selected || ""),
+          mcq?.options,
+        );
+        const correctLabel = resolveAnswerLabel(
+          String(answer?.correct || ""),
+          mcq?.options,
+        );
         return {
           id: mcqId,
           question: mcq?.question || "Question not found",
-          selectedAnswer: answer.selected,
-          correctAnswer: answer.correct,
-          isCorrect: answer.isCorrect,
+          selectedAnswer:
+            answer?.selectedText ||
+            getOptionTextByLabel(selectedLabel, mcq?.options) ||
+            String(answer?.selected || ""),
+          correctAnswer:
+            answer?.correctText ||
+            getOptionTextByLabel(correctLabel, mcq?.options) ||
+            String(answer?.correct || ""),
+          isCorrect: Boolean(answer?.isCorrect),
           explanation: answer.explanation || mcq?.explanation || "",
         };
       });

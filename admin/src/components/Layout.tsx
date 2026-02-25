@@ -8,6 +8,7 @@ import {
   BarChart3,
   Megaphone,
   AlertTriangle,
+  Smartphone,
   Settings,
   LogOut,
   Menu,
@@ -19,6 +20,7 @@ import {
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/books', icon: BookOpen, label: 'Content' },
+  { to: '/mobile-app-content', icon: Smartphone, label: 'Mobile App Content' },
   { to: '/mcqs', icon: ClipboardList, label: 'MCQs' },
   { to: '/users', icon: Users, label: 'Users' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },

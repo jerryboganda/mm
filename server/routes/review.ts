@@ -1,6 +1,12 @@
 import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
+import {
+  getOptionTextByLabel,
+  normalizeOptions,
+  resolveAnswerLabel,
+  resolveCorrectLabel,
+} from "../lib/mcq-options";
 
 const router = Router();
 
@@ -38,7 +44,7 @@ router.get("/due", authMiddleware, async (req: AuthRequest, res) => {
           reviewId: review.id,
           mcqId: mcq.id,
           question: mcq.question,
-          options: mcq.options as { label: string; text: string }[],
+          options: normalizeOptions(mcq.options),
           difficulty: mcq.difficulty,
           interval: review.interval,
           repetitions: review.repetitions,
@@ -56,11 +62,13 @@ router.get("/due", authMiddleware, async (req: AuthRequest, res) => {
 // Submit a review result (SM-2 quality rating)
 router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { reviewId, mcqId, selectedAnswer } = req.body;
+    const { reviewId, mcqId, selectedAnswer, quality } = req.body as {
+      reviewId?: string;
+      mcqId?: string;
+      selectedAnswer?: string;
+      quality?: number;
+    };
 
-    if (!selectedAnswer || typeof selectedAnswer !== "string") {
-      return res.status(400).json({ message: "selectedAnswer is required" });
-    }
     if (!reviewId && !mcqId) {
       return res.status(400).json({ message: "reviewId or mcqId is required" });
     }
@@ -89,16 +97,35 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
       return res.status(404).json({ message: "MCQ not found" });
     }
 
-    const isCorrect = selectedAnswer === mcq.correctAnswer;
-    // SM-2 quality: 5 = perfect, 4 = correct with hesitation, 3 = correct with difficulty
-    // 2 = incorrect but close, 1 = incorrect, 0 = complete blank
-    const quality = isCorrect ? 4 : 1;
+    const hasExplicitQuality =
+      typeof quality === "number" &&
+      Number.isFinite(quality) &&
+      quality >= 0 &&
+      quality <= 5;
 
-    const updated = await storage.updateReview(actualReviewId, quality);
+    if (!hasExplicitQuality && typeof selectedAnswer !== "string") {
+      return res.status(400).json({
+        message: "Either quality or selectedAnswer is required",
+      });
+    }
+
+    const selectedLabel =
+      typeof selectedAnswer === "string"
+        ? resolveAnswerLabel(selectedAnswer, mcq.options)
+        : "";
+    const correctLabel = resolveCorrectLabel(mcq.correctAnswer, mcq.options);
+    const isCorrect = selectedLabel === correctLabel;
+
+    // Prefer explicit client-provided quality for spaced-repetition,
+    // fallback to correctness mapping for legacy callers.
+    const normalizedQuality = hasExplicitQuality ? quality : isCorrect ? 4 : 1;
+
+    const updated = await storage.updateReview(actualReviewId, normalizedQuality);
 
     res.json({
       isCorrect,
-      correctAnswer: mcq.correctAnswer,
+      correctAnswer: correctLabel,
+      correctAnswerText: getOptionTextByLabel(correctLabel, mcq.options),
       explanation: mcq.explanation,
       nextReviewAt: updated.nextReviewAt.toISOString(),
       interval: updated.interval,

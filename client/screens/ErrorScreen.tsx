@@ -54,7 +54,7 @@ export default function ErrorScreen({
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <LinearGradient
-              colors={[theme.error, theme.errorDark || "#dc2626"]}
+              colors={[theme.error, "#dc2626"]}
               style={styles.iconGradient}
             >
               <Feather name="alert-circle" size={48} color="#fff" />

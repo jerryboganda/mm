@@ -3,6 +3,7 @@ import { StyleSheet, View, Image, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
 import * as Linking from "expo-linking";
 
@@ -28,6 +29,7 @@ type ResetPasswordScreenRouteProp = RouteProp<
 
 export default function ResetPasswordScreen() {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const navigation = useNavigation<ResetPasswordScreenNavigationProp>();
   const route = useRoute<ResetPasswordScreenRouteProp>();
   const { theme } = useTheme();
@@ -41,6 +43,10 @@ export default function ResetPasswordScreen() {
     confirmPassword?: string;
   }>({});
   const [token, setToken] = useState("");
+  const authTopPadding = Math.max(
+    insets.top + Spacing["6xl"],
+    headerHeight + Spacing["2xl"],
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -134,23 +140,23 @@ export default function ResetPasswordScreen() {
           style={[
             styles.container,
             {
-              paddingTop: insets.top + Spacing["4xl"],
+              paddingTop: authTopPadding,
               paddingBottom: insets.bottom + Spacing["3xl"],
             },
           ]}
         >
           <View style={styles.successContainer}>
-            <View style={[styles.successIcon, { backgroundColor: theme.glass }]}>
-              <Feather
-                name="check-circle"
-                size={48}
-                color={theme.primary}
-              />
+            <View
+              style={[styles.successIcon, { backgroundColor: theme.glass }]}
+            >
+              <Feather name="check-circle" size={48} color={theme.primary} />
             </View>
             <ThemedText type="h2" style={styles.successTitle}>
               Password Reset!
             </ThemedText>
-            <ThemedText style={[styles.successMessage, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.successMessage, { color: theme.textSecondary }]}
+            >
               Your password has been successfully reset. You can now sign in
               with your new password.
             </ThemedText>
@@ -172,7 +178,7 @@ export default function ResetPasswordScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing["4xl"],
+            paddingTop: authTopPadding,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -227,7 +233,9 @@ export default function ResetPasswordScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.footerText, { color: theme.textSecondary }]}
+          >
             Remember your password?{" "}
           </ThemedText>
           <ThemedText

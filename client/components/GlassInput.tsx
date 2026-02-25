@@ -16,6 +16,7 @@ import { Feather } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius, Typography } from "@/constants/theme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 interface GlassInputProps extends TextInputProps {
   label: string;
@@ -38,6 +39,7 @@ export function GlassInput({
   placeholder,
   ...props
 }: GlassInputProps) {
+  const { resolveText } = useMobileContent();
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<TextInput>(null);
@@ -67,7 +69,11 @@ export function GlassInput({
   };
 
   // Only show placeholder when focused (label has animated up) and no value yet
-  const effectivePlaceholder = isFocused && !hasValue ? placeholder : undefined;
+  const resolvedPlaceholder =
+    typeof placeholder === "string" ? resolveText(placeholder) : placeholder;
+  const effectivePlaceholder =
+    isFocused && !hasValue ? resolvedPlaceholder : undefined;
+  const resolvedLabel = resolveText(label);
 
   const isPassword = secureTextEntry !== undefined;
   const actualSecureTextEntry = isPassword && !showPassword;
@@ -104,7 +110,7 @@ export function GlassInput({
                 isFocused && { color: Colors.dark.primary },
               ]}
             >
-              {label}
+              {resolvedLabel}
             </ThemedText>
           </Animated.View>
           <TextInput
@@ -149,7 +155,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: "transparent",
     borderRadius: BorderRadius.md,
     borderWidth: 1,
     borderColor: Colors.dark.glassBorder,
@@ -157,12 +163,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
   },
   inputContainerFocused: {
-    borderColor: "rgba(17,164,212,0.4)",
-    shadowColor: "#11a4d4",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    borderColor: "rgba(17,164,212,0.7)",
   },
   inputContainerError: {
     borderColor: Colors.dark.error,
@@ -187,8 +188,10 @@ const styles = StyleSheet.create({
   input: {
     ...Typography.body,
     color: Colors.dark.text,
-    paddingTop: 8,
+    paddingTop: 0,
+    paddingBottom: 0,
     height: "100%",
+    includeFontPadding: false,
   },
   rightIcon: {
     marginLeft: Spacing.md,

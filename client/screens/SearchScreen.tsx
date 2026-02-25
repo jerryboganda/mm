@@ -20,6 +20,7 @@ import debounce from "lodash.debounce";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { ThemedText } from "@/components/ThemedText";
+import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
 import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -117,6 +118,8 @@ export default function SearchScreen() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   const debouncedSetQuery = useMemo(
     () => debounce((text: string) => setDebouncedQuery(text), 300),
@@ -210,7 +213,7 @@ export default function SearchScreen() {
             <Feather name="search" size={18} color={theme.textMuted} />
             <TextInput
               style={[styles.searchInput, { color: theme.text }]}
-              placeholder="Search topics, chapters, books..."
+              placeholder={t("Search topics, chapters, books...")}
               placeholderTextColor={theme.textMuted}
               value={query}
               onChangeText={handleQueryChange}

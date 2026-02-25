@@ -15,6 +15,7 @@ import SearchScreen from "@/screens/SearchScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Colors, Spacing } from "@/constants/theme";
 import type { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useMobileContent } from "@/lib/mobile-content";
 
 export type LearnStackParamList = {
   LearnHome: undefined;
@@ -48,6 +49,8 @@ function SearchButton() {
 
 export default function LearnStackNavigator() {
   const screenOptions = useScreenOptions();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   return (
     <Stack.Navigator screenOptions={screenOptions}>
@@ -55,7 +58,7 @@ export default function LearnStackNavigator() {
         name="LearnHome"
         component={LearnScreen}
         options={{
-          headerTitle: () => <HeaderTitle title="Library" />,
+          headerTitle: () => <HeaderTitle title={t("Library")} />,
           headerRight: () => <SearchButton />,
         }}
       />
@@ -84,7 +87,7 @@ export default function LearnStackNavigator() {
         name="Search"
         component={SearchScreen}
         options={{
-          headerTitle: "Search",
+          headerTitle: t("Search"),
         }}
       />
     </Stack.Navigator>

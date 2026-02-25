@@ -14,13 +14,11 @@ interface MermaidDiagramProps {
  * Uses the Mermaid CDN to render the diagram as SVG, then auto-sizes the WebView height.
  */
 export function MermaidDiagram({ code, width }: MermaidDiagramProps) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const [height, setHeight] = useState(200);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const webViewRef = useRef<WebView>(null);
-
-  const isDark = theme.background === "#0A0A0F" || theme.background === "#000";
 
   const html = `
 <!DOCTYPE html>
@@ -147,7 +145,7 @@ export function MermaidDiagram({ code, width }: MermaidDiagramProps) {
         styles.container,
         {
           borderColor: theme.glassBorder,
-          backgroundColor: isDark ? "#1E1E2E" : "#FAFAFA",
+          backgroundColor: isDark ? "#1E1E2E" : theme.backgroundSecondary,
           height: height + 4,
         },
       ]}

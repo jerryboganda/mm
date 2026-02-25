@@ -13,6 +13,7 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import ContentReportsPage from './pages/ContentReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import MobileAppContentPage from './pages/MobileAppContentPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -52,6 +53,7 @@ export default function App() {
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/content-reports" element={<ContentReportsPage />} />
+                <Route path="/mobile-app-content" element={<MobileAppContentPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
