@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INTERVAL_SECONDS="${INTERVAL_SECONDS:-60}"
+INTERVAL_SECONDS="${INTERVAL_SECONDS:-900}"
 
 while true; do
   if ! "$REPO_ROOT/scripts/sync-now.sh"; then

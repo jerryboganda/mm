@@ -1,5 +1,5 @@
 param(
-  [int]$IntervalSeconds = 60,
+  [int]$IntervalSeconds = 900,
   [string]$RepoRoot = ""
 )
 
