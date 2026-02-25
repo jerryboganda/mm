@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
+import { normalizeOptions, resolveAnswerLabel } from "../lib/mcq-options";
 
 const router = Router();
 
@@ -83,7 +84,13 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
 
     const answersData = attempt.answers as Record<
       string,
-      { selected: string; correct: string; isCorrect: boolean }
+      {
+        selected?: string;
+        correct?: string;
+        selectedText?: string;
+        correctText?: string;
+        isCorrect?: boolean;
+      }
     >;
     const questionIds = Object.keys(answersData);
 
@@ -93,14 +100,24 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
 
     const questionsWithDetails = questionIds.map((qId) => {
       const mcq = mcqMap.get(qId);
-      const answerInfo = answersData[qId];
+      const answerInfo = answersData[qId] || {};
+      const options = normalizeOptions(mcq?.options);
+      const selectedAnswer = resolveAnswerLabel(
+        String(answerInfo.selected || answerInfo.selectedText || ""),
+        mcq?.options,
+      );
+      const correctAnswer = resolveAnswerLabel(
+        String(answerInfo.correct || answerInfo.correctText || ""),
+        mcq?.options,
+      );
+
       return {
         id: qId,
         question: mcq?.question || "Question not found",
-        options: mcq?.options || [],
-        selectedAnswer: answerInfo.selected,
-        correctAnswer: answerInfo.correct,
-        isCorrect: answerInfo.isCorrect,
+        options,
+        selectedAnswer,
+        correctAnswer,
+        isCorrect: Boolean(answerInfo.isCorrect),
         explanation: mcq?.explanation || "",
       };
     });

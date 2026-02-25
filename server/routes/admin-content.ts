@@ -401,7 +401,10 @@ router.post("/blocks", async (req: AuthRequest, res) => {
   try {
     const data = validateBody(contentBlockSchema, req.body, res);
     if (!data) return;
-    const cb = await adminCreateContentBlock(data);
+    const cb = await adminCreateContentBlock({
+      ...data,
+      content: data.content ?? "",
+    });
     await createAuditLog({
       adminUserId: req.userId!,
       action: "create",

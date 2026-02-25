@@ -19,6 +19,7 @@ import * as Haptics from "expo-haptics";
 
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 interface PrimaryButtonProps {
   title: string;
@@ -61,6 +62,8 @@ export function PrimaryButton({
   size = "default",
   testID,
 }: PrimaryButtonProps) {
+  const { resolveText } = useMobileContent();
+  const resolvedTitle = resolveText(title);
   const scale = useSharedValue(1);
   const brightness = useSharedValue(1);
 
@@ -125,7 +128,7 @@ export function PrimaryButton({
       disabled={disabled || loading}
       testID={testID}
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={resolvedTitle}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[
         styles.button,
@@ -174,7 +177,7 @@ export function PrimaryButton({
               isGhost && styles.ghostText,
             ]}
           >
-            {title}
+            {resolvedTitle}
           </ThemedText>
           {icon && iconPosition === "right" ? (
             <Feather

@@ -1,7 +1,9 @@
+import React from "react";
 import { Text, type TextProps } from "react-native";
 
 import { Colors, Typography } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -19,6 +21,14 @@ export type ThemedTextProps = TextProps & {
 
 export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+
+  const resolvedChildren = React.Children.map(rest.children, (child) => {
+    if (typeof child === "string") {
+      return resolveText(child);
+    }
+    return child;
+  });
 
   const getColor = () => {
     if (type === "link") {
@@ -59,6 +69,8 @@ export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
       maxFontSizeMultiplier={1.5}
       style={[{ color: getColor() }, getTypeStyle(), style]}
       {...rest}
-    />
+    >
+      {resolvedChildren}
+    </Text>
   );
 }

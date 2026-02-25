@@ -3,6 +3,7 @@ import { StyleSheet, View, Image, Pressable, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -28,6 +29,7 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const { login } = useAuth();
   const { theme, isDark } = useTheme();
@@ -38,6 +40,10 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
+  );
+  const authTopPadding = Math.max(
+    insets.top + Spacing["6xl"],
+    headerHeight + Spacing["2xl"],
   );
 
   React.useEffect(() => {
@@ -111,7 +117,7 @@ export default function LoginScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing["5xl"],
+            paddingTop: authTopPadding,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -178,7 +184,9 @@ export default function LoginScreen() {
                 <Ionicons name="checkmark" size={12} color="white" />
               )}
             </View>
-            <ThemedText style={[styles.rememberMeText, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.rememberMeText, { color: theme.textSecondary }]}
+            >
               Remember me
             </ThemedText>
           </Pressable>
@@ -187,7 +195,12 @@ export default function LoginScreen() {
             style={styles.forgotPassword}
             onPress={() => navigation.navigate("ForgotPassword")}
           >
-            <ThemedText style={[styles.forgotPasswordText, { color: `${theme.primary}CC` }]}>
+            <ThemedText
+              style={[
+                styles.forgotPasswordText,
+                { color: `${theme.primary}CC` },
+              ]}
+            >
               Forgot Password?
             </ThemedText>
           </Pressable>
@@ -203,11 +216,16 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.footerText, { color: theme.textSecondary }]}
+          >
             Don&apos;t have an account?
           </ThemedText>
           <Pressable onPress={() => navigation.navigate("Register")}>
-            <ThemedText style={[styles.signUpLink, { color: theme.primary }]}> Sign Up</ThemedText>
+            <ThemedText style={[styles.signUpLink, { color: theme.primary }]}>
+              {" "}
+              Sign Up
+            </ThemedText>
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
@@ -289,8 +307,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: Spacing["3xl"],
   },
-  footerText: {
-  },
+  footerText: {},
   signUpLink: {
     fontWeight: "600",
   },

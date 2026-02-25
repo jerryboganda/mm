@@ -3,6 +3,7 @@ import { StyleSheet, View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
@@ -23,6 +24,7 @@ type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<
 
 export default function ForgotPasswordScreen() {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
   const { theme } = useTheme();
 
@@ -30,6 +32,10 @@ export default function ForgotPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const authTopPadding = Math.max(
+    insets.top + Spacing["6xl"],
+    headerHeight + Spacing["2xl"],
+  );
 
   const handleSubmit = async () => {
     if (!email) {
@@ -81,19 +87,23 @@ export default function ForgotPasswordScreen() {
           style={[
             styles.container,
             {
-              paddingTop: insets.top + Spacing["4xl"],
+              paddingTop: authTopPadding,
               paddingBottom: insets.bottom + Spacing["3xl"],
             },
           ]}
         >
           <View style={styles.successContainer}>
-            <View style={[styles.successIcon, { backgroundColor: theme.glass }]}>
+            <View
+              style={[styles.successIcon, { backgroundColor: theme.glass }]}
+            >
               <Feather name="mail" size={48} color={theme.primary} />
             </View>
             <ThemedText type="h2" style={styles.successTitle}>
               Check Your Email
             </ThemedText>
-            <ThemedText style={[styles.successMessage, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.successMessage, { color: theme.textSecondary }]}
+            >
               If an account exists with {email}, we&apos;ve sent password reset
               instructions.
             </ThemedText>
@@ -115,7 +125,7 @@ export default function ForgotPasswordScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing["4xl"],
+            paddingTop: authTopPadding,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -158,7 +168,9 @@ export default function ForgotPasswordScreen() {
         </View>
 
         <View style={styles.footer}>
-          <ThemedText style={[styles.footerText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.footerText, { color: theme.textSecondary }]}
+          >
             Remember your password?{" "}
           </ThemedText>
           <ThemedText

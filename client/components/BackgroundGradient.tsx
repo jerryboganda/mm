@@ -142,7 +142,6 @@ export function BackgroundGradient({
   }));
 
   const isImmersive = variant === "immersive";
-  const isAuth = variant === "auth";
   const isQuiz = variant === "quiz";
 
   return (
@@ -174,7 +173,6 @@ export function BackgroundGradient({
               <View style={[styles.orb, styles.orbBottomLeft]} />
             </>
           )}
-          {isAuth ? <View style={[styles.orb, styles.orbCenter]} /> : null}
           {isQuiz ? <View style={[styles.orb, styles.orbQuiz]} /> : null}
           {isImmersive ? (
             <>
@@ -215,13 +213,6 @@ const styles = StyleSheet.create({
     bottom: -width * 0.25,
     left: -width * 0.25,
     backgroundColor: "rgba(168,85,247,0.05)",
-  },
-  orbCenter: {
-    width: width * 0.55,
-    height: width * 0.55,
-    top: height * 0.32,
-    left: width * 0.22,
-    backgroundColor: "rgba(17,164,212,0.06)",
   },
   orbQuiz: {
     width: width * 0.6,

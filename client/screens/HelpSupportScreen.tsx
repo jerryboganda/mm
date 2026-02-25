@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -10,15 +10,17 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useFocusEffect } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
+import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -27,6 +29,16 @@ interface FAQ {
   question: string;
   answer: string;
   isOpen?: boolean;
+}
+
+interface SupportContactSettings {
+  whatsappNumber: string;
+  phoneNumber: string;
+  supportEmail: string;
+  whatsappDefaultMessage: string;
+  whatsappEnabled: boolean;
+  phoneEnabled: boolean;
+  emailEnabled: boolean;
 }
 
 const faqs: FAQ[] = [
@@ -57,15 +69,54 @@ const faqs: FAQ[] = [
   },
 ];
 
+const DEFAULT_SUPPORT_CONTACT_SETTINGS: SupportContactSettings = {
+  whatsappNumber: "",
+  phoneNumber: "",
+  supportEmail: "support@maternalmind.com.pk",
+  whatsappDefaultMessage: "Hello Support Team, I need help.",
+  whatsappEnabled: false,
+  phoneEnabled: false,
+  emailEnabled: true,
+};
+
+function normalizeWhatsappNumber(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
 export default function HelpSupportScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { user } = useAuth();
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [issueType, setIssueType] = useState<string>("");
   const [issueDescription, setIssueDescription] = useState("");
+  const {
+    data: supportContactSettingsData,
+    isLoading: isSupportContactLoading,
+    refetch: refetchSupportContact,
+  } = useQuery<SupportContactSettings>({
+    queryKey: ["/api/support/contact"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/support/contact");
+      return response.json();
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetchSupportContact();
+    }, [refetchSupportContact]),
+  );
+
+  const supportContactSettings =
+    supportContactSettingsData || DEFAULT_SUPPORT_CONTACT_SETTINGS;
 
   const reportIssueMutation = useMutation({
     mutationFn: async (data: {
@@ -83,8 +134,10 @@ export default function HelpSupportScreen() {
     onSuccess: () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
-        "Issue Reported",
-        "Thank you for your feedback. We'll review your report and get back to you within 24-48 hours.",
+        t("Issue Reported"),
+        t(
+          "Thank you for your feedback. We'll review your report and get back to you within 24-48 hours.",
+        ),
         [
           {
             text: "OK",
@@ -99,7 +152,7 @@ export default function HelpSupportScreen() {
     onError: (error: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
-        "Error",
+        t("Error"),
         error.message || "Failed to submit report. Please try again.",
       );
     },
@@ -110,23 +163,102 @@ export default function HelpSupportScreen() {
     setExpandedFaq(expandedFaq === index ? null : index);
   };
 
-  const handleContactSupport = () => {
+  const openExternalLink = useCallback(async (url: string, channel: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Linking.openURL(
-      "mailto:support@maternalmind.com.pk?subject=Support%20Request",
+    const canOpen = await Linking.canOpenURL(url);
+    if (!canOpen) {
+      Alert.alert(t("Unavailable"), `Unable to open ${channel} on this device.`);
+      return;
+    }
+    await Linking.openURL(url);
+  }, []);
+
+  const handleContactSupportEmail = useCallback(() => {
+    const subject = encodeURIComponent("Support Request");
+    openExternalLink(
+      `mailto:${supportContactSettings.supportEmail}?subject=${subject}`,
+      "email",
     );
-  };
+  }, [openExternalLink, supportContactSettings.supportEmail]);
+
+  const handleContactSupportPhone = useCallback(() => {
+    openExternalLink(`tel:${supportContactSettings.phoneNumber}`, "phone");
+  }, [openExternalLink, supportContactSettings.phoneNumber]);
+
+  const handleContactSupportWhatsApp = useCallback(() => {
+    const number = normalizeWhatsappNumber(supportContactSettings.whatsappNumber);
+    if (!number) {
+      Alert.alert(t("Unavailable"), t("WhatsApp number is not configured."));
+      return;
+    }
+    const message = encodeURIComponent(
+      supportContactSettings.whatsappDefaultMessage ||
+        "Hello Support Team, I need help.",
+    );
+    openExternalLink(`https://wa.me/${number}?text=${message}`, "WhatsApp");
+  }, [
+    openExternalLink,
+    supportContactSettings.whatsappDefaultMessage,
+    supportContactSettings.whatsappNumber,
+  ]);
+
+  const contactMethods = useMemo(
+    () =>
+      [
+        {
+          id: "email",
+          title: "Email Support",
+          subtitle: supportContactSettings.supportEmail,
+          icon: "mail",
+          onPress: handleContactSupportEmail,
+          enabled:
+            supportContactSettings.emailEnabled &&
+            !!supportContactSettings.supportEmail,
+        },
+        {
+          id: "phone",
+          title: "Call Support",
+          subtitle: supportContactSettings.phoneNumber,
+          icon: "phone",
+          onPress: handleContactSupportPhone,
+          enabled:
+            supportContactSettings.phoneEnabled &&
+            !!supportContactSettings.phoneNumber,
+        },
+        {
+          id: "whatsapp",
+          title: "WhatsApp Support",
+          subtitle: supportContactSettings.whatsappNumber,
+          icon: "message-circle",
+          onPress: handleContactSupportWhatsApp,
+          enabled:
+            supportContactSettings.whatsappEnabled &&
+            !!supportContactSettings.whatsappNumber,
+        },
+      ].filter((method) => method.enabled),
+    [
+      handleContactSupportEmail,
+      handleContactSupportPhone,
+      handleContactSupportWhatsApp,
+      supportContactSettings.emailEnabled,
+      supportContactSettings.phoneEnabled,
+      supportContactSettings.supportEmail,
+      supportContactSettings.phoneNumber,
+      supportContactSettings.whatsappEnabled,
+      supportContactSettings.whatsappNumber,
+    ],
+  );
 
   const handleSubmitIssue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (!issueType) {
-      Alert.alert("Error", "Please select an issue type");
+      Alert.alert(t("Error"), t("Please select an issue type"));
       return;
     }
 
     if (!issueDescription.trim()) {
-      Alert.alert("Error", "Please describe your issue");
+      Alert.alert(t("Error"), t("Please describe your issue"));
       return;
     }
 
@@ -188,26 +320,41 @@ export default function HelpSupportScreen() {
 
         <View style={styles.section}>
           <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CONTACT US</ThemedText>
-          <GlassCard style={styles.contactCard} onPress={handleContactSupport}>
-            <View style={styles.contactRow}>
-              <View style={[styles.contactIcon, { backgroundColor: `${theme.primary}15` }]}>
-                <Feather name="mail" size={20} color={theme.primary} />
-              </View>
-              <View style={styles.contactContent}>
-                <ThemedText style={styles.contactTitle}>
-                  Email Support
-                </ThemedText>
-                <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
-                  support@maternalmind.com.pk
-                </ThemedText>
-              </View>
-              <Feather
-                name="external-link"
-                size={18}
-                color={theme.textSecondary}
-              />
-            </View>
-          </GlassCard>
+          {isSupportContactLoading ? (
+            <ThemedText style={[styles.contactLoadingText, { color: theme.textSecondary }]}>
+              Loading support contacts...
+            </ThemedText>
+          ) : null}
+          {contactMethods.length === 0 ? (
+            <GlassCard style={styles.contactCard}>
+              <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
+                Support contact details are currently unavailable.
+              </ThemedText>
+            </GlassCard>
+          ) : (
+            contactMethods.map((method) => (
+              <GlassCard key={method.id} style={styles.contactCard} onPress={method.onPress}>
+                <View style={styles.contactRow}>
+                  <View style={[styles.contactIcon, { backgroundColor: `${theme.primary}15` }]}>
+                    <Feather name={method.icon as any} size={20} color={theme.primary} />
+                  </View>
+                  <View style={styles.contactContent}>
+                    <ThemedText style={styles.contactTitle}>
+                      {method.title}
+                    </ThemedText>
+                    <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
+                      {method.subtitle}
+                    </ThemedText>
+                  </View>
+                  <Feather
+                    name="external-link"
+                    size={18}
+                    color={theme.textSecondary}
+                  />
+                </View>
+              </GlassCard>
+            ))
+          )}
         </View>
 
         <View style={styles.section}>
@@ -260,7 +407,7 @@ export default function HelpSupportScreen() {
               value={issueDescription}
               onChangeText={setIssueDescription}
               style={[styles.textArea, { color: theme.text }]}
-              placeholder="Describe your issue in detail..."
+              placeholder={t("Describe your issue in detail...")}
               placeholderTextColor={theme.textMuted}
               multiline
               numberOfLines={5}
@@ -324,6 +471,7 @@ const styles = StyleSheet.create({
   },
   contactCard: {
     padding: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   contactRow: {
     flexDirection: "row",
@@ -347,6 +495,10 @@ const styles = StyleSheet.create({
   },
   contactSubtitle: {
     fontSize: 13,
+  },
+  contactLoadingText: {
+    fontSize: 13,
+    marginBottom: Spacing.md,
   },
   issueTypes: {
     flexDirection: "row",

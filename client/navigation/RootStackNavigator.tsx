@@ -40,6 +40,7 @@ import DisclaimerScreen from "@/screens/DisclaimerScreen";
 import SpacedReviewScreen from "@/screens/SpacedReviewScreen";
 import AdminEmailSettingsScreen from "@/screens/AdminEmailSettingsScreen";
 import { Colors } from "@/constants/theme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -87,8 +88,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { resolveText } = useMobileContent();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } =
     useOnboarding();
+  const t = resolveText;
 
   const accountAgeDays = user?.createdAt
     ? (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)
@@ -124,7 +127,7 @@ export default function RootStackNavigator() {
             name="VerifyPhone"
             component={VerifyPhoneScreen}
             options={{
-              headerTitle: "Verify Phone",
+              headerTitle: t("Verify Phone"),
               presentation: "card",
             }}
           />
@@ -139,7 +142,7 @@ export default function RootStackNavigator() {
               name="VerifyPhone"
               component={VerifyPhoneScreen}
               options={{
-                headerTitle: "Verify Phone",
+                headerTitle: t("Verify Phone"),
                 presentation: "card",
               }}
             />
@@ -155,7 +158,7 @@ export default function RootStackNavigator() {
               name="QuizTopicSelect"
               component={QuizTopicSelectScreen}
               options={{
-                headerTitle: "Select Topic",
+                headerTitle: t("Select Topic"),
                 presentation: "card",
               }}
             />
@@ -180,7 +183,7 @@ export default function RootStackNavigator() {
               name="QuizSettings"
               component={QuizSettingsScreen}
               options={{
-                headerTitle: "Quiz Settings",
+                headerTitle: t("Quiz Settings"),
                 presentation: "card",
               }}
             />
@@ -188,7 +191,7 @@ export default function RootStackNavigator() {
               name="Subscription"
               component={SubscriptionScreen}
               options={{
-                headerTitle: "Subscription",
+                headerTitle: t("Subscription"),
                 presentation: "card",
               }}
             />
@@ -196,7 +199,7 @@ export default function RootStackNavigator() {
               name="Bookmarks"
               component={BookmarksScreen}
               options={{
-                headerTitle: "Bookmarks",
+                headerTitle: t("Bookmarks"),
                 presentation: "card",
               }}
             />
@@ -204,7 +207,7 @@ export default function RootStackNavigator() {
               name="RecentActivity"
               component={RecentActivityScreen}
               options={{
-                headerTitle: "Recent Activity",
+                headerTitle: t("Recent Activity"),
                 presentation: "card",
               }}
             />
@@ -212,7 +215,7 @@ export default function RootStackNavigator() {
               name="AttemptHistory"
               component={AttemptHistoryScreen}
               options={{
-                headerTitle: "Attempt History",
+                headerTitle: t("Attempt History"),
                 presentation: "card",
               }}
             />
@@ -220,7 +223,7 @@ export default function RootStackNavigator() {
               name="AttemptDetail"
               component={AttemptDetailScreen}
               options={{
-                headerTitle: "Attempt Detail",
+                headerTitle: t("Attempt Detail"),
                 presentation: "card",
               }}
             />
@@ -252,7 +255,7 @@ export default function RootStackNavigator() {
               name="PurchaseFailed"
               component={PurchaseFailedScreen}
               options={{
-                headerTitle: "Purchase Failed",
+                headerTitle: t("Purchase Failed"),
                 presentation: "card",
               }}
             />
@@ -260,7 +263,7 @@ export default function RootStackNavigator() {
               name="RestorePurchases"
               component={RestorePurchasesScreen}
               options={{
-                headerTitle: "Restore Purchases",
+                headerTitle: t("Restore Purchases"),
                 presentation: "card",
               }}
             />
@@ -268,7 +271,7 @@ export default function RootStackNavigator() {
               name="EditProfile"
               component={EditProfileScreen}
               options={{
-                headerTitle: "Edit Profile",
+                headerTitle: t("Edit Profile"),
                 presentation: "card",
               }}
             />
@@ -276,7 +279,7 @@ export default function RootStackNavigator() {
               name="Settings"
               component={SettingsScreen}
               options={{
-                headerTitle: "Settings",
+                headerTitle: t("Settings"),
                 presentation: "card",
               }}
             />
@@ -284,7 +287,7 @@ export default function RootStackNavigator() {
               name="SecuritySettings"
               component={SecuritySettingsScreen}
               options={{
-                headerTitle: "Security",
+                headerTitle: t("Security"),
                 presentation: "card",
               }}
             />
@@ -292,7 +295,7 @@ export default function RootStackNavigator() {
               name="HelpSupport"
               component={HelpSupportScreen}
               options={{
-                headerTitle: "Help & Support",
+                headerTitle: t("Help & Support"),
                 presentation: "card",
               }}
             />
@@ -300,7 +303,7 @@ export default function RootStackNavigator() {
               name="About"
               component={AboutScreen}
               options={{
-                headerTitle: "About",
+                headerTitle: t("About"),
                 presentation: "card",
               }}
             />
@@ -308,7 +311,7 @@ export default function RootStackNavigator() {
               name="TermsPrivacy"
               component={TermsPrivacyScreen}
               options={{
-                headerTitle: "Terms & Privacy",
+                headerTitle: t("Terms & Privacy"),
                 presentation: "card",
               }}
             />
@@ -316,7 +319,7 @@ export default function RootStackNavigator() {
               name="Disclaimer"
               component={DisclaimerScreen}
               options={{
-                headerTitle: "Medical Disclaimer",
+                headerTitle: t("Medical Disclaimer"),
                 presentation: "card",
               }}
             />
@@ -333,7 +336,7 @@ export default function RootStackNavigator() {
               name="AdminEmailSettings"
               component={AdminEmailSettingsScreen}
               options={{
-                headerTitle: "Email Settings",
+                headerTitle: t("Email Settings"),
                 presentation: "card",
               }}
             />

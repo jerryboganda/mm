@@ -3,6 +3,7 @@ import { StyleSheet, View, Image, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
@@ -23,6 +24,7 @@ type VerifyEmailScreenNavigationProp = NativeStackNavigationProp<
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const navigation = useNavigation<VerifyEmailScreenNavigationProp>();
   const route = useRoute<VerifyEmailScreenRouteProp>();
   const { verifyEmail, resendVerificationEmail } = useAuth();
@@ -32,6 +34,10 @@ export default function VerifyEmailScreen() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const authTopPadding = Math.max(
+    insets.top + Spacing["6xl"],
+    headerHeight + Spacing["2xl"],
+  );
 
   const handleVerify = async () => {
     if (!code || code.length !== 6) {
@@ -72,7 +78,7 @@ export default function VerifyEmailScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing["5xl"],
+            paddingTop: authTopPadding,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}

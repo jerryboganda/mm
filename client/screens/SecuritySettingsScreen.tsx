@@ -19,6 +19,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
+import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -29,6 +30,8 @@ export default function SecuritySettingsScreen() {
   const navigation = useNavigation();
   const { logout } = useAuth();
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -51,13 +54,13 @@ export default function SecuritySettingsScreen() {
     },
     onSuccess: () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert("Success", "Your password has been changed successfully.", [
+      Alert.alert(t("Success"), t("Your password has been changed successfully."), [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
     },
     onError: (error: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", error.message || "Failed to change password");
+      Alert.alert(t("Error"), error.message || t("Failed to change password"));
     },
   });
 
@@ -69,14 +72,14 @@ export default function SecuritySettingsScreen() {
     onSuccess: async () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
-        "Sessions Terminated",
-        "You have been logged out of all devices.",
+        t("Sessions Terminated"),
+        t("You have been logged out of all devices."),
         [{ text: "OK", onPress: () => logout() }],
       );
     },
     onError: (error: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert("Error", error.message || "Failed to logout all devices");
+      Alert.alert(t("Error"), error.message || t("Failed to logout all devices"));
     },
   });
 
@@ -84,17 +87,17 @@ export default function SecuritySettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert(t("Error"), t("Please fill in all fields"));
       return;
     }
 
     if (newPassword.length < 8) {
-      Alert.alert("Error", "New password must be at least 8 characters");
+      Alert.alert(t("Error"), t("New password must be at least 8 characters"));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert("Error", "New passwords do not match");
+      Alert.alert(t("Error"), t("New passwords do not match"));
       return;
     }
 
@@ -105,12 +108,14 @@ export default function SecuritySettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     Alert.alert(
-      "Logout All Devices?",
-      "This will sign you out of all devices including this one. You will need to log in again.",
+      t("Logout All Devices?"),
+      t(
+        "This will sign you out of all devices including this one. You will need to log in again.",
+      ),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("Cancel"), style: "cancel" },
         {
-          text: "Logout All",
+          text: t("Logout All"),
           style: "destructive",
           onPress: () => logoutAllMutation.mutate(),
         },
@@ -147,7 +152,7 @@ export default function SecuritySettingsScreen() {
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
                 style={[styles.input, { color: theme.text }]}
-                placeholder="Enter current password"
+                placeholder={t("Enter current password")}
                 placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showCurrentPassword}
                 autoCapitalize="none"
@@ -174,7 +179,7 @@ export default function SecuritySettingsScreen() {
                 value={newPassword}
                 onChangeText={setNewPassword}
                 style={[styles.input, { color: theme.text }]}
-                placeholder="Enter new password"
+                placeholder={t("Enter new password")}
                 placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showNewPassword}
                 autoCapitalize="none"
@@ -201,7 +206,7 @@ export default function SecuritySettingsScreen() {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 style={[styles.input, { color: theme.text }]}
-                placeholder="Confirm new password"
+                placeholder={t("Confirm new password")}
                 placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showConfirmPassword}
                 autoCapitalize="none"

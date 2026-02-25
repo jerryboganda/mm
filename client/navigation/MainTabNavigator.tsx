@@ -12,6 +12,7 @@ import PracticeStackNavigator from "@/navigation/PracticeStackNavigator";
 import ProgressStackNavigator from "@/navigation/ProgressStackNavigator";
 import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
 import { Colors } from "@/constants/theme";
+import { useMobileContent } from "@/lib/mobile-content";
 
 export type MainTabParamList = {
   HomeTab: undefined;
@@ -25,6 +26,8 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
   const insets = useSafeAreaInsets();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
 
   return (
     <Tab.Navigator
@@ -85,7 +88,7 @@ export default function MainTabNavigator() {
         name="HomeTab"
         component={HomeStackNavigator}
         options={{
-          title: "Home",
+          title: t("Home"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="home" size={size} color={color} />
           ),
@@ -95,7 +98,7 @@ export default function MainTabNavigator() {
         name="LibraryTab"
         component={LearnStackNavigator}
         options={{
-          title: "Library",
+          title: t("Library"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="book-open" size={size} color={color} />
           ),
@@ -105,7 +108,7 @@ export default function MainTabNavigator() {
         name="QuizTab"
         component={PracticeStackNavigator}
         options={{
-          title: "Quiz",
+          title: t("Quiz"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="edit-3" size={size} color={color} />
           ),
@@ -115,7 +118,7 @@ export default function MainTabNavigator() {
         name="ProgressTab"
         component={ProgressStackNavigator}
         options={{
-          title: "Progress",
+          title: t("Progress"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="trending-up" size={size} color={color} />
           ),
@@ -125,7 +128,7 @@ export default function MainTabNavigator() {
         name="ProfileTab"
         component={ProfileStackNavigator}
         options={{
-          title: "Profile",
+          title: t("Profile"),
           tabBarIcon: ({ color, size }) => (
             <Feather name="user" size={size} color={color} />
           ),

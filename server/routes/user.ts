@@ -2,6 +2,7 @@ import { Router } from "express";
 import { storage } from "../storage";
 import { sendEmail, supportIssueEmailHtml } from "../email";
 import { AuthRequest, authMiddleware } from "../middleware";
+import { getSupportContactSettings } from "../lib/support-contact";
 
 const router = Router();
 
@@ -54,8 +55,9 @@ router.post(
 
       // Send email to support via Brevo SMTP
       try {
+        const supportContactSettings = await getSupportContactSettings();
         await sendEmail({
-          to: "support@maternalmind.com.pk",
+          to: supportContactSettings.supportEmail,
           subject: `[${type.toUpperCase()}] New Issue Report`,
           html: supportIssueEmailHtml(type, email, description),
         });

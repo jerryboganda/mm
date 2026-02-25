@@ -26,6 +26,7 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { ImageViewer } from "@/components/ImageViewer";
+import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest, queryClient } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -69,6 +70,8 @@ export default function TopicReaderScreen() {
   const [reportType, setReportType] = useState<string>("factual_error");
   const [reportDescription, setReportDescription] = useState("");
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
   const { width: windowWidth } = useWindowDimensions();
   const contentWidth = windowWidth - Spacing.lg * 2;
 
@@ -198,16 +201,19 @@ export default function TopicReaderScreen() {
       setReportDescription("");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (Platform.OS === "web") {
-        window.alert("Thank you! Your report has been submitted.");
+        window.alert(t("Thank you! Your report has been submitted."));
       } else {
-        Alert.alert("Thank you!", "Your report has been submitted for review.");
+        Alert.alert(
+          t("Thank you!"),
+          t("Your report has been submitted for review."),
+        );
       }
     },
     onError: () => {
       if (Platform.OS === "web") {
-        window.alert("Failed to submit report. Please try again.");
+        window.alert(t("Failed to submit report. Please try again."));
       } else {
-        Alert.alert("Error", "Failed to submit report. Please try again.");
+        Alert.alert(t("Error"), t("Failed to submit report. Please try again."));
       }
     },
   });
@@ -678,7 +684,7 @@ export default function TopicReaderScreen() {
                   color: theme.text,
                 },
               ]}
-              placeholder="Describe the error..."
+              placeholder={t("Describe the error...")}
               placeholderTextColor={theme.textSecondary}
               multiline
               numberOfLines={4}

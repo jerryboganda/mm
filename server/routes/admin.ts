@@ -4,12 +4,86 @@
  * All routes are protected by authMiddleware + requireRole("admin").
  * Provides CRUD for app_settings and SMTP test endpoint.
  */
-import { Router } from "express";
+import { Router, Response } from "express";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
 import { storage } from "../storage";
 import { testSmtpConnection } from "../email";
+import {
+  getSupportContactSettings,
+  SUPPORT_CONTACT_KEYS,
+} from "../lib/support-contact";
 
 const router = Router();
+
+const getSupportContactHandler = async (_req: AuthRequest, res: Response) => {
+  try {
+    const supportContactSettings = await getSupportContactSettings();
+    res.json(supportContactSettings);
+  } catch (error) {
+    console.error("Get support contact settings error:", error);
+    res.status(500).json({ message: "Failed to load support contact settings" });
+  }
+};
+
+const putSupportContactHandler = async (req: AuthRequest, res: Response) => {
+  try {
+    const whatsappNumber = String(req.body?.whatsappNumber || "").trim();
+    const phoneNumber = String(req.body?.phoneNumber || "").trim();
+    const supportEmail = String(req.body?.supportEmail || "").trim();
+    const whatsappDefaultMessage = String(
+      req.body?.whatsappDefaultMessage || "",
+    ).trim();
+
+    if (supportEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportEmail)) {
+      return res.status(400).json({ message: "Invalid support email format" });
+    }
+
+    await storage.setAppSettings([
+      { key: SUPPORT_CONTACT_KEYS.whatsappNumber, value: whatsappNumber },
+      { key: SUPPORT_CONTACT_KEYS.phoneNumber, value: phoneNumber },
+      { key: SUPPORT_CONTACT_KEYS.supportEmail, value: supportEmail },
+      {
+        key: SUPPORT_CONTACT_KEYS.whatsappDefaultMessage,
+        value: whatsappDefaultMessage,
+      },
+    ]);
+
+    const updated = await getSupportContactSettings();
+    res.json({
+      message: "Support contact settings saved successfully",
+      ...updated,
+    });
+  } catch (error) {
+    console.error("Save support contact settings error:", error);
+    res.status(500).json({ message: "Failed to save support contact settings" });
+  }
+};
+
+router.get(
+  "/support-contact",
+  authMiddleware,
+  requireRole("admin"),
+  getSupportContactHandler,
+);
+router.get(
+  "/settings/support-contact",
+  authMiddleware,
+  requireRole("admin"),
+  getSupportContactHandler,
+);
+
+router.put(
+  "/support-contact",
+  authMiddleware,
+  requireRole("admin"),
+  putSupportContactHandler,
+);
+router.put(
+  "/settings/support-contact",
+  authMiddleware,
+  requireRole("admin"),
+  putSupportContactHandler,
+);
 
 // â”€â”€ GET /api/admin/email-settings â€” Fetch current Brevo SMTP config â”€â”€
 router.get(

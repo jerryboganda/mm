@@ -26,6 +26,7 @@ import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
+import { useMobileContent } from "@/lib/mobile-content";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -48,6 +49,7 @@ type RecommendedTopic = {
 
 function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
   const { theme, isDark } = useTheme();
+  const { resolveText } = useMobileContent();
 
   // Use theme colors with opacity for glow effects
   const glowColor = {
@@ -112,7 +114,7 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
                 style={[styles.bentoLabel, { color: theme.textSecondary }]}
                 numberOfLines={1}
               >
-                {item.label}
+                {resolveText(item.label)}
               </Text>
             </View>
           </View>
@@ -130,12 +132,13 @@ function ContinueLearningCard({
   onPress: () => void;
 }) {
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
 
   return (
     <GlassCard onPress={onPress} variant="glow" style={styles.continueCard}>
       <View style={styles.continueContent}>
         <Text style={[styles.continueLabel, { color: theme.primary }]}>
-          CONTINUE LEARNING
+          {resolveText("CONTINUE LEARNING")}
         </Text>
         <Text
           style={[styles.continueTitle, { color: theme.text }]}
@@ -219,6 +222,8 @@ export default function HomeScreen() {
   const headerHeight = useHeaderHeight();
   const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
+  const { resolveText } = useMobileContent();
+  const t = resolveText;
   const { user } = useAuth();
   const navigation = useNavigation<NavigationProp>();
   const [refreshing, setRefreshing] = React.useState(false);
@@ -305,7 +310,7 @@ export default function HomeScreen() {
   const stats: StatCardData[] = [
     {
       id: "topics",
-      label: "Topics Read",
+      label: t("Topics Read"),
       value: progress?.topicsCompleted?.toString() || "0",
       icon: "book",
       color: theme.primary,
@@ -313,7 +318,7 @@ export default function HomeScreen() {
     },
     {
       id: "quizzes",
-      label: "Quizzes Done",
+      label: t("Quizzes Done"),
       value: progress?.quizzesCompleted?.toString() || "0",
       icon: "check-circle",
       color: theme.success,
@@ -321,7 +326,7 @@ export default function HomeScreen() {
     },
     {
       id: "accuracy",
-      label: "Avg. Score",
+      label: t("Avg. Score"),
       value: progress?.averageScore
         ? `${Math.round(progress.averageScore)}%`
         : "—",
@@ -331,7 +336,7 @@ export default function HomeScreen() {
     },
     {
       id: "streak",
-      label: "Study Streak",
+      label: t("Study Streak"),
       value: progress?.studyStreak?.toString() || "0",
       icon: "zap",
       color: theme.purple || "#a855f7",
@@ -342,14 +347,14 @@ export default function HomeScreen() {
   const continueTopic =
     recentTopics && recentTopics.length > 0 ? recentTopics[0] : null;
 
-  const firstName = user?.name?.split(" ")[0] || "Student";
+  const firstName = user?.name?.split(" ")[0] || t("Student");
   const greeting = getGreeting();
 
   function getGreeting() {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 17) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return t("Good morning");
+    if (hour < 17) return t("Good afternoon");
+    return t("Good evening");
   }
 
   const dueCount = dueReviewData?.count || 0;
@@ -400,7 +405,7 @@ export default function HomeScreen() {
                   ]}
                   onPress={handleNotifications}
                   accessibilityRole="button"
-                  accessibilityLabel="Notifications"
+                  accessibilityLabel={t("Notifications")}
                 >
                   <Feather name="bell" size={20} color={theme.text} />
                   <View
@@ -420,7 +425,7 @@ export default function HomeScreen() {
           <View style={styles.statsSection}>
             <AnimatedListItem index={1} delay={50}>
               <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                Your Progress
+                {t("Your Progress")}
               </Text>
             </AnimatedListItem>
             {progressLoading ? (
@@ -464,7 +469,9 @@ export default function HomeScreen() {
               ]}
               onPress={handleStartReview}
               accessibilityRole="button"
-              accessibilityLabel={`Spaced Review: ${dueCount} cards due`}
+              accessibilityLabel={`${t("Spaced Review")}: ${dueCount} ${t(
+                "cards due",
+              )}`}
             >
               <View style={styles.reviewBannerLeft}>
                 <View
@@ -484,7 +491,7 @@ export default function HomeScreen() {
                     style={[styles.reviewBannerTitle, { color: theme.text }]}
                     numberOfLines={1}
                   >
-                    Spaced Review
+                    {t("Spaced Review")}
                   </Text>
                   <Text
                     style={[
@@ -493,7 +500,8 @@ export default function HomeScreen() {
                     ]}
                     numberOfLines={1}
                   >
-                    {dueCount} card{dueCount !== 1 ? "s" : ""} due for review
+                    {dueCount} {t("card")}
+                    {dueCount !== 1 ? "s" : ""} {t("due for review")}
                   </Text>
                 </View>
               </View>
@@ -511,7 +519,7 @@ export default function HomeScreen() {
           <View style={styles.recommendedSection}>
             <AnimatedListItem index={8} delay={60}>
               <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                Recommended Topics
+                {t("Recommended Topics")}
               </Text>
             </AnimatedListItem>
             {recommendedTopics.map((topic, idx) => (
