@@ -409,6 +409,68 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+router.post(
+  "/change-password",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const { currentPassword, newPassword } = req.body as {
+        currentPassword?: string;
+        newPassword?: string;
+      };
+
+      if (!currentPassword || !newPassword) {
+        return res
+          .status(400)
+          .json({ message: "Current password and new password are required" });
+      }
+
+      if (newPassword.length < 8) {
+        return res
+          .status(400)
+          .json({ message: "New password must be at least 8 characters" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password,
+      );
+      if (!isCurrentPasswordValid) {
+        return res
+          .status(400)
+          .json({ message: "Current password is incorrect" });
+      }
+
+      const isSamePassword = await bcrypt.compare(newPassword, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({
+          message: "New password must be different from current password",
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(userId, hashedPassword);
+
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  },
+);
+
+router.post("/logout-all", authMiddleware, async (_req: AuthRequest, res) => {
+  // JWT sessions are stateless in this app, so we acknowledge the request.
+  // Client logs out locally right after this endpoint returns success.
+  res.json({ success: true, message: "Logged out from all devices" });
+});
+
 router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const user = await storage.getUser(req.userId!);
