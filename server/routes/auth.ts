@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import twilio from "twilio";
@@ -15,7 +15,12 @@ import {
   resetPasswordSchema,
 } from "@shared/schema";
 import { z } from "zod";
-import { AuthRequest, authMiddleware, rateLimiter } from "../middleware";
+import {
+  AuthRequest,
+  authMiddleware,
+  getRateLimitClientId,
+  rateLimiter,
+} from "../middleware";
 
 const router = Router();
 
@@ -202,56 +207,69 @@ router.post(
   },
 );
 
-router.post("/login", rateLimiter(10, 15 * 60 * 1000), async (req, res) => {
-  try {
-    const data = loginSchema.parse(req.body);
+router.post(
+  "/login",
+  rateLimiter(10, 15 * 60 * 1000, {
+    keyPrefix: "auth_login",
+    keyGenerator: (req) => {
+      const email =
+        typeof req.body?.email === "string"
+          ? req.body.email.trim().toLowerCase()
+          : "unknown";
+      return `${getRateLimitClientId(req)}:${email}`;
+    },
+  }),
+  async (req, res) => {
+    try {
+      const data = loginSchema.parse(req.body);
 
-    const user = await storage.getUserByEmail(data.email);
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
+      const user = await storage.getUserByEmail(data.email);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
 
-    const validPassword = await bcrypt.compare(data.password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
+      const validPassword = await bcrypt.compare(data.password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
 
-    // 1. Check Email Verification
-    if (!user.isEmailVerified) {
-      return res.status(403).json({
-        code: "EMAIL_NOT_VERIFIED",
-        message: "Please verify your email address",
-        email: user.email,
+      // 1. Check Email Verification
+      if (!user.isEmailVerified) {
+        return res.status(403).json({
+          code: "EMAIL_NOT_VERIFIED",
+          message: "Please verify your email address",
+          email: user.email,
+        });
+      }
+
+      const accessToken = generateToken(user.id);
+      const refreshToken = generateRefreshToken(user.id);
+
+      // SECURITY: Never include password hash in response
+      res.json({
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          subscriptionStatus: user.subscriptionStatus,
+          subscriptionPlan: user.subscriptionPlan,
+          isEmailVerified: user.isEmailVerified,
+          isPhoneVerified: user.isPhoneVerified,
+          createdAt: user.createdAt,
+        },
       });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
     }
-
-    const accessToken = generateToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
-
-    // SECURITY: Never include password hash in response
-    res.json({
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        subscriptionStatus: user.subscriptionStatus,
-        subscriptionPlan: user.subscriptionPlan,
-        isEmailVerified: user.isEmailVerified,
-        isPhoneVerified: user.isPhoneVerified,
-        createdAt: user.createdAt,
-      },
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ message: error.errors[0].message });
-    }
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Login failed" });
-  }
-});
+  },
+);
 
 router.post(
   "/send-phone-otp",
@@ -391,6 +409,68 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+router.post(
+  "/change-password",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const { currentPassword, newPassword } = req.body as {
+        currentPassword?: string;
+        newPassword?: string;
+      };
+
+      if (!currentPassword || !newPassword) {
+        return res
+          .status(400)
+          .json({ message: "Current password and new password are required" });
+      }
+
+      if (newPassword.length < 8) {
+        return res
+          .status(400)
+          .json({ message: "New password must be at least 8 characters" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isCurrentPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password,
+      );
+      if (!isCurrentPasswordValid) {
+        return res
+          .status(400)
+          .json({ message: "Current password is incorrect" });
+      }
+
+      const isSamePassword = await bcrypt.compare(newPassword, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({
+          message: "New password must be different from current password",
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await storage.updateUserPassword(userId, hashedPassword);
+
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  },
+);
+
+router.post("/logout-all", authMiddleware, async (_req: AuthRequest, res) => {
+  // JWT sessions are stateless in this app, so we acknowledge the request.
+  // Client logs out locally right after this endpoint returns success.
+  res.json({ success: true, message: "Logged out from all devices" });
+});
+
 router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const user = await storage.getUser(req.userId!);
@@ -404,7 +484,7 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
       isEmailVerified: user.isEmailVerified,
       isPhoneVerified: user.isPhoneVerified,
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ message: "Failed to get user" });
   }
 });
