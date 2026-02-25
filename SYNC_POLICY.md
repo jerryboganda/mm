@@ -11,8 +11,8 @@ This repository now uses automatic sync scripts so GitHub stays the latest sourc
 ## What is configured
 - `scripts/sync-now.sh` (Linux/VPS): add/commit/push current changes.
 - `scripts/sync-now.ps1` (Windows): add/commit/push current changes.
-- `scripts/auto-sync-loop.sh`: runs sync every 60 seconds.
-- `scripts/auto-sync-loop.ps1`: runs sync every 60 seconds.
+- `scripts/auto-sync-loop.sh`: runs sync every 15 minutes by default.
+- `scripts/auto-sync-loop.ps1`: runs sync every 15 minutes by default.
 - `.githooks/post-commit`: pushes right after each manual commit.
 
 ## Manual sync commands
@@ -23,9 +23,9 @@ This repository now uses automatic sync scripts so GitHub stays the latest sourc
 
 ## Continuous auto-sync commands
 - VPS/Linux:
-  - `INTERVAL_SECONDS=60 bash scripts/auto-sync-loop.sh`
+  - `INTERVAL_SECONDS=900 bash scripts/auto-sync-loop.sh`
 - Windows PowerShell:
-  - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\auto-sync-loop.ps1 -IntervalSeconds 60`
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\auto-sync-loop.ps1 -IntervalSeconds 900`
 
 ## Safety notes
 - `.env` remains ignored by git.
