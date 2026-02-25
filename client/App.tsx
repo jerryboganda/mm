@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { StyleSheet, AppState } from "react-native";
-import { NavigationContainer, LinkingOptions } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  type InitialState,
+  LinkingOptions,
+} from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ExpoLinking from "expo-linking";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -63,7 +69,11 @@ const linking: LinkingOptions<RootStackParamList> = {
   },
 };
 
-function AppContent() {
+function AppContent({
+  initialNavigationState,
+}: {
+  initialNavigationState: InitialState | undefined;
+}) {
   const { theme, isDark } = useTheme();
 
   const navigationTheme = {
@@ -97,7 +107,16 @@ function AppContent() {
   };
 
   return (
-    <NavigationContainer theme={navigationTheme} linking={linking as any}>
+    <NavigationContainer
+      theme={navigationTheme}
+      linking={linking as any}
+      initialState={initialNavigationState}
+      onStateChange={(state) => {
+        if (state) {
+          AsyncStorage.setItem(NAVIGATION_STATE_KEY, JSON.stringify(state));
+        }
+      }}
+    >
       <AppNetworkWrapper>
         <RootStackNavigator />
       </AppNetworkWrapper>
@@ -105,7 +124,13 @@ function AppContent() {
   );
 }
 
+const NAVIGATION_STATE_KEY = "NAVIGATION_STATE_V1";
+
 export default function App() {
+  const [initialNavigationState, setInitialNavigationState] = React.useState<
+    InitialState | undefined
+  >(undefined);
+  const [navigationStateReady, setNavigationStateReady] = React.useState(false);
   const [fontsLoaded, fontError] = useFonts({
     Inter_300Light,
     Inter_400Regular,
@@ -119,6 +144,31 @@ export default function App() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    const restoreNavigationState = async () => {
+      try {
+        const initialUrl = await ExpoLinking.getInitialURL();
+        if (initialUrl) {
+          setNavigationStateReady(true);
+          return;
+        }
+
+        const savedStateString =
+          await AsyncStorage.getItem(NAVIGATION_STATE_KEY);
+
+        if (savedStateString) {
+          setInitialNavigationState(JSON.parse(savedStateString));
+        }
+      } catch (error) {
+        console.warn("Failed to restore navigation state", error);
+      } finally {
+        setNavigationStateReady(true);
+      }
+    };
+
+    restoreNavigationState();
+  }, []);
 
   // Restore offline cache on startup
   useEffect(() => {
@@ -139,6 +189,10 @@ export default function App() {
     return null;
   }
 
+  if (!navigationStateReady) {
+    return null;
+  }
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -149,7 +203,9 @@ export default function App() {
                 <SafeAreaProvider>
                   <GestureHandlerRootView style={styles.root}>
                     <KeyboardProvider>
-                      <AppContent />
+                      <AppContent
+                        initialNavigationState={initialNavigationState}
+                      />
                       <StatusBar style="auto" />
                     </KeyboardProvider>
                   </GestureHandlerRootView>
