@@ -21,6 +21,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
+import { useNetwork } from "@/lib/network";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -32,6 +33,7 @@ export default function SecuritySettingsScreen() {
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
   const t = resolveText;
+  const { isOffline } = useNetwork();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -86,6 +88,11 @@ export default function SecuritySettingsScreen() {
   const handleChangePassword = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
+    if (isOffline) {
+      Alert.alert(t("No Internet"), t("Changing your password requires an internet connection. Please try again when you're online."));
+      return;
+    }
+
     if (!currentPassword || !newPassword || !confirmPassword) {
       Alert.alert(t("Error"), t("Please fill in all fields"));
       return;
@@ -106,6 +113,11 @@ export default function SecuritySettingsScreen() {
 
   const handleLogoutAll = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (isOffline) {
+      Alert.alert(t("No Internet"), t("This action requires an internet connection. Please try again when you're online."));
+      return;
+    }
 
     Alert.alert(
       t("Logout All Devices?"),

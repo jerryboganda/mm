@@ -50,7 +50,7 @@ export function OfflineBanner({
         <Feather name="wifi-off" size={14} color="#fff" />
         <View style={styles.textCol}>
           <ThemedText style={styles.text}>
-            You're offline — showing cached content
+            You're offline â€” showing cached content
           </ThemedText>
           {cachedQueryCount !== undefined && cachedQueryCount > 0 && (
             <ThemedText style={styles.subtext}>

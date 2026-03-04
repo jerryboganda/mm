@@ -22,6 +22,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
+import { useNetwork } from "@/lib/network";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -50,7 +51,7 @@ const faqs: FAQ[] = [
   {
     question: "Can I use the app offline?",
     answer:
-      "Currently, Maternal Mind requires an internet connection to sync your progress and access content. Offline mode is planned for a future update.",
+      "Yes! Maternal Mind caches content you've already viewed so you can read it offline. Bookmarks and completions are saved and synced when you reconnect. Some features like quizzes and password changes require an internet connection.",
   },
   {
     question: "How do I reset my password?",
@@ -90,6 +91,7 @@ export default function HelpSupportScreen() {
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
   const t = resolveText;
+  const { isOffline } = useNetwork();
 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [issueType, setIssueType] = useState<string>("");
@@ -251,6 +253,11 @@ export default function HelpSupportScreen() {
 
   const handleSubmitIssue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (isOffline) {
+      Alert.alert(t("No Internet"), t("Submitting a support request requires an internet connection. Please try again when you're online."));
+      return;
+    }
 
     if (!issueType) {
       Alert.alert(t("Error"), t("Please select an issue type"));
