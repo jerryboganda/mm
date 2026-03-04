@@ -23,7 +23,7 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Feather } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
+import * as Haptics from "@/lib/haptics-wrapper";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { PrimaryButton } from "@/components/PrimaryButton";

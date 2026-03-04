@@ -8,6 +8,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ExpoLinking from "expo-linking";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { FeedbackProvider } from "@/lib/feedback";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -200,7 +201,8 @@ export default function App() {
           <PurchasesProvider>
             <NetworkProvider>
               <MobileContentProvider>
-                <SafeAreaProvider>
+                <FeedbackProvider>
+                  <SafeAreaProvider>
                   <GestureHandlerRootView style={styles.root}>
                     <KeyboardProvider>
                       <AppContent
@@ -209,8 +211,7 @@ export default function App() {
                       <StatusBar style="auto" />
                     </KeyboardProvider>
                   </GestureHandlerRootView>
-                </SafeAreaProvider>
-              </MobileContentProvider>
+                </SafeAreaProvider>                </FeedbackProvider>              </MobileContentProvider>
             </NetworkProvider>
           </PurchasesProvider>
         </AuthProvider>

@@ -22,7 +22,7 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
+import * as Haptics from "@/lib/haptics-wrapper";
 
 import { Colors, Spacing, BorderRadius } from "@/constants/theme";
 
