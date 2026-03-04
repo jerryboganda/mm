@@ -23,19 +23,19 @@ type Announcement = {
   id: string;
   title: string;
   message: string;
-  type: "new_content" | "update" | "info" | "important";
+  type: "info" | "warning" | "update" | "promo";
   createdAt: string;
-  isRead: boolean;
 };
 
 function getTypeIcon(type: Announcement["type"]) {
   switch (type) {
-    case "new_content":
-      return "book";
     case "update":
       return "refresh-cw";
-    case "important":
+    case "warning":
       return "alert-circle";
+    case "promo":
+      return "gift";
+    case "info":
     default:
       return "info";
   }
@@ -43,12 +43,13 @@ function getTypeIcon(type: Announcement["type"]) {
 
 function getTypeColor(type: Announcement["type"], theme: ThemeColors) {
   switch (type) {
-    case "new_content":
-      return theme.success;
     case "update":
-      return theme.primary;
-    case "important":
+      return theme.success;
+    case "warning":
       return theme.warning;
+    case "promo":
+      return theme.primary;
+    case "info":
     default:
       return theme.info;
   }
@@ -86,8 +87,7 @@ function AnnouncementCard({ item }: { item: Announcement }) {
         styles.card,
         {
           backgroundColor: theme.glass,
-          borderColor: item.isRead ? theme.glassBorder : typeColor,
-          opacity: item.isRead ? 0.7 : 1,
+          borderColor: typeColor,
         },
       ]}
       onPress={handlePress}
@@ -105,9 +105,6 @@ function AnnouncementCard({ item }: { item: Announcement }) {
           >
             {item.title}
           </Text>
-          {!item.isRead && (
-            <View style={[styles.unreadDot, { backgroundColor: typeColor }]} />
-          )}
         </View>
         <Text
           style={[styles.cardMessage, { color: theme.textSecondary }]}
@@ -148,7 +145,7 @@ export default function NotificationsScreen() {
     setRefreshing(false);
   };
 
-  const unreadCount = announcements?.filter((a) => !a.isRead).length || 0;
+  const totalCount = announcements?.length || 0;
 
   if (isLoading) {
     return (
@@ -176,11 +173,11 @@ export default function NotificationsScreen() {
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <AnnouncementCard item={item} />}
       ListHeaderComponent={
-        unreadCount > 0 ? (
+        totalCount > 0 ? (
           <View style={styles.headerSection}>
             <Text style={[styles.unreadLabel, { color: theme.primary }]}>
-              {unreadCount} {t("new")}{" "}
-              {unreadCount === 1 ? t("announcement") : t("announcements")}
+              {totalCount}{" "}
+              {totalCount === 1 ? t("announcement") : t("announcements")}
             </Text>
           </View>
         ) : null
