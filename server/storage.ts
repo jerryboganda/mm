@@ -974,25 +974,56 @@ export class DatabaseStorage implements IStorage {
     return report;
   }
 
-  /** Get content reports (for admin) */
+  /** Get content reports (for admin), enriched with user name and topic title */
   async getContentReports(
     status?: string,
     limit: number = 50,
-  ): Promise<ContentReport[]> {
-    let query = db
-      .select()
+  ) {
+    const baseQuery = db
+      .select({
+        id: contentReports.id,
+        userId: contentReports.userId,
+        userName: users.name,
+        contentType: contentReports.contentType,
+        contentId: contentReports.contentId,
+        topicTitle: topics.title,
+        reportType: contentReports.reportType,
+        description: contentReports.description,
+        status: contentReports.status,
+        reviewedBy: contentReports.reviewedBy,
+        reviewedAt: contentReports.reviewedAt,
+        createdAt: contentReports.createdAt,
+      })
       .from(contentReports)
+      .leftJoin(users, eq(contentReports.userId, users.id))
+      .leftJoin(topics, eq(contentReports.contentId, topics.id))
       .orderBy(desc(contentReports.createdAt))
       .limit(limit);
+
     if (status) {
       return await db
-        .select()
+        .select({
+          id: contentReports.id,
+          userId: contentReports.userId,
+          userName: users.name,
+          contentType: contentReports.contentType,
+          contentId: contentReports.contentId,
+          topicTitle: topics.title,
+          reportType: contentReports.reportType,
+          description: contentReports.description,
+          status: contentReports.status,
+          reviewedBy: contentReports.reviewedBy,
+          reviewedAt: contentReports.reviewedAt,
+          createdAt: contentReports.createdAt,
+        })
         .from(contentReports)
+        .leftJoin(users, eq(contentReports.userId, users.id))
+        .leftJoin(topics, eq(contentReports.contentId, topics.id))
         .where(eq(contentReports.status, status))
         .orderBy(desc(contentReports.createdAt))
         .limit(limit);
     }
-    return await query;
+    return await baseQuery;
   }
 
   /** Update report status */

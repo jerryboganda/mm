@@ -815,7 +815,7 @@ export default function TopicReaderScreen() {
               onPress={() => reportMutation.mutate()}
               loading={reportMutation.isPending}
               icon="send"
-              disabled={!reportDescription.trim()}
+              disabled={!reportDescription.trim() || reportDescription.trim().length < 3}
               style={{ marginTop: Spacing.lg }}
             />
           </Pressable>

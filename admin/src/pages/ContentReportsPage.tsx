@@ -3,16 +3,17 @@ import { api } from '../lib/api';
 import { Loader2, Flag, CheckCircle, Clock, AlertTriangle, XCircle } from 'lucide-react';
 
 interface Report {
-  id: number;
-  userId: number;
-  userName: string;
-  topicId: number;
-  topicTitle: string;
-  contentBlockId: number | null;
-  mcqId: number | null;
-  type: string;
+  id: string;
+  userId: string;
+  userName: string | null;
+  contentType: string;
+  contentId: string;
+  topicTitle: string | null;
+  reportType: string;
   description: string;
   status: string;
+  reviewedBy: string | null;
+  reviewedAt: string | null;
   createdAt: string;
 }
 
@@ -48,7 +49,7 @@ export default function ContentReportsPage() {
 
   useEffect(() => { fetchReports(); }, [statusFilter]);
 
-  const updateStatus = async (id: number, status: string) => {
+  const updateStatus = async (id: string, status: string) => {
     try {
       await api.patch(`/content-reports/${id}`, { status });
       fetchReports();
@@ -89,15 +90,14 @@ export default function ContentReportsPage() {
                     <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md ${STATUS_COLORS[r.status]}`}>
                       {STATUS_ICONS[r.status]} {r.status}
                     </span>
-                    <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">{r.type}</span>
+                    <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md capitalize">{r.reportType.replace('_', ' ')}</span>
+                    <span className="text-xs text-indigo-400 bg-indigo-50 px-2 py-0.5 rounded-md">{r.contentType}</span>
                     <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
                   </div>
                   <p className="text-sm text-gray-900 font-medium">{r.description}</p>
                   <div className="mt-2 flex items-center gap-4 text-xs text-gray-400">
                     <span>By: <span className="text-gray-600">{r.userName || `User #${r.userId}`}</span></span>
-                    <span>Topic: <span className="text-gray-600">{r.topicTitle || `#${r.topicId}`}</span></span>
-                    {r.mcqId && <span>MCQ #{r.mcqId}</span>}
-                    {r.contentBlockId && <span>Block #{r.contentBlockId}</span>}
+                    <span>Topic: <span className="text-gray-600">{r.topicTitle || r.contentId}</span></span>
                   </div>
                 </div>
 
