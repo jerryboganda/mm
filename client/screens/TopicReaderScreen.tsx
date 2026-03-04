@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -12,6 +12,10 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import RenderHtml from "react-native-render-html";
+import TableRenderer, {
+  tableModel,
+} from "@native-html/table-plugin";
+import WebView from "react-native-webview";
 import { MermaidDiagram } from "@/components/MermaidDiagram";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -69,7 +73,7 @@ export default function TopicReaderScreen() {
   const [reportVisible, setReportVisible] = useState(false);
   const [reportType, setReportType] = useState<string>("factual_error");
   const [reportDescription, setReportDescription] = useState("");
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { resolveText } = useMobileContent();
   const t = resolveText;
   const { width: windowWidth } = useWindowDimensions();
@@ -167,6 +171,82 @@ export default function TopicReaderScreen() {
     [theme],
   );
 
+  /* ─── Table plugin: renders HTML tables via WebView for full CSS support ─── */
+  const tableWebViewCss = useMemo(
+    () => `
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: transparent;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0;
+        table-layout: auto;
+        border: 1.5px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"};
+      }
+      thead tr {
+        background-color: ${isDark ? "rgba(17,164,212,0.18)" : "rgba(0,153,204,0.12)"};
+      }
+      th {
+        padding: 10px 12px;
+        font-weight: 700;
+        font-size: 14px;
+        color: ${isDark ? "#3dbde8" : "#007aa3"};
+        text-align: left;
+        border: 1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)"};
+      }
+      td {
+        padding: 9px 12px;
+        font-size: 13px;
+        color: ${isDark ? "rgba(255,255,255,0.92)" : "rgba(0,0,0,0.88)"};
+        border: 1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"};
+        vertical-align: top;
+      }
+      tbody tr:nth-child(odd) {
+        background-color: ${isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"};
+      }
+      tbody tr:nth-child(even) {
+        background-color: ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"};
+      }
+      td strong, th strong {
+        color: ${isDark ? "#3dbde8" : "#007aa3"};
+        font-weight: 700;
+      }
+    `,
+    [theme, isDark],
+  );
+
+  const htmlRenderers = useMemo(
+    () => ({
+      table: TableRenderer,
+    }),
+    [],
+  );
+
+  const htmlCustomModels = useMemo(
+    () => ({
+      table: tableModel,
+    }),
+    [],
+  );
+
+  const htmlRenderersProps = useMemo(
+    () => ({
+      table: {
+        animationType: "none" as const,
+        cssRules: tableWebViewCss,
+        computeContainerHeight(state: any) {
+          return state.contentHeight != null ? state.contentHeight + 2 : undefined;
+        },
+      },
+    }),
+    [tableWebViewCss],
+  );
+
   const bookmarkMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("POST", `/api/topics/${topicId}/bookmark`);
@@ -251,6 +331,10 @@ export default function TopicReaderScreen() {
               source={{ html }}
               tagsStyles={htmlTagsStyles}
               classesStyles={htmlClassesStyles}
+              renderers={htmlRenderers}
+              customHTMLElementModels={htmlCustomModels}
+              renderersProps={htmlRenderersProps}
+              WebView={WebView}
               enableExperimentalBRCollapsing
               enableExperimentalGhostLinesPrevention
               enableExperimentalMarginCollapsing
