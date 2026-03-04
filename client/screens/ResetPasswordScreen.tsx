@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Image, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "expo-haptics";
-import * as Linking from "expo-linking";
 
 import { KeyboardAwareScrollViewCompat } from "@/components/KeyboardAwareScrollViewCompat";
 import { BackgroundGradient } from "@/components/BackgroundGradient";
@@ -34,6 +33,9 @@ export default function ResetPasswordScreen() {
   const route = useRoute<ResetPasswordScreenRouteProp>();
   const { theme } = useTheme();
 
+  const email = route.params?.email ?? "";
+  const code = route.params?.code ?? "";
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,33 +44,10 @@ export default function ResetPasswordScreen() {
     password?: string;
     confirmPassword?: string;
   }>({});
-  const [token, setToken] = useState("");
   const authTopPadding = Math.max(
     insets.top + Spacing["6xl"],
     headerHeight + Spacing["2xl"],
   );
-
-  useEffect(() => {
-    let mounted = true;
-
-    const tokenFromRoute = route.params?.token;
-    if (tokenFromRoute) {
-      setToken(tokenFromRoute);
-    } else {
-      Linking.getInitialURL().then((url) => {
-        if (!mounted || !url) return;
-        const parsed = Linking.parse(url);
-        const deepLinkToken = parsed.queryParams?.token;
-        if (typeof deepLinkToken === "string") {
-          setToken(deepLinkToken);
-        }
-      });
-    }
-
-    return () => {
-      mounted = false;
-    };
-  }, [route.params]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -95,10 +74,10 @@ export default function ResetPasswordScreen() {
       return;
     }
 
-    if (!token) {
+    if (!email || !code) {
       Alert.alert(
         "Error",
-        "Invalid reset link. Please request a new password reset.",
+        "Missing reset information. Please request a new reset code.",
       );
       return;
     }
@@ -112,7 +91,7 @@ export default function ResetPasswordScreen() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token, password }),
+          body: JSON.stringify({ email, code, password }),
         },
       );
 
