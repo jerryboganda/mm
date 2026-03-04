@@ -17,6 +17,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
 
+import { useFeedback } from "@/lib/feedback";
+
 import { ThemedText } from "@/components/ThemedText";
 import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { useMobileContent } from "@/lib/mobile-content";
@@ -63,6 +65,7 @@ export function PrimaryButton({
   testID,
 }: PrimaryButtonProps) {
   const { resolveText } = useMobileContent();
+  const feedback = useFeedback();
   const resolvedTitle = resolveText(title);
   const scale = useSharedValue(1);
   const brightness = useSharedValue(1);
@@ -89,6 +92,7 @@ export function PrimaryButton({
       if (Platform.OS !== "web") {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
+      feedback.playSound("tap");
       onPress();
     }
   };

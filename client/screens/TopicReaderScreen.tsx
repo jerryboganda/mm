@@ -35,6 +35,7 @@ import { apiRequest, queryClient } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useFeedback } from "@/lib/feedback";
 
 type TopicReaderRouteProp = RouteProp<RootStackParamList, "TopicReader">;
 type TopicReaderNavigationProp = NativeStackNavigationProp<
@@ -74,6 +75,7 @@ export default function TopicReaderScreen() {
   const [reportType, setReportType] = useState<string>("factual_error");
   const [reportDescription, setReportDescription] = useState("");
   const { theme, isDark } = useTheme();
+  const feedback = useFeedback();
   const { resolveText } = useMobileContent();
   const t = resolveText;
   const { width: windowWidth } = useWindowDimensions();
@@ -260,6 +262,7 @@ export default function TopicReaderScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      feedback.playSound("tap");
     },
   });
 
@@ -270,6 +273,7 @@ export default function TopicReaderScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      feedback.playSound("success");
     },
   });
 
