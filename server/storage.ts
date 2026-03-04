@@ -13,6 +13,7 @@ import {
   reviewSchedule,
   contentReports,
   appSettings,
+  announcements,
   type User,
   type InsertUser,
   type Book,
@@ -1045,7 +1046,7 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  /** Get system announcements — for now returns empty since no announcements table exists yet */
+  /** Get active, non-expired announcements for mobile users */
   async getAnnouncements(): Promise<
     {
       id: string;
@@ -1053,12 +1054,26 @@ export class DatabaseStorage implements IStorage {
       message: string;
       type: string;
       createdAt: string;
-      isRead: boolean;
     }[]
   > {
-    // No announcements table yet — return empty list.
-    // When an announcements table is added to schema, this will query it.
-    return [];
+    const now = new Date();
+    const rows = await db
+      .select()
+      .from(announcements)
+      .where(
+        and(
+          eq(announcements.isActive, true),
+          sql`(${announcements.expiresAt} IS NULL OR ${announcements.expiresAt} > ${now})`,
+        ),
+      )
+      .orderBy(desc(announcements.createdAt));
+    return rows.map((r) => ({
+      id: String(r.id),
+      title: r.title,
+      message: r.message,
+      type: r.type,
+      createdAt: r.createdAt.toISOString(),
+    }));
   }
 
   // ── App Settings ──────────────────────────
