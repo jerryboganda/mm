@@ -1,6 +1,6 @@
 # Maternal Mind - Single Source of Truth (SSOT)
 
-Last updated: 2026-03-04
+Last updated: 2026-03-05
 Purpose: Canonical project memory, technical baseline, risk register, and execution plan.
 
 ## 1) Project Snapshot
@@ -61,6 +61,16 @@ cd /root/maternalmind && docker compose exec app npm run db:push
 - Dependency alignment done with `npx expo install --fix`.
 
 ## 4) Recently Completed Improvements (Jan–Mar 2026)
+- **Comprehensive offline support (Mar 2026)**: App was completely unusable offline — `AppNetworkWrapper` replaced the entire UI with a dead-end `OfflineScreen` (just a Retry button), even though `offline-cache.ts` existed and saved query data to AsyncStorage. Users could never access cached content. Multi-layer fix:
+  - **Architecture**: Rewrote `AppNetworkWrapper.tsx` to always render children (the full navigation stack) instead of blocking with `OfflineScreen`. Added `OfflineBanner.tsx` — a slim animated amber banner at the top showing "You're offline — showing cached content" with cached page count.
+  - **TanStack Query integration**: Wired `onlineManager` from `@tanstack/react-query` to `@react-native-community/netinfo` in `query-client.ts` so TanStack Query knows about network state and auto-pauses/resumes fetches.
+  - **Cache coverage**: Expanded `offline-cache.ts` `OFFLINE_QUERY_KEYS` to include `/api/progress`, `/api/bookmarks`, `/api/profile`, `/api/announcements`, `/api/me`, `/api/reviews/due`, `/api/reviews/due-count`, `/api/progress/recent`, `/api/progress/recommended`, `/api/recent-activity`, `/api/recommended-topics`. Added prefix matching for `/api/quiz/`, `/api/attempts/`, `/api/progress/`.
+  - **Mutation queue**: Created `client/lib/mutation-queue.ts` — when offline, bookmark/complete/uncomplete mutations are queued to AsyncStorage with last-write-wins deduplication. `startMutationQueueListener()` auto-drains the queue when connectivity restores. Wired into `App.tsx` at startup.
+  - **Optimistic updates**: `TopicReaderScreen` bookmark/complete/uncomplete mutations now have `onMutate` optimistic toggles (instant UI feedback) with `onError` rollback. Works seamlessly offline — UI updates immediately, mutation is queued, synced later.
+  - **Periodic persistence**: Added `startPeriodicPersist(queryClient, 60_000)` (persists cache every 60s) and `persistOnQuerySuccess(queryClient, 3_000)` (debounced persist after successful fetches) to `offline-cache.ts`. Both wired in `App.tsx` alongside the existing background-persist.
+  - **Offline-aware screens**: `QuizPlayerScreen` blocks submission when offline with "Your answers are saved — please submit when you're back online" alert. `SecuritySettingsScreen` guards change-password and logout-all. `HelpSupportScreen` guards issue submission. `EditProfileScreen` guards profile save. All show clear "requires internet connection" messaging.
+  - **FAQ update**: Updated Help FAQ answer about offline support to reflect new capabilities.
+  - Files: `client/components/OfflineBanner.tsx` (new), `client/lib/mutation-queue.ts` (new), `client/components/AppNetworkWrapper.tsx` (rewritten), `client/lib/offline-cache.ts` (expanded), `client/lib/query-client.ts` (onlineManager), `client/App.tsx` (wiring), `client/screens/TopicReaderScreen.tsx` (optimistic mutations), `client/screens/QuizPlayerScreen.tsx`, `client/screens/SecuritySettingsScreen.tsx`, `client/screens/HelpSupportScreen.tsx`, `client/screens/EditProfileScreen.tsx`.
 - **Content reporting fix (Mar 2026)**: "Report an Error" feature in TopicReaderScreen always failed with "Failed to submit report. Please try again." and admin Content Reports page showed nothing. Two root causes: (1) **reportType enum mismatch** — client sent `"factual_error"` / `"typo"` but server Zod schema only accepted `"error"` / `"outdated"` / `"unclear"` / `"other"`, causing immediate validation failure; (2) **description min-length** — server required `min(10)` chars but client had no matching minimum, letting users submit short descriptions that were rejected. Fix: Expanded server `reportSchema` in `server/routes/reports.ts` to accept all client values (`factual_error`, `typo`, `outdated`, `unclear`, `error`, `other`), lowered description min to 3 chars, added `length >= 3` check on client submit button. Also fixed admin panel `ContentReportsPage.tsx` — interface had wrong field names (`type` instead of `reportType`, `topicId` instead of `contentId`, etc.) and numeric IDs instead of string UUIDs. Enhanced `storage.getContentReports()` to LEFT JOIN with `users` and `topics` tables to return `userName` and `topicTitle` for admin display.
 - **Change Password 404 fix (Mar 2026)**: Security screen's "Change Password" returned `404: {"message":"Endpoint not found"}`. Root cause: the `/change-password` and `/logout-all` routes were added to `server/routes/auth.ts` (commit `5acede3`, Feb 25) but the Docker container on the VPS was running an older image that predated those routes. The 404 came from the Express catch-all in `server/index.ts`. The mobile client code (`SecuritySettingsScreen.tsx`) correctly called `POST /api/auth/change-password` via `apiRequest()`; only the server deployment was stale. Fix: Rebuilt the Docker container with `docker compose build app --no-cache && docker compose up -d --force-recreate app`, which picked up the existing route code. Verified externally via `https://admin.maternalmind.com.pk/api/auth/change-password` returning HTTP 401 (auth required) instead of 404.
 - **Topic completion toggle (Mar 2026)**: Students could mark topics as "Completed" but could never uncomplete them for revision. The "Completed" badge was a static non-interactive `<View>`. Root cause: only `markTopicComplete()` existed in storage (sets `isCompleted: true`), no uncomplete method, no uncomplete API endpoint, and UI rendered a non-pressable badge. Fix: Added `markTopicUncomplete()` to `server/storage.ts` (sets `isCompleted: false, completedAt: null`), added `POST /api/topics/:topicId/uncomplete` route in `server/routes/content.ts`, and converted the static "Completed" badge in `TopicReaderScreen.tsx` to a `<Pressable>` that calls `markUncompleteMutation` with "Tap to mark for revision" hint text. Also invalidates progress queries on both complete/uncomplete to keep the Progress tab in sync.
@@ -94,14 +104,14 @@ cd /root/maternalmind && docker compose exec app npm run db:push
 4. RBAC field exists but is not enforced.
 5. No rate limiting for auth and sensitive endpoints.
 6. Hardcoded HTTP API URL in client.
-7. No offline support.
+7. ~~No offline support.~~ **RESOLVED** — Comprehensive offline support implemented (Mar 2026).
 8. No spaced repetition system.
 9. Search uses full scan pattern (performance/scalability risk).
 10. Accessibility implementation is weak/incomplete.
 
 ## 6) Confirmed Gaps (Functional/Platform)
 - Admin panel implemented and routed via backend `/admin`; dedicated HTTPS subdomain finalization in progress.
-- Offline mode not implemented.
+- ~~Offline mode not implemented.~~ **RESOLVED** — Comprehensive offline caching, mutation queue, optimistic updates, and offline-aware UI implemented (Mar 2026).
 - Localization not implemented.
 - CI/CD pipeline not implemented.
 - Analytics/crash reporting not implemented.
