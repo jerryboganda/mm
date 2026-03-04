@@ -36,7 +36,8 @@ import { MobileContentProvider } from "@/lib/mobile-content";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
 import { Colors } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
-import { persistQueryCache, restoreQueryCache } from "@/lib/offline-cache";
+import { persistQueryCache, restoreQueryCache, startPeriodicPersist, persistOnQuerySuccess } from "@/lib/offline-cache";
+import { startMutationQueueListener } from "@/lib/mutation-queue";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -171,9 +172,17 @@ export default function App() {
     restoreNavigationState();
   }, []);
 
-  // Restore offline cache on startup
+  // Restore offline cache on startup & start mutation queue listener
   useEffect(() => {
     restoreQueryCache(queryClient);
+    const unsubMutationQueue = startMutationQueueListener();
+    const stopPeriodicPersist = startPeriodicPersist(queryClient, 60_000);
+    const stopPersistOnSuccess = persistOnQuerySuccess(queryClient, 3_000);
+    return () => {
+      unsubMutationQueue();
+      stopPeriodicPersist();
+      stopPersistOnSuccess();
+    };
   }, []);
 
   // Persist cache when app goes to background

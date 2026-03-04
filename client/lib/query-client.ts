@@ -1,9 +1,21 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient, QueryFunction, onlineManager } from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 
 const TOKEN_KEY = "auth_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
+
+// ── Wire TanStack Query's onlineManager to NetInfo ──────────────
+// When offline: queries serve from cache, mutations are paused.
+// When back online: stale queries refetch, paused mutations execute.
+onlineManager.setEventListener((setOnline) => {
+  const unsubscribe = NetInfo.addEventListener((state) => {
+    const online = !!(state.isConnected && state.isInternetReachable !== false);
+    setOnline(online);
+  });
+  return unsubscribe;
+});
 
 async function getToken(): Promise<string | null> {
   if (Platform.OS === "web") {
