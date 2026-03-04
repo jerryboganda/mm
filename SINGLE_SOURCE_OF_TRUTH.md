@@ -1,6 +1,6 @@
 # Maternal Mind - Single Source of Truth (SSOT)
 
-Last updated: 2026-02-11
+Last updated: 2026-03-04
 Purpose: Canonical project memory, technical baseline, risk register, and execution plan.
 
 ## 1) Project Snapshot
@@ -60,7 +60,9 @@ cd /root/maternalmind && docker compose exec app npm run db:push
 - CORS adjustments were made server-side for mobile origin handling.
 - Dependency alignment done with `npx expo install --fix`.
 
-## 4) Recently Completed Improvements (Jan 2026)
+## 4) Recently Completed Improvements (Jan–Mar 2026)
+- **OTP-based password reset (Mar 2026)**: Converted the entire "Forgot Password" flow from a link-based approach (which broke due to Brevo SMTP link tracking rewriting URLs) to a fully in-app OTP-based flow. User never leaves the app. Flow: enter email → receive 6-digit code via email → enter code in app → set new password. Files changed: `server/routes/auth.ts` (new `/verify-reset-otp` endpoint), `server/email.ts` (`passwordResetOtpEmailHtml`), `server/storage.ts` (`createPasswordResetOtp`, `getPasswordResetByOtp`), `shared/schema.ts` (updated `resetPasswordSchema`), `client/screens/ForgotPasswordScreen.tsx` (OTP entry UI), `client/screens/ResetPasswordScreen.tsx` (accepts email+code params), `client/navigation/RootStackNavigator.tsx` (updated type params).
+- **HTML table rendering fix (Mar 2026)**: Added `@native-html/table-plugin` for proper table rendering in `TopicReaderScreen` content (e.g., PALM-COEIN classification tables).
 - Increased glass component contrast and readability on dark backgrounds.
 - Fixed dashboard card layout squashing and hero stat indexing.
 - Improved Android safe-area/system-nav overlap handling in tab navigator.
