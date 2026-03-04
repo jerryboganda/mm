@@ -239,6 +239,12 @@ export default function TopicReaderScreen() {
       table: {
         animationType: "none" as const,
         cssRules: tableWebViewCss,
+        webViewProps: {
+          style: {
+            backgroundColor: "transparent",
+            opacity: 0.99, // Workaround for Android WebView transparency
+          },
+        },
         computeContainerHeight(state: any) {
           return state.contentHeight != null ? state.contentHeight + 2 : undefined;
         },
