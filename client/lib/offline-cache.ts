@@ -24,8 +24,11 @@ const OFFLINE_QUERY_KEYS = [
   "/api/announcements",
   "/api/me",
   "/api/reviews/due",
+  "/api/reviews/due-count",
   "/api/progress/recent",
   "/api/progress/recommended",
+  "/api/recent-activity",
+  "/api/recommended-topics",
 ];
 
 // Prefix matches — any query starting with these will be cached

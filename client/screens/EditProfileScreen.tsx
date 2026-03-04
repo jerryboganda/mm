@@ -25,6 +25,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
+import { useNetwork } from "@/lib/network";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -37,6 +38,7 @@ export default function EditProfileScreen() {
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
   const t = resolveText;
+  const { isOffline } = useNetwork();
 
   const [name, setName] = useState(user?.name || "");
   const [photoUri, setPhotoUri] = useState<string | null>(null);
@@ -94,6 +96,11 @@ export default function EditProfileScreen() {
 
   const handleSave = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (isOffline) {
+      Alert.alert(t("No Internet"), t("Updating your profile requires an internet connection. Please try again when you're online."));
+      return;
+    }
 
     if (!name.trim()) {
       Alert.alert("Error", "Name cannot be empty");

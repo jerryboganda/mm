@@ -22,7 +22,7 @@ export interface QueuedMutation {
   createdAt: number;     // unix ms
 }
 
-// ── Storage helpers ─────────────────────────────────────────────
+// â”€â”€ Storage helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function getStorage() {
   if (Platform.OS === "web") {
@@ -40,7 +40,7 @@ async function getStorage() {
   return AsyncStorage.default;
 }
 
-// ── Queue operations ────────────────────────────────────────────
+// â”€â”€ Queue operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getQueuedMutations(): Promise<QueuedMutation[]> {
   try {
@@ -100,7 +100,7 @@ export async function enqueueMutationIfOffline(
 }
 
 /**
- * Drain the queue — replay all queued mutations sequentially.
+ * Drain the queue â€” replay all queued mutations sequentially.
  * Called automatically when connectivity is restored.
  */
 export async function drainMutationQueue(): Promise<{
@@ -111,7 +111,7 @@ export async function drainMutationQueue(): Promise<{
   if (queue.length === 0) return { succeeded: 0, failed: 0 };
 
   if (__DEV__) {
-    console.log(`[MutationQueue] Draining ${queue.length} mutations…`);
+    console.log(`[MutationQueue] Draining ${queue.length} mutationsâ€¦`);
   }
 
   let succeeded = 0;
@@ -123,13 +123,13 @@ export async function drainMutationQueue(): Promise<{
       await apiRequest(mutation.method, mutation.route, mutation.data);
       succeeded++;
     } catch (error) {
-      // If it's a client error (4xx), drop it — retrying won't help
+      // If it's a client error (4xx), drop it â€” retrying won't help
       const msg = (error as Error)?.message || "";
       if (/^4\d{2}:/.test(msg)) {
         failed++;
         // discard
       } else {
-        // Server error or network still down — keep in queue
+        // Server error or network still down â€” keep in queue
         remaining.push(mutation);
         failed++;
       }
@@ -158,7 +158,7 @@ export function startMutationQueueListener(): () => void {
     const isOnline = !!(state.isConnected && state.isInternetReachable !== false);
 
     if (isOnline && wasOffline) {
-      // Just came back online — drain the queue
+      // Just came back online â€” drain the queue
       drainMutationQueue().catch(console.warn);
     }
 
