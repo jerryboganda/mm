@@ -8,8 +8,8 @@ const router = Router();
 const reportSchema = z.object({
   contentType: z.enum(["topic", "mcq", "content_block"]),
   contentId: z.string().min(1),
-  reportType: z.enum(["error", "outdated", "unclear", "other"]),
-  description: z.string().min(10, "Description must be at least 10 characters"),
+  reportType: z.enum(["factual_error", "typo", "outdated", "unclear", "error", "other"]),
+  description: z.string().min(3, "Description must be at least 3 characters"),
 });
 
 // Submit a content error report
