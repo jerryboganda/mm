@@ -32,6 +32,7 @@ import { apiRequest, queryClient } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useFeedback } from "@/lib/feedback";
 
 type QuizPlayerRouteProp = RouteProp<RootStackParamList, "QuizPlayer">;
 type QuizPlayerNavigationProp = NativeStackNavigationProp<
@@ -59,6 +60,7 @@ export default function QuizPlayerScreen() {
   const { mode, topicId, questionCount: paramQuestionCount } = route.params;
   const isExamMode = mode === "exam";
   const { theme, isDark } = useTheme();
+  const feedback = useFeedback();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -199,6 +201,7 @@ export default function QuizPlayerScreen() {
     setSelectedOption(label);
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: label }));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    feedback.playSound("tap");
   };
 
   const handleNext = () => {
@@ -229,6 +232,7 @@ export default function QuizPlayerScreen() {
   const confirmSubmit = () => {
     if (!quizData) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    feedback.playSound("success");
     setShowSubmitModal(false);
     submitMutation.mutate({
       quizId: quizData.quizId,

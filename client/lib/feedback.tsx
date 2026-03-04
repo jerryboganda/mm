@@ -70,7 +70,6 @@ export function getSoundEnabled(): boolean {
 export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const [soundEnabled, _setSoundEnabled] = useState(true);
   const [hapticEnabled, _setHapticEnabled] = useState(true);
-  const [loaded, setLoaded] = useState(false);
   const soundCache = useRef<Map<SoundName, Audio.Sound>>(new Map());
 
   // Restore from AsyncStorage on mount
@@ -94,7 +93,7 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
       } catch {
         // defaults stay true
       } finally {
-        setLoaded(true);
+        // preferences loaded
       }
     })();
   }, []);
@@ -123,9 +122,7 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const playHaptic = useCallback(
     (
       type: "impact" | "notification" | "selection" = "impact",
-      style?:
-        | Haptics.ImpactFeedbackStyle
-        | Haptics.NotificationFeedbackType,
+      style?: Haptics.ImpactFeedbackStyle | Haptics.NotificationFeedbackType,
     ) => {
       if (!_hapticEnabled || Platform.OS === "web") return;
       switch (type) {
@@ -178,8 +175,9 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
 
   // Cleanup sounds on unmount
   useEffect(() => {
+    const cache = soundCache.current;
     return () => {
-      soundCache.current.forEach((s) => s.unloadAsync().catch(() => {}));
+      cache.forEach((s) => s.unloadAsync().catch(() => {}));
     };
   }, []);
 
