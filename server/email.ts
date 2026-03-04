@@ -238,9 +238,9 @@ export function verificationEmailHtml(otp: string): string {
   `;
 }
 
-export function passwordResetEmailHtml(
+export function passwordResetOtpEmailHtml(
   userName: string,
-  resetLink: string,
+  otp: string,
 ): string {
   return `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -250,12 +250,11 @@ export function passwordResetEmailHtml(
       <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 30px; border-radius: 16px; border: 1px solid #bae6fd;">
         <h2 style="color: #0284c7; margin-top: 0;">Reset Your Password</h2>
         <p style="color: #334155; line-height: 1.6;">Hello ${userName},</p>
-        <p style="color: #334155; line-height: 1.6;">You requested to reset your password. Click the button below:</p>
-        <div style="text-align: center; margin: 25px 0;">
-          <a href="${resetLink}" style="background: #0284c7; color: white; padding: 15px 40px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block;">Reset Password</a>
+        <p style="color: #334155; line-height: 1.6;">You requested to reset your password. Enter the code below in the Maternal Mind app:</p>
+        <div style="text-align: center; margin: 20px 0;">
+          <span style="background: #0284c7; color: white; padding: 15px 30px; font-size: 28px; letter-spacing: 8px; border-radius: 12px; display: inline-block; font-weight: bold;">${otp}</span>
         </div>
-        <p style="color: #64748b; font-size: 14px;">If the button doesn't work, copy this link into your browser:</p>
-        <p style="color: #0284c7; font-size: 13px; word-break: break-all;">${resetLink}</p>
+        <p style="color: #64748b; font-size: 14px; text-align: center;">This code will expire in 1 hour.</p>
       </div>
       <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 30px;">
         If you didn't request a password reset, you can safely ignore this email.

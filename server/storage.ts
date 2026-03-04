@@ -397,6 +397,16 @@ export class DatabaseStorage implements IStorage {
     return token;
   }
 
+  /** Store a 6-digit OTP for password reset (in the same table, using `token` column) */
+  async createPasswordResetOtp(userId: string, otp: string): Promise<void> {
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+    await db.insert(passwordResetTokens).values({
+      userId,
+      token: otp,
+      expiresAt,
+    });
+  }
+
   async getPasswordResetToken(
     token: string,
   ): Promise<PasswordResetToken | undefined> {
@@ -406,6 +416,31 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(passwordResetTokens.token, token),
+          eq(passwordResetTokens.used, false),
+          gt(passwordResetTokens.expiresAt, new Date()),
+        ),
+      );
+    return resetToken || undefined;
+  }
+
+  /** Look up a password reset OTP by the user's email + OTP code */
+  async getPasswordResetByOtp(
+    email: string,
+    otp: string,
+  ): Promise<PasswordResetToken | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+    if (!user) return undefined;
+
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(
+        and(
+          eq(passwordResetTokens.userId, user.id),
+          eq(passwordResetTokens.token, otp),
           eq(passwordResetTokens.used, false),
           gt(passwordResetTokens.expiresAt, new Date()),
         ),
