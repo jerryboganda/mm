@@ -32,6 +32,8 @@ import { ThemedText } from "@/components/ThemedText";
 import { ImageViewer } from "@/components/ImageViewer";
 import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest, queryClient } from "@/lib/query-client";
+import { enqueueMutationIfOffline } from "@/lib/mutation-queue";
+import { useNetwork } from "@/lib/network";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -76,6 +78,7 @@ export default function TopicReaderScreen() {
   const [reportDescription, setReportDescription] = useState("");
   const { theme, isDark } = useTheme();
   const feedback = useFeedback();
+  const { isOffline } = useNetwork();
   const { resolveText } = useMobileContent();
   const t = resolveText;
   const { width: windowWidth } = useWindowDimensions();
@@ -257,10 +260,36 @@ export default function TopicReaderScreen() {
 
   const bookmarkMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", `/api/topics/${topicId}/bookmark`);
+      const route = `/api/topics/${topicId}/bookmark`;
+      const queued = await enqueueMutationIfOffline("POST", route);
+      if (!queued) {
+        await apiRequest("POST", route);
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+    onMutate: async () => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
+      // Snapshot previous value
+      const previous = queryClient.getQueryData<TopicDetail>(["/api/topics", topicId]);
+      // Optimistic toggle
+      if (previous) {
+        queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
+          ...previous,
+          isBookmarked: !previous.isBookmarked,
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      // Rollback
+      if (context?.previous) {
+        queryClient.setQueryData(["/api/topics", topicId], context.previous);
+      }
+    },
+    onSettled: () => {
+      if (!isOffline) {
+        queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+      }
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       feedback.playSound("tap");
     },
@@ -268,11 +297,33 @@ export default function TopicReaderScreen() {
 
   const markCompleteMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", `/api/topics/${topicId}/complete`);
+      const route = `/api/topics/${topicId}/complete`;
+      const queued = await enqueueMutationIfOffline("POST", route);
+      if (!queued) {
+        await apiRequest("POST", route);
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
+      const previous = queryClient.getQueryData<TopicDetail>(["/api/topics", topicId]);
+      if (previous) {
+        queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
+          ...previous,
+          isCompleted: true,
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["/api/topics", topicId], context.previous);
+      }
+    },
+    onSettled: () => {
+      if (!isOffline) {
+        queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+      }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       feedback.playSound("success");
     },
@@ -280,11 +331,33 @@ export default function TopicReaderScreen() {
 
   const markUncompleteMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("POST", `/api/topics/${topicId}/uncomplete`);
+      const route = `/api/topics/${topicId}/uncomplete`;
+      const queued = await enqueueMutationIfOffline("POST", route);
+      if (!queued) {
+        await apiRequest("POST", route);
+      }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
+      const previous = queryClient.getQueryData<TopicDetail>(["/api/topics", topicId]);
+      if (previous) {
+        queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
+          ...previous,
+          isCompleted: false,
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["/api/topics", topicId], context.previous);
+      }
+    },
+    onSettled: () => {
+      if (!isOffline) {
+        queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+        queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+      }
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       feedback.playSound("tap");
     },
@@ -292,6 +365,9 @@ export default function TopicReaderScreen() {
 
   const reportMutation = useMutation({
     mutationFn: async () => {
+      if (isOffline) {
+        throw new Error("OFFLINE");
+      }
       await apiRequest("POST", "/api/content-reports", {
         contentType: "topic",
         contentId: topicId,
@@ -312,11 +388,14 @@ export default function TopicReaderScreen() {
         );
       }
     },
-    onError: () => {
+    onError: (error) => {
+      const msg = (error as Error)?.message === "OFFLINE"
+        ? t("Report submission requires an internet connection. Please try again when you're online.")
+        : t("Failed to submit report. Please try again.");
       if (Platform.OS === "web") {
-        window.alert(t("Failed to submit report. Please try again."));
+        window.alert(msg);
       } else {
-        Alert.alert(t("Error"), t("Failed to submit report. Please try again."));
+        Alert.alert(t("Error"), msg);
       }
     },
   });

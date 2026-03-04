@@ -29,6 +29,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { apiRequest, queryClient } from "@/lib/query-client";
+import { useNetwork } from "@/lib/network";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -61,6 +62,7 @@ export default function QuizPlayerScreen() {
   const isExamMode = mode === "exam";
   const { theme, isDark } = useTheme();
   const feedback = useFeedback();
+  const { isOffline } = useNetwork();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -231,6 +233,13 @@ export default function QuizPlayerScreen() {
 
   const confirmSubmit = () => {
     if (!quizData) return;
+    if (isOffline) {
+      Alert.alert(
+        "No Internet",
+        "Quiz submission requires an internet connection. Your answers are saved — please submit when you\u2019re back online.",
+      );
+      return;
+    }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     feedback.playSound("success");
     setShowSubmitModal(false);

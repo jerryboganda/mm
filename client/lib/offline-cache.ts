@@ -18,13 +18,24 @@ const OFFLINE_QUERY_KEYS = [
   "/api/books",
   "/api/quiz/topics",
   "/api/quiz/stats",
+  "/api/progress",
+  "/api/bookmarks",
+  "/api/profile",
+  "/api/announcements",
+  "/api/me",
+  "/api/reviews/due",
+  "/api/progress/recent",
+  "/api/progress/recommended",
 ];
 
-// Prefix matches â€” any query starting with these will be cached
+// Prefix matches — any query starting with these will be cached
 const OFFLINE_QUERY_PREFIXES = [
-  "/api/books/", // chapters
-  "/api/chapters/", // topics
-  "/api/topics/", // topic content
+  "/api/books/",     // chapters within a book
+  "/api/chapters/",  // topics within a chapter
+  "/api/topics/",    // topic content + detail
+  "/api/quiz/",      // quiz questions for topics
+  "/api/attempts/",  // quiz attempt history & detail
+  "/api/progress/",  // progress details
 ];
 
 function shouldPersistQuery(queryKey: readonly unknown[]): boolean {
@@ -131,4 +142,50 @@ export async function clearOfflineCache(): Promise<void> {
   } catch (error) {
     console.warn("[OfflineCache] Failed to clear:", error);
   }
+}
+
+/**
+ * Start a periodic cache persistence interval.
+ * Persists every `intervalMs` milliseconds (default 60 s).
+ * Returns a cleanup function to stop the interval.
+ */
+export function startPeriodicPersist(
+  queryClient: QueryClient,
+  intervalMs = 60_000,
+): () => void {
+  const id = setInterval(() => {
+    persistQueryCache(queryClient).catch(console.warn);
+  }, intervalMs);
+
+  return () => clearInterval(id);
+}
+
+/**
+ * Subscribe to query-cache changes and persist when new data arrives.
+ * Uses a debounce window so rapid successive fetches don't hammer storage.
+ * Returns an unsubscribe function.
+ */
+export function persistOnQuerySuccess(
+  queryClient: QueryClient,
+  debounceMs = 3_000,
+): () => void {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+    if (
+      event?.type === "updated" &&
+      event.action?.type === "success" &&
+      shouldPersistQuery(event.query.queryKey)
+    ) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        persistQueryCache(queryClient).catch(console.warn);
+      }, debounceMs);
+    }
+  });
+
+  return () => {
+    if (timer) clearTimeout(timer);
+    unsubscribe();
+  };
 }
