@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -13,7 +13,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
+import * as Haptics from "@/lib/haptics-wrapper";
 import * as Notifications from "expo-notifications";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
@@ -22,6 +22,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useFeedback } from "@/lib/feedback";
 
 type SettingsScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -32,11 +33,15 @@ export default function SettingsScreen() {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
   const { theme, themeMode, setThemeMode } = useTheme();
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [studyReminders, setStudyReminders] = useState(true);
-  const [quizReminders, setQuizReminders] = useState(false);
-  const [soundEffects, setSoundEffects] = useState(true);
-  const [hapticFeedback, setHapticFeedback] = useState(true);
+  const {
+    soundEnabled,
+    hapticEnabled,
+    setSoundEnabled,
+    setHapticEnabled,
+  } = useFeedback();
+  const [pushNotifications, setPushNotifications] = React.useState(true);
+  const [studyReminders, setStudyReminders] = React.useState(true);
+  const [quizReminders, setQuizReminders] = React.useState(false);
 
   const handleToggleNotifications = async (value: boolean) => {
     if (value) {
@@ -60,13 +65,13 @@ export default function SettingsScreen() {
         return;
       }
     }
-    if (hapticFeedback) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (hapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setPushNotifications(value);
   };
 
   const handleToggle =
     (setter: (value: boolean) => void) => (value: boolean) => {
-      if (hapticFeedback) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      if (hapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setter(value);
     };
 
@@ -164,8 +169,8 @@ export default function SettingsScreen() {
           subtitle: "Play sounds for actions",
           icon: "volume-2",
           type: "toggle",
-          value: soundEffects,
-          onToggle: handleToggle(setSoundEffects),
+          value: soundEnabled,
+          onToggle: handleToggle(setSoundEnabled),
         },
         {
           id: "haptics",
@@ -173,8 +178,8 @@ export default function SettingsScreen() {
           subtitle: "Vibration for interactions",
           icon: "smartphone",
           type: "toggle",
-          value: hapticFeedback,
-          onToggle: handleToggle(setHapticFeedback),
+          value: hapticEnabled,
+          onToggle: handleToggle(setHapticEnabled),
         },
       ],
     },
@@ -221,7 +226,7 @@ export default function SettingsScreen() {
                 onPress={
                   item.type === "navigation" || item.type === "selection"
                     ? () => {
-                      if (hapticFeedback) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      if (hapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       item.onPress?.();
                     }
                     : undefined
