@@ -269,6 +269,16 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async markTopicUncomplete(userId: string, topicId: string): Promise<void> {
+    const existing = await this.getTopicProgress(userId, topicId);
+    if (existing) {
+      await db
+        .update(userProgress)
+        .set({ isCompleted: false, completedAt: null })
+        .where(eq(userProgress.id, existing.id));
+    }
+  }
+
   async getBookmarks(userId: string): Promise<Bookmark[]> {
     return await db
       .select()

@@ -203,6 +203,21 @@ router.post(
 );
 
 router.post(
+  "/topics/:topicId/uncomplete",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const { topicId } = req.params as { topicId: string };
+      await storage.markTopicUncomplete(req.userId!, topicId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Mark uncomplete error:", error);
+      res.status(500).json({ message: "Failed to mark topic uncomplete" });
+    }
+  },
+);
+
+router.post(
   "/topics/:topicId/bookmark",
   authMiddleware,
   async (req: AuthRequest, res) => {

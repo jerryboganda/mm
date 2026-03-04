@@ -272,8 +272,21 @@ export default function TopicReaderScreen() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       feedback.playSound("success");
+    },
+  });
+
+  const markUncompleteMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", `/api/topics/${topicId}/uncomplete`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      feedback.playSound("tap");
     },
   });
 
@@ -628,19 +641,29 @@ export default function TopicReaderScreen() {
             style={styles.completeButton}
           />
         ) : (
-          <View
-            style={[
+          <Pressable
+            onPress={() => markUncompleteMutation.mutate()}
+            disabled={markUncompleteMutation.isPending}
+            style={({ pressed }) => [
               styles.completedBadge,
-              { backgroundColor: `${theme.success}1A` },
+              {
+                backgroundColor: `${theme.success}1A`,
+                opacity: pressed ? 0.6 : markUncompleteMutation.isPending ? 0.5 : 1,
+              },
             ]}
           >
             <Feather name="check-circle" size={20} color={theme.success} />
             <ThemedText
               style={[styles.completedText, { color: theme.success }]}
             >
-              Completed
+              {markUncompleteMutation.isPending ? "Removing..." : "Completed"}
             </ThemedText>
-          </View>
+            <ThemedText
+              style={[styles.tapToRevise, { color: theme.textMuted }]}
+            >
+              Tap to mark for revision
+            </ThemedText>
+          </Pressable>
         )}
       </ScrollView>
 
@@ -876,6 +899,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    flexWrap: "wrap",
     marginTop: Spacing["2xl"],
     padding: Spacing.lg,
     borderRadius: BorderRadius.lg,
@@ -883,6 +907,12 @@ const styles = StyleSheet.create({
   completedText: {
     marginLeft: Spacing.sm,
     fontWeight: "600",
+  },
+  tapToRevise: {
+    width: "100%",
+    textAlign: "center",
+    marginTop: Spacing.xs,
+    fontSize: 12,
   },
   floatingNav: {
     position: "absolute",
