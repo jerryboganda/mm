@@ -50,7 +50,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  ResetPassword: { token?: string };
+  ResetPassword: { email: string; code: string };
   VerifyEmail: { email: string };
   VerifyPhone: undefined;
   TopicReader: { topicId: string; topicTitle: string };

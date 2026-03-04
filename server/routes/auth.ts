@@ -6,7 +6,7 @@ import { storage } from "../storage";
 import {
   sendEmail,
   verificationEmailHtml,
-  passwordResetEmailHtml,
+  passwordResetOtpEmailHtml,
 } from "../email";
 import {
   loginSchema,
@@ -360,29 +360,31 @@ router.post(
 
       const user = await storage.getUserByEmail(data.email);
       if (!user) {
+        // Don't reveal whether user exists
         return res.json({
           message:
-            "If an account exists with this email, a reset link has been sent.",
+            "If an account exists with this email, a reset code has been sent.",
         });
       }
 
-      const token = await storage.createPasswordResetToken(user.id);
-      const resetLink = `https://${req.get("host")}/reset-password?token=${token}`;
+      // Generate a 6-digit OTP instead of a long token link
+      const otp = generateOTP();
+      await storage.createPasswordResetOtp(user.id, otp);
 
-      // Send password reset email via Brevo SMTP
+      // Send OTP email (no links — stays entirely in-app)
       const emailSent = await sendEmail({
         to: user.email,
-        subject: "Reset Your Password - Maternal Mind",
-        html: passwordResetEmailHtml(user.name, resetLink),
+        subject: "Password Reset Code - Maternal Mind",
+        html: passwordResetOtpEmailHtml(user.name, otp),
       });
 
       if (!emailSent && process.env.NODE_ENV !== "production") {
-        console.log(`[DEV] Reset link for ${user.email}: ${resetLink}`);
+        console.log(`[DEV] Reset OTP for ${user.email}: ${otp}`);
       }
 
       res.json({
         message:
-          "If an account exists with this email, a reset link has been sent.",
+          "If an account exists with this email, a reset code has been sent.",
       });
     } catch (error) {
       console.error("Forgot password error:", error);
@@ -391,13 +393,45 @@ router.post(
   },
 );
 
-// Password reset
+// Verify the password reset OTP (optional step — validates OTP before showing new password form)
+router.post(
+  "/verify-reset-otp",
+  rateLimiter(10, 15 * 60 * 1000),
+  async (req, res) => {
+    try {
+      const { email, code } = req.body;
+      if (!email || !code) {
+        return res.status(400).json({ message: "Email and code are required" });
+      }
+      const resetToken = await storage.getPasswordResetByOtp(email, code);
+      if (!resetToken) {
+        return res.status(400).json({ message: "Invalid or expired code" });
+      }
+      res.json({ valid: true, message: "Code verified" });
+    } catch (error) {
+      console.error("Verify reset OTP error:", error);
+      res.status(500).json({ message: "Verification failed" });
+    }
+  },
+);
+
+// Password reset via OTP (in-app flow — no external links)
 router.post("/reset-password", async (req, res) => {
   try {
     const data = resetPasswordSchema.parse(req.body);
-    const resetToken = await storage.getPasswordResetToken(data.token);
+
+    // Support both legacy token-based and new OTP-based flows
+    let resetToken;
+    if (data.email && data.code) {
+      // New OTP-based flow
+      resetToken = await storage.getPasswordResetByOtp(data.email, data.code);
+    } else if (data.token) {
+      // Legacy token-based flow (backward compat)
+      resetToken = await storage.getPasswordResetToken(data.token);
+    }
+
     if (!resetToken) {
-      return res.status(400).json({ message: "Invalid or expired reset link" });
+      return res.status(400).json({ message: "Invalid or expired reset code" });
     }
     const hashedPassword = await bcrypt.hash(data.password, 10);
     await storage.updateUserPassword(resetToken.userId, hashedPassword);
