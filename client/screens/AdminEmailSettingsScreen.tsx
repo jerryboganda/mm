@@ -18,7 +18,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { getApiUrl } from "@/lib/query-client";
 import * as SecureStore from "expo-secure-store";
 
@@ -43,6 +44,7 @@ interface EmailSettings {
 export default function AdminEmailSettingsScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
+  const { theme } = useTheme();
 
   const [settings, setSettings] = useState<EmailSettings>({
     smtpHost: "",
@@ -196,8 +198,8 @@ export default function AdminEmailSettingsScreen() {
     return (
       <BackgroundGradient>
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
-          <ActivityIndicator size="large" color={Colors.dark.primary} />
-          <ThemedText style={styles.loadingText}>
+          <ActivityIndicator size="large" color={theme.primary} />
+          <ThemedText style={[styles.loadingText, { color: theme.textSecondary }]}>
             Loading settings...
           </ThemedText>
         </View>
@@ -221,14 +223,14 @@ export default function AdminEmailSettingsScreen() {
         {/* Header Info Card */}
         <GlassCard style={styles.infoCard}>
           <View style={styles.infoContent}>
-            <View style={styles.infoIconContainer}>
-              <Feather name="mail" size={24} color={Colors.dark.primary} />
+            <View style={[styles.infoIconContainer, { backgroundColor: `${theme.primary}20` }]}>
+              <Feather name="mail" size={24} color={theme.primary} />
             </View>
             <View style={styles.infoTextContainer}>
               <ThemedText type="h4" style={styles.infoTitle}>
                 Brevo SMTP Configuration
               </ThemedText>
-              <ThemedText style={styles.infoSubtitle}>
+              <ThemedText style={[styles.infoSubtitle, { color: theme.textSecondary }]}>
                 Configure your Brevo (Sendinblue) SMTP settings to enable email
                 sending for verification, password reset, and support.
               </ThemedText>
@@ -237,7 +239,7 @@ export default function AdminEmailSettingsScreen() {
         </GlassCard>
 
         {/* SMTP Settings Section */}
-        <ThemedText style={styles.sectionLabel}>SMTP SERVER</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>SMTP SERVER</ThemedText>
         <View style={styles.formSection}>
           <GlassInput
             label="SMTP Host"
@@ -258,7 +260,7 @@ export default function AdminEmailSettingsScreen() {
           />
         </View>
 
-        <ThemedText style={styles.sectionLabel}>AUTHENTICATION</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>AUTHENTICATION</ThemedText>
         <View style={styles.formSection}>
           <GlassInput
             label="SMTP Login"
@@ -282,7 +284,7 @@ export default function AdminEmailSettingsScreen() {
           />
         </View>
 
-        <ThemedText style={styles.sectionLabel}>SENDER INFO</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>SENDER INFO</ThemedText>
         <View style={styles.formSection}>
           <GlassInput
             label="From Email"
@@ -312,19 +314,19 @@ export default function AdminEmailSettingsScreen() {
         />
 
         {/* Divider */}
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
 
         {/* Test Email Section */}
-        <ThemedText style={styles.sectionLabel}>TEST EMAIL</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>TEST EMAIL</ThemedText>
         <GlassCard style={styles.testCard}>
           <View style={styles.testContent}>
-            <Feather
+              <Feather
               name="send"
               size={20}
-              color={Colors.dark.warning}
+              color={theme.warning}
               style={styles.testIcon}
             />
-            <ThemedText style={styles.testDescription}>
+            <ThemedText style={[styles.testDescription, { color: theme.textSecondary }]}>
               Send a test email to verify your SMTP configuration is working
               correctly. The current settings (including unsaved changes) will
               be used.
@@ -347,12 +349,12 @@ export default function AdminEmailSettingsScreen() {
             onPress={handleTestEmail}
             disabled={testing}
             variant="secondary"
-            style={styles.testButton}
+            style={[styles.testButton, { borderColor: theme.warning }]}
           />
         </GlassCard>
 
         {/* Help Card */}
-        <GlassCard style={styles.helpCard}>
+        <GlassCard style={[styles.helpCard, { backgroundColor: `${theme.info}10` }]}>
           <ThemedText type="h4" style={styles.helpTitle}>
             ðŸ“‹ How to get Brevo SMTP credentials
           </ThemedText>
@@ -401,7 +403,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: Spacing.md,
-    color: Colors.dark.textSecondary,
   },
   infoCard: {
     marginBottom: Spacing.xl,
@@ -415,7 +416,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: `${Colors.dark.primary}20`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
@@ -427,7 +427,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoSubtitle: {
-    color: Colors.dark.textSecondary,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -435,7 +434,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 1.2,
-    color: Colors.dark.textMuted,
     marginBottom: Spacing.sm,
     marginTop: Spacing.lg,
     marginLeft: 4,
@@ -453,7 +451,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.dark.glassBorder,
     marginVertical: Spacing["2xl"],
   },
   testCard: {
@@ -471,7 +468,6 @@ const styles = StyleSheet.create({
   },
   testDescription: {
     flex: 1,
-    color: Colors.dark.textSecondary,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -479,12 +475,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   testButton: {
-    borderColor: Colors.dark.warning,
   },
   helpCard: {
     padding: Spacing.lg,
     marginBottom: Spacing.xl,
-    backgroundColor: `${Colors.dark.info}10`,
   },
   helpTitle: {
     marginBottom: Spacing.md,
@@ -493,16 +487,13 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   helpStep: {
-    color: Colors.dark.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
   helpLink: {
-    color: Colors.dark.primary,
     fontWeight: "600",
   },
   helpCode: {
-    color: Colors.dark.warning,
     fontWeight: "600",
     fontFamily: Platform.select({ ios: "Menlo", android: "monospace" }),
   },

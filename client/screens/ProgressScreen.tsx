@@ -21,7 +21,8 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { EmptyState } from "@/components/EmptyState";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type ProgressScreenNavigationProp =
@@ -53,6 +54,7 @@ export default function ProgressScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<ProgressScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
+  const { theme } = useTheme();
 
   const {
     data: progress,
@@ -129,7 +131,7 @@ export default function ProgressScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
       >
@@ -138,21 +140,21 @@ export default function ProgressScreen() {
             label="Total Attempts"
             value={progress.totalAttempts}
             icon="activity"
-            color={Colors.dark.primary}
+            color={theme.primary}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Avg Accuracy"
             value={`${progress.averageAccuracy}%`}
             icon="target"
-            color={Colors.dark.success}
+            color={theme.success}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Topics Done"
             value={`${progress.topicsCompleted}/${progress.totalTopics}`}
             icon="book"
-            color={Colors.dark.info}
+            color={theme.info}
           />
         </View>
 
@@ -175,7 +177,7 @@ export default function ProgressScreen() {
                 <ThemedText style={styles.topicTitle} numberOfLines={1}>
                   {topic.title}
                 </ThemedText>
-                <ThemedText style={styles.topicAttempts}>
+                <ThemedText style={[styles.topicAttempts, { color: theme.textSecondary }]}>
                   {topic.attempts} attempts
                 </ThemedText>
               </View>
@@ -185,13 +187,13 @@ export default function ProgressScreen() {
                   height={6}
                   style={{ flex: 1, marginRight: Spacing.md }}
                 />
-                <ThemedText style={styles.topicAccuracy}>
+                <ThemedText style={[styles.topicAccuracy, { color: theme.primary }]}>
                   {topic.accuracy}%
                 </ThemedText>
                 <Feather
                   name="chevron-right"
                   size={16}
-                  color={Colors.dark.textMuted}
+                  color={theme.textMuted}
                   style={{ marginLeft: Spacing.sm }}
                 />
               </View>
@@ -203,7 +205,7 @@ export default function ProgressScreen() {
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionLabel}>RECENT ATTEMPTS</ThemedText>
             <Pressable onPress={() => navigation.navigate("AttemptHistory")}>
-              <ThemedText style={styles.viewAllText}>View All</ThemedText>
+              <ThemedText style={[styles.viewAllText, { color: theme.primary }]}>View All</ThemedText>
             </Pressable>
           </View>
           {progress.recentAttempts.map((attempt) => (
@@ -223,7 +225,7 @@ export default function ProgressScreen() {
                         ? "Mixed Quiz"
                         : "Wrong Questions"}
                   </ThemedText>
-                  <ThemedText style={styles.attemptDate}>
+                  <ThemedText style={[styles.attemptDate, { color: theme.textSecondary }]}>
                     {formatDate(attempt.date)}
                   </ThemedText>
                 </View>
@@ -246,10 +248,10 @@ export default function ProgressScreen() {
                       {
                         color:
                           attempt.score >= 80
-                            ? Colors.dark.success
+                            ? theme.success
                             : attempt.score >= 50
-                              ? Colors.dark.warning
-                              : Colors.dark.error,
+                              ? theme.warning
+                              : theme.error,
                       },
                     ]}
                   >
@@ -297,7 +299,6 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 13,
-    color: Colors.dark.primary,
     fontWeight: "500",
   },
   topicRow: {
@@ -316,7 +317,6 @@ const styles = StyleSheet.create({
   },
   topicAttempts: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
   },
   topicProgress: {
     flexDirection: "row",
@@ -325,7 +325,6 @@ const styles = StyleSheet.create({
   topicAccuracy: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.dark.primary,
     width: 40,
     textAlign: "right",
   },
@@ -348,7 +347,6 @@ const styles = StyleSheet.create({
   },
   attemptDate: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
   },
   scoreBadge: {
     paddingHorizontal: Spacing.md,

@@ -8,11 +8,13 @@ import * as Haptics from "@/lib/haptics-wrapper";
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function QuizSettingsScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
+  const { theme } = useTheme();
 
   const [timerEnabled, setTimerEnabled] = useState(true);
   const [timerMinutes, setTimerMinutes] = useState(10);
@@ -55,7 +57,7 @@ export default function QuizSettingsScreen() {
           <GlassCard style={styles.settingCard}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <Feather name="clock" size={20} color={Colors.dark.primary} />
+                <Feather name="clock" size={20} color={theme.primary} />
                 <ThemedText style={styles.settingTitle}>
                   Enable Timer
                 </ThemedText>
@@ -64,8 +66,8 @@ export default function QuizSettingsScreen() {
                 value={timerEnabled}
                 onValueChange={handleToggleTimer}
                 trackColor={{
-                  false: Colors.dark.glass,
-                  true: Colors.dark.primary,
+                  false: theme.glass,
+                  true: theme.primary,
                 }}
                 thumbColor="#fff"
               />
@@ -81,12 +83,14 @@ export default function QuizSettingsScreen() {
                     }}
                     style={[
                       styles.optionChip,
-                      timerMinutes === mins && styles.optionChipSelected,
+                      { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+                      timerMinutes === mins && [styles.optionChipSelected, { backgroundColor: theme.primary, borderColor: theme.primary }],
                     ]}
                   >
                     <ThemedText
                       style={[
                         styles.optionText,
+                        { color: theme.textSecondary },
                         timerMinutes === mins && styles.optionTextSelected,
                       ]}
                     >
@@ -114,12 +118,14 @@ export default function QuizSettingsScreen() {
                   }}
                   style={[
                     styles.optionChip,
-                    questionsCount === count && styles.optionChipSelected,
+                    { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+                    questionsCount === count && [styles.optionChipSelected, { backgroundColor: theme.primary, borderColor: theme.primary }],
                   ]}
                 >
                   <ThemedText
                     style={[
                       styles.optionText,
+                      { color: theme.textSecondary },
                       questionsCount === count && styles.optionTextSelected,
                     ]}
                   >
@@ -145,12 +151,14 @@ export default function QuizSettingsScreen() {
                   style={[
                     styles.optionChip,
                     styles.difficultyChip,
-                    difficulty === opt.id && styles.optionChipSelected,
+                    { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+                    difficulty === opt.id && [styles.optionChipSelected, { backgroundColor: theme.primary, borderColor: theme.primary }],
                   ]}
                 >
                   <ThemedText
                     style={[
                       styles.optionText,
+                      { color: theme.textSecondary },
                       difficulty === opt.id && styles.optionTextSelected,
                     ]}
                   >
@@ -163,8 +171,8 @@ export default function QuizSettingsScreen() {
         </View>
 
         <View style={styles.infoBox}>
-          <Feather name="info" size={16} color={Colors.dark.primary} />
-          <ThemedText style={styles.infoText}>
+          <Feather name="info" size={16} color={theme.primary} />
+          <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
             Settings will apply to your next quiz session. Timer pauses when you
             leave the quiz screen.
           </ThemedText>
@@ -219,13 +227,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.dark.glass,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
   },
   optionChipSelected: {
-    backgroundColor: Colors.dark.primary,
-    borderColor: Colors.dark.primary,
   },
   difficultyChip: {
     flex: 1,
@@ -234,7 +238,6 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 14,
     fontWeight: "500",
-    color: Colors.dark.textSecondary,
   },
   optionTextSelected: {
     color: "#fff",
@@ -250,7 +253,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     lineHeight: 20,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.md,
   },
 });

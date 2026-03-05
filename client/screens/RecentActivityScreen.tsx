@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { EmptyState } from "@/components/EmptyState";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type RecentActivityScreenNavigationProp =
@@ -32,6 +33,7 @@ export default function RecentActivityScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<RecentActivityScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
+  const { theme } = useTheme();
 
   const {
     data: activities,
@@ -76,9 +78,9 @@ export default function RecentActivityScreen() {
           topicTitle: item.topicTitle,
         })
       }
-      icon={<Feather name="clock" size={24} color={Colors.dark.primary} />}
+      icon={<Feather name="clock" size={24} color={theme.primary} />}
       rightElement={
-        <ThemedText style={styles.timeText}>
+        <ThemedText style={[styles.timeText, { color: theme.textMuted }]}>
           {formatTimeAgo(item.viewedAt)}
         </ThemedText>
       }
@@ -124,7 +126,7 @@ export default function RecentActivityScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
         ListHeaderComponent={
@@ -157,6 +159,5 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 11,
-    color: Colors.dark.textMuted,
   },
 });

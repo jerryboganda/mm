@@ -24,7 +24,8 @@ import Animated, {
 } from "react-native-reanimated";
 import * as Haptics from "@/lib/haptics-wrapper";
 
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -35,6 +36,7 @@ interface ImageViewerProps {
 }
 
 export function ImageViewer({ visible, imageUri, onClose }: ImageViewerProps) {
+  const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
 
@@ -137,7 +139,7 @@ export function ImageViewer({ visible, imageUri, onClose }: ImageViewerProps) {
 
           {loading && (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={Colors.dark.primary} />
+              <ActivityIndicator size="large" color={theme.primary} />
             </View>
           )}
 
@@ -154,7 +156,7 @@ export function ImageViewer({ visible, imageUri, onClose }: ImageViewerProps) {
           </GestureDetector>
 
           <View style={[styles.hint, { bottom: insets.bottom + Spacing.lg }]}>
-            <Feather name="zoom-in" size={14} color={Colors.dark.textMuted} />
+            <Feather name="zoom-in" size={14} color={theme.textMuted} />
           </View>
         </View>
       </GestureHandlerRootView>

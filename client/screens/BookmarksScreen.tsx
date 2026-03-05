@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { EmptyState } from "@/components/EmptyState";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type BookmarksScreenNavigationProp =
@@ -32,6 +33,7 @@ export default function BookmarksScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<BookmarksScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
+  const { theme } = useTheme();
 
   const {
     data: bookmarks,
@@ -66,9 +68,9 @@ export default function BookmarksScreen() {
           topicTitle: item.topicTitle,
         })
       }
-      icon={<Feather name="bookmark" size={24} color={Colors.dark.primary} />}
+      icon={<Feather name="bookmark" size={24} color={theme.primary} />}
       rightElement={
-        <ThemedText style={styles.dateText}>
+        <ThemedText style={[styles.dateText, { color: theme.textMuted }]}>
           {formatDate(item.createdAt)}
         </ThemedText>
       }
@@ -114,7 +116,7 @@ export default function BookmarksScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
         ListHeaderComponent={
@@ -147,6 +149,5 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 11,
-    color: Colors.dark.textMuted,
   },
 });

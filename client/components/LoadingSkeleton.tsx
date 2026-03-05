@@ -9,7 +9,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { Colors, BorderRadius, Spacing } from "@/constants/theme";
+import { BorderRadius, Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface LoadingSkeletonProps {
   width?: number | string;
@@ -24,6 +25,7 @@ export function LoadingSkeleton({
   borderRadius = BorderRadius.sm,
   style,
 }: LoadingSkeletonProps) {
+  const { theme, isDark } = useTheme();
   const shimmer = useSharedValue(0);
 
   useEffect(() => {
@@ -42,13 +44,13 @@ export function LoadingSkeleton({
     <View
       style={[
         styles.container,
-        { width: width as any, height, borderRadius },
+        { width: width as any, height, borderRadius, backgroundColor: theme.glass },
         style,
       ]}
     >
       <Animated.View style={[styles.shimmer, animatedStyle]}>
         <LinearGradient
-          colors={["transparent", "rgba(255,255,255,0.08)", "transparent"]}
+          colors={["transparent", isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", "transparent"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.gradient}
@@ -59,8 +61,10 @@ export function LoadingSkeleton({
 }
 
 export function CardSkeleton() {
+  const { theme } = useTheme();
+
   return (
-    <View style={styles.cardContainer}>
+    <View style={[styles.cardContainer, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}>
       <View style={styles.cardHeader}>
         <LoadingSkeleton
           width={48}
@@ -79,7 +83,6 @@ export function CardSkeleton() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.dark.glass,
     overflow: "hidden",
   },
   shimmer: {
@@ -91,10 +94,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardContainer: {
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
   },

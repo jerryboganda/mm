@@ -11,7 +11,8 @@ import { Feather } from "@expo/vector-icons";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface Props {
   message?: string;
@@ -21,6 +22,7 @@ export default function CheckoutProcessingScreen({
   message = "Processing your purchase...",
 }: Props) {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -69,10 +71,10 @@ export default function CheckoutProcessingScreen({
     <BackgroundGradient>
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <Animated.View
-          style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}
+          style={[styles.iconContainer, { backgroundColor: `${theme.primary}15`, transform: [{ scale: pulseAnim }] }]}
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
-            <Feather name="loader" size={48} color={Colors.dark.primary} />
+            <Feather name="loader" size={48} color={theme.primary} />
           </Animated.View>
         </Animated.View>
 
@@ -80,33 +82,33 @@ export default function CheckoutProcessingScreen({
           {message}
         </ThemedText>
 
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
           Please wait while we securely process your payment. Do not close the
           app.
         </ThemedText>
 
         <View style={styles.stepsContainer}>
           <View style={styles.step}>
-            <View style={[styles.stepIcon, styles.stepIconComplete]}>
+            <View style={[styles.stepIcon, styles.stepIconComplete, { backgroundColor: theme.success }]}>
               <Feather name="check" size={14} color="#fff" />
             </View>
-            <ThemedText style={styles.stepText}>Verifying payment</ThemedText>
+            <ThemedText style={[styles.stepText, { color: theme.text }]}>Verifying payment</ThemedText>
           </View>
-          <View style={styles.stepLine} />
+          <View style={[styles.stepLine, { backgroundColor: theme.glass }]} />
           <View style={styles.step}>
-            <View style={[styles.stepIcon, styles.stepIconActive]}>
+            <View style={[styles.stepIcon, styles.stepIconActive, { backgroundColor: theme.primary }]}>
               <ActivityIndicator size="small" color="#fff" />
             </View>
-            <ThemedText style={styles.stepText}>
+            <ThemedText style={[styles.stepText, { color: theme.text }]}>
               Processing subscription
             </ThemedText>
           </View>
-          <View style={styles.stepLine} />
+          <View style={[styles.stepLine, { backgroundColor: theme.glass }]} />
           <View style={styles.step}>
-            <View style={styles.stepIcon}>
-              <Feather name="circle" size={14} color={Colors.dark.textMuted} />
+            <View style={[styles.stepIcon, { backgroundColor: theme.glass }]}>
+              <Feather name="circle" size={14} color={theme.textMuted} />
             </View>
-            <ThemedText style={[styles.stepText, styles.stepTextPending]}>
+            <ThemedText style={[styles.stepText, { color: theme.textMuted }]}>
               Activating premium
             </ThemedText>
           </View>
@@ -127,7 +129,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${Colors.dark.primary}15`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing["2xl"],
@@ -138,7 +139,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["3xl"],
     lineHeight: 22,
   },
@@ -155,28 +155,22 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.md,
   },
   stepIconComplete: {
-    backgroundColor: Colors.dark.success,
   },
   stepIconActive: {
-    backgroundColor: Colors.dark.primary,
   },
   stepText: {
     fontSize: 14,
-    color: Colors.dark.text,
   },
   stepTextPending: {
-    color: Colors.dark.textMuted,
   },
   stepLine: {
     width: 2,
     height: 20,
-    backgroundColor: Colors.dark.glass,
     marginLeft: 13,
   },
 });

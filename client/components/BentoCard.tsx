@@ -12,7 +12,8 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface BentoCardProps {
   title: string;
@@ -48,6 +49,7 @@ export function BentoCard({
   variant = "default",
   testID,
 }: BentoCardProps) {
+  const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -76,15 +78,15 @@ export function BentoCard({
   const getAccentColor = () => {
     switch (variant) {
       case "accent":
-        return Colors.dark.primary;
+        return theme.primary;
       case "success":
-        return Colors.dark.success;
+        return theme.success;
       case "purple":
-        return Colors.dark.purple;
+        return theme.purple;
       case "warning":
-        return Colors.dark.warning;
+        return theme.warning;
       default:
-        return Colors.dark.textMuted;
+        return theme.textMuted;
     }
   };
 
@@ -125,7 +127,7 @@ export function BentoCard({
     }
 
     return (
-      <BlurView intensity={18} tint="dark" style={styles.background}>
+      <BlurView intensity={18} tint={isDark ? "dark" : "light"} style={styles.background}>
         <LinearGradient
           colors={[glowColor, "rgba(255,255,255,0.03)"]}
           style={StyleSheet.absoluteFill}
@@ -147,6 +149,7 @@ export function BentoCard({
       accessibilityLabel={`${title}: ${value}${subtitle ? `, ${subtitle}` : ""}`}
       style={[
         styles.card,
+        { borderColor: theme.glassBorder },
         animatedStyle,
         isSmall && styles.cardSmall,
         isLarge && styles.cardLarge,
@@ -174,7 +177,7 @@ export function BentoCard({
           ) : null}
           <ThemedText
             type="label"
-            style={[styles.title, isSmall && styles.titleSmall]}
+            style={[styles.title, { color: theme.textSecondary }, isSmall && styles.titleSmall]}
             numberOfLines={1}
           >
             {title}
@@ -187,7 +190,7 @@ export function BentoCard({
               styles.value,
               isSmall && styles.valueSmall,
               isLarge && styles.valueLarge,
-              { color: variant !== "default" ? accentColor : Colors.dark.text },
+              { color: variant !== "default" ? accentColor : theme.text },
             ]}
             numberOfLines={1}
           >
@@ -196,7 +199,7 @@ export function BentoCard({
           {subtitle ? (
             <ThemedText
               type="caption"
-              style={styles.subtitle}
+              style={[styles.subtitle, { color: theme.textMuted }]}
               numberOfLines={1}
             >
               {subtitle}
@@ -212,7 +215,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     overflow: "hidden",
     minHeight: 120,
   },
@@ -250,7 +252,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    color: Colors.dark.textSecondary,
     flex: 1,
   },
   titleSmall: {
@@ -260,7 +261,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   value: {
-    color: Colors.dark.text,
   },
   valueSmall: {
     fontSize: 26,
@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
     lineHeight: 48,
   },
   subtitle: {
-    color: Colors.dark.textMuted,
     marginTop: Spacing.xs,
   },
 });
