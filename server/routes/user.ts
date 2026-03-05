@@ -125,4 +125,63 @@ router.get("/bookmarks", authMiddleware, async (req: AuthRequest, res) => {
   }
 });
 
+// ── Subscription sync (client reports purchase to server) ─────
+router.post(
+  "/subscription/sync",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const { subscriptionStatus, subscriptionPlan, expiresAt, revenueCatId } =
+        req.body;
+
+      if (!subscriptionStatus) {
+        return res
+          .status(400)
+          .json({ message: "subscriptionStatus is required" });
+      }
+
+      const data: Record<string, any> = {
+        subscriptionStatus,
+      };
+      if (subscriptionPlan) data.subscriptionPlan = subscriptionPlan;
+      if (expiresAt) data.subscriptionExpiresAt = new Date(expiresAt);
+
+      const user = await storage.updateSubscription(req.userId!, data);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        subscriptionStatus: user.subscriptionStatus,
+        subscriptionPlan: user.subscriptionPlan,
+        subscriptionExpiresAt: user.subscriptionExpiresAt,
+      });
+    } catch (error) {
+      console.error("Subscription sync error:", error);
+      res.status(500).json({ message: "Failed to sync subscription" });
+    }
+  },
+);
+
+// ── Get subscription status ──────────────────────────────────
+router.get(
+  "/subscription/status",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      res.json({
+        subscriptionStatus: user.subscriptionStatus,
+        subscriptionPlan: user.subscriptionPlan,
+        subscriptionExpiresAt: user.subscriptionExpiresAt,
+      });
+    } catch (error) {
+      console.error("Get subscription status error:", error);
+      res.status(500).json({ message: "Failed to get subscription status" });
+    }
+  },
+);
+
 export default router;

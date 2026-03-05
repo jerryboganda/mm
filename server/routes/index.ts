@@ -17,6 +17,7 @@ import adminContentRoutes from "./admin-content";
 import adminUserRoutes from "./admin-users";
 import adminAnalyticsRoutes from "./admin-analytics";
 import adminAnnouncementsRoutes from "./admin-announcements";
+import webhookRoutes from "./webhook";
 
 // General API rate limits (per IP)
 const generalLimiter = rateLimiter(120, 60_000); // 120 requests/min for content browsing
@@ -44,6 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/admin/users", adminLimiter, adminUserRoutes);
   app.use("/api/admin/analytics", adminLimiter, adminAnalyticsRoutes);
   app.use("/api/admin/announcements", adminLimiter, adminAnnouncementsRoutes);
+  app.use("/api/webhooks", webhookRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
