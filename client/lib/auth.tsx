@@ -17,7 +17,6 @@ interface User {
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionPlan?: string;
   isEmailVerified: boolean;
-  isPhoneVerified: boolean;
   createdAt: string;
 }
 
@@ -38,8 +37,6 @@ interface AuthContextType {
   dismissSessionExpired: () => void;
   verifyEmail: (email: string, code: string) => Promise<void>;
   resendVerificationEmail: (email: string) => Promise<void>;
-  sendPhoneOtp: (phoneNumber: string) => Promise<void>;
-  verifyPhoneOtp: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -234,49 +231,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const sendPhoneOtp = async (phoneNumber: string) => {
-    const baseUrl = getApiUrl();
-    const token = await getToken(TOKEN_KEY);
-
-    const response = await fetch(new URL("/api/auth/send-phone-otp", baseUrl), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ phoneNumber }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to send OTP");
-    }
-  };
-
-  const verifyPhoneOtp = async (code: string) => {
-    const baseUrl = getApiUrl();
-    const token = await getToken(TOKEN_KEY);
-    const response = await fetch(
-      new URL("/api/auth/verify-phone-otp", baseUrl),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ code }),
-      },
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Verification failed");
-    }
-
-    // Refresh user to get updated verification status
-    await checkAuth();
-  };
-
   const logout = async () => {
     try {
       const token = await getToken(TOKEN_KEY);
@@ -322,8 +276,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         dismissSessionExpired,
         verifyEmail,
         resendVerificationEmail,
-        sendPhoneOtp,
-        verifyPhoneOtp,
       }}
     >
       {children}

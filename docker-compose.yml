@@ -10,9 +10,6 @@ services:
       - SESSION_SECRET=${SESSION_SECRET:?SESSION_SECRET is required}
       - DB_POOL_MAX=20
       - ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-https://maternalmind.com.pk}
-      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
-      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
-      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER:-}
     depends_on:
       db:
         condition: service_healthy

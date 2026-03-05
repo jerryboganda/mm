@@ -14,7 +14,6 @@ import RegisterScreen from "@/screens/RegisterScreen";
 import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
 import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
 import VerifyEmailScreen from "@/screens/VerifyEmailScreen";
-import VerifyPhoneScreen from "@/screens/VerifyPhoneScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import QuizTopicSelectScreen from "@/screens/QuizTopicSelectScreen";
 import QuizPlayerScreen from "@/screens/QuizPlayerScreen";
@@ -52,7 +51,6 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   ResetPassword: { email: string; code: string };
   VerifyEmail: { email: string };
-  VerifyPhone: undefined;
   TopicReader: { topicId: string; topicTitle: string };
   QuizTopicSelect: undefined;
   QuizPlayer: {
@@ -93,13 +91,7 @@ export default function RootStackNavigator() {
     useOnboarding();
   const t = resolveText;
 
-  const accountAgeDays = user?.createdAt
-    ? (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-    : 0;
-
   const requiresEmailVerification = user && !user.isEmailVerified;
-  const requiresPhoneVerification =
-    user && accountAgeDays > 5 && !user.isPhoneVerified;
 
   if (authLoading || onboardingLoading) {
     return (
@@ -122,29 +114,12 @@ export default function RootStackNavigator() {
               headerTransparent: true,
             }}
           />
-        ) : requiresPhoneVerification ? (
-          <Stack.Screen
-            name="VerifyPhone"
-            component={VerifyPhoneScreen}
-            options={{
-              headerTitle: t("Verify Phone"),
-              presentation: "card",
-            }}
-          />
         ) : (
           <>
             <Stack.Screen
               name="Main"
               component={MainTabNavigator}
               options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="VerifyPhone"
-              component={VerifyPhoneScreen}
-              options={{
-                headerTitle: t("Verify Phone"),
-                presentation: "card",
-              }}
             />
             <Stack.Screen
               name="TopicReader"
