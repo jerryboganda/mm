@@ -191,34 +191,34 @@ export default function TopicReaderScreen() {
         width: 100%;
         margin: 0;
         table-layout: auto;
-        border: 1.5px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"};
+        border: 1.5px solid ${theme.glassBorderLight};
       }
       thead tr {
-        background-color: ${isDark ? "rgba(17,164,212,0.18)" : "rgba(0,153,204,0.12)"};
+        background-color: ${theme.primary}${isDark ? '2E' : '1F'};
       }
       th {
         padding: 10px 12px;
         font-weight: 700;
         font-size: 14px;
-        color: ${isDark ? "#3dbde8" : "#007aa3"};
+        color: ${isDark ? theme.primaryLight : theme.primaryDark};
         text-align: left;
-        border: 1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)"};
+        border: 1px solid ${theme.glassBorder};
       }
       td {
         padding: 9px 12px;
         font-size: 13px;
-        color: ${isDark ? "rgba(255,255,255,0.92)" : "rgba(0,0,0,0.88)"};
-        border: 1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"};
+        color: ${theme.text};
+        border: 1px solid ${theme.glassBorder};
         vertical-align: top;
       }
       tbody tr:nth-child(odd) {
-        background-color: ${isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"};
+        background-color: transparent;
       }
       tbody tr:nth-child(even) {
-        background-color: ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"};
+        background-color: ${theme.glass};
       }
       td strong, th strong {
-        color: ${isDark ? "#3dbde8" : "#007aa3"};
+        color: ${isDark ? theme.primaryLight : theme.primaryDark};
         font-weight: 700;
       }
     `,
