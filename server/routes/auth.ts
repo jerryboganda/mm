@@ -1,7 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import twilio from "twilio";
 import { storage } from "../storage";
 import {
   sendEmail,
@@ -23,11 +22,6 @@ import {
 } from "../middleware";
 
 const router = Router();
-
-const twilioClient =
-  process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-    : null;
 
 const JWT_SECRET = process.env.SESSION_SECRET;
 if (!JWT_SECRET) {
@@ -147,7 +141,6 @@ router.post(
           subscriptionStatus: user.subscriptionStatus,
           subscriptionPlan: user.subscriptionPlan,
           isEmailVerified: true,
-          isPhoneVerified: user.isPhoneVerified,
           createdAt: user.createdAt,
         },
       });
@@ -257,7 +250,6 @@ router.post(
           subscriptionStatus: user.subscriptionStatus,
           subscriptionPlan: user.subscriptionPlan,
           isEmailVerified: user.isEmailVerified,
-          isPhoneVerified: user.isPhoneVerified,
           createdAt: user.createdAt,
         },
       });
@@ -267,86 +259,6 @@ router.post(
       }
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed" });
-    }
-  },
-);
-
-router.post(
-  "/send-phone-otp",
-  authMiddleware,
-  async (req: AuthRequest, res) => {
-    try {
-      const { phoneNumber } = req.body;
-      const userId = req.userId!;
-
-      const user = await storage.getUser(userId);
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      const phoneToUse = phoneNumber || user.phoneNumber;
-
-      if (!phoneToUse) {
-        return res.status(400).json({ message: "Phone number is required" });
-      }
-
-      const otp = generateOTP();
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-
-      // Save OTP to DB
-      await storage.updateUserPhoneOtp(userId, {
-        phoneNumber: phoneToUse,
-        phoneVerificationToken: otp,
-        phoneTokenExpiresAt: expiresAt,
-      });
-
-      // Send SMS via Twilio
-      if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
-        await twilioClient.messages.create({
-          body: `Your Maternal Mind verification code is: ${otp}`,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: phoneToUse,
-        });
-      } else if (process.env.NODE_ENV !== "production") {
-        console.log(`[DEV] SMS OTP for ${phoneToUse}: ${otp}`);
-      }
-
-      res.json({ message: "OTP sent successfully" });
-    } catch (error) {
-      console.error("Send Phone OTP error:", error);
-      res.status(500).json({ message: "Failed to send OTP" });
-    }
-  },
-);
-
-router.post(
-  "/verify-phone-otp",
-  authMiddleware,
-  async (req: AuthRequest, res) => {
-    try {
-      const { code } = req.body;
-      const userId = req.userId!;
-
-      const user = await storage.getUser(userId);
-      if (!user) return res.status(404).json({ message: "User not found" });
-
-      if (
-        user.phoneVerificationToken !== code ||
-        !user.phoneTokenExpiresAt ||
-        new Date() > user.phoneTokenExpiresAt
-      ) {
-        return res.status(400).json({ message: "Invalid or expired code" });
-      }
-
-      // Mark phone verified
-      await storage.updateUserVerification(userId, {
-        isPhoneVerified: true,
-        phoneVerificationToken: null,
-        phoneTokenExpiresAt: null,
-      });
-
-      res.json({ message: "Phone verified successfully" });
-    } catch (error) {
-      console.error("Verify Phone OTP error:", error);
-      res.status(500).json({ message: "Verification failed" });
     }
   },
 );
@@ -516,7 +428,6 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
       role: user.role,
       subscriptionStatus: user.subscriptionStatus,
       isEmailVerified: user.isEmailVerified,
-      isPhoneVerified: user.isPhoneVerified,
     });
   } catch {
     res.status(500).json({ message: "Failed to get user" });

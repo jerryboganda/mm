@@ -95,18 +95,6 @@ export interface IStorage {
       isEmailVerified?: boolean;
       emailVerificationToken?: string | null;
       emailTokenExpiresAt?: Date | null;
-      isPhoneVerified?: boolean;
-      phoneVerificationToken?: string | null;
-      phoneTokenExpiresAt?: Date | null;
-    },
-  ): Promise<User | undefined>;
-
-  updateUserPhoneOtp(
-    userId: string,
-    data: {
-      phoneNumber: string;
-      phoneVerificationToken: string;
-      phoneTokenExpiresAt: Date;
     },
   ): Promise<User | undefined>;
 
@@ -530,25 +518,6 @@ export class DatabaseStorage implements IStorage {
       isEmailVerified?: boolean;
       emailVerificationToken?: string | null;
       emailTokenExpiresAt?: Date | null;
-      isPhoneVerified?: boolean;
-      phoneVerificationToken?: string | null;
-      phoneTokenExpiresAt?: Date | null;
-    },
-  ): Promise<User | undefined> {
-    const [user] = await db
-      .update(users)
-      .set(data)
-      .where(eq(users.id, userId))
-      .returning();
-    return user || undefined;
-  }
-
-  async updateUserPhoneOtp(
-    userId: string,
-    data: {
-      phoneNumber: string;
-      phoneVerificationToken: string;
-      phoneTokenExpiresAt: Date;
     },
   ): Promise<User | undefined> {
     const [user] = await db

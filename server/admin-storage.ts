@@ -445,10 +445,6 @@ export async function adminGetUsers(filters?: {
       isEmailVerified: users.isEmailVerified,
       emailVerificationToken: users.emailVerificationToken,
       emailTokenExpiresAt: users.emailTokenExpiresAt,
-      phoneNumber: users.phoneNumber,
-      isPhoneVerified: users.isPhoneVerified,
-      phoneVerificationToken: users.phoneVerificationToken,
-      phoneTokenExpiresAt: users.phoneTokenExpiresAt,
     })
     .from(users)
     .where(where)

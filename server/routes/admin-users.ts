@@ -56,13 +56,11 @@ router.put("/:id", async (req: AuthRequest, res) => {
       subscriptionExpiresAt,
       name,
       isEmailVerified,
-      isPhoneVerified,
     } = req.body;
     const data: any = {};
     if (role !== undefined) data.role = role;
     if (name !== undefined) data.name = name;
     if (isEmailVerified !== undefined) data.isEmailVerified = isEmailVerified;
-    if (isPhoneVerified !== undefined) data.isPhoneVerified = isPhoneVerified;
     if (subscriptionStatus !== undefined)
       data.subscriptionStatus = subscriptionStatus;
     if (subscriptionPlan !== undefined)
