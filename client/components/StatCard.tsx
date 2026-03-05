@@ -4,7 +4,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface StatCardProps {
   label: string;
@@ -18,34 +19,37 @@ export function StatCard({
   label,
   value,
   icon,
-  color = Colors.dark.primary,
+  color,
   style,
 }: StatCardProps) {
+  const { theme } = useTheme();
+  const resolvedColor = color ?? theme.primary;
+
   return (
     <View
-      style={[styles.container, style]}
+      style={[styles.container, { borderColor: theme.glassBorder }, style]}
       accessibilityRole="text"
       accessibilityLabel={`${label}: ${value}`}
     >
       <LinearGradient
-        colors={[Colors.dark.glass, "rgba(255,255,255,0.08)"]}
+        colors={[theme.glass, "rgba(255,255,255,0.08)"]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      <View style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
-        <Feather name={icon} size={20} color={color} />
+      <View style={[styles.iconContainer, { backgroundColor: `${resolvedColor}20` }]}>
+        <Feather name={icon} size={20} color={resolvedColor} />
       </View>
       <ThemedText
         type="h2"
-        style={[styles.value, { color }]}
+        style={[styles.value, { color: resolvedColor }]}
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.7}
       >
         {value}
       </ThemedText>
-      <ThemedText style={styles.label} numberOfLines={2}>
+      <ThemedText style={[styles.label, { color: theme.textSecondary }]} numberOfLines={2}>
         {label}
       </ThemedText>
     </View>
@@ -58,7 +62,6 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     alignItems: "center",
     overflow: "hidden",
   },
@@ -75,7 +78,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
     textAlign: "center",
   },
 });

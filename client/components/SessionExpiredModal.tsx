@@ -8,7 +8,8 @@ import * as Haptics from "@/lib/haptics-wrapper";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface SessionExpiredModalProps {
   visible: boolean;
@@ -21,6 +22,8 @@ export function SessionExpiredModal({
   onLogin,
   onDismiss,
 }: SessionExpiredModalProps) {
+  const { theme, isDark } = useTheme();
+
   const handleLogin = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onLogin();
@@ -39,14 +42,14 @@ export function SessionExpiredModal({
       statusBarTranslucent
       onRequestClose={onDismiss}
     >
-      <BlurView intensity={20} tint="dark" style={styles.overlay}>
+      <BlurView intensity={20} tint={isDark ? "dark" : "light"} style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={handleDismiss}>
           <View style={styles.centeredView}>
             <Pressable onPress={(e) => e.stopPropagation()}>
               <GlassCard style={styles.modalContent}>
                 <View style={styles.iconContainer}>
                   <LinearGradient
-                    colors={[Colors.dark.warning, "#f59e0b"]}
+                    colors={[theme.warning, "#f59e0b"]}
                     style={styles.iconGradient}
                   >
                     <Feather name="clock" size={32} color="#fff" />
@@ -57,14 +60,14 @@ export function SessionExpiredModal({
                   Session Expired
                 </ThemedText>
 
-                <ThemedText style={styles.description}>
+                <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
                   Your session has expired for security reasons. Please log in
                   again to continue using Maternal Mind.
                 </ThemedText>
 
-                <View style={styles.infoBox}>
-                  <Feather name="shield" size={18} color={Colors.dark.info} />
-                  <ThemedText style={styles.infoText}>
+                <View style={[styles.infoBox, { backgroundColor: theme.glass }]}>
+                  <Feather name="shield" size={18} color={theme.info} />
+                  <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
                     Your progress and data are safely saved.
                   </ThemedText>
                 </View>
@@ -82,7 +85,7 @@ export function SessionExpiredModal({
                       style={styles.dismissButton}
                       onPress={handleDismiss}
                     >
-                      <ThemedText style={styles.dismissText}>
+                      <ThemedText style={[styles.dismissText, { color: theme.textMuted }]}>
                         Dismiss
                       </ThemedText>
                     </Pressable>
@@ -133,7 +136,6 @@ const styles = StyleSheet.create({
   },
   description: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     lineHeight: 22,
     marginBottom: Spacing.lg,
   },
@@ -141,7 +143,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.sm,
-    backgroundColor: Colors.dark.glass,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
@@ -151,7 +152,6 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   buttonContainer: {
     width: "100%",
@@ -166,6 +166,5 @@ const styles = StyleSheet.create({
   },
   dismissText: {
     fontSize: 14,
-    color: Colors.dark.textMuted,
   },
 });
