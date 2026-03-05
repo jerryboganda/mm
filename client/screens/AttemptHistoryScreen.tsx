@@ -19,7 +19,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { EmptyState } from "@/components/EmptyState";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type AttemptHistoryScreenNavigationProp =
@@ -46,6 +47,7 @@ export default function AttemptHistoryScreen() {
   const navigation = useNavigation<AttemptHistoryScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<FilterMode>("all");
+  const { theme } = useTheme();
 
   const {
     data: attempts,
@@ -103,20 +105,20 @@ export default function AttemptHistoryScreen() {
   const getModeColor = (mode: string) => {
     switch (mode) {
       case "topic":
-        return Colors.dark.primary;
+        return theme.primary;
       case "mixed":
-        return Colors.dark.info;
+        return theme.info;
       case "wrong":
-        return Colors.dark.error;
+        return theme.error;
       default:
-        return Colors.dark.textSecondary;
+        return theme.textSecondary;
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return Colors.dark.success;
-    if (score >= 50) return Colors.dark.warning;
-    return Colors.dark.error;
+    if (score >= 80) return theme.success;
+    if (score >= 50) return theme.warning;
+    return theme.error;
   };
 
   const filters: { id: FilterMode; label: string }[] = [
@@ -162,31 +164,31 @@ export default function AttemptHistoryScreen() {
       </View>
 
       {item.topicTitle ? (
-        <ThemedText style={styles.topicTitle} numberOfLines={1}>
+        <ThemedText style={[styles.topicTitle, { color: theme.text }]} numberOfLines={1}>
           {item.topicTitle}
         </ThemedText>
       ) : null}
 
       <View style={styles.attemptStats}>
         <View style={styles.statItem}>
-          <Feather name="check-circle" size={14} color={Colors.dark.success} />
-          <ThemedText style={styles.statText}>{item.correctCount}</ThemedText>
+          <Feather name="check-circle" size={14} color={theme.success} />
+          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>{item.correctCount}</ThemedText>
         </View>
         <View style={styles.statItem}>
-          <Feather name="x-circle" size={14} color={Colors.dark.error} />
-          <ThemedText style={styles.statText}>{item.wrongCount}</ThemedText>
+          <Feather name="x-circle" size={14} color={theme.error} />
+          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>{item.wrongCount}</ThemedText>
         </View>
         <View style={styles.statItem}>
-          <Feather name="clock" size={14} color={Colors.dark.textSecondary} />
-          <ThemedText style={styles.statText}>
+          <Feather name="clock" size={14} color={theme.textSecondary} />
+          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>
             {formatTime(item.timeTaken)}
           </ThemedText>
         </View>
       </View>
 
-      <View style={styles.attemptFooter}>
-        <ThemedText style={styles.dateText}>{formatDate(item.date)}</ThemedText>
-        <Feather name="chevron-right" size={16} color={Colors.dark.textMuted} />
+      <View style={[styles.attemptFooter, { borderTopColor: theme.glass }]}>
+        <ThemedText style={[styles.dateText, { color: theme.textMuted }]}>{formatDate(item.date)}</ThemedText>
+        <Feather name="chevron-right" size={16} color={theme.textMuted} />
       </View>
     </GlassCard>
   );
@@ -228,7 +230,7 @@ export default function AttemptHistoryScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.dark.primary}
+            tintColor={theme.primary}
           />
         }
         ListHeaderComponent={
@@ -240,12 +242,13 @@ export default function AttemptHistoryScreen() {
                   onPress={() => handleFilterChange(filter.id)}
                   style={[
                     styles.filterChip,
-                    selectedFilter === filter.id && styles.filterChipSelected,
+                    { backgroundColor: selectedFilter === filter.id ? theme.primary : theme.glass },
                   ]}
                 >
                   <ThemedText
                     style={[
                       styles.filterText,
+                      { color: theme.textSecondary },
                       selectedFilter === filter.id && styles.filterTextSelected,
                     ]}
                   >
@@ -280,15 +283,10 @@ const styles = StyleSheet.create({
   filterChip: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.dark.glass,
     borderRadius: BorderRadius.full,
-  },
-  filterChipSelected: {
-    backgroundColor: Colors.dark.primary,
   },
   filterText: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   filterTextSelected: {
     color: "#fff",
@@ -325,7 +323,6 @@ const styles = StyleSheet.create({
   topicTitle: {
     fontSize: 15,
     fontWeight: "600",
-    color: Colors.dark.text,
     marginBottom: Spacing.sm,
   },
   attemptStats: {
@@ -339,7 +336,6 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.xs,
   },
   attemptFooter: {
@@ -348,10 +344,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: Spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: Colors.dark.glass,
   },
   dateText: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
   },
 });

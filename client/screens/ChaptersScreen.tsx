@@ -108,7 +108,7 @@ export default function ChaptersScreen() {
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <ThemedText style={styles.sectionLabel}>CHAPTERS</ThemedText>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CHAPTERS</ThemedText>
             <ThemedText type="small" style={[styles.bookTitle, { color: theme.textSecondary }]}>
               {bookTitle}
             </ThemedText>
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: 2,
     textTransform: "uppercase",
-    color: "#11a4d4",
   },
   bookTitle: {
     marginTop: Spacing.xs,

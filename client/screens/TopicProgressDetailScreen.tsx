@@ -14,7 +14,8 @@ import { StatCard } from "@/components/StatCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type TopicProgressDetailRouteProp = RouteProp<
@@ -54,6 +55,7 @@ export default function TopicProgressDetailScreen() {
   const navigation = useNavigation<TopicProgressDetailNavigationProp>();
   const route = useRoute<TopicProgressDetailRouteProp>();
   const { topicId, topicTitle } = route.params;
+  const { theme } = useTheme();
 
   const { data: progress, isLoading } = useQuery<TopicProgressData>({
     queryKey: ["/api/progress/topic", topicId],
@@ -79,16 +81,16 @@ export default function TopicProgressDetailScreen() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return Colors.dark.success;
-    if (score >= 50) return Colors.dark.warning;
-    return Colors.dark.error;
+    if (score >= 80) return theme.success;
+    if (score >= 50) return theme.warning;
+    return theme.error;
   };
 
   const renderTrendChart = () => {
     if (!progress?.accuracyTrend || progress.accuracyTrend.length === 0) {
       return (
         <View style={styles.noChartData}>
-          <ThemedText style={styles.noChartText}>No data to display</ThemedText>
+          <ThemedText style={[styles.noChartText, { color: theme.textMuted }]}>No data to display</ThemedText>
         </View>
       );
     }
@@ -100,15 +102,15 @@ export default function TopicProgressDetailScreen() {
     return (
       <View style={styles.chartContainer}>
         <View style={styles.chartYAxis}>
-          <ThemedText style={styles.chartAxisLabel}>100%</ThemedText>
-          <ThemedText style={styles.chartAxisLabel}>50%</ThemedText>
-          <ThemedText style={styles.chartAxisLabel}>0%</ThemedText>
+          <ThemedText style={[styles.chartAxisLabel, { color: theme.textMuted }]}>100%</ThemedText>
+          <ThemedText style={[styles.chartAxisLabel, { color: theme.textMuted }]}>50%</ThemedText>
+          <ThemedText style={[styles.chartAxisLabel, { color: theme.textMuted }]}>0%</ThemedText>
         </View>
         <View style={styles.chartArea}>
           <View style={styles.chartGrid}>
-            <View style={styles.chartGridLine} />
-            <View style={styles.chartGridLine} />
-            <View style={styles.chartGridLine} />
+            <View style={[styles.chartGridLine, { backgroundColor: theme.glass }]} />
+            <View style={[styles.chartGridLine, { backgroundColor: theme.glass }]} />
+            <View style={[styles.chartGridLine, { backgroundColor: theme.glass }]} />
           </View>
           <View style={styles.chartBars}>
             {data.map((point, index) => {
@@ -126,7 +128,7 @@ export default function TopicProgressDetailScreen() {
                       end={{ x: 0, y: 1 }}
                     />
                   </View>
-                  <ThemedText style={styles.chartBarLabel}>
+                  <ThemedText style={[styles.chartBarLabel, { color: theme.textMuted }]}>
                     {formatDate(point.date)}
                   </ThemedText>
                 </View>
@@ -185,7 +187,7 @@ export default function TopicProgressDetailScreen() {
           <ThemedText type="h3" style={styles.topicTitle}>
             {progress?.topicTitle || topicTitle}
           </ThemedText>
-          <ThemedText style={styles.chapterTitle}>
+          <ThemedText style={[styles.chapterTitle, { color: theme.textSecondary }]}>
             {progress?.chapterTitle}
           </ThemedText>
         </View>
@@ -195,21 +197,21 @@ export default function TopicProgressDetailScreen() {
             label="Total Attempts"
             value={progress?.totalAttempts || 0}
             icon="activity"
-            color={Colors.dark.primary}
+            color={theme.primary}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Avg Score"
             value={`${progress?.averageScore || 0}%`}
             icon="trending-up"
-            color={Colors.dark.info}
+            color={theme.info}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Best Score"
             value={`${progress?.bestScore || 0}%`}
             icon="award"
-            color={Colors.dark.success}
+            color={theme.success}
           />
         </View>
 
@@ -233,7 +235,7 @@ export default function TopicProgressDetailScreen() {
               >
                 <View style={styles.attemptRow}>
                   <View style={styles.attemptInfo}>
-                    <ThemedText style={styles.attemptDate}>
+                    <ThemedText style={[styles.attemptDate, { color: theme.text }]}>
                       {formatFullDate(attempt.date)}
                     </ThemedText>
                     <View style={styles.attemptStats}>
@@ -241,9 +243,9 @@ export default function TopicProgressDetailScreen() {
                         <Feather
                           name="check"
                           size={12}
-                          color={Colors.dark.success}
+                          color={theme.success}
                         />
-                        <ThemedText style={styles.attemptStatText}>
+                        <ThemedText style={[styles.attemptStatText, { color: theme.textSecondary }]}>
                           {attempt.correctCount}/{attempt.totalQuestions}
                         </ThemedText>
                       </View>
@@ -269,7 +271,7 @@ export default function TopicProgressDetailScreen() {
             ))
           ) : (
             <View style={styles.noAttempts}>
-              <ThemedText style={styles.noAttemptsText}>
+              <ThemedText style={[styles.noAttemptsText, { color: theme.textMuted }]}>
                 No attempts yet for this topic
               </ThemedText>
             </View>
@@ -306,7 +308,6 @@ const styles = StyleSheet.create({
   },
   chapterTitle: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
   },
   statsRow: {
     flexDirection: "row",
@@ -337,7 +338,6 @@ const styles = StyleSheet.create({
   },
   chartAxisLabel: {
     fontSize: 10,
-    color: Colors.dark.textMuted,
   },
   chartArea: {
     flex: 1,
@@ -352,7 +352,6 @@ const styles = StyleSheet.create({
   },
   chartGridLine: {
     height: 1,
-    backgroundColor: Colors.dark.glass,
   },
   chartBars: {
     flexDirection: "row",
@@ -372,7 +371,6 @@ const styles = StyleSheet.create({
   },
   chartBarLabel: {
     fontSize: 8,
-    color: Colors.dark.textMuted,
     marginTop: 4,
   },
   noChartData: {
@@ -382,7 +380,6 @@ const styles = StyleSheet.create({
   },
   noChartText: {
     fontSize: 14,
-    color: Colors.dark.textMuted,
   },
   attemptCard: {
     marginBottom: Spacing.sm,
@@ -397,7 +394,6 @@ const styles = StyleSheet.create({
   },
   attemptDate: {
     fontSize: 14,
-    color: Colors.dark.text,
     marginBottom: 4,
   },
   attemptStats: {
@@ -409,7 +405,6 @@ const styles = StyleSheet.create({
   },
   attemptStatText: {
     fontSize: 12,
-    color: Colors.dark.textSecondary,
     marginLeft: 4,
   },
   scoreBadge: {
@@ -427,7 +422,6 @@ const styles = StyleSheet.create({
   },
   noAttemptsText: {
     fontSize: 14,
-    color: Colors.dark.textMuted,
   },
   actionSection: {
     marginTop: Spacing.lg,

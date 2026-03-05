@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { StatCard } from "@/components/StatCard";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type AttemptDetailRouteProp = RouteProp<RootStackParamList, "AttemptDetail">;
@@ -46,6 +47,7 @@ export default function AttemptDetailScreen() {
   const headerHeight = useHeaderHeight();
   const route = useRoute<AttemptDetailRouteProp>();
   const { attemptId } = route.params;
+  const { theme } = useTheme();
 
   const { data: attempt, isLoading } = useQuery<AttemptDetail>({
     queryKey: ["/api/attempts", attemptId],
@@ -143,8 +145,8 @@ export default function AttemptDetailScreen() {
             <LinearGradient
               colors={
                 isHighScore
-                  ? [Colors.dark.success, "#16a34a"]
-                  : [Colors.dark.primary, Colors.dark.primaryDark]
+                  ? [theme.success, "#16a34a"]
+                  : [theme.primary, theme.primaryDark]
               }
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0 }}
@@ -158,11 +160,11 @@ export default function AttemptDetailScreen() {
             {getModeLabel(attempt.mode)}
           </ThemedText>
           {attempt.topicTitle ? (
-            <ThemedText style={styles.topicName}>
+            <ThemedText style={[styles.topicName, { color: theme.textSecondary }]}>
               {attempt.topicTitle}
             </ThemedText>
           ) : null}
-          <ThemedText style={styles.dateText}>
+          <ThemedText style={[styles.dateText, { color: theme.textMuted }]}>
             {formatDate(attempt.date)}
           </ThemedText>
         </View>
@@ -172,21 +174,21 @@ export default function AttemptDetailScreen() {
             label="Correct"
             value={attempt.correctCount}
             icon="check-circle"
-            color={Colors.dark.success}
+            color={theme.success}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Wrong"
             value={attempt.wrongCount}
             icon="x-circle"
-            color={Colors.dark.error}
+            color={theme.error}
           />
           <View style={{ width: Spacing.md }} />
           <StatCard
             label="Time"
             value={formatTime(attempt.timeTaken)}
             icon="clock"
-            color={Colors.dark.info}
+            color={theme.info}
           />
         </View>
 
@@ -198,7 +200,7 @@ export default function AttemptDetailScreen() {
               active={false}
               style={[
                 styles.questionCard,
-                q.isCorrect ? styles.questionCorrect : styles.questionWrong,
+                { borderLeftColor: q.isCorrect ? theme.success : theme.error },
               ]}
             >
               <View style={styles.questionHeader}>
@@ -207,8 +209,8 @@ export default function AttemptDetailScreen() {
                     styles.questionBadge,
                     {
                       backgroundColor: q.isCorrect
-                        ? Colors.dark.success
-                        : Colors.dark.error,
+                        ? theme.success
+                        : theme.error,
                     },
                   ]}
                 >
@@ -218,12 +220,12 @@ export default function AttemptDetailScreen() {
                     color="#fff"
                   />
                 </View>
-                <ThemedText style={styles.questionNumber}>
+                <ThemedText style={[styles.questionNumber, { color: theme.textSecondary }]}>
                   Question {index + 1}
                 </ThemedText>
               </View>
 
-              <ThemedText style={styles.questionText}>{q.question}</ThemedText>
+              <ThemedText style={[styles.questionText, { color: theme.text }]}>{q.question}</ThemedText>
 
               <View style={styles.answersContainer}>
                 {q.options.map((option) => {
@@ -234,17 +236,19 @@ export default function AttemptDetailScreen() {
                       key={option.label}
                       style={[
                         styles.answerOption,
-                        isSelected && !isCorrect && styles.answerWrong,
-                        isCorrect && styles.answerCorrect,
+                        { backgroundColor: theme.glass },
+                        isSelected && !isCorrect && { backgroundColor: `${theme.error}15` },
+                        isCorrect && { backgroundColor: `${theme.success}15` },
                       ]}
                     >
-                      <View style={styles.optionLabel}>
+                      <View style={[styles.optionLabel, { backgroundColor: theme.glass }]}>
                         <ThemedText
                           style={[
                             styles.optionLabelText,
-                            isCorrect && { color: Colors.dark.success },
+                            { color: theme.textSecondary },
+                            isCorrect && { color: theme.success },
                             isSelected &&
-                            !isCorrect && { color: Colors.dark.error },
+                            !isCorrect && { color: theme.error },
                           ]}
                         >
                           {option.label}
@@ -253,9 +257,10 @@ export default function AttemptDetailScreen() {
                       <ThemedText
                         style={[
                           styles.optionText,
-                          isCorrect && { color: Colors.dark.success },
+                          { color: theme.text },
+                          isCorrect && { color: theme.success },
                           isSelected &&
-                          !isCorrect && { color: Colors.dark.error },
+                          !isCorrect && { color: theme.error },
                         ]}
                       >
                         {option.text}
@@ -265,7 +270,7 @@ export default function AttemptDetailScreen() {
                           name={isCorrect ? "check-circle" : "x-circle"}
                           size={16}
                           color={
-                            isCorrect ? Colors.dark.success : Colors.dark.error
+                            isCorrect ? theme.success : theme.error
                           }
                           style={styles.optionIcon}
                         />
@@ -273,7 +278,7 @@ export default function AttemptDetailScreen() {
                         <Feather
                           name="check-circle"
                           size={16}
-                          color={Colors.dark.success}
+                          color={theme.success}
                           style={styles.optionIcon}
                         />
                       ) : null}
@@ -283,14 +288,14 @@ export default function AttemptDetailScreen() {
               </View>
 
               {q.explanation ? (
-                <View style={styles.explanationContainer}>
+                <View style={[styles.explanationContainer, { backgroundColor: `${theme.info}10` }]}>
                   <View style={styles.explanationHeader}>
-                    <Feather name="info" size={14} color={Colors.dark.info} />
-                    <ThemedText style={styles.explanationLabel}>
+                    <Feather name="info" size={14} color={theme.info} />
+                    <ThemedText style={[styles.explanationLabel, { color: theme.info }]}>
                       Explanation
                     </ThemedText>
                   </View>
-                  <ThemedText style={styles.explanationText}>
+                  <ThemedText style={[styles.explanationText, { color: theme.textSecondary }]}>
                     {q.explanation}
                   </ThemedText>
                 </View>
@@ -339,12 +344,10 @@ const styles = StyleSheet.create({
   },
   topicName: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing.xs,
   },
   dateText: {
     fontSize: 12,
-    color: Colors.dark.textMuted,
   },
   statsRow: {
     flexDirection: "row",
@@ -365,12 +368,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     borderLeftWidth: 3,
   },
-  questionCorrect: {
-    borderLeftColor: Colors.dark.success,
-  },
-  questionWrong: {
-    borderLeftColor: Colors.dark.error,
-  },
   questionHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -387,12 +384,10 @@ const styles = StyleSheet.create({
   questionNumber: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.dark.textSecondary,
   },
   questionText: {
     fontSize: 15,
     lineHeight: 22,
-    color: Colors.dark.text,
     marginBottom: Spacing.md,
   },
   answersContainer: {
@@ -404,19 +399,11 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
     borderRadius: BorderRadius.md,
     marginBottom: Spacing.xs,
-    backgroundColor: Colors.dark.glass,
-  },
-  answerWrong: {
-    backgroundColor: `${Colors.dark.error}15`,
-  },
-  answerCorrect: {
-    backgroundColor: `${Colors.dark.success}15`,
   },
   optionLabel: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: Colors.dark.glass,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.sm,
@@ -424,19 +411,16 @@ const styles = StyleSheet.create({
   optionLabelText: {
     fontSize: 12,
     fontWeight: "600",
-    color: Colors.dark.textSecondary,
   },
   optionText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.dark.text,
   },
   optionIcon: {
     marginLeft: Spacing.sm,
   },
   explanationContainer: {
     padding: Spacing.md,
-    backgroundColor: `${Colors.dark.info}10`,
     borderRadius: BorderRadius.md,
   },
   explanationHeader: {
@@ -447,12 +431,10 @@ const styles = StyleSheet.create({
   explanationLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: Colors.dark.info,
     marginLeft: Spacing.xs,
   },
   explanationText: {
     fontSize: 13,
     lineHeight: 20,
-    color: Colors.dark.textSecondary,
   },
 });

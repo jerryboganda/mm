@@ -88,7 +88,7 @@ function SearchResultCard({
       style={[styles.resultCard, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
       onPress={onPress}
     >
-      <View style={[styles.resultIcon, { backgroundColor: "rgba(17, 164, 212, 0.1)" }]}>
+      <View style={[styles.resultIcon, { backgroundColor: `${theme.primary}1A` }]}>
         <Feather name={getIcon()} size={18} color={theme.primary} />
       </View>
       <View style={styles.resultContent}>
@@ -244,7 +244,7 @@ export default function SearchScreen() {
                 style={[
                   styles.filterText,
                   { color: theme.textSecondary },
-                  activeFilter === filter.key && { color: "#fff", fontWeight: "600" },
+                  activeFilter === filter.key && { color: theme.buttonText, fontWeight: "600" },
                 ]}
               >
                 {filter.label}
