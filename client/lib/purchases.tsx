@@ -53,8 +53,11 @@ function getApiKey(): string {
     Platform.OS === "ios"
       ? REVENUECAT_API_KEY_IOS
       : REVENUECAT_API_KEY_ANDROID;
-  // Use platform-specific key first, then fall back to test key
-  return platformKey || REVENUECAT_API_KEY_TEST;
+  // Use platform-specific key first; only fall back to test key in dev mode
+  if (platformKey) return platformKey;
+  if (__DEV__) return REVENUECAT_API_KEY_TEST;
+  // In release builds, don't use test keys — RevenueCat SDK will block them
+  return "";
 }
 
 export function PurchasesProvider({ children }: { children: ReactNode }) {
