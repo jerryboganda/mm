@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import { Platform, Alert } from "react-native";
@@ -11,6 +12,8 @@ import Purchases, {
   CustomerInfo,
   LOG_LEVEL,
 } from "react-native-purchases";
+import { apiRequest } from "@/lib/query-client";
+import { useAuth } from "@/lib/auth";
 
 interface PurchasesContextType {
   isSubscribed: boolean;
@@ -18,6 +21,7 @@ interface PurchasesContextType {
   packages: PurchasesPackage[];
   loading: boolean;
   error: string | null;
+  initialized: boolean;
   purchase: (packageToPurchase: PurchasesPackage) => Promise<boolean>;
   restorePurchases: () => Promise<boolean>;
   refreshCustomerInfo: () => Promise<void>;
@@ -27,12 +31,31 @@ const PurchasesContext = createContext<PurchasesContextType | undefined>(
   undefined,
 );
 
+// Read env vars matching the .env file names, with fallbacks for legacy names
 const REVENUECAT_API_KEY_IOS =
-  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS || "";
+  process.env.EXPO_PUBLIC_RC_API_KEY_IOS ||
+  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS ||
+  "";
 const REVENUECAT_API_KEY_ANDROID =
-  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID || "";
+  process.env.EXPO_PUBLIC_RC_API_KEY_ANDROID ||
+  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID ||
+  "";
+// Fallback to the test key if no platform-specific key is set
+const REVENUECAT_API_KEY_TEST =
+  process.env.EXPO_PUBLIC_RC_API_KEY_TEST || "";
 const REVENUECAT_ENTITLEMENT_ID =
-  process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID || "pro";
+  process.env.EXPO_PUBLIC_RC_ENTITLEMENT_ID ||
+  process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID ||
+  "pro";
+
+function getApiKey(): string {
+  const platformKey =
+    Platform.OS === "ios"
+      ? REVENUECAT_API_KEY_IOS
+      : REVENUECAT_API_KEY_ANDROID;
+  // Use platform-specific key first, then fall back to test key
+  return platformKey || REVENUECAT_API_KEY_TEST;
+}
 
 export function PurchasesProvider({ children }: { children: ReactNode }) {
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -41,10 +64,25 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     initializePurchases();
   }, []);
+
+  // When user logs in, identify them to RevenueCat
+  useEffect(() => {
+    if (initialized && user?.id) {
+      Purchases.logIn(user.id).then(({ customerInfo: info }) => {
+        setCustomerInfo(info);
+        const entitlement =
+          info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
+        setIsSubscribed(!!entitlement);
+      }).catch((err) => {
+        console.error("RevenueCat logIn error:", err);
+      });
+    }
+  }, [initialized, user?.id]);
 
   const initializePurchases = async () => {
     try {
@@ -53,22 +91,23 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const apiKey =
-        Platform.OS === "ios"
-          ? REVENUECAT_API_KEY_IOS
-          : REVENUECAT_API_KEY_ANDROID;
+      const apiKey = getApiKey();
 
       if (!apiKey) {
-        if (__DEV__) {
-          console.log(
-            "RevenueCat API key not configured - running in preview mode",
-          );
-        }
+        console.warn(
+          "RevenueCat: No API key found. Set EXPO_PUBLIC_RC_API_KEY_ANDROID in eas.json or .env",
+        );
+        setError("Subscription service not configured");
         setLoading(false);
         return;
       }
 
-      Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+      if (__DEV__) {
+        Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+      } else {
+        Purchases.setLogLevel(LOG_LEVEL.ERROR);
+      }
+
       await Purchases.configure({ apiKey });
       setInitialized(true);
 
@@ -106,6 +145,28 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Sync subscription status to our backend after any purchase/restore
+  const syncSubscriptionToServer = useCallback(
+    async (info: CustomerInfo) => {
+      try {
+        const entitlement =
+          info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
+        if (entitlement) {
+          await apiRequest("POST", "/api/profile/subscription/sync", {
+            subscriptionStatus: "active",
+            subscriptionPlan: entitlement.productIdentifier || "premium",
+            expiresAt: entitlement.expirationDate || null,
+            revenueCatId: info.originalAppUserId,
+          });
+        }
+      } catch (err) {
+        // Non-critical — server webhook will also sync
+        console.warn("Failed to sync subscription to server:", err);
+      }
+    },
+    [],
+  );
+
   const purchase = async (
     packageToPurchase: PurchasesPackage,
   ): Promise<boolean> => {
@@ -113,7 +174,7 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
       if (!initialized) {
         Alert.alert(
           "Not Available",
-          "In-app purchases are not available in preview mode. Please use the app on a real device.",
+          "Subscription service is still loading. Please try again in a moment.",
         );
         return false;
       }
@@ -125,6 +186,11 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
       const entitlement = info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
       const success = !!entitlement;
       setIsSubscribed(success);
+
+      if (success) {
+        // Sync to our backend
+        await syncSubscriptionToServer(info);
+      }
 
       return success;
     } catch (err: any) {
@@ -145,7 +211,7 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
       if (!initialized) {
         Alert.alert(
           "Not Available",
-          "Restore purchases is not available in preview mode.",
+          "Subscription service is still loading. Please try again in a moment.",
         );
         return false;
       }
@@ -158,6 +224,8 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
       setIsSubscribed(success);
 
       if (success) {
+        // Sync restored subscription to backend
+        await syncSubscriptionToServer(info);
         Alert.alert(
           "Restored!",
           "Your subscription has been restored successfully.",
@@ -195,6 +263,7 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
         packages,
         loading,
         error,
+        initialized,
         purchase,
         restorePurchases,
         refreshCustomerInfo,

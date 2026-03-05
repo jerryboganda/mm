@@ -85,6 +85,14 @@ export interface IStorage {
     userId: string,
     data: { name: string },
   ): Promise<User | undefined>;
+  updateSubscription(
+    userId: string,
+    data: {
+      subscriptionStatus: string;
+      subscriptionPlan?: string;
+      subscriptionExpiresAt?: Date | null;
+    },
+  ): Promise<User | undefined>;
 
   recordTopicView(userId: string, topicId: string): Promise<void>;
   getRecentActivity(userId: string, limit?: number): Promise<RecentActivity[]>;
@@ -471,6 +479,30 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set({ name: data.name })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  async updateSubscription(
+    userId: string,
+    data: {
+      subscriptionStatus: string;
+      subscriptionPlan?: string;
+      subscriptionExpiresAt?: Date | null;
+    },
+  ): Promise<User | undefined> {
+    const setData: Record<string, any> = {
+      subscriptionStatus: data.subscriptionStatus,
+    };
+    if (data.subscriptionPlan !== undefined)
+      setData.subscriptionPlan = data.subscriptionPlan;
+    if (data.subscriptionExpiresAt !== undefined)
+      setData.subscriptionExpiresAt = data.subscriptionExpiresAt;
+
+    const [user] = await db
+      .update(users)
+      .set(setData)
       .where(eq(users.id, userId))
       .returning();
     return user || undefined;

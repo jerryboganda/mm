@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   ScrollView,
   Pressable,
   ActivityIndicator,
-  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -13,7 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
-import { PurchasesPackage } from "react-native-purchases";
+import { PurchasesPackage, PACKAGE_TYPE } from "react-native-purchases";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { PrimaryButton } from "@/components/PrimaryButton";
@@ -26,129 +25,111 @@ import { RootStackParamList } from "@/navigation/RootStackNavigator";
 type SubscriptionScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
-interface FallbackPlan {
-  id: string;
+// Map package type to user-friendly details
+function getPackageLabel(pkg: PurchasesPackage): {
   name: string;
-  price: string;
   period: string;
-  features: string[];
-  popular?: boolean;
   savings?: string;
+  popular?: boolean;
+} {
+  const id = pkg.identifier.toLowerCase();
+  const type = pkg.packageType;
+
+  if (
+    type === PACKAGE_TYPE.ANNUAL ||
+    id.includes("yearly") ||
+    id.includes("annual")
+  ) {
+    return { name: "Yearly", period: "/year", savings: "Save 33%" };
+  }
+  if (
+    type === PACKAGE_TYPE.THREE_MONTH ||
+    id.includes("quarterly") ||
+    id.includes("3month")
+  ) {
+    return {
+      name: "Quarterly",
+      period: "/3 months",
+      savings: "Save 17%",
+      popular: true,
+    };
+  }
+  if (
+    type === PACKAGE_TYPE.SIX_MONTH ||
+    id.includes("6month") ||
+    id.includes("half")
+  ) {
+    return { name: "6 Months", period: "/6 months", savings: "Save 25%" };
+  }
+  if (
+    type === PACKAGE_TYPE.TWO_MONTH ||
+    id.includes("2month")
+  ) {
+    return { name: "2 Months", period: "/2 months", savings: "Save 10%" };
+  }
+  if (
+    type === PACKAGE_TYPE.WEEKLY ||
+    id.includes("weekly")
+  ) {
+    return { name: "Weekly", period: "/week" };
+  }
+  // Default: Monthly
+  return { name: "Monthly", period: "/month" };
 }
 
-const fallbackPlans: FallbackPlan[] = [
-  {
-    id: "monthly",
-    name: "Monthly",
-    price: "$9.99",
-    period: "/month",
-    features: [
-      "Access all textbook content",
-      "Unlimited MCQ practice",
-      "Progress tracking",
-      "Bookmarks & notes",
-    ],
-  },
-  {
-    id: "quarterly",
-    name: "Quarterly",
-    price: "$24.99",
-    period: "/3 months",
-    popular: true,
-    savings: "Save 17%",
-    features: [
-      "Access all textbook content",
-      "Unlimited MCQ practice",
-      "Progress tracking",
-      "Bookmarks & notes",
-      "Priority support",
-    ],
-  },
-  {
-    id: "yearly",
-    name: "Yearly",
-    price: "$79.99",
-    period: "/year",
-    savings: "Save 33%",
-    features: [
-      "Access all textbook content",
-      "Unlimited MCQ practice",
-      "Progress tracking",
-      "Bookmarks & notes",
-      "Priority support",
-      "Early access to new content",
-    ],
-  },
+const allFeatures = [
+  "Access all textbook content",
+  "Unlimited MCQ practice",
+  "Progress tracking",
+  "Bookmarks & notes",
+  "Priority support",
+  "Early access to new content",
 ];
-
-const getFeatures = (packageId: string): string[] => {
-  if (packageId.includes("yearly") || packageId.includes("annual")) {
-    return [
-      "Access all textbook content",
-      "Unlimited MCQ practice",
-      "Progress tracking",
-      "Bookmarks & notes",
-      "Priority support",
-      "Early access to new content",
-    ];
-  }
-  if (packageId.includes("quarterly") || packageId.includes("3month")) {
-    return [
-      "Access all textbook content",
-      "Unlimited MCQ practice",
-      "Progress tracking",
-      "Bookmarks & notes",
-      "Priority support",
-    ];
-  }
-  return [
-    "Access all textbook content",
-    "Unlimited MCQ practice",
-    "Progress tracking",
-    "Bookmarks & notes",
-  ];
-};
 
 export default function SubscriptionScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<SubscriptionScreenNavigationProp>();
-  const { packages, loading, isSubscribed, purchase, restorePurchases } =
+  const { packages, loading, isSubscribed, purchase, error, initialized } =
     usePurchases();
   const { theme } = useTheme();
 
   const [selectedPackage, setSelectedPackage] =
     useState<PurchasesPackage | null>(null);
-  const [selectedFallback, setSelectedFallback] = useState<string>("quarterly");
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
 
-  const hasRevenueCatPackages = packages.length > 0;
+  // Auto-select the "popular" (quarterly) or first package
+  useEffect(() => {
+    if (packages.length > 0 && !selectedPackage) {
+      const popular = packages.find((pkg) => {
+        const label = getPackageLabel(pkg);
+        return label.popular;
+      });
+      setSelectedPackage(popular || packages[0]);
+    }
+  }, [packages, selectedPackage]);
 
   const handlePurchase = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    if (hasRevenueCatPackages && selectedPackage) {
-      setPurchasing(true);
-      try {
-        const success = await purchase(selectedPackage);
-        setPurchasing(false);
+    if (!selectedPackage) {
+      return;
+    }
 
-        if (success) {
-          navigation.replace("PurchaseSuccess");
-        }
-      } catch (error: any) {
-        setPurchasing(false);
-        navigation.navigate("PurchaseFailed", {
-          errorMessage: error.message || "Purchase failed. Please try again.",
-        });
+    setPurchasing(true);
+    try {
+      const success = await purchase(selectedPackage);
+      setPurchasing(false);
+
+      if (success) {
+        navigation.replace("PurchaseSuccess");
       }
-    } else {
-      setPurchasing(true);
-      setTimeout(() => {
-        setPurchasing(false);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      }, 1500);
+    } catch (err: any) {
+      setPurchasing(false);
+      navigation.navigate("PurchaseFailed", {
+        errorMessage: err.message || "Purchase failed. Please try again.",
+      });
     }
   };
 
@@ -203,10 +184,50 @@ export default function SubscriptionScreen() {
     );
   }
 
-  const selectedPlanFeatures =
-    hasRevenueCatPackages && selectedPackage
-      ? getFeatures(selectedPackage.identifier)
-      : fallbackPlans.find((p) => p.id === selectedFallback)?.features || [];
+  // Show error state if RevenueCat failed to initialize or no packages available
+  if (!initialized || (error && packages.length === 0)) {
+    return (
+      <BackgroundGradient>
+        <View
+          style={[
+            styles.subscribedContainer,
+            {
+              paddingTop: headerHeight + Spacing["2xl"],
+              paddingBottom: insets.bottom + Spacing["3xl"],
+            },
+          ]}
+        >
+          <View style={styles.errorIconContainer}>
+            <Feather name="alert-circle" size={56} color={theme.warning} />
+          </View>
+          <ThemedText type="h3" style={styles.successTitle}>
+            Subscription Unavailable
+          </ThemedText>
+          <ThemedText
+            style={[styles.successSubtitle, { color: theme.textSecondary }]}
+          >
+            {error ||
+              "Unable to load subscription plans. Please check your internet connection and try again."}
+          </ThemedText>
+          <PrimaryButton
+            title="Try Again"
+            onPress={() => navigation.replace("Subscription")}
+            style={styles.continueButton}
+          />
+          <Pressable
+            style={styles.restoreButton}
+            onPress={handleRestore}
+          >
+            <ThemedText
+              style={[styles.restoreText, { color: theme.primary }]}
+            >
+              Restore Purchases
+            </ThemedText>
+          </Pressable>
+        </View>
+      </BackgroundGradient>
+    );
+  }
 
   return (
     <BackgroundGradient>
@@ -232,99 +253,16 @@ export default function SubscriptionScreen() {
         </View>
 
         <View style={styles.plansContainer}>
-          {hasRevenueCatPackages
-            ? packages.map((pkg) => {
-              const isSelected =
-                selectedPackage?.identifier === pkg.identifier;
-              const isPopular =
-                pkg.identifier.includes("quarterly") ||
-                pkg.packageType === "THREE_MONTH";
+          {packages.map((pkg) => {
+            const isSelected =
+              selectedPackage?.identifier === pkg.identifier;
+            const label = getPackageLabel(pkg);
 
-              return (
-                <Pressable
-                  key={pkg.identifier}
-                  onPress={() => {
-                    setSelectedPackage(pkg);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }}
-                  style={[
-                    styles.planCard,
-                    {
-                      backgroundColor: theme.glass,
-                      borderColor: theme.glassBorder,
-                    },
-                    isSelected && {
-                      borderColor: theme.primary,
-                      backgroundColor: `${theme.primary}15`,
-                    },
-                    isPopular && {
-                      borderColor: theme.primary,
-                    },
-                  ]}
-                >
-                  {isPopular ? (
-                    <View
-                      style={[
-                        styles.popularBadge,
-                        { backgroundColor: theme.primary },
-                      ]}
-                    >
-                      <ThemedText style={styles.popularText}>
-                        BEST VALUE
-                      </ThemedText>
-                    </View>
-                  ) : null}
-
-                  <View style={styles.planHeader}>
-                    <View
-                      style={[
-                        styles.radioOuter,
-                        { borderColor: theme.glassBorder },
-                        isSelected && { borderColor: theme.primary },
-                      ]}
-                    >
-                      {isSelected ? (
-                        <View
-                          style={[
-                            styles.radioInner,
-                            { backgroundColor: theme.primary },
-                          ]}
-                        />
-                      ) : null}
-                    </View>
-                    <View style={styles.planInfo}>
-                      <ThemedText type="h4" style={styles.planName}>
-                        {pkg.product.title}
-                      </ThemedText>
-                      {pkg.product.description ? (
-                        <ThemedText
-                          style={[
-                            styles.planDescription,
-                            { color: theme.textSecondary },
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {pkg.product.description}
-                        </ThemedText>
-                      ) : null}
-                    </View>
-                    <View style={styles.priceContainer}>
-                      <ThemedText
-                        type="h3"
-                        style={[styles.price, { color: theme.primary }]}
-                      >
-                        {pkg.product.priceString}
-                      </ThemedText>
-                    </View>
-                  </View>
-                </Pressable>
-              );
-            })
-            : fallbackPlans.map((plan) => (
+            return (
               <Pressable
-                key={plan.id}
+                key={pkg.identifier}
                 onPress={() => {
-                  setSelectedFallback(plan.id);
+                  setSelectedPackage(pkg);
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }}
                 style={[
@@ -333,16 +271,16 @@ export default function SubscriptionScreen() {
                     backgroundColor: theme.glass,
                     borderColor: theme.glassBorder,
                   },
-                  selectedFallback === plan.id && {
+                  isSelected && {
                     borderColor: theme.primary,
                     backgroundColor: `${theme.primary}15`,
                   },
-                  plan.popular && {
+                  label.popular && {
                     borderColor: theme.primary,
                   },
                 ]}
               >
-                {plan.popular ? (
+                {label.popular ? (
                   <View
                     style={[
                       styles.popularBadge,
@@ -360,12 +298,10 @@ export default function SubscriptionScreen() {
                     style={[
                       styles.radioOuter,
                       { borderColor: theme.glassBorder },
-                      selectedFallback === plan.id && {
-                        borderColor: theme.primary,
-                      },
+                      isSelected && { borderColor: theme.primary },
                     ]}
                   >
-                    {selectedFallback === plan.id ? (
+                    {isSelected ? (
                       <View
                         style={[
                           styles.radioInner,
@@ -376,9 +312,9 @@ export default function SubscriptionScreen() {
                   </View>
                   <View style={styles.planInfo}>
                     <ThemedText type="h4" style={styles.planName}>
-                      {plan.name}
+                      {label.name}
                     </ThemedText>
-                    {plan.savings ? (
+                    {label.savings ? (
                       <View
                         style={[
                           styles.savingsBadge,
@@ -391,7 +327,7 @@ export default function SubscriptionScreen() {
                             { color: theme.success },
                           ]}
                         >
-                          {plan.savings}
+                          {label.savings}
                         </ThemedText>
                       </View>
                     ) : null}
@@ -401,7 +337,7 @@ export default function SubscriptionScreen() {
                       type="h3"
                       style={[styles.price, { color: theme.primary }]}
                     >
-                      {plan.price}
+                      {pkg.product.priceString}
                     </ThemedText>
                     <ThemedText
                       style={[
@@ -409,36 +345,20 @@ export default function SubscriptionScreen() {
                         { color: theme.textSecondary },
                       ]}
                     >
-                      {plan.period}
+                      {label.period}
                     </ThemedText>
                   </View>
                 </View>
               </Pressable>
-            ))}
+            );
+          })}
         </View>
-
-        {!hasRevenueCatPackages && Platform.OS !== "web" ? (
-          <View
-            style={[
-              styles.previewNotice,
-              { backgroundColor: `${theme.primary}1A` },
-            ]}
-          >
-            <Feather name="info" size={16} color={theme.primary} />
-            <ThemedText
-              style={[styles.previewText, { color: theme.primary }]}
-            >
-              Running in preview mode. Configure RevenueCat to enable real
-              purchases.
-            </ThemedText>
-          </View>
-        ) : null}
 
         <View style={styles.featuresSection}>
           <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
             INCLUDED FEATURES
           </ThemedText>
-          {selectedPlanFeatures.map((feature, index) => (
+          {allFeatures.map((feature, index) => (
             <View key={index} style={styles.featureRow}>
               <View
                 style={[
@@ -455,13 +375,13 @@ export default function SubscriptionScreen() {
 
         <PrimaryButton
           title={
-            hasRevenueCatPackages && selectedPackage
+            selectedPackage
               ? `Subscribe for ${selectedPackage.product.priceString}`
-              : "Subscribe Now"
+              : "Select a Plan"
           }
           onPress={handlePurchase}
           loading={purchasing}
-          disabled={hasRevenueCatPackages && !selectedPackage}
+          disabled={!selectedPackage}
           style={styles.subscribeButton}
           testID="button-subscribe"
         />
@@ -559,10 +479,6 @@ const styles = StyleSheet.create({
   planName: {
     marginBottom: 0,
   },
-  planDescription: {
-    fontSize: 12,
-    marginTop: 2,
-  },
   savingsBadge: {
     alignSelf: "flex-start",
     paddingHorizontal: Spacing.sm,
@@ -581,17 +497,8 @@ const styles = StyleSheet.create({
   period: {
     fontSize: 12,
   },
-  previewNotice: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
+  errorIconContainer: {
     marginBottom: Spacing.xl,
-  },
-  previewText: {
-    flex: 1,
-    fontSize: 13,
-    marginLeft: Spacing.sm,
   },
   featuresSection: {
     marginBottom: Spacing["2xl"],

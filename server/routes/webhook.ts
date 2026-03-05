@@ -1,0 +1,159 @@
+import { Router, Request, Response } from "express";
+import { storage } from "../storage";
+
+const router = Router();
+
+/**
+ * RevenueCat Webhook Endpoint
+ *
+ * RevenueCat sends POST requests to this endpoint when subscription events occur
+ * (new purchase, renewal, cancellation, expiration, etc.).
+ *
+ * Configure this URL in RevenueCat Dashboard:
+ *   https://your-server.com/api/webhooks/revenuecat
+ *
+ * Optional: Set REVENUECAT_WEBHOOK_SECRET in your .env and docker-compose.yml
+ * to verify the webhook authenticity via the Authorization header.
+ */
+
+const WEBHOOK_SECRET = process.env.REVENUECAT_WEBHOOK_SECRET || "";
+
+// RevenueCat event types
+type RCEventType =
+  | "INITIAL_PURCHASE"
+  | "RENEWAL"
+  | "PRODUCT_CHANGE"
+  | "CANCELLATION"
+  | "UNCANCELLATION"
+  | "BILLING_ISSUE"
+  | "SUBSCRIBER_ALIAS"
+  | "SUBSCRIPTION_PAUSED"
+  | "TRANSFER"
+  | "EXPIRATION"
+  | "SUBSCRIPTION_EXTENDED"
+  | "NON_RENEWING_PURCHASE"
+  | "TEST";
+
+interface RCWebhookEvent {
+  api_version: string;
+  event: {
+    type: RCEventType;
+    app_user_id: string;
+    aliases?: string[];
+    product_id: string;
+    entitlement_ids?: string[];
+    period_type: string;
+    purchased_at_ms: number;
+    expiration_at_ms: number | null;
+    environment: string;
+    store: string;
+    is_trial_conversion?: boolean;
+    cancel_reason?: string;
+    original_app_user_id: string;
+  };
+}
+
+router.post("/revenuecat", async (req: Request, res: Response) => {
+  try {
+    // Optional: Verify webhook secret
+    if (WEBHOOK_SECRET) {
+      const authHeader = req.headers.authorization;
+      if (authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
+        console.warn("RevenueCat webhook: Invalid auth header");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+    }
+
+    const payload = req.body as RCWebhookEvent;
+    const event = payload?.event;
+
+    if (!event) {
+      return res.status(400).json({ message: "Invalid webhook payload" });
+    }
+
+    console.log(
+      `[RC Webhook] ${event.type} for user ${event.app_user_id} (product: ${event.product_id}, env: ${event.environment})`,
+    );
+
+    // Resolve the user ID â€” RevenueCat app_user_id should match our server user ID
+    const userId = event.app_user_id;
+
+    // Determine subscription status based on event type
+    let subscriptionStatus: string | null = null;
+
+    switch (event.type) {
+      case "INITIAL_PURCHASE":
+      case "RENEWAL":
+      case "UNCANCELLATION":
+      case "SUBSCRIPTION_EXTENDED":
+      case "NON_RENEWING_PURCHASE":
+        subscriptionStatus = "active";
+        break;
+
+      case "CANCELLATION":
+        // Subscription is cancelled but may still be active until expiration
+        subscriptionStatus = "cancelled";
+        break;
+
+      case "EXPIRATION":
+        subscriptionStatus = "expired";
+        break;
+
+      case "BILLING_ISSUE":
+        subscriptionStatus = "billing_issue";
+        break;
+
+      case "SUBSCRIPTION_PAUSED":
+        subscriptionStatus = "paused";
+        break;
+
+      case "TEST":
+        // Just acknowledge test events
+        console.log("[RC Webhook] Test event received");
+        return res.json({ received: true });
+
+      default:
+        // Events like PRODUCT_CHANGE, TRANSFER, SUBSCRIBER_ALIAS
+        console.log(`[RC Webhook] Unhandled event type: ${event.type}`);
+        return res.json({ received: true });
+    }
+
+    if (subscriptionStatus && userId) {
+      // Check if user exists first
+      const user = await storage.getUser(userId);
+      if (user) {
+        const data: {
+          subscriptionStatus: string;
+          subscriptionPlan?: string;
+          subscriptionExpiresAt?: Date | null;
+        } = {
+          subscriptionStatus,
+          subscriptionPlan: event.product_id,
+        };
+
+        if (event.expiration_at_ms) {
+          data.subscriptionExpiresAt = new Date(event.expiration_at_ms);
+        }
+
+        await storage.updateSubscription(userId, data);
+        console.log(
+          `[RC Webhook] Updated user ${userId} â†’ ${subscriptionStatus} (${event.product_id})`,
+        );
+      } else {
+        // Try matching by aliases if direct user ID doesn't work
+        console.warn(
+          `[RC Webhook] User not found: ${userId}. This may happen if user hasn't been linked yet.`,
+        );
+      }
+    }
+
+    // Always respond 200 to acknowledge receipt
+    res.json({ received: true });
+  } catch (error) {
+    console.error("[RC Webhook] Error processing event:", error);
+    // Still respond 200 to prevent retries for permanent errors
+    res.json({ received: true, error: "Internal processing error" });
+  }
+});
+
+export default router;
