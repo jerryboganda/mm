@@ -176,8 +176,10 @@ export default function LoginScreen() {
             <View
               style={[
                 styles.checkbox,
-                rememberMe && styles.checkboxChecked,
-                { borderColor: theme.glassBorder },
+                {
+                  borderColor: rememberMe ? theme.primary : theme.glassBorder,
+                  backgroundColor: rememberMe ? theme.primary : "transparent",
+                },
               ]}
             >
               {rememberMe && (
@@ -289,8 +291,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   checkboxChecked: {
-    backgroundColor: "#11a4d4",
-    borderColor: "#11a4d4",
+    // themed inline
   },
   forgotPassword: {
     alignSelf: "flex-end",

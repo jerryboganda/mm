@@ -12,7 +12,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { usePurchases } from "@/lib/purchases";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type RestorePurchasesScreenNavigationProp =
@@ -26,6 +27,7 @@ export default function RestorePurchasesScreen() {
   const { restorePurchases } = usePurchases();
   const [status, setStatus] = useState<RestoreStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   const spinAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -98,14 +100,14 @@ export default function RestorePurchasesScreen() {
         return (
           <View style={styles.statusContainer}>
             <Animated.View
-              style={[styles.iconCircle, { transform: [{ rotate: spin }] }]}
+              style={[styles.iconCircle, { backgroundColor: `${theme.primary}15`, transform: [{ rotate: spin }] }]}
             >
-              <Feather name="loader" size={40} color={Colors.dark.primary} />
+              <Feather name="loader" size={40} color={theme.primary} />
             </Animated.View>
             <ThemedText type="h3" style={styles.statusTitle}>
               Restoring Purchases...
             </ThemedText>
-            <ThemedText style={styles.statusSubtitle}>
+            <ThemedText style={[styles.statusSubtitle, { color: theme.textSecondary }]}>
               Please wait while we check your purchase history
             </ThemedText>
           </View>
@@ -121,7 +123,7 @@ export default function RestorePurchasesScreen() {
               ]}
             >
               <LinearGradient
-                colors={[Colors.dark.success, "#16a34a"]}
+                colors={[theme.success, "#16a34a"]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -131,7 +133,7 @@ export default function RestorePurchasesScreen() {
             <ThemedText type="h3" style={styles.statusTitle}>
               Subscription Restored!
             </ThemedText>
-            <ThemedText style={styles.statusSubtitle}>
+            <ThemedText style={[styles.statusSubtitle, { color: theme.textSecondary }]}>
               Your premium access has been successfully restored
             </ThemedText>
             <PrimaryButton
@@ -148,21 +150,21 @@ export default function RestorePurchasesScreen() {
             <Animated.View
               style={[
                 styles.warningCircle,
-                { transform: [{ scale: scaleAnim }] },
+                { backgroundColor: `${theme.warning}15`, transform: [{ scale: scaleAnim }] },
               ]}
             >
-              <Feather name="search" size={40} color={Colors.dark.warning} />
+              <Feather name="search" size={40} color={theme.warning} />
             </Animated.View>
             <ThemedText type="h3" style={styles.statusTitle}>
               No Purchases Found
             </ThemedText>
-            <ThemedText style={styles.statusSubtitle}>
+            <ThemedText style={[styles.statusSubtitle, { color: theme.textSecondary }]}>
               We couldn&apos;t find any previous purchases associated with your
               account
             </ThemedText>
             <GlassCard style={styles.helpCard}>
-              <Feather name="info" size={18} color={Colors.dark.info} />
-              <ThemedText style={styles.helpText}>
+              <Feather name="info" size={18} color={theme.info} />
+              <ThemedText style={[styles.helpText, { color: theme.textSecondary }]}>
                 Make sure you&apos;re signed in with the same account you used
                 for the original purchase
               </ThemedText>
@@ -172,7 +174,7 @@ export default function RestorePurchasesScreen() {
               onPress={() => navigation.navigate("Subscription")}
               style={styles.subscribeButton}
             />
-            <ThemedText style={styles.goBackLink} onPress={handleContinue}>
+            <ThemedText style={[styles.goBackLink, { color: theme.textMuted }]} onPress={handleContinue}>
               Go Back
             </ThemedText>
           </View>
@@ -184,15 +186,15 @@ export default function RestorePurchasesScreen() {
             <Animated.View
               style={[
                 styles.errorCircle,
-                { transform: [{ scale: scaleAnim }] },
+                { backgroundColor: `${theme.error}15`, transform: [{ scale: scaleAnim }] },
               ]}
             >
-              <Feather name="x" size={40} color={Colors.dark.error} />
+              <Feather name="x" size={40} color={theme.error} />
             </Animated.View>
             <ThemedText type="h3" style={styles.statusTitle}>
               Restore Failed
             </ThemedText>
-            <ThemedText style={styles.statusSubtitle}>
+            <ThemedText style={[styles.statusSubtitle, { color: theme.textSecondary }]}>
               {errorMessage || "An error occurred while restoring purchases"}
             </ThemedText>
             <PrimaryButton
@@ -201,7 +203,7 @@ export default function RestorePurchasesScreen() {
               icon="refresh-cw"
               style={styles.retryButton}
             />
-            <ThemedText style={styles.goBackLink} onPress={handleContinue}>
+            <ThemedText style={[styles.goBackLink, { color: theme.textMuted }]} onPress={handleContinue}>
               Go Back
             </ThemedText>
           </View>
@@ -210,17 +212,17 @@ export default function RestorePurchasesScreen() {
       default:
         return (
           <View style={styles.idleContainer}>
-            <View style={styles.iconCircle}>
+            <View style={[styles.iconCircle, { backgroundColor: `${theme.primary}15` }]}>
               <Feather
                 name="refresh-cw"
                 size={40}
-                color={Colors.dark.primary}
+                color={theme.primary}
               />
             </View>
             <ThemedText type="h2" style={styles.title}>
               Restore Purchases
             </ThemedText>
-            <ThemedText style={styles.subtitle}>
+            <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
               If you&apos;ve previously subscribed to Maternal Mind Premium, you
               can restore your subscription here
             </ThemedText>
@@ -231,9 +233,9 @@ export default function RestorePurchasesScreen() {
                 <Feather
                   name="smartphone"
                   size={16}
-                  color={Colors.dark.textSecondary}
+                  color={theme.textSecondary}
                 />
-                <ThemedText style={styles.infoText}>
+                <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
                   Switching to a new device
                 </ThemedText>
               </View>
@@ -241,9 +243,9 @@ export default function RestorePurchasesScreen() {
                 <Feather
                   name="refresh-cw"
                   size={16}
-                  color={Colors.dark.textSecondary}
+                  color={theme.textSecondary}
                 />
-                <ThemedText style={styles.infoText}>
+                <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
                   Reinstalled the app
                 </ThemedText>
               </View>
@@ -251,9 +253,9 @@ export default function RestorePurchasesScreen() {
                 <Feather
                   name="user"
                   size={16}
-                  color={Colors.dark.textSecondary}
+                  color={theme.textSecondary}
                 />
-                <ThemedText style={styles.infoText}>
+                <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
                   Signed in with a different account
                 </ThemedText>
               </View>
@@ -267,7 +269,7 @@ export default function RestorePurchasesScreen() {
               testID="button-restore"
             />
             <ThemedText
-              style={styles.goBackLink}
+              style={[styles.goBackLink, { color: theme.textMuted }]}
               onPress={() => navigation.goBack()}
             >
               Cancel
@@ -312,7 +314,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${Colors.dark.primary}15`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.xl,
@@ -330,7 +331,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${Colors.dark.warning}15`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.xl,
@@ -339,7 +339,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: `${Colors.dark.error}15`,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.xl,
@@ -350,7 +349,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
     lineHeight: 22,
     paddingHorizontal: Spacing.md,
@@ -361,7 +359,6 @@ const styles = StyleSheet.create({
   },
   statusSubtitle: {
     textAlign: "center",
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
     lineHeight: 22,
     paddingHorizontal: Spacing.md,
@@ -383,7 +380,6 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.md,
   },
   helpCard: {
@@ -395,7 +391,6 @@ const styles = StyleSheet.create({
   helpText: {
     flex: 1,
     fontSize: 13,
-    color: Colors.dark.textSecondary,
     marginLeft: Spacing.sm,
     lineHeight: 18,
   },
@@ -417,7 +412,6 @@ const styles = StyleSheet.create({
   },
   goBackLink: {
     fontSize: 14,
-    color: Colors.dark.textMuted,
     textAlign: "center",
     padding: Spacing.md,
   },

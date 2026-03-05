@@ -49,7 +49,7 @@ export default function PracticeScreen() {
       title: "Mixed Quiz",
       description: "Random questions from all topics",
       icon: "shuffle" as const,
-      color: "#3b82f6", // Info color usually
+      color: theme.info,
     },
     {
       id: "wrong",
@@ -98,7 +98,7 @@ export default function PracticeScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>QUIZ MODES</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>QUIZ MODES</ThemedText>
           {quizModes.map((mode) => (
             <GlassCard
               key={mode.id}
@@ -129,7 +129,7 @@ export default function PracticeScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionLabel}>SETTINGS</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>SETTINGS</ThemedText>
           <GlassCard
             title="Quiz Settings"
             subtitle="Timer, question count, difficulty"
@@ -168,7 +168,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: 2,
     textTransform: "uppercase",
-    color: "#11a4d4",
     marginBottom: Spacing.lg,
   },
 });

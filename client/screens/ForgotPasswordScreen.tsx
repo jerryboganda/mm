@@ -204,7 +204,7 @@ export default function ForgotPasswordScreen() {
                     borderColor: digit
                       ? theme.primary
                       : otpError
-                        ? "#ef4444"
+                        ? theme.error
                         : theme.border,
                     backgroundColor: theme.glass,
                     color: theme.text,
@@ -222,7 +222,7 @@ export default function ForgotPasswordScreen() {
           </View>
 
           {otpError ? (
-            <ThemedText style={styles.errorText}>{otpError}</ThemedText>
+            <ThemedText style={[styles.errorText, { color: theme.error }]}>{otpError}</ThemedText>
           ) : null}
 
           <PrimaryButton
@@ -402,7 +402,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   errorText: {
-    color: "#ef4444",
     fontSize: 13,
     textAlign: "center",
     marginBottom: Spacing.sm,

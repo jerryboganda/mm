@@ -12,7 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { GlassCard } from "@/components/GlassCard";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 const ONBOARDING_COMPLETE_KEY = "@maternal_mind_onboarding_complete";
@@ -24,6 +25,7 @@ export default function PermissionsPromptScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<PermissionsPromptScreenNavigationProp>();
   const [isRequesting, setIsRequesting] = useState(false);
+  const { theme } = useTheme();
 
   const handleEnableNotifications = async () => {
     setIsRequesting(true);
@@ -67,12 +69,12 @@ export default function PermissionsPromptScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <LinearGradient
         colors={[
-          Colors.dark.backgroundRoot,
+          theme.backgroundRoot,
           "#0a1518",
-          Colors.dark.backgroundRoot,
+          theme.backgroundRoot,
         ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
@@ -97,14 +99,14 @@ export default function PermissionsPromptScreen() {
         <View style={styles.mainContent}>
           <View style={styles.iconContainer}>
             <View style={styles.iconRing}>
-              <Feather name="bell" size={64} color={Colors.dark.primary} />
+              <Feather name="bell" size={64} color={theme.primary} />
             </View>
           </View>
 
           <ThemedText type="h2" style={styles.title}>
             Stay on Track
           </ThemedText>
-          <ThemedText style={styles.description}>
+          <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
             Enable notifications to receive study reminders, quiz alerts, and
             updates on your learning progress.
           </ThemedText>
@@ -112,43 +114,43 @@ export default function PermissionsPromptScreen() {
           <GlassCard style={styles.benefitsCard}>
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
-                <Feather name="clock" size={20} color={Colors.dark.primary} />
+                <Feather name="clock" size={20} color={theme.primary} />
               </View>
               <View style={styles.benefitText}>
                 <ThemedText style={styles.benefitTitle}>
                   Study Reminders
                 </ThemedText>
-                <ThemedText style={styles.benefitDesc}>
+                <ThemedText style={[styles.benefitDesc, { color: theme.textSecondary }]}>
                   Get gentle nudges to keep your study streak
                 </ThemedText>
               </View>
             </View>
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
 
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
-                <Feather name="award" size={20} color={Colors.dark.warning} />
+                <Feather name="award" size={20} color={theme.warning} />
               </View>
               <View style={styles.benefitText}>
                 <ThemedText style={styles.benefitTitle}>
                   Achievement Alerts
                 </ThemedText>
-                <ThemedText style={styles.benefitDesc}>
+                <ThemedText style={[styles.benefitDesc, { color: theme.textSecondary }]}>
                   Celebrate your milestones and progress
                 </ThemedText>
               </View>
             </View>
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
 
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
-                <Feather name="zap" size={20} color={Colors.dark.success} />
+                <Feather name="zap" size={20} color={theme.success} />
               </View>
               <View style={styles.benefitText}>
                 <ThemedText style={styles.benefitTitle}>New Content</ThemedText>
-                <ThemedText style={styles.benefitDesc}>
+                <ThemedText style={[styles.benefitDesc, { color: theme.textSecondary }]}>
                   Be first to know about new topics and quizzes
                 </ThemedText>
               </View>
@@ -181,7 +183,6 @@ export default function PermissionsPromptScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.backgroundRoot,
   },
   content: {
     flex: 1,
@@ -215,7 +216,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     lineHeight: 24,
-    color: Colors.dark.textSecondary,
     marginBottom: Spacing["2xl"],
     maxWidth: 300,
   },
@@ -247,11 +247,9 @@ const styles = StyleSheet.create({
   },
   benefitDesc: {
     fontSize: 13,
-    color: Colors.dark.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.dark.glassBorder,
     marginVertical: Spacing.sm,
   },
   buttonSection: {
