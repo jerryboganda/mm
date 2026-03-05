@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, AppState } from "react-native";
+import { AppState } from "react-native";
 import {
   NavigationContainer,
   type InitialState,
@@ -34,7 +34,6 @@ import { PurchasesProvider } from "@/lib/purchases";
 import { NetworkProvider } from "@/lib/network";
 import { MobileContentProvider } from "@/lib/mobile-content";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
-import { Colors } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { persistQueryCache, restoreQueryCache, startPeriodicPersist, persistOnQuerySuccess } from "@/lib/offline-cache";
 import { startMutationQueueListener } from "@/lib/mutation-queue";
@@ -212,14 +211,13 @@ export default function App() {
               <MobileContentProvider>
                 <FeedbackProvider>
                   <SafeAreaProvider>
-                  <GestureHandlerRootView style={styles.root}>
+                  <ThemedRoot>
                     <KeyboardProvider>
                       <AppContent
                         initialNavigationState={initialNavigationState}
                       />
-                      <StatusBar style="auto" />
                     </KeyboardProvider>
-                  </GestureHandlerRootView>
+                  </ThemedRoot>
                 </SafeAreaProvider>                </FeedbackProvider>              </MobileContentProvider>
             </NetworkProvider>
           </PurchasesProvider>
@@ -229,9 +227,14 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: Colors.dark.backgroundRoot,
-  },
-});
+function ThemedRoot({ children }: { children: React.ReactNode }) {
+  const { theme, isDark } = useTheme();
+  return (
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.backgroundRoot }}>
+      {children}
+      <StatusBar style={isDark ? "light" : "dark"} />
+    </GestureHandlerRootView>
+  );
+}
+
+// root style is applied dynamically in the component via useTheme()

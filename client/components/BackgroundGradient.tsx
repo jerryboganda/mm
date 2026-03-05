@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -16,7 +16,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 
-import { Colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface BackgroundGradientProps {
   children: React.ReactNode;
@@ -33,10 +33,11 @@ export function BackgroundGradient({
   variant = "default",
   animated = true,
 }: BackgroundGradientProps) {
+  const { theme, isDark } = useTheme();
   const orbScale1 = useSharedValue(1);
   const orbScale2 = useSharedValue(1);
-  const orbOpacity1 = useSharedValue(0.08);
-  const orbOpacity2 = useSharedValue(0.05);
+  const orbOpacity1 = useSharedValue(isDark ? 0.08 : 0.06);
+  const orbOpacity2 = useSharedValue(isDark ? 0.05 : 0.04);
   const orbTranslateY1 = useSharedValue(0);
   const orbTranslateX2 = useSharedValue(0);
 
@@ -144,15 +145,30 @@ export function BackgroundGradient({
   const isImmersive = variant === "immersive";
   const isQuiz = variant === "quiz";
 
+  // Compute gradient colors based on theme
+  const gradientColors = useMemo(() => {
+    if (isDark) {
+      return [
+        theme.backgroundRoot,
+        isImmersive ? "#0a1519" : "#0d1519",
+        isImmersive ? "#101d22" : theme.backgroundRoot,
+      ] as const;
+    }
+    return [
+      theme.backgroundRoot,
+      isImmersive ? "#EDF0F4" : "#F0F2F5",
+      isImmersive ? "#F5F7FA" : theme.backgroundRoot,
+    ] as const;
+  }, [isDark, theme, isImmersive]);
+
+  const orbTealColor = isDark ? "rgba(17,164,212,0.08)" : "rgba(0,153,204,0.06)";
+  const orbPurpleColor = isDark ? "rgba(168,85,247,0.05)" : "rgba(147,51,234,0.04)";
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, { backgroundColor: theme.backgroundRoot }, style]}>
       <View style={StyleSheet.absoluteFill}>
         <LinearGradient
-          colors={[
-            Colors.dark.backgroundRoot,
-            isImmersive ? "#0a1519" : "#0d1519",
-            isImmersive ? "#101d22" : Colors.dark.backgroundRoot,
-          ]}
+          colors={gradientColors as any}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -161,23 +177,23 @@ export function BackgroundGradient({
           {Platform.OS !== "web" && animated ? (
             <>
               <Animated.View
-                style={[styles.orb, styles.orbTopRight, animatedOrb1Style]}
+                style={[styles.orb, styles.orbTopRight, { backgroundColor: orbTealColor }, animatedOrb1Style]}
               />
               <Animated.View
-                style={[styles.orb, styles.orbBottomLeft, animatedOrb2Style]}
+                style={[styles.orb, styles.orbBottomLeft, { backgroundColor: orbPurpleColor }, animatedOrb2Style]}
               />
             </>
           ) : (
             <>
-              <View style={[styles.orb, styles.orbTopRight]} />
-              <View style={[styles.orb, styles.orbBottomLeft]} />
+              <View style={[styles.orb, styles.orbTopRight, { backgroundColor: orbTealColor }]} />
+              <View style={[styles.orb, styles.orbBottomLeft, { backgroundColor: orbPurpleColor }]} />
             </>
           )}
-          {isQuiz ? <View style={[styles.orb, styles.orbQuiz]} /> : null}
+          {isQuiz ? <View style={[styles.orb, styles.orbQuiz, { backgroundColor: isDark ? "rgba(34,197,94,0.04)" : "rgba(22,163,74,0.03)" }]} /> : null}
           {isImmersive ? (
             <>
-              <View style={[styles.orb, styles.orbAccent]} />
-              <View style={[styles.orb, styles.orbPurple]} />
+              <View style={[styles.orb, styles.orbAccent, { backgroundColor: isDark ? "rgba(17,164,212,0.04)" : "rgba(0,153,204,0.03)" }]} />
+              <View style={[styles.orb, styles.orbPurple, { backgroundColor: isDark ? "rgba(168,85,247,0.03)" : "rgba(147,51,234,0.02)" }]} />
             </>
           ) : null}
         </View>
@@ -190,7 +206,6 @@ export function BackgroundGradient({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.backgroundRoot,
   },
   orbContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -205,34 +220,29 @@ const styles = StyleSheet.create({
     height: width * 0.9,
     top: -width * 0.35,
     right: -width * 0.35,
-    backgroundColor: "rgba(17,164,212,0.08)",
   },
   orbBottomLeft: {
     width: width * 0.7,
     height: width * 0.7,
     bottom: -width * 0.25,
     left: -width * 0.25,
-    backgroundColor: "rgba(168,85,247,0.05)",
   },
   orbQuiz: {
     width: width * 0.6,
     height: width * 0.6,
     top: height * 0.15,
     right: -width * 0.2,
-    backgroundColor: "rgba(34,197,94,0.04)",
   },
   orbAccent: {
     width: width * 0.4,
     height: width * 0.4,
     top: height * 0.5,
     right: width * 0.1,
-    backgroundColor: "rgba(17,164,212,0.04)",
   },
   orbPurple: {
     width: width * 0.5,
     height: width * 0.5,
     bottom: height * 0.2,
     left: width * 0.3,
-    backgroundColor: "rgba(168,85,247,0.03)",
   },
 });

@@ -15,7 +15,8 @@ import Animated, {
 import { Feather } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius, Typography } from "@/constants/theme";
+import { Spacing, BorderRadius, Typography } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { useMobileContent } from "@/lib/mobile-content";
 
 interface GlassInputProps extends TextInputProps {
@@ -40,6 +41,7 @@ export function GlassInput({
   ...props
 }: GlassInputProps) {
   const { resolveText } = useMobileContent();
+  const { theme } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<TextInput>(null);
@@ -83,8 +85,9 @@ export function GlassInput({
       <Pressable
         style={[
           styles.inputContainer,
+          { borderColor: theme.glassBorder },
           isFocused && styles.inputContainerFocused,
-          error ? styles.inputContainerError : null,
+          error ? { borderColor: theme.error } : null,
         ]}
         onPress={() => inputRef.current?.focus()}
       >
@@ -94,7 +97,7 @@ export function GlassInput({
               name={icon}
               size={20}
               color={
-                isFocused ? Colors.dark.primary : Colors.dark.textSecondary
+                isFocused ? theme.primary : theme.textSecondary
               }
             />
           </View>
@@ -107,7 +110,8 @@ export function GlassInput({
             <ThemedText
               style={[
                 styles.label,
-                isFocused && { color: Colors.dark.primary },
+                { color: theme.textSecondary },
+                isFocused && { color: theme.primary },
               ]}
             >
               {resolvedLabel}
@@ -115,13 +119,13 @@ export function GlassInput({
           </Animated.View>
           <TextInput
             ref={inputRef}
-            style={styles.input}
+            style={[styles.input, { color: theme.text }]}
             value={value}
             onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={effectivePlaceholder}
-            placeholderTextColor={Colors.dark.textMuted}
-            selectionColor={Colors.dark.primary}
+            placeholderTextColor={theme.textMuted}
+            selectionColor={theme.primary}
             secureTextEntry={actualSecureTextEntry}
             {...props}
           />
@@ -134,16 +138,16 @@ export function GlassInput({
             <Feather
               name={showPassword ? "eye-off" : "eye"}
               size={20}
-              color={Colors.dark.textSecondary}
+              color={theme.textSecondary}
             />
           </Pressable>
         ) : rightIcon ? (
           <Pressable style={styles.rightIcon} onPress={onRightIconPress}>
-            <Feather name={rightIcon} size={20} color={Colors.dark.primary} />
+            <Feather name={rightIcon} size={20} color={theme.primary} />
           </Pressable>
         ) : null}
       </Pressable>
-      {error ? <ThemedText style={styles.errorText}>{error}</ThemedText> : null}
+      {error ? <ThemedText style={[styles.errorText, { color: theme.error }]}>{error}</ThemedText> : null}
     </View>
   );
 }
@@ -158,15 +162,11 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderRadius: BorderRadius.md,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     height: Spacing.inputHeight,
     paddingHorizontal: Spacing.lg,
   },
   inputContainerFocused: {
     borderColor: "rgba(17,164,212,0.7)",
-  },
-  inputContainerError: {
-    borderColor: Colors.dark.error,
   },
   leftIcon: {
     marginRight: Spacing.md,
@@ -183,11 +183,9 @@ const styles = StyleSheet.create({
   },
   label: {
     ...Typography.body,
-    color: Colors.dark.textSecondary,
   },
   input: {
     ...Typography.body,
-    color: Colors.dark.text,
     paddingTop: 0,
     paddingBottom: 0,
     height: "100%",
@@ -199,7 +197,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     ...Typography.small,
-    color: Colors.dark.error,
     marginTop: Spacing.xs,
     marginLeft: Spacing.lg,
   },

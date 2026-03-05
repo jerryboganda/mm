@@ -11,7 +11,7 @@ import LearnStackNavigator from "@/navigation/LearnStackNavigator";
 import PracticeStackNavigator from "@/navigation/PracticeStackNavigator";
 import ProgressStackNavigator from "@/navigation/ProgressStackNavigator";
 import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
-import { Colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { useMobileContent } from "@/lib/mobile-content";
 
 export type MainTabParamList = {
@@ -27,20 +27,21 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 export default function MainTabNavigator() {
   const insets = useSafeAreaInsets();
   const { resolveText } = useMobileContent();
+  const { theme, isDark } = useTheme();
   const t = resolveText;
 
   return (
     <Tab.Navigator
       initialRouteName="HomeTab"
       screenOptions={{
-        tabBarActiveTintColor: Colors.dark.primary,
-        tabBarInactiveTintColor: Colors.dark.tabIconDefault,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
           position: "absolute",
           backgroundColor: Platform.select({
             ios: "transparent",
-            android: Colors.dark.backgroundRoot,
-            web: Colors.dark.backgroundRoot,
+            android: theme.backgroundRoot,
+            web: theme.backgroundRoot,
           }),
           borderTopWidth: 0,
           elevation: 0,
@@ -59,18 +60,21 @@ export default function MainTabNavigator() {
           Platform.OS === "ios" ? (
             <BlurView
               intensity={80}
-              tint="dark"
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
           ) : (
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: Colors.dark.backgroundRoot },
+                { backgroundColor: theme.backgroundRoot },
               ]}
             >
               <LinearGradient
-                colors={["rgba(16,29,34,0.95)", Colors.dark.backgroundRoot]}
+                colors={[
+                  isDark ? "rgba(16,29,34,0.95)" : "rgba(245,247,250,0.95)",
+                  theme.backgroundRoot,
+                ]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
