@@ -20,7 +20,8 @@ import * as Haptics from "@/lib/haptics-wrapper";
 import { useFeedback } from "@/lib/feedback";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { useMobileContent } from "@/lib/mobile-content";
 
 interface PrimaryButtonProps {
@@ -65,6 +66,7 @@ export function PrimaryButton({
   testID,
 }: PrimaryButtonProps) {
   const { resolveText } = useMobileContent();
+  const { theme } = useTheme();
   const feedback = useFeedback();
   const resolvedTitle = resolveText(title);
   const scale = useSharedValue(1);
@@ -107,9 +109,9 @@ export function PrimaryButton({
   const isLarge = size === "large";
 
   const getGradientColors = (): [string, string] => {
-    if (isSuccess) return [Colors.dark.success, "#16a34a"];
-    if (isDanger) return [Colors.dark.error, "#dc2626"];
-    return [Colors.dark.primary, Colors.dark.primaryDark];
+    if (isSuccess) return [theme.success, "#16a34a"];
+    if (isDanger) return [theme.error, "#dc2626"];
+    return [theme.primary, theme.primaryDark];
   };
 
   const getShadowStyle = () => {
@@ -122,7 +124,7 @@ export function PrimaryButton({
 
   const iconSize = isSmall ? 16 : isLarge ? 24 : 20;
   const iconColor =
-    isPrimary || isSuccess || isDanger ? "#fff" : Colors.dark.primary;
+    isPrimary || isSuccess || isDanger ? "#fff" : theme.primary;
 
   return (
     <AnimatedPressable
@@ -140,7 +142,11 @@ export function PrimaryButton({
         isSmall && styles.buttonSmall,
         isLarge && styles.buttonLarge,
         (isPrimary || isSuccess || isDanger) && getShadowStyle(),
-        isSecondary && styles.secondaryButton,
+        isSecondary && {
+          backgroundColor: theme.glassMedium,
+          borderWidth: 1,
+          borderColor: theme.glassBorderLight,
+        },
         isGhost && styles.ghostButton,
         (disabled || loading) && styles.disabled,
         style,
@@ -157,7 +163,7 @@ export function PrimaryButton({
       {loading ? (
         <ActivityIndicator
           color={
-            isPrimary || isSuccess || isDanger ? "#fff" : Colors.dark.primary
+            isPrimary || isSuccess || isDanger ? "#fff" : theme.primary
           }
           size={isSmall ? "small" : "small"}
         />
@@ -177,8 +183,8 @@ export function PrimaryButton({
               isSmall && styles.buttonTextSmall,
               isLarge && styles.buttonTextLarge,
               (isPrimary || isSuccess || isDanger) && styles.primaryText,
-              isSecondary && styles.secondaryText,
-              isGhost && styles.ghostText,
+              isSecondary && { color: theme.text },
+              isGhost && { color: theme.primary },
             ]}
           >
             {resolvedTitle}
@@ -217,11 +223,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing["2xl"],
     borderRadius: BorderRadius.xl,
   },
-  secondaryButton: {
-    backgroundColor: Colors.dark.glassMedium,
-    borderWidth: 1,
-    borderColor: Colors.dark.glassBorderLight,
-  },
+
   ghostButton: {
     backgroundColor: "transparent",
   },
@@ -243,12 +245,7 @@ const styles = StyleSheet.create({
   primaryText: {
     color: "#fff",
   },
-  secondaryText: {
-    color: Colors.dark.text,
-  },
-  ghostText: {
-    color: Colors.dark.primary,
-  },
+
   iconLeft: {
     marginRight: Spacing.sm,
   },

@@ -19,7 +19,8 @@ import { BlurView } from "expo-blur";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 interface GlassCardProps {
   title?: string;
@@ -66,6 +67,7 @@ export function GlassCard({
   variant = "default",
   blurIntensity = 20,
 }: GlassCardProps) {
+  const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
   const pressed = useSharedValue(0);
 
@@ -73,16 +75,19 @@ export function GlassCard({
     transform: [{ scale: scale.value }],
   }));
 
+  const activeBorderColor = active ? theme.primary : theme.glassBorder;
+  const pressedBorderColor = theme.primaryLight;
+
   const borderStyle = useAnimatedStyle(() => ({
     borderColor: interpolateColor(
       pressed.value,
       [0, 1],
       [
-        active ? Colors.dark.primary : Colors.dark.glassBorder,
-        Colors.dark.primaryLight,
+        activeBorderColor,
+        pressedBorderColor,
       ],
     ),
-  }));
+  }), [activeBorderColor, pressedBorderColor]);
 
   const handlePressIn = () => {
     if (!disabled && onPress) {
@@ -113,7 +118,6 @@ export function GlassCard({
     styles.card,
     animatedStyle,
     borderStyle,
-    active && styles.cardActive,
     disabled && styles.cardDisabled,
     isElevated && Shadows.cardSubtle,
     isGlow && active && Shadows.glowSmall,
@@ -144,7 +148,7 @@ export function GlassCard({
     return (
       <BlurView
         intensity={active ? blurIntensity + 10 : blurIntensity}
-        tint="dark"
+        tint={isDark ? "dark" : "light"}
         style={styles.cardBackground}
       >
         <LinearGradient
@@ -176,7 +180,7 @@ export function GlassCard({
     >
       {renderBackground()}
       <View style={styles.content}>
-        {icon ? <View style={styles.iconContainer}>{icon}</View> : null}
+        {icon ? <View style={[styles.iconContainer, { backgroundColor: theme.glassMedium }]}>{icon}</View> : null}
         <View style={styles.textContainer}>
           {title ? (
             <ThemedText type="h4" style={styles.title} numberOfLines={2}>
@@ -186,7 +190,7 @@ export function GlassCard({
           {subtitle ? (
             <ThemedText
               type="small"
-              style={{ color: Colors.dark.textSecondary }}
+              style={{ color: theme.textSecondary }}
               numberOfLines={2}
             >
               {subtitle}
@@ -206,14 +210,10 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: Colors.dark.glassBorder,
     overflow: "hidden",
   },
   cardBackground: {
     ...StyleSheet.absoluteFillObject,
-  },
-  cardActive: {
-    borderColor: Colors.dark.primary,
   },
   cardDisabled: {
     opacity: 0.45,
@@ -227,7 +227,6 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: BorderRadius.lg,
-    backgroundColor: Colors.dark.glassMedium,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.lg,

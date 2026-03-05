@@ -13,7 +13,8 @@ import TopicsScreen from "@/screens/TopicsScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import SearchScreen from "@/screens/SearchScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
-import { Colors, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useMobileContent } from "@/lib/mobile-content";
 
@@ -30,6 +31,7 @@ const Stack = createNativeStackNavigator<LearnStackParamList>();
 function SearchButton() {
   const navigation =
     useNavigation<NativeStackNavigationProp<LearnStackParamList>>();
+  const { theme } = useTheme();
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -42,7 +44,7 @@ function SearchButton() {
       style={{ padding: Spacing.sm }}
       hitSlop={10}
     >
-      <Feather name="search" size={22} color={Colors.dark.text} />
+      <Feather name="search" size={22} color={theme.text} />
     </Pressable>
   );
 }

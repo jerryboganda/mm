@@ -38,7 +38,7 @@ import TermsPrivacyScreen from "@/screens/TermsPrivacyScreen";
 import DisclaimerScreen from "@/screens/DisclaimerScreen";
 import SpacedReviewScreen from "@/screens/SpacedReviewScreen";
 import AdminEmailSettingsScreen from "@/screens/AdminEmailSettingsScreen";
-import { Colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 import { useMobileContent } from "@/lib/mobile-content";
 
 export type RootStackParamList = {
@@ -89,14 +89,15 @@ export default function RootStackNavigator() {
   const { resolveText } = useMobileContent();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } =
     useOnboarding();
+  const { theme } = useTheme();
   const t = resolveText;
 
   const requiresEmailVerification = user && !user.isEmailVerified;
 
   if (authLoading || onboardingLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.dark.primary} />
+      <View style={[styles.loadingContainer, { backgroundColor: theme.backgroundRoot }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -427,6 +428,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.dark.backgroundRoot,
   },
 });
