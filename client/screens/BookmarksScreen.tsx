@@ -38,7 +38,7 @@ export default function BookmarksScreen() {
     isLoading,
     refetch,
   } = useQuery<Bookmark[]>({
-    queryKey: ["/api/bookmarks"],
+    queryKey: ["/api/profile/bookmarks"],
   });
 
   const onRefresh = useCallback(async () => {

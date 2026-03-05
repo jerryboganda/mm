@@ -237,11 +237,11 @@ export default function HomeScreen() {
   });
 
   const { data: recentTopics, refetch: refetchRecent } = useQuery({
-    queryKey: ["/api/recent-activity"],
+    queryKey: ["/api/profile/recent-activity"],
     queryFn: async () => {
       try {
         const { apiRequest } = await import("@/lib/query-client");
-        const res = await apiRequest("GET", "/api/recent-activity?limit=5");
+        const res = await apiRequest("GET", "/api/profile/recent-activity?limit=5");
         const activities = await res.json();
         return activities.map((activity: any) => ({
           id: activity.topicId,
