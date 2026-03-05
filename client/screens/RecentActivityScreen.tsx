@@ -38,7 +38,7 @@ export default function RecentActivityScreen() {
     isLoading,
     refetch,
   } = useQuery<Activity[]>({
-    queryKey: ["/api/recent-activity"],
+    queryKey: ["/api/profile/recent-activity"],
   });
 
   const onRefresh = useCallback(async () => {

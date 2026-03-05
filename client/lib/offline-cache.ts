@@ -19,7 +19,7 @@ const OFFLINE_QUERY_KEYS = [
   "/api/quiz/topics",
   "/api/quiz/stats",
   "/api/progress",
-  "/api/bookmarks",
+  "/api/profile/bookmarks",
   "/api/profile",
   "/api/announcements",
   "/api/me",
@@ -27,7 +27,7 @@ const OFFLINE_QUERY_KEYS = [
   "/api/reviews/due-count",
   "/api/progress/recent",
   "/api/progress/recommended",
-  "/api/recent-activity",
+  "/api/profile/recent-activity",
   "/api/recommended-topics",
 ];
 
