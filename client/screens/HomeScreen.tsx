@@ -169,7 +169,7 @@ function ContinueLearningCard({
         </View>
       </View>
       <View style={[styles.continueArrow, { backgroundColor: theme.primary }]}>
-        <Feather name="arrow-right" size={20} color="#fff" />
+        <Feather name="arrow-right" size={20} color={theme.buttonText} />
       </View>
     </GlassCard>
   );
@@ -463,8 +463,8 @@ export default function HomeScreen() {
               style={[
                 styles.reviewBanner,
                 {
-                  backgroundColor: `${theme.purple || "#8b5cf6"}1F`, // ~12% opacity equivalent
-                  borderColor: theme.purple || "#8b5cf6",
+                  backgroundColor: `${theme.purple}1F`, // ~12% opacity equivalent
+                  borderColor: theme.purple,
                 },
               ]}
               onPress={handleStartReview}
@@ -477,13 +477,13 @@ export default function HomeScreen() {
                 <View
                   style={[
                     styles.reviewIconBg,
-                    { backgroundColor: `${theme.purple || "#8b5cf6"}33` },
+                    { backgroundColor: `${theme.purple}33` },
                   ]}
                 >
                   <Feather
                     name="repeat"
                     size={20}
-                    color={theme.purple || "#8b5cf6"}
+                    color={theme.purple}
                   />
                 </View>
                 <View>
@@ -508,7 +508,7 @@ export default function HomeScreen() {
               <Feather
                 name="chevron-right"
                 size={20}
-                color={theme.purple || "#8b5cf6"}
+                color={theme.purple}
               />
             </Pressable>
           </AnimatedListItem>

@@ -90,8 +90,8 @@ export default function TopicsScreen() {
       rightElement={
         <View style={styles.rightElements}>
           {item.isPremium && (
-            <View style={styles.premiumBadge}>
-              <Feather name="star" size={10} color="#fbbf24" />
+            <View style={[styles.premiumBadge, { backgroundColor: theme.warningGlow }]}>
+              <Feather name="star" size={10} color={theme.warning} />
             </View>
           )}
           {item.isBookmarked && (
@@ -198,7 +198,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: "rgba(251,191,36,0.15)",
     alignItems: "center",
     justifyContent: "center",
   },

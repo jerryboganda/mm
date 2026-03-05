@@ -90,7 +90,7 @@ export default function QuizResultsScreen() {
             <LinearGradient
               colors={
                 isHighScore
-                  ? [theme.success, theme.successGlow || "#16a34a"]
+                  ? [theme.success, theme.successGlow || theme.success]
                   : [theme.primary, theme.primaryDark || theme.text]
               }
               style={StyleSheet.absoluteFill}

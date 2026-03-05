@@ -26,7 +26,7 @@ export default function WelcomeScreen() {
       <LinearGradient
         colors={[
           theme.backgroundRoot,
-          isDark ? "#0a1518" : "#E0F7FA", // Dark: dark teal/black, Light: light cyan
+          isDark ? theme.backgroundDefault : theme.backgroundTertiary,
           theme.backgroundRoot,
         ]}
         style={StyleSheet.absoluteFill}
@@ -53,19 +53,15 @@ export default function WelcomeScreen() {
             style={[
               styles.featureItem,
               {
-                backgroundColor: isDark
-                  ? "rgba(17,164,212,0.08)"
-                  : "rgba(17,164,212,0.05)",
-                borderColor: isDark
-                  ? "rgba(17,164,212,0.15)"
-                  : "rgba(17,164,212,0.1)",
+                backgroundColor: theme.glassMedium,
+                borderColor: theme.glassBorder,
               },
             ]}
           >
             <View
               style={[
                 styles.featureIcon,
-                { backgroundColor: "rgba(17,164,212,0.15)" },
+                { backgroundColor: `${theme.primary}26` },
               ]}
             >
               <ThemedText style={styles.featureEmoji}>{"📚"}</ThemedText>
@@ -84,19 +80,15 @@ export default function WelcomeScreen() {
             style={[
               styles.featureItem,
               {
-                backgroundColor: isDark
-                  ? "rgba(17,164,212,0.08)"
-                  : "rgba(17,164,212,0.05)",
-                borderColor: isDark
-                  ? "rgba(17,164,212,0.15)"
-                  : "rgba(17,164,212,0.1)",
+                backgroundColor: theme.glassMedium,
+                borderColor: theme.glassBorder,
               },
             ]}
           >
             <View
               style={[
                 styles.featureIcon,
-                { backgroundColor: "rgba(17,164,212,0.15)" },
+                { backgroundColor: `${theme.primary}26` },
               ]}
             >
               <ThemedText style={styles.featureEmoji}>{"🎯"}</ThemedText>
@@ -115,19 +107,15 @@ export default function WelcomeScreen() {
             style={[
               styles.featureItem,
               {
-                backgroundColor: isDark
-                  ? "rgba(17,164,212,0.08)"
-                  : "rgba(17,164,212,0.05)",
-                borderColor: isDark
-                  ? "rgba(17,164,212,0.15)"
-                  : "rgba(17,164,212,0.1)",
+                backgroundColor: theme.glassMedium,
+                borderColor: theme.glassBorder,
               },
             ]}
           >
             <View
               style={[
                 styles.featureIcon,
-                { backgroundColor: "rgba(17,164,212,0.15)" },
+                { backgroundColor: `${theme.primary}26` },
               ]}
             >
               <ThemedText style={styles.featureEmoji}>{"📊"}</ThemedText>

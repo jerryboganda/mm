@@ -72,19 +72,19 @@ export default function LearnScreen() {
           style={[
             styles.badge,
             item.isPremium
-              ? { backgroundColor: "rgba(251,191,36,0.15)" }
+              ? { backgroundColor: theme.warningGlow }
               : { backgroundColor: `${theme.success}26` },
           ]}
         >
           <Feather
             name={item.isPremium ? "star" : "unlock"}
             size={10}
-            color={item.isPremium ? "#fbbf24" : theme.success}
+            color={item.isPremium ? theme.warning : theme.success}
           />
           <ThemedText
             style={[
               styles.badgeText,
-              { color: item.isPremium ? "#fbbf24" : theme.success },
+              { color: item.isPremium ? theme.warning : theme.success },
             ]}
           >
             {item.isPremium ? "Premium" : "Free"}
