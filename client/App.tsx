@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 import {
   NavigationContainer,
   type InitialState,
   LinkingOptions,
+  getPathFromState as defaultGetPathFromState,
+  getStateFromPath as defaultGetStateFromPath,
 } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ExpoLinking from "expo-linking";
@@ -35,14 +37,70 @@ import { NetworkProvider } from "@/lib/network";
 import { MobileContentProvider } from "@/lib/mobile-content";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
 import { useTheme } from "@/hooks/useTheme";
-import { persistQueryCache, restoreQueryCache, startPeriodicPersist, persistOnQuerySuccess } from "@/lib/offline-cache";
+import {
+  persistQueryCache,
+  restoreQueryCache,
+  startPeriodicPersist,
+  persistOnQuerySuccess,
+} from "@/lib/offline-cache";
 import { startMutationQueueListener } from "@/lib/mutation-queue";
 
 SplashScreen.preventAutoHideAsync();
 
+const WEB_APP_BASE_PATH = "/app";
+
+function shouldUseHostedWebBasePath() {
+  return (
+    Platform.OS === "web" &&
+    typeof window !== "undefined" &&
+    (window.location.pathname.startsWith(WEB_APP_BASE_PATH) ||
+      window.location.hostname === "admin.maternalmind.com.pk")
+  );
+}
+
+function stripHostedWebBasePath(path: string) {
+  if (!shouldUseHostedWebBasePath()) {
+    return path;
+  }
+
+  if (path === WEB_APP_BASE_PATH) {
+    return "/";
+  }
+
+  if (path.startsWith(`${WEB_APP_BASE_PATH}/`)) {
+    return path.slice(WEB_APP_BASE_PATH.length);
+  }
+
+  return path;
+}
+
+function addHostedWebBasePath(path: string) {
+  if (!shouldUseHostedWebBasePath()) {
+    return path;
+  }
+
+  if (!path || path === "/") {
+    return WEB_APP_BASE_PATH;
+  }
+
+  return `${WEB_APP_BASE_PATH}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 // Deep linking configuration
 const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: ["maternalmind://", "https://maternalmind.com.pk"],
+  prefixes: [
+    "maternalmind://",
+    "https://maternalmind.com.pk",
+    "https://admin.maternalmind.com.pk",
+    "https://admin.maternalmind.com.pk/app",
+    ExpoLinking.createURL("/"),
+  ],
+  getStateFromPath(path, options) {
+    return defaultGetStateFromPath(stripHostedWebBasePath(path), options);
+  },
+  getPathFromState(state, options) {
+    return addHostedWebBasePath(defaultGetPathFromState(state, options));
+  },
   config: {
     screens: {
       Main: {
@@ -211,14 +269,16 @@ export default function App() {
               <MobileContentProvider>
                 <FeedbackProvider>
                   <SafeAreaProvider>
-                  <ThemedRoot>
-                    <KeyboardProvider>
-                      <AppContent
-                        initialNavigationState={initialNavigationState}
-                      />
-                    </KeyboardProvider>
-                  </ThemedRoot>
-                </SafeAreaProvider>                </FeedbackProvider>              </MobileContentProvider>
+                    <ThemedRoot>
+                      <KeyboardProvider>
+                        <AppContent
+                          initialNavigationState={initialNavigationState}
+                        />
+                      </KeyboardProvider>
+                    </ThemedRoot>
+                  </SafeAreaProvider>
+                </FeedbackProvider>
+              </MobileContentProvider>
             </NetworkProvider>
           </PurchasesProvider>
         </AuthProvider>
@@ -230,7 +290,9 @@ export default function App() {
 function ThemedRoot({ children }: { children: React.ReactNode }) {
   const { theme, isDark } = useTheme();
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.backgroundRoot }}>
+    <GestureHandlerRootView
+      style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
+    >
       {children}
       <StatusBar style={isDark ? "light" : "dark"} />
     </GestureHandlerRootView>
