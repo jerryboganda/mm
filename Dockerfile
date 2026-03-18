@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npm run server:build
+RUN npm run expo:web:build
 # Ensure static-build exists even if no Expo build has been run
 RUN mkdir -p static-build
 # Mark server_dist as ESM to avoid Node.js reparsing overhead
@@ -27,6 +28,7 @@ RUN npm ci --omit=dev --legacy-peer-deps
 COPY --from=builder /app/server_dist ./server_dist
 COPY --from=builder /app/server/templates ./server/templates
 COPY --from=builder /app/assets ./assets
+COPY --from=builder /app/web_dist ./web_dist
 COPY --from=builder /app/static-build ./static-build
 COPY --from=builder /app/admin_dist ./admin_dist
 COPY --from=builder /app/app.json ./app.json

@@ -211,6 +211,7 @@ function configureExpoAndLanding(app: express.Application) {
   );
   const landingPageTemplate = fs.readFileSync(templatePath, "utf-8");
   const appName = getAppName();
+  const webDistPath = path.resolve(process.cwd(), "web_dist");
 
   log("Serving static Expo files with dynamic manifest routing");
 
@@ -230,6 +231,19 @@ function configureExpoAndLanding(app: express.Application) {
     log("Admin panel: serving from /admin/");
   } else {
     log("Admin panel: admin_dist not found — skipping");
+  }
+
+  if (fs.existsSync(webDistPath)) {
+    app.use("/app", express.static(webDistPath));
+    app.get("/app", (_req: Request, res: Response) => {
+      res.sendFile(path.join(webDistPath, "index.html"));
+    });
+    app.get("/app/{*splat}", (_req: Request, res: Response) => {
+      res.sendFile(path.join(webDistPath, "index.html"));
+    });
+    log("Mobile web app: serving from /app/");
+  } else {
+    log("Mobile web app: web_dist not found — skipping");
   }
 
   app.use((req: Request, res: Response, next: NextFunction) => {
