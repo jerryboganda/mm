@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -12,12 +12,9 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import RenderHtml from "react-native-render-html";
-import TableRenderer, {
-  tableModel,
-} from "@native-html/table-plugin";
+import TableRenderer, { tableModel } from "@native-html/table-plugin";
 import WebView from "react-native-webview";
 import { MermaidDiagram } from "@/components/MermaidDiagram";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -38,6 +35,7 @@ import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useFeedback } from "@/lib/feedback";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type TopicReaderRouteProp = RouteProp<RootStackParamList, "TopicReader">;
 type TopicReaderNavigationProp = NativeStackNavigationProp<
@@ -67,7 +65,6 @@ interface TopicDetail {
 }
 
 export default function TopicReaderScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<TopicReaderNavigationProp>();
   const route = useRoute<TopicReaderRouteProp>();
@@ -83,6 +80,11 @@ export default function TopicReaderScreen() {
   const t = resolveText;
   const { width: windowWidth } = useWindowDimensions();
   const contentWidth = windowWidth - Spacing.lg * 2;
+  const bottomLayout = useBottomLayout({
+    footerHeight: 56,
+    footerSpacing: Spacing["3xl"],
+    anchorSpacing: Spacing.lg,
+  });
 
   const { data: topic, isLoading } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
@@ -93,9 +95,24 @@ export default function TopicReaderScreen() {
     () => ({
       body: { color: theme.text, fontSize: 15, lineHeight: 24 },
       p: { marginBottom: 8, color: theme.text },
-      h1: { fontSize: 24, fontWeight: "700" as const, color: theme.text, marginBottom: 8 },
-      h2: { fontSize: 20, fontWeight: "700" as const, color: theme.text, marginBottom: 6 },
-      h3: { fontSize: 17, fontWeight: "700" as const, color: theme.text, marginBottom: 4 },
+      h1: {
+        fontSize: 24,
+        fontWeight: "700" as const,
+        color: theme.text,
+        marginBottom: 8,
+      },
+      h2: {
+        fontSize: 20,
+        fontWeight: "700" as const,
+        color: theme.text,
+        marginBottom: 6,
+      },
+      h3: {
+        fontSize: 17,
+        fontWeight: "700" as const,
+        color: theme.text,
+        marginBottom: 4,
+      },
       strong: { fontWeight: "700" as const, color: theme.text },
       b: { fontWeight: "700" as const },
       em: { fontStyle: "italic" as const },
@@ -115,7 +132,11 @@ export default function TopicReaderScreen() {
       },
       sup: { fontSize: 10, lineHeight: 14 },
       sub: { fontSize: 10, lineHeight: 14 },
-      hr: { borderColor: theme.glassBorder, borderWidth: 0.5, marginVertical: 12 },
+      hr: {
+        borderColor: theme.glassBorder,
+        borderWidth: 0.5,
+        marginVertical: 12,
+      },
       /* Table styles — prominent borders */
       table: {
         borderWidth: 1.5,
@@ -194,7 +215,7 @@ export default function TopicReaderScreen() {
         border: 1.5px solid ${theme.glassBorderLight};
       }
       thead tr {
-        background-color: ${theme.primary}${isDark ? '2E' : '1F'};
+        background-color: ${theme.primary}${isDark ? "2E" : "1F"};
       }
       th {
         padding: 10px 12px;
@@ -251,7 +272,9 @@ export default function TopicReaderScreen() {
           },
         },
         computeContainerHeight(state: any) {
-          return state.contentHeight != null ? state.contentHeight + 2 : undefined;
+          return state.contentHeight != null
+            ? state.contentHeight + 2
+            : undefined;
         },
       },
     }),
@@ -270,7 +293,10 @@ export default function TopicReaderScreen() {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
       // Snapshot previous value
-      const previous = queryClient.getQueryData<TopicDetail>(["/api/topics", topicId]);
+      const previous = queryClient.getQueryData<TopicDetail>([
+        "/api/topics",
+        topicId,
+      ]);
       // Optimistic toggle
       if (previous) {
         queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
@@ -305,7 +331,10 @@ export default function TopicReaderScreen() {
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
-      const previous = queryClient.getQueryData<TopicDetail>(["/api/topics", topicId]);
+      const previous = queryClient.getQueryData<TopicDetail>([
+        "/api/topics",
+        topicId,
+      ]);
       if (previous) {
         queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
           ...previous,
@@ -339,7 +368,10 @@ export default function TopicReaderScreen() {
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
-      const previous = queryClient.getQueryData<TopicDetail>(["/api/topics", topicId]);
+      const previous = queryClient.getQueryData<TopicDetail>([
+        "/api/topics",
+        topicId,
+      ]);
       if (previous) {
         queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
           ...previous,
@@ -389,9 +421,12 @@ export default function TopicReaderScreen() {
       }
     },
     onError: (error) => {
-      const msg = (error as Error)?.message === "OFFLINE"
-        ? t("Report submission requires an internet connection. Please try again when you're online.")
-        : t("Failed to submit report. Please try again.");
+      const msg =
+        (error as Error)?.message === "OFFLINE"
+          ? t(
+              "Report submission requires an internet connection. Please try again when you're online.",
+            )
+          : t("Failed to submit report. Please try again.");
       if (Platform.OS === "web") {
         window.alert(msg);
       } else {
@@ -551,9 +586,12 @@ export default function TopicReaderScreen() {
           styles.content,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + 100,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
       >
         <View style={styles.header}>
           <ThemedText type="h2" style={styles.title}>
@@ -566,9 +604,7 @@ export default function TopicReaderScreen() {
             <Feather
               name="bookmark"
               size={24}
-              color={
-                topic?.isBookmarked ? theme.primary : theme.textSecondary
-              }
+              color={topic?.isBookmarked ? theme.primary : theme.textSecondary}
               style={{
                 opacity: topic?.isBookmarked ? 1 : 0.6,
               }}
@@ -609,107 +645,97 @@ export default function TopicReaderScreen() {
           topic?.author ||
           topic?.source ||
           topic?.references) && (
-            <View
-              style={[
-                styles.metadataSection,
-                { borderTopColor: theme.glassBorder },
-              ]}
-            >
-              {(topic?.updatedAt || topic?.author) && (
-                <View style={styles.metadataRow}>
-                  {topic?.updatedAt && (
-                    <View
-                      style={[
-                        styles.metaBadge,
-                        {
-                          backgroundColor: theme.glass,
-                          borderColor: theme.glassBorder,
-                        },
-                      ]}
-                    >
-                      <Feather name="clock" size={12} color={theme.textMuted} />
-                      <ThemedText
-                        style={[
-                          styles.metaBadgeText,
-                          { color: theme.textMuted },
-                        ]}
-                      >
-                        Updated{" "}
-                        {new Date(topic.updatedAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </ThemedText>
-                    </View>
-                  )}
-                  {topic?.author && (
-                    <View
-                      style={[
-                        styles.metaBadge,
-                        {
-                          backgroundColor: theme.glass,
-                          borderColor: theme.glassBorder,
-                        },
-                      ]}
-                    >
-                      <Feather name="user" size={12} color={theme.textMuted} />
-                      <ThemedText
-                        style={[
-                          styles.metaBadgeText,
-                          { color: theme.textMuted },
-                        ]}
-                      >
-                        {topic.author}
-                      </ThemedText>
-                    </View>
-                  )}
-                </View>
-              )}
-              {topic?.references && (
-                <View
-                  style={[
-                    styles.referencesBox,
-                    {
-                      backgroundColor: `${theme.primary}15`,
-                      borderColor: `${theme.primary}26`,
-                    },
-                  ]}
-                >
-                  <View style={styles.referencesHeader}>
-                    <Feather
-                      name="book-open"
-                      size={14}
-                      color={theme.primary}
-                    />
-                    <ThemedText
-                      style={[styles.referencesTitle, { color: theme.primary }]}
-                    >
-                      References
-                    </ThemedText>
-                  </View>
-                  <ThemedText
+          <View
+            style={[
+              styles.metadataSection,
+              { borderTopColor: theme.glassBorder },
+            ]}
+          >
+            {(topic?.updatedAt || topic?.author) && (
+              <View style={styles.metadataRow}>
+                {topic?.updatedAt && (
+                  <View
                     style={[
-                      styles.referencesText,
-                      { color: theme.textSecondary },
+                      styles.metaBadge,
+                      {
+                        backgroundColor: theme.glass,
+                        borderColor: theme.glassBorder,
+                      },
                     ]}
                   >
-                    {topic.references}
-                  </ThemedText>
-                </View>
-              )}
-              {topic?.source && (
-                <View style={styles.sourceRow}>
-                  <Feather name="link" size={12} color={theme.textMuted} />
-                  <ThemedText
-                    style={[styles.sourceText, { color: theme.textMuted }]}
+                    <Feather name="clock" size={12} color={theme.textMuted} />
+                    <ThemedText
+                      style={[styles.metaBadgeText, { color: theme.textMuted }]}
+                    >
+                      Updated{" "}
+                      {new Date(topic.updatedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </ThemedText>
+                  </View>
+                )}
+                {topic?.author && (
+                  <View
+                    style={[
+                      styles.metaBadge,
+                      {
+                        backgroundColor: theme.glass,
+                        borderColor: theme.glassBorder,
+                      },
+                    ]}
                   >
-                    Source: {topic.source}
+                    <Feather name="user" size={12} color={theme.textMuted} />
+                    <ThemedText
+                      style={[styles.metaBadgeText, { color: theme.textMuted }]}
+                    >
+                      {topic.author}
+                    </ThemedText>
+                  </View>
+                )}
+              </View>
+            )}
+            {topic?.references && (
+              <View
+                style={[
+                  styles.referencesBox,
+                  {
+                    backgroundColor: `${theme.primary}15`,
+                    borderColor: `${theme.primary}26`,
+                  },
+                ]}
+              >
+                <View style={styles.referencesHeader}>
+                  <Feather name="book-open" size={14} color={theme.primary} />
+                  <ThemedText
+                    style={[styles.referencesTitle, { color: theme.primary }]}
+                  >
+                    References
                   </ThemedText>
                 </View>
-              )}
-            </View>
-          )}
+                <ThemedText
+                  style={[
+                    styles.referencesText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
+                  {topic.references}
+                </ThemedText>
+              </View>
+            )}
+            {topic?.source && (
+              <View style={styles.sourceRow}>
+                <Feather name="link" size={12} color={theme.textMuted} />
+                <ThemedText
+                  style={[styles.sourceText, { color: theme.textMuted }]}
+                >
+                  Source: {topic.source}
+                </ThemedText>
+              </View>
+            )}
+          </View>
+        )}
 
         {!topic?.isCompleted ? (
           <PrimaryButton
@@ -727,7 +753,11 @@ export default function TopicReaderScreen() {
               styles.completedBadge,
               {
                 backgroundColor: `${theme.success}1A`,
-                opacity: pressed ? 0.6 : markUncompleteMutation.isPending ? 0.5 : 1,
+                opacity: pressed
+                  ? 0.6
+                  : markUncompleteMutation.isPending
+                    ? 0.5
+                    : 1,
               },
             ]}
           >
@@ -747,7 +777,10 @@ export default function TopicReaderScreen() {
       </ScrollView>
 
       <View
-        style={[styles.floatingNav, { bottom: insets.bottom + Spacing.lg }]}
+        style={[
+          styles.floatingNav,
+          { bottom: bottomLayout.bottomAnchorOffset },
+        ]}
       >
         {topic?.previousTopicId ? (
           <Pressable
@@ -894,7 +927,9 @@ export default function TopicReaderScreen() {
               onPress={() => reportMutation.mutate()}
               loading={reportMutation.isPending}
               icon="send"
-              disabled={!reportDescription.trim() || reportDescription.trim().length < 3}
+              disabled={
+                !reportDescription.trim() || reportDescription.trim().length < 3
+              }
               style={{ marginTop: Spacing.lg }}
             />
           </Pressable>

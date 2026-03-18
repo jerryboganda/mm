@@ -7,7 +7,6 @@ import {
   boolean,
   timestamp,
   jsonb,
-  serial,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -23,6 +22,11 @@ export const users = pgTable("users", {
   subscriptionStatus: text("subscription_status").notNull().default("none"),
   subscriptionPlan: text("subscription_plan"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
+  isActive: boolean("is_active").default(true).notNull(),
+  deactivatedAt: timestamp("deactivated_at"),
+  deactivationReason: text("deactivation_reason"),
+  deletionRequestedAt: timestamp("deletion_requested_at"),
+  deletionStatus: text("deletion_status").notNull().default("none"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   isEmailVerified: boolean("is_email_verified").default(false).notNull(),
   emailVerificationToken: text("email_verification_token"),

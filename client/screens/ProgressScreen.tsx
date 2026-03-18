@@ -6,9 +6,7 @@ import {
   RefreshControl,
   Pressable,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
@@ -24,6 +22,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type ProgressScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -49,12 +48,11 @@ interface ProgressData {
 }
 
 export default function ProgressScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<ProgressScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: progress,
@@ -123,10 +121,12 @@ export default function ProgressScreen() {
           styles.content,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: tabBarHeight + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -177,7 +177,9 @@ export default function ProgressScreen() {
                 <ThemedText style={styles.topicTitle} numberOfLines={1}>
                   {topic.title}
                 </ThemedText>
-                <ThemedText style={[styles.topicAttempts, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.topicAttempts, { color: theme.textSecondary }]}
+                >
                   {topic.attempts} attempts
                 </ThemedText>
               </View>
@@ -187,7 +189,9 @@ export default function ProgressScreen() {
                   height={6}
                   style={{ flex: 1, marginRight: Spacing.md }}
                 />
-                <ThemedText style={[styles.topicAccuracy, { color: theme.primary }]}>
+                <ThemedText
+                  style={[styles.topicAccuracy, { color: theme.primary }]}
+                >
                   {topic.accuracy}%
                 </ThemedText>
                 <Feather
@@ -205,7 +209,11 @@ export default function ProgressScreen() {
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionLabel}>RECENT ATTEMPTS</ThemedText>
             <Pressable onPress={() => navigation.navigate("AttemptHistory")}>
-              <ThemedText style={[styles.viewAllText, { color: theme.primary }]}>View All</ThemedText>
+              <ThemedText
+                style={[styles.viewAllText, { color: theme.primary }]}
+              >
+                View All
+              </ThemedText>
             </Pressable>
           </View>
           {progress.recentAttempts.map((attempt) => (
@@ -225,7 +233,9 @@ export default function ProgressScreen() {
                         ? "Mixed Quiz"
                         : "Wrong Questions"}
                   </ThemedText>
-                  <ThemedText style={[styles.attemptDate, { color: theme.textSecondary }]}>
+                  <ThemedText
+                    style={[styles.attemptDate, { color: theme.textSecondary }]}
+                  >
                     {formatDate(attempt.date)}
                   </ThemedText>
                 </View>

@@ -32,6 +32,11 @@ if (!JWT_SECRET) {
 const JWT_EXPIRES_IN = "7d";
 const REFRESH_EXPIRES_IN = "30d";
 
+const ACCOUNT_DEACTIVATED_MESSAGE =
+  "Your account has been deactivated. Please contact support to reactivate it.";
+const ACCOUNT_DELETION_PENDING_MESSAGE =
+  "Your account deletion request is in progress. Please contact support if you need help.";
+
 function generateToken(userId: string): string {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
@@ -44,6 +49,52 @@ function generateRefreshToken(userId: string): string {
 
 function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function getBlockedAccountState(
+  user: Awaited<ReturnType<typeof storage.getUser>>,
+) {
+  if (!user) return null;
+
+  if (!user.isActive) {
+    return {
+      status: 403,
+      code: "ACCOUNT_DEACTIVATED",
+      message: ACCOUNT_DEACTIVATED_MESSAGE,
+    };
+  }
+
+  if (
+    user.deletionStatus === "requested" ||
+    user.deletionStatus === "processing"
+  ) {
+    return {
+      status: 403,
+      code: "ACCOUNT_DELETION_PENDING",
+      message: ACCOUNT_DELETION_PENDING_MESSAGE,
+    };
+  }
+
+  return null;
+}
+
+function serializeUser(
+  user: NonNullable<Awaited<ReturnType<typeof storage.getUser>>>,
+) {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    subscriptionStatus: user.subscriptionStatus,
+    subscriptionPlan: user.subscriptionPlan,
+    isEmailVerified: user.isEmailVerified,
+    isActive: user.isActive,
+    deactivatedAt: user.deactivatedAt,
+    deletionRequestedAt: user.deletionRequestedAt,
+    deletionStatus: user.deletionStatus,
+    createdAt: user.createdAt,
+  };
 }
 
 router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
@@ -110,6 +161,13 @@ router.post(
         return res.status(404).json({ message: "User not found" });
       }
 
+      const blockedState = getBlockedAccountState(user);
+      if (blockedState) {
+        return res
+          .status(blockedState.status)
+          .json({ code: blockedState.code, message: blockedState.message });
+      }
+
       if (user.isEmailVerified) {
         return res.json({ message: "Email already verified" });
       }
@@ -130,19 +188,9 @@ router.post(
       });
 
       const accessToken = generateToken(user.id);
-      // SECURITY: Never include password hash or verification tokens in response
       res.json({
         accessToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          subscriptionStatus: user.subscriptionStatus,
-          subscriptionPlan: user.subscriptionPlan,
-          isEmailVerified: true,
-          createdAt: user.createdAt,
-        },
+        user: serializeUser({ ...user, isEmailVerified: true }),
       });
     } catch (error) {
       console.error("Verify email error:", error);
@@ -235,23 +283,20 @@ router.post(
         });
       }
 
+      const blockedState = getBlockedAccountState(user);
+      if (blockedState) {
+        return res
+          .status(blockedState.status)
+          .json({ code: blockedState.code, message: blockedState.message });
+      }
+
       const accessToken = generateToken(user.id);
       const refreshToken = generateRefreshToken(user.id);
 
-      // SECURITY: Never include password hash in response
       res.json({
         accessToken,
         refreshToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          subscriptionStatus: user.subscriptionStatus,
-          subscriptionPlan: user.subscriptionPlan,
-          isEmailVerified: user.isEmailVerified,
-          createdAt: user.createdAt,
-        },
+        user: serializeUser(user),
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -421,14 +466,15 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const user = await storage.getUser(req.userId!);
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      subscriptionStatus: user.subscriptionStatus,
-      isEmailVerified: user.isEmailVerified,
-    });
+
+    const blockedState = getBlockedAccountState(user);
+    if (blockedState) {
+      return res
+        .status(blockedState.status)
+        .json({ code: blockedState.code, message: blockedState.message });
+    }
+
+    res.json(serializeUser(user));
   } catch {
     res.status(500).json({ message: "Failed to get user" });
   }
@@ -458,6 +504,13 @@ router.post("/refresh", rateLimiter(20, 60 * 1000), async (req, res) => {
     const user = await storage.getUser(decoded.userId);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
+    }
+
+    const blockedState = getBlockedAccountState(user);
+    if (blockedState) {
+      return res
+        .status(blockedState.status)
+        .json({ code: blockedState.code, message: blockedState.message });
     }
 
     const newAccessToken = generateToken(user.id);

@@ -34,6 +34,7 @@ import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useFeedback } from "@/lib/feedback";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type QuizPlayerRouteProp = RouteProp<RootStackParamList, "QuizPlayer">;
 type QuizPlayerNavigationProp = NativeStackNavigationProp<
@@ -63,6 +64,7 @@ export default function QuizPlayerScreen() {
   const { theme, isDark } = useTheme();
   const feedback = useFeedback();
   const { isOffline } = useNetwork();
+  const bottomLayout = useBottomLayout();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -150,7 +152,7 @@ export default function QuizPlayerScreen() {
       }
     });
     return () => subscription.remove();
-  }, []);
+  }, [confirmSubmit]);
 
   useEffect(() => {
     if (timeRemaining === null || timeRemaining <= 0) return;
@@ -170,7 +172,7 @@ export default function QuizPlayerScreen() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining]);
+  }, [confirmSubmit, timeRemaining]);
 
   useFocusEffect(
     useCallback(() => {
@@ -231,7 +233,7 @@ export default function QuizPlayerScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const confirmSubmit = () => {
+  const confirmSubmit = useCallback(() => {
     if (!quizData) return;
     if (isOffline) {
       Alert.alert(
@@ -249,7 +251,7 @@ export default function QuizPlayerScreen() {
       mode,
       topicId,
     });
-  };
+  }, [answers, feedback, isOffline, mode, quizData, submitMutation, topicId]);
 
   const handleSubmitPress = () => {
     setShowSubmitModal(true);
@@ -422,7 +424,10 @@ export default function QuizPlayerScreen() {
         </View>
 
         <View
-          style={[styles.footer, { paddingBottom: insets.bottom + Spacing.lg }]}
+          style={[
+            styles.footer,
+            { paddingBottom: bottomLayout.baseBottomInset + Spacing.lg },
+          ]}
         >
           <View style={styles.navButtons}>
             <Pressable
@@ -475,7 +480,7 @@ export default function QuizPlayerScreen() {
               styles.navigatorSheet,
               {
                 backgroundColor: theme.backgroundElevated,
-                paddingBottom: insets.bottom + Spacing.lg,
+                paddingBottom: bottomLayout.baseBottomInset + Spacing.lg,
               },
             ]}
           >
@@ -496,10 +501,7 @@ export default function QuizPlayerScreen() {
             <View style={styles.navigatorStats}>
               <View style={[styles.statChip, { backgroundColor: theme.glass }]}>
                 <View
-                  style={[
-                    styles.statDot,
-                    { backgroundColor: theme.success },
-                  ]}
+                  style={[styles.statDot, { backgroundColor: theme.success }]}
                 />
                 <ThemedText
                   style={[styles.statText, { color: theme.textSecondary }]}
@@ -509,10 +511,7 @@ export default function QuizPlayerScreen() {
               </View>
               <View style={[styles.statChip, { backgroundColor: theme.glass }]}>
                 <View
-                  style={[
-                    styles.statDot,
-                    { backgroundColor: theme.textMuted },
-                  ]}
+                  style={[styles.statDot, { backgroundColor: theme.textMuted }]}
                 />
                 <ThemedText
                   style={[styles.statText, { color: theme.textSecondary }]}
@@ -593,11 +592,7 @@ export default function QuizPlayerScreen() {
                 { backgroundColor: `${theme.primary}20` },
               ]}
             >
-              <Feather
-                name="check-circle"
-                size={48}
-                color={theme.primary}
-              />
+              <Feather name="check-circle" size={48} color={theme.primary} />
             </View>
             <ThemedText type="h3" style={styles.submitModalTitle}>
               Submit Quiz?

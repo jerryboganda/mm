@@ -8,16 +8,20 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { useTheme } from "@/hooks/useTheme";
-import { Spacing, BorderRadius, Typography, ThemeColors } from "@/constants/theme";
+import {
+  Spacing,
+  BorderRadius,
+  Typography,
+  ThemeColors,
+} from "@/constants/theme";
 import { useMobileContent } from "@/lib/mobile-content";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type Announcement = {
   id: string;
@@ -55,7 +59,10 @@ function getTypeColor(type: Announcement["type"], theme: ThemeColors) {
   }
 }
 
-function formatTimeAgo(dateString: string, t: (value: string) => string): string {
+function formatTimeAgo(
+  dateString: string,
+  t: (value: string) => string,
+): string {
   const now = new Date();
   const date = new Date(dateString);
   const diffMs = now.getTime() - date.getTime();
@@ -121,11 +128,10 @@ function AnnouncementCard({ item }: { item: Announcement }) {
 }
 
 export default function NotificationsScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
   const t = resolveText;
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -165,10 +171,12 @@ export default function NotificationsScreen() {
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
       contentContainerStyle={{
         paddingTop: headerHeight + Spacing.lg,
-        paddingBottom: tabBarHeight + Spacing.xl,
+        paddingBottom: bottomLayout.contentBottomInset,
         paddingHorizontal: Spacing.lg,
       }}
-      scrollIndicatorInsets={{ bottom: insets.bottom }}
+      scrollIndicatorInsets={{
+        bottom: bottomLayout.scrollIndicatorBottomInset,
+      }}
       data={announcements}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <AnnouncementCard item={item} />}

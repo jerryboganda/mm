@@ -6,7 +6,6 @@ import {
   RefreshControl,
   Pressable,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -22,6 +21,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type AttemptHistoryScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -42,12 +42,12 @@ interface Attempt {
 type FilterMode = "all" | "topic" | "mixed" | "wrong";
 
 export default function AttemptHistoryScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<AttemptHistoryScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<FilterMode>("all");
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: attempts,
@@ -133,6 +133,7 @@ export default function AttemptHistoryScreen() {
       onPress={() =>
         navigation.navigate("AttemptDetail", { attemptId: item.id })
       }
+      density="compact"
       style={styles.attemptCard}
       testID={`card-attempt-${item.id}`}
     >
@@ -164,7 +165,10 @@ export default function AttemptHistoryScreen() {
       </View>
 
       {item.topicTitle ? (
-        <ThemedText style={[styles.topicTitle, { color: theme.text }]} numberOfLines={1}>
+        <ThemedText
+          style={[styles.topicTitle, { color: theme.text }]}
+          numberOfLines={1}
+        >
           {item.topicTitle}
         </ThemedText>
       ) : null}
@@ -172,11 +176,15 @@ export default function AttemptHistoryScreen() {
       <View style={styles.attemptStats}>
         <View style={styles.statItem}>
           <Feather name="check-circle" size={14} color={theme.success} />
-          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>{item.correctCount}</ThemedText>
+          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>
+            {item.correctCount}
+          </ThemedText>
         </View>
         <View style={styles.statItem}>
           <Feather name="x-circle" size={14} color={theme.error} />
-          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>{item.wrongCount}</ThemedText>
+          <ThemedText style={[styles.statText, { color: theme.textSecondary }]}>
+            {item.wrongCount}
+          </ThemedText>
         </View>
         <View style={styles.statItem}>
           <Feather name="clock" size={14} color={theme.textSecondary} />
@@ -187,7 +195,9 @@ export default function AttemptHistoryScreen() {
       </View>
 
       <View style={[styles.attemptFooter, { borderTopColor: theme.glass }]}>
-        <ThemedText style={[styles.dateText, { color: theme.textMuted }]}>{formatDate(item.date)}</ThemedText>
+        <ThemedText style={[styles.dateText, { color: theme.textMuted }]}>
+          {formatDate(item.date)}
+        </ThemedText>
         <Feather name="chevron-right" size={16} color={theme.textMuted} />
       </View>
     </GlassCard>
@@ -219,13 +229,15 @@ export default function AttemptHistoryScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
           (!attempts || attempts.length === 0) &&
             !isLoading &&
             styles.emptyList,
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -242,7 +254,12 @@ export default function AttemptHistoryScreen() {
                   onPress={() => handleFilterChange(filter.id)}
                   style={[
                     styles.filterChip,
-                    { backgroundColor: selectedFilter === filter.id ? theme.primary : theme.glass },
+                    {
+                      backgroundColor:
+                        selectedFilter === filter.id
+                          ? theme.primary
+                          : theme.glass,
+                    },
                   ]}
                 >
                   <ThemedText
@@ -293,7 +310,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   attemptCard: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   attemptHeader: {
     flexDirection: "row",
@@ -327,7 +344,7 @@ const styles = StyleSheet.create({
   },
   attemptStats: {
     flexDirection: "row",
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   statItem: {
     flexDirection: "row",

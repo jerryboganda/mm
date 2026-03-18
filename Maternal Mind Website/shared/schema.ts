@@ -4,25 +4,33 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
 
 export const waitlistEntries = pgTable("waitlist_entries", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   email: text("email").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const newsletterEntries = pgTable("newsletter_entries", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   email: text("email").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const contactMessages = pgTable("contact_messages", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull(),
   subject: text("subject").notNull(),
@@ -30,8 +38,21 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const accountDeletionRequests = pgTable("account_deletion_requests", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  platform: text("platform").notNull(),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const institutionalRequests = pgTable("institutional_requests", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   institution: text("institution").notNull(),
   role: text("role").notNull(),
@@ -50,7 +71,9 @@ export const insertWaitlistSchema = createInsertSchema(waitlistEntries).pick({
   email: true,
 });
 
-export const insertNewsletterSchema = createInsertSchema(newsletterEntries).pick({
+export const insertNewsletterSchema = createInsertSchema(
+  newsletterEntries,
+).pick({
   email: true,
 });
 
@@ -61,7 +84,29 @@ export const insertContactSchema = createInsertSchema(contactMessages).pick({
   message: true,
 });
 
-export const insertInstitutionalRequestSchema = createInsertSchema(institutionalRequests).pick({
+export const accountDeletionPlatformSchema = z.enum([
+  "android",
+  "ios",
+  "web",
+  "unknown",
+]);
+
+export const insertAccountDeletionRequestSchema = createInsertSchema(
+  accountDeletionRequests,
+)
+  .pick({
+    name: true,
+    email: true,
+    platform: true,
+    message: true,
+  })
+  .extend({
+    platform: accountDeletionPlatformSchema,
+  });
+
+export const insertInstitutionalRequestSchema = createInsertSchema(
+  institutionalRequests,
+).pick({
   name: true,
   institution: true,
   role: true,
@@ -78,5 +123,12 @@ export type InsertNewsletter = z.infer<typeof insertNewsletterSchema>;
 export type NewsletterEntry = typeof newsletterEntries.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
-export type InsertInstitutionalRequest = z.infer<typeof insertInstitutionalRequestSchema>;
+export type InsertAccountDeletionRequest = z.infer<
+  typeof insertAccountDeletionRequestSchema
+>;
+export type AccountDeletionRequest =
+  typeof accountDeletionRequests.$inferSelect;
+export type InsertInstitutionalRequest = z.infer<
+  typeof insertInstitutionalRequestSchema
+>;
 export type InstitutionalRequest = typeof institutionalRequests.$inferSelect;

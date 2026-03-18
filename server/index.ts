@@ -311,16 +311,19 @@ function setupErrorHandler(app: express.Application) {
   setupErrorHandler(app);
 
   const port = parseInt(process.env.PORT || "5000", 10);
-  server.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`express server serving on port ${port}`);
-    },
-  );
+  const listenOptions: Parameters<typeof server.listen>[0] = {
+    port,
+    host: "0.0.0.0",
+  };
+
+  // `reusePort` is not supported on some Windows/socket setups used for local dev.
+  if (process.platform !== "win32") {
+    (listenOptions as any).reusePort = true;
+  }
+
+  server.listen(listenOptions, () => {
+    log(`express server serving on port ${port}`);
+  });
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {

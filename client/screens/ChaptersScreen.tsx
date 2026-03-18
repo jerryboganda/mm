@@ -1,13 +1,9 @@
 import React, { useState, useCallback } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
-import { Feather } from "@expo/vector-icons";
-
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -16,6 +12,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type ChaptersScreenNavigationProp = NativeStackNavigationProp<
   LearnStackParamList,
@@ -33,14 +30,13 @@ interface Chapter {
 }
 
 export default function ChaptersScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<ChaptersScreenNavigationProp>();
   const route = useRoute<ChaptersScreenRouteProp>();
   const { bookId, bookTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: chapters,
@@ -60,6 +56,9 @@ export default function ChaptersScreen() {
     <GlassCard
       title={`${item.order}. ${item.title}`}
       subtitle={`${item.topicsCount} Topics`}
+      density="compact"
+      titleNumberOfLines={2}
+      subtitleNumberOfLines={1}
       onPress={() =>
         navigation.navigate("Topics", {
           chapterId: item.id,
@@ -67,9 +66,13 @@ export default function ChaptersScreen() {
           bookId,
         })
       }
-      icon={<ThemedText style={[styles.chapterNumber, { color: theme.primary }]}>{item.order}</ThemedText>}
+      icon={
+        <ThemedText style={[styles.chapterNumber, { color: theme.primary }]}>
+          {item.order}
+        </ThemedText>
+      }
       testID={`card-chapter-${item.id}`}
-      style={{ marginBottom: Spacing.md }}
+      style={{ marginBottom: Spacing.sm }}
     >
       <View style={styles.progressContainer}>
         <ProgressBar progress={item.progress} height={4} />
@@ -95,10 +98,12 @@ export default function ChaptersScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: tabBarHeight + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -108,8 +113,13 @@ export default function ChaptersScreen() {
         }
         ListHeaderComponent={
           <View style={styles.header}>
-            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CHAPTERS</ThemedText>
-            <ThemedText type="small" style={[styles.bookTitle, { color: theme.textSecondary }]}>
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+              CHAPTERS
+            </ThemedText>
+            <ThemedText
+              type="small"
+              style={[styles.bookTitle, { color: theme.textSecondary }]}
+            >
               {bookTitle}
             </ThemedText>
           </View>
@@ -141,6 +151,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   progressContainer: {
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
   },
 });

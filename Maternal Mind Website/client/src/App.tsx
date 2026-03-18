@@ -14,7 +14,12 @@ import Pricing from "@/pages/pricing";
 import Institutions from "@/pages/institutions";
 import About from "@/pages/about";
 import Support from "@/pages/support";
-import LegalHub, { TermsPage, PrivacyPage, DisclaimerPage } from "@/pages/legal";
+import LegalHub, {
+  TermsPage,
+  PrivacyPage,
+  DisclaimerPage,
+} from "@/pages/legal";
+import DeleteAccount from "@/pages/delete-account";
 import { ResourcesHub, ResourcePage } from "@/pages/resources";
 import Media from "@/pages/media";
 
@@ -33,6 +38,7 @@ function Router() {
         <Route path="/legal/terms" component={TermsPage} />
         <Route path="/legal/privacy" component={PrivacyPage} />
         <Route path="/legal/disclaimer" component={DisclaimerPage} />
+        <Route path="/delete-account" component={DeleteAccount} />
         <Route path="/resources" component={ResourcesHub} />
         <Route path="/resources/:slug">
           {(params) => <ResourcePage slug={params.slug} />}
