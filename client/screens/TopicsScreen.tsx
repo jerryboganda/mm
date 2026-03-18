@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +14,7 @@ import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type TopicsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type TopicsScreenRouteProp = RouteProp<LearnStackParamList, "Topics">;
@@ -32,14 +31,13 @@ interface Topic {
 }
 
 export default function TopicsScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<TopicsScreenNavigationProp>();
   const route = useRoute<TopicsScreenRouteProp>();
   const { chapterId, chapterTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: topics,
@@ -59,6 +57,9 @@ export default function TopicsScreen() {
     <GlassCard
       title={item.title}
       subtitle={item.description}
+      density="compact"
+      titleNumberOfLines={2}
+      subtitleNumberOfLines={1}
       onPress={() => {
         if (!item.isLocked) {
           navigation.navigate("TopicReader", {
@@ -90,7 +91,12 @@ export default function TopicsScreen() {
       rightElement={
         <View style={styles.rightElements}>
           {item.isPremium && (
-            <View style={[styles.premiumBadge, { backgroundColor: theme.warningGlow }]}>
+            <View
+              style={[
+                styles.premiumBadge,
+                { backgroundColor: theme.warningGlow },
+              ]}
+            >
               <Feather name="star" size={10} color={theme.warning} />
             </View>
           )}
@@ -122,10 +128,12 @@ export default function TopicsScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: tabBarHeight + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -184,7 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   topicCard: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   lockedCard: {
     opacity: 0.6,

@@ -438,13 +438,22 @@ export async function adminGetUsers(filters?: {
       name: users.name,
       role: users.role,
       password: sql<string>`'***'`.as("password"),
+      phoneNumber: users.phoneNumber,
       subscriptionStatus: users.subscriptionStatus,
       subscriptionPlan: users.subscriptionPlan,
       subscriptionExpiresAt: users.subscriptionExpiresAt,
+      isActive: users.isActive,
+      deactivatedAt: users.deactivatedAt,
+      deactivationReason: users.deactivationReason,
+      deletionRequestedAt: users.deletionRequestedAt,
+      deletionStatus: users.deletionStatus,
       createdAt: users.createdAt,
       isEmailVerified: users.isEmailVerified,
       emailVerificationToken: users.emailVerificationToken,
       emailTokenExpiresAt: users.emailTokenExpiresAt,
+      isPhoneVerified: users.isPhoneVerified,
+      phoneVerificationToken: users.phoneVerificationToken,
+      phoneTokenExpiresAt: users.phoneTokenExpiresAt,
     })
     .from(users)
     .where(where)

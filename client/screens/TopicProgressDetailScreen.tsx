@@ -1,6 +1,5 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -17,6 +16,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type TopicProgressDetailRouteProp = RouteProp<
   RootStackParamList,
@@ -46,16 +46,13 @@ interface TopicProgressData {
   recentAttempts: RecentAttempt[];
 }
 
-const { width: screenWidth } = Dimensions.get("window");
-const chartWidth = screenWidth - Spacing.lg * 2 - 32;
-
 export default function TopicProgressDetailScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<TopicProgressDetailNavigationProp>();
   const route = useRoute<TopicProgressDetailRouteProp>();
   const { topicId, topicTitle } = route.params;
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const { data: progress, isLoading } = useQuery<TopicProgressData>({
     queryKey: ["/api/progress/topic", topicId],
@@ -90,7 +87,9 @@ export default function TopicProgressDetailScreen() {
     if (!progress?.accuracyTrend || progress.accuracyTrend.length === 0) {
       return (
         <View style={styles.noChartData}>
-          <ThemedText style={[styles.noChartText, { color: theme.textMuted }]}>No data to display</ThemedText>
+          <ThemedText style={[styles.noChartText, { color: theme.textMuted }]}>
+            No data to display
+          </ThemedText>
         </View>
       );
     }
@@ -102,15 +101,33 @@ export default function TopicProgressDetailScreen() {
     return (
       <View style={styles.chartContainer}>
         <View style={styles.chartYAxis}>
-          <ThemedText style={[styles.chartAxisLabel, { color: theme.textMuted }]}>100%</ThemedText>
-          <ThemedText style={[styles.chartAxisLabel, { color: theme.textMuted }]}>50%</ThemedText>
-          <ThemedText style={[styles.chartAxisLabel, { color: theme.textMuted }]}>0%</ThemedText>
+          <ThemedText
+            style={[styles.chartAxisLabel, { color: theme.textMuted }]}
+          >
+            100%
+          </ThemedText>
+          <ThemedText
+            style={[styles.chartAxisLabel, { color: theme.textMuted }]}
+          >
+            50%
+          </ThemedText>
+          <ThemedText
+            style={[styles.chartAxisLabel, { color: theme.textMuted }]}
+          >
+            0%
+          </ThemedText>
         </View>
         <View style={styles.chartArea}>
           <View style={styles.chartGrid}>
-            <View style={[styles.chartGridLine, { backgroundColor: theme.glass }]} />
-            <View style={[styles.chartGridLine, { backgroundColor: theme.glass }]} />
-            <View style={[styles.chartGridLine, { backgroundColor: theme.glass }]} />
+            <View
+              style={[styles.chartGridLine, { backgroundColor: theme.glass }]}
+            />
+            <View
+              style={[styles.chartGridLine, { backgroundColor: theme.glass }]}
+            />
+            <View
+              style={[styles.chartGridLine, { backgroundColor: theme.glass }]}
+            />
           </View>
           <View style={styles.chartBars}>
             {data.map((point, index) => {
@@ -128,7 +145,9 @@ export default function TopicProgressDetailScreen() {
                       end={{ x: 0, y: 1 }}
                     />
                   </View>
-                  <ThemedText style={[styles.chartBarLabel, { color: theme.textMuted }]}>
+                  <ThemedText
+                    style={[styles.chartBarLabel, { color: theme.textMuted }]}
+                  >
                     {formatDate(point.date)}
                   </ThemedText>
                 </View>
@@ -178,16 +197,20 @@ export default function TopicProgressDetailScreen() {
           styles.content,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
       >
         <View style={styles.header}>
           <ThemedText type="h3" style={styles.topicTitle}>
             {progress?.topicTitle || topicTitle}
           </ThemedText>
-          <ThemedText style={[styles.chapterTitle, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.chapterTitle, { color: theme.textSecondary }]}
+          >
             {progress?.chapterTitle}
           </ThemedText>
         </View>
@@ -235,17 +258,20 @@ export default function TopicProgressDetailScreen() {
               >
                 <View style={styles.attemptRow}>
                   <View style={styles.attemptInfo}>
-                    <ThemedText style={[styles.attemptDate, { color: theme.text }]}>
+                    <ThemedText
+                      style={[styles.attemptDate, { color: theme.text }]}
+                    >
                       {formatFullDate(attempt.date)}
                     </ThemedText>
                     <View style={styles.attemptStats}>
                       <View style={styles.attemptStat}>
-                        <Feather
-                          name="check"
-                          size={12}
-                          color={theme.success}
-                        />
-                        <ThemedText style={[styles.attemptStatText, { color: theme.textSecondary }]}>
+                        <Feather name="check" size={12} color={theme.success} />
+                        <ThemedText
+                          style={[
+                            styles.attemptStatText,
+                            { color: theme.textSecondary },
+                          ]}
+                        >
                           {attempt.correctCount}/{attempt.totalQuestions}
                         </ThemedText>
                       </View>
@@ -271,7 +297,9 @@ export default function TopicProgressDetailScreen() {
             ))
           ) : (
             <View style={styles.noAttempts}>
-              <ThemedText style={[styles.noAttemptsText, { color: theme.textMuted }]}>
+              <ThemedText
+                style={[styles.noAttemptsText, { color: theme.textMuted }]}
+              >
                 No attempts yet for this topic
               </ThemedText>
             </View>

@@ -35,6 +35,9 @@ interface GlassCardProps {
   testID?: string;
   variant?: "default" | "elevated" | "subtle" | "glow";
   blurIntensity?: number;
+  density?: "default" | "compact";
+  titleNumberOfLines?: number;
+  subtitleNumberOfLines?: number;
 }
 
 const springConfig: WithSpringConfig = {
@@ -66,6 +69,9 @@ export function GlassCard({
   testID,
   variant = "default",
   blurIntensity = 20,
+  density = "default",
+  titleNumberOfLines,
+  subtitleNumberOfLines,
 }: GlassCardProps) {
   const { theme, isDark } = useTheme();
   const scale = useSharedValue(1);
@@ -78,16 +84,16 @@ export function GlassCard({
   const activeBorderColor = active ? theme.primary : theme.glassBorder;
   const pressedBorderColor = theme.primaryLight;
 
-  const borderStyle = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(
-      pressed.value,
-      [0, 1],
-      [
-        activeBorderColor,
-        pressedBorderColor,
-      ],
-    ),
-  }), [activeBorderColor, pressedBorderColor]);
+  const borderStyle = useAnimatedStyle(
+    () => ({
+      borderColor: interpolateColor(
+        pressed.value,
+        [0, 1],
+        [activeBorderColor, pressedBorderColor],
+      ),
+    }),
+    [activeBorderColor, pressedBorderColor],
+  );
 
   const handlePressIn = () => {
     if (!disabled && onPress) {
@@ -113,6 +119,9 @@ export function GlassCard({
   const isElevated = variant === "elevated" || variant === "glow";
   const isGlow = variant === "glow";
   const isSubtle = variant === "subtle";
+  const isCompact = density === "compact";
+  const resolvedTitleLines = titleNumberOfLines ?? (isCompact ? 2 : 2);
+  const resolvedSubtitleLines = subtitleNumberOfLines ?? (isCompact ? 1 : 2);
 
   const cardStyles = [
     styles.card,
@@ -179,19 +188,37 @@ export function GlassCard({
       accessibilityState={{ disabled, selected: active }}
     >
       {renderBackground()}
-      <View style={styles.content}>
-        {icon ? <View style={[styles.iconContainer, { backgroundColor: theme.glassMedium }]}>{icon}</View> : null}
+      <View style={[styles.content, isCompact && styles.contentCompact]}>
+        {icon ? (
+          <View
+            style={[
+              styles.iconContainer,
+              isCompact && styles.iconContainerCompact,
+              { backgroundColor: theme.glassMedium },
+            ]}
+          >
+            {icon}
+          </View>
+        ) : null}
         <View style={styles.textContainer}>
           {title ? (
-            <ThemedText type="h4" style={styles.title} numberOfLines={2}>
+            <ThemedText
+              type="h4"
+              style={[styles.title, isCompact && styles.titleCompact]}
+              numberOfLines={resolvedTitleLines}
+            >
               {title}
             </ThemedText>
           ) : null}
           {subtitle ? (
             <ThemedText
               type="small"
-              style={{ color: theme.textSecondary }}
-              numberOfLines={2}
+              style={[
+                styles.subtitle,
+                isCompact && styles.subtitleCompact,
+                { color: theme.textSecondary },
+              ]}
+              numberOfLines={resolvedSubtitleLines}
             >
               {subtitle}
             </ThemedText>
@@ -199,7 +226,14 @@ export function GlassCard({
           {children}
         </View>
         {rightElement ? (
-          <View style={styles.rightElement}>{rightElement}</View>
+          <View
+            style={[
+              styles.rightElement,
+              isCompact && styles.rightElementCompact,
+            ]}
+          >
+            {rightElement}
+          </View>
         ) : null}
       </View>
     </AnimatedPressable>
@@ -223,6 +257,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: Spacing.cardPadding,
   },
+  contentCompact: {
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
   iconContainer: {
     width: 52,
     height: 52,
@@ -231,13 +269,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: Spacing.lg,
   },
+  iconContainerCompact: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.md,
+    marginRight: Spacing.md,
+  },
   textContainer: {
     flex: 1,
+    minWidth: 0,
   },
   title: {
     marginBottom: Spacing.xs,
   },
+  titleCompact: {
+    fontSize: 17,
+    lineHeight: 22,
+    marginBottom: 2,
+  },
+  subtitle: {
+    minWidth: 0,
+  },
+  subtitleCompact: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
   rightElement: {
     marginLeft: Spacing.md,
+    flexShrink: 0,
+  },
+  rightElementCompact: {
+    marginLeft: Spacing.sm,
   },
 });

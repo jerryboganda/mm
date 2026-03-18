@@ -6,6 +6,11 @@ import { getSupportContactSettings } from "../lib/support-contact";
 
 const router = Router();
 
+const ACCOUNT_DEACTIVATED_MESSAGE =
+  "Your account has been deactivated. Please contact support to reactivate it.";
+const ACCOUNT_DELETION_PENDING_MESSAGE =
+  "Your account deletion request is in progress. Please contact support if you need help.";
+
 router.patch("/profile", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { name } = req.body;
@@ -73,6 +78,112 @@ router.post(
   },
 );
 
+router.post("/deactivate", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const user = await storage.getUser(req.userId!);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.isActive) {
+      return res.status(400).json({
+        code: "ACCOUNT_DEACTIVATED",
+        message: ACCOUNT_DEACTIVATED_MESSAGE,
+      });
+    }
+
+    if (
+      user.deletionStatus === "requested" ||
+      user.deletionStatus === "processing"
+    ) {
+      return res.status(400).json({
+        code: "ACCOUNT_DELETION_PENDING",
+        message: ACCOUNT_DELETION_PENDING_MESSAGE,
+      });
+    }
+
+    const reason =
+      typeof req.body?.reason === "string" ? req.body.reason.trim() : undefined;
+
+    const updatedUser = await storage.deactivateUser(req.userId!, reason);
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Your account has been deactivated successfully.",
+      user: {
+        id: updatedUser.id,
+        isActive: updatedUser.isActive,
+        deactivatedAt: updatedUser.deactivatedAt,
+        deactivationReason: updatedUser.deactivationReason,
+      },
+    });
+  } catch (error) {
+    console.error("Deactivate account error:", error);
+    res.status(500).json({ message: "Failed to deactivate account" });
+  }
+});
+
+router.post(
+  "/request-account-deletion",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.isActive) {
+        return res.status(400).json({
+          code: "ACCOUNT_DEACTIVATED",
+          message:
+            "Deactivated accounts must contact support for deletion assistance.",
+        });
+      }
+
+      if (
+        user.deletionStatus === "requested" ||
+        user.deletionStatus === "processing" ||
+        user.deletionStatus === "completed"
+      ) {
+        return res.status(400).json({
+          code: "ACCOUNT_DELETION_PENDING",
+          message: "An account deletion request has already been submitted.",
+        });
+      }
+
+      const note =
+        typeof req.body?.note === "string" ? req.body.note.trim() : undefined;
+
+      const updatedUser = await storage.requestAccountDeletion(
+        req.userId!,
+        note,
+      );
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json({
+        success: true,
+        message:
+          "Your account deletion request has been received. We may contact you to confirm your identity.",
+        user: {
+          id: updatedUser.id,
+          isActive: updatedUser.isActive,
+          deletionRequestedAt: updatedUser.deletionRequestedAt,
+          deletionStatus: updatedUser.deletionStatus,
+        },
+      });
+    } catch (error) {
+      console.error("Request account deletion error:", error);
+      res.status(500).json({ message: "Failed to request account deletion" });
+    }
+  },
+);
+
 router.get(
   "/recent-activity",
   authMiddleware,
@@ -131,8 +242,7 @@ router.post(
   authMiddleware,
   async (req: AuthRequest, res) => {
     try {
-      const { subscriptionStatus, subscriptionPlan, expiresAt, revenueCatId } =
-        req.body;
+      const { subscriptionStatus, subscriptionPlan, expiresAt } = req.body;
 
       if (!subscriptionStatus) {
         return res
@@ -140,7 +250,11 @@ router.post(
           .json({ message: "subscriptionStatus is required" });
       }
 
-      const data: Record<string, any> = {
+      const data: {
+        subscriptionStatus: string;
+        subscriptionPlan?: string;
+        subscriptionExpiresAt?: Date | null;
+      } = {
         subscriptionStatus,
       };
       if (subscriptionPlan) data.subscriptionPlan = subscriptionPlan;

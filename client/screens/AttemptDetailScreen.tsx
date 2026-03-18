@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, View, ScrollView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +14,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type AttemptDetailRouteProp = RouteProp<RootStackParamList, "AttemptDetail">;
 
@@ -43,11 +43,11 @@ interface AttemptDetail {
 }
 
 export default function AttemptDetailScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const route = useRoute<AttemptDetailRouteProp>();
   const { attemptId } = route.params;
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const { data: attempt, isLoading } = useQuery<AttemptDetail>({
     queryKey: ["/api/attempts", attemptId],
@@ -130,10 +130,12 @@ export default function AttemptDetailScreen() {
           styles.content,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
       >
         <View style={styles.scoreSection}>
           <View
@@ -160,7 +162,9 @@ export default function AttemptDetailScreen() {
             {getModeLabel(attempt.mode)}
           </ThemedText>
           {attempt.topicTitle ? (
-            <ThemedText style={[styles.topicName, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.topicName, { color: theme.textSecondary }]}
+            >
               {attempt.topicTitle}
             </ThemedText>
           ) : null}
@@ -220,12 +224,19 @@ export default function AttemptDetailScreen() {
                     color="#fff"
                   />
                 </View>
-                <ThemedText style={[styles.questionNumber, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[
+                    styles.questionNumber,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   Question {index + 1}
                 </ThemedText>
               </View>
 
-              <ThemedText style={[styles.questionText, { color: theme.text }]}>{q.question}</ThemedText>
+              <ThemedText style={[styles.questionText, { color: theme.text }]}>
+                {q.question}
+              </ThemedText>
 
               <View style={styles.answersContainer}>
                 {q.options.map((option) => {
@@ -237,18 +248,23 @@ export default function AttemptDetailScreen() {
                       style={[
                         styles.answerOption,
                         { backgroundColor: theme.glass },
-                        isSelected && !isCorrect && { backgroundColor: `${theme.error}15` },
+                        isSelected &&
+                          !isCorrect && { backgroundColor: `${theme.error}15` },
                         isCorrect && { backgroundColor: `${theme.success}15` },
                       ]}
                     >
-                      <View style={[styles.optionLabel, { backgroundColor: theme.glass }]}>
+                      <View
+                        style={[
+                          styles.optionLabel,
+                          { backgroundColor: theme.glass },
+                        ]}
+                      >
                         <ThemedText
                           style={[
                             styles.optionLabelText,
                             { color: theme.textSecondary },
                             isCorrect && { color: theme.success },
-                            isSelected &&
-                            !isCorrect && { color: theme.error },
+                            isSelected && !isCorrect && { color: theme.error },
                           ]}
                         >
                           {option.label}
@@ -259,8 +275,7 @@ export default function AttemptDetailScreen() {
                           styles.optionText,
                           { color: theme.text },
                           isCorrect && { color: theme.success },
-                          isSelected &&
-                          !isCorrect && { color: theme.error },
+                          isSelected && !isCorrect && { color: theme.error },
                         ]}
                       >
                         {option.text}
@@ -269,9 +284,7 @@ export default function AttemptDetailScreen() {
                         <Feather
                           name={isCorrect ? "check-circle" : "x-circle"}
                           size={16}
-                          color={
-                            isCorrect ? theme.success : theme.error
-                          }
+                          color={isCorrect ? theme.success : theme.error}
                           style={styles.optionIcon}
                         />
                       ) : isCorrect ? (
@@ -288,14 +301,26 @@ export default function AttemptDetailScreen() {
               </View>
 
               {q.explanation ? (
-                <View style={[styles.explanationContainer, { backgroundColor: `${theme.info}10` }]}>
+                <View
+                  style={[
+                    styles.explanationContainer,
+                    { backgroundColor: `${theme.info}10` },
+                  ]}
+                >
                   <View style={styles.explanationHeader}>
                     <Feather name="info" size={14} color={theme.info} />
-                    <ThemedText style={[styles.explanationLabel, { color: theme.info }]}>
+                    <ThemedText
+                      style={[styles.explanationLabel, { color: theme.info }]}
+                    >
                       Explanation
                     </ThemedText>
                   </View>
-                  <ThemedText style={[styles.explanationText, { color: theme.textSecondary }]}>
+                  <ThemedText
+                    style={[
+                      styles.explanationText,
+                      { color: theme.textSecondary },
+                    ]}
+                  >
                     {q.explanation}
                   </ThemedText>
                 </View>

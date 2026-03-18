@@ -28,6 +28,7 @@ const footerLinks = {
     { label: "Terms of Service", href: "/legal/terms" },
     { label: "Privacy Policy", href: "/legal/privacy" },
     { label: "Disclaimer", href: "/legal/disclaimer" },
+    { label: "Delete Account", href: "/delete-account" },
   ],
 };
 
@@ -57,14 +58,19 @@ export function Footer() {
       setEmail("");
       setSubmitSuccess(true);
     } catch {
-      setSubmitError("Network error. Please check your connection and try again.");
+      setSubmitError(
+        "Network error. Please check your connection and try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <footer className="bg-[#0a1519] border-t border-white/5" data-testid="footer">
+    <footer
+      className="bg-[#0a1519] border-t border-white/5"
+      data-testid="footer"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
           <div className="col-span-2">
@@ -75,11 +81,14 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-white/50 max-w-xs mb-6 leading-relaxed">
-              Premium OB-GYN educational platform for postgraduate doctors. Learn, practice, and track your progress.
+              Premium OB-GYN educational platform for postgraduate doctors.
+              Learn, practice, and track your progress.
             </p>
 
             <div className="mb-6">
-              <p className="text-xs font-medium uppercase tracking-widest text-white/40 mb-3">Stay updated</p>
+              <p className="text-xs font-medium uppercase tracking-widest text-white/40 mb-3">
+                Stay updated
+              </p>
               <form onSubmit={handleNewsletterSubmit}>
                 <div className="flex gap-2">
                   <input
@@ -91,17 +100,28 @@ export function Footer() {
                     data-testid="input-newsletter-email"
                     required
                   />
-                  <NeonButton size="sm" data-testid="button-subscribe" type="submit" disabled={isSubmitting}>
+                  <NeonButton
+                    size="sm"
+                    data-testid="button-subscribe"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
                     <ArrowRight className="w-4 h-4" />
                   </NeonButton>
                 </div>
                 {submitError && (
-                  <p className="mt-2 text-xs text-[#ef4444]" data-testid="text-newsletter-error">
+                  <p
+                    className="mt-2 text-xs text-[#ef4444]"
+                    data-testid="text-newsletter-error"
+                  >
                     {submitError}
                   </p>
                 )}
                 {submitSuccess && (
-                  <p className="mt-2 text-xs text-[#22c55e]" data-testid="text-newsletter-success">
+                  <p
+                    className="mt-2 text-xs text-[#22c55e]"
+                    data-testid="text-newsletter-success"
+                  >
                     Subscribed successfully.
                   </p>
                 )}
@@ -148,7 +168,10 @@ export function Footer() {
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.href}>
-                    <GlowLink href={link.href} className="text-sm text-white/60 hover:text-[#11a4d4]">
+                    <GlowLink
+                      href={link.href}
+                      className="text-sm text-white/60 hover:text-[#11a4d4]"
+                    >
                       {link.label}
                     </GlowLink>
                   </li>
@@ -161,10 +184,12 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-white/5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs text-white/30">
-              &copy; {new Date().getFullYear()} Maternal Mind. All rights reserved.
+              &copy; {new Date().getFullYear()} Maternal Mind. All rights
+              reserved.
             </p>
             <p className="text-xs text-white/30 text-center sm:text-right max-w-md">
-              For educational purposes only. Not intended as medical advice. Consult qualified healthcare professionals for clinical decisions.
+              For educational purposes only. Not intended as medical advice.
+              Consult qualified healthcare professionals for clinical decisions.
             </p>
           </div>
         </div>

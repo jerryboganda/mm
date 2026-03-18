@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   FlatList,
@@ -8,9 +8,7 @@ import {
   ActivityIndicator,
   Keyboard,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
@@ -25,6 +23,7 @@ import { apiRequest } from "@/lib/query-client";
 import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import type { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -85,22 +84,37 @@ function SearchResultCard({
 
   return (
     <Pressable
-      style={[styles.resultCard, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}
+      style={[
+        styles.resultCard,
+        { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+      ]}
       onPress={onPress}
     >
-      <View style={[styles.resultIcon, { backgroundColor: `${theme.primary}1A` }]}>
+      <View
+        style={[styles.resultIcon, { backgroundColor: `${theme.primary}1A` }]}
+      >
         <Feather name={getIcon()} size={18} color={theme.primary} />
       </View>
       <View style={styles.resultContent}>
         <View style={styles.resultHeader}>
-          <ThemedText style={[styles.resultTitle, { color: theme.text }]} numberOfLines={1}>
+          <ThemedText
+            style={[styles.resultTitle, { color: theme.text }]}
+            numberOfLines={1}
+          >
             {item.title}
           </ThemedText>
           <View style={[styles.typeTag, { backgroundColor: theme.glass }]}>
-            <ThemedText style={[styles.typeTagText, { color: theme.textMuted }]}>{getTypeLabel()}</ThemedText>
+            <ThemedText
+              style={[styles.typeTagText, { color: theme.textMuted }]}
+            >
+              {getTypeLabel()}
+            </ThemedText>
           </View>
         </View>
-        <ThemedText style={[styles.resultSubtitle, { color: theme.textSecondary }]} numberOfLines={1}>
+        <ThemedText
+          style={[styles.resultSubtitle, { color: theme.textSecondary }]}
+          numberOfLines={1}
+        >
           {item.subtitle}
         </ThemedText>
       </View>
@@ -110,15 +124,14 @@ function SearchResultCard({
 }
 
 export default function SearchScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<NavigationProp>();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
   const t = resolveText;
 
   const debouncedSetQuery = useMemo(
@@ -209,7 +222,12 @@ export default function SearchScreen() {
         style={[styles.container, { paddingTop: headerHeight + Spacing.lg }]}
       >
         <View style={styles.searchContainer}>
-          <View style={[styles.searchInputWrapper, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}>
+          <View
+            style={[
+              styles.searchInputWrapper,
+              { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+            ]}
+          >
             <Feather name="search" size={18} color={theme.textMuted} />
             <TextInput
               style={[styles.searchInput, { color: theme.text }]}
@@ -235,8 +253,14 @@ export default function SearchScreen() {
               key={filter.key}
               style={[
                 styles.filterChip,
-                { backgroundColor: theme.glass, borderColor: theme.glassBorder },
-                activeFilter === filter.key && { backgroundColor: theme.primary, borderColor: theme.primary },
+                {
+                  backgroundColor: theme.glass,
+                  borderColor: theme.glassBorder,
+                },
+                activeFilter === filter.key && {
+                  backgroundColor: theme.primary,
+                  borderColor: theme.primary,
+                },
               ]}
               onPress={() => handleFilterPress(filter.key)}
             >
@@ -244,7 +268,10 @@ export default function SearchScreen() {
                 style={[
                   styles.filterText,
                   { color: theme.textSecondary },
-                  activeFilter === filter.key && { color: theme.buttonText, fontWeight: "600" },
+                  activeFilter === filter.key && {
+                    color: theme.buttonText,
+                    fontWeight: "600",
+                  },
                 ]}
               >
                 {filter.label}
@@ -256,8 +283,12 @@ export default function SearchScreen() {
         {debouncedQuery.length < 2 ? (
           <View style={styles.emptyContainer}>
             <Feather name="search" size={48} color={theme.textMuted} />
-            <ThemedText style={[styles.emptyTitle, { color: theme.text }]}>Search Content</ThemedText>
-            <ThemedText style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+            <ThemedText style={[styles.emptyTitle, { color: theme.text }]}>
+              Search Content
+            </ThemedText>
+            <ThemedText
+              style={[styles.emptySubtitle, { color: theme.textSecondary }]}
+            >
               Enter at least 2 characters to search books, chapters, and topics
             </ThemedText>
           </View>
@@ -267,13 +298,13 @@ export default function SearchScreen() {
           </View>
         ) : filteredResults.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Feather
-              name="file-minus"
-              size={48}
-              color={theme.textMuted}
-            />
-            <ThemedText style={[styles.emptyTitle, { color: theme.text }]}>No Results</ThemedText>
-            <ThemedText style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+            <Feather name="file-minus" size={48} color={theme.textMuted} />
+            <ThemedText style={[styles.emptyTitle, { color: theme.text }]}>
+              No Results
+            </ThemedText>
+            <ThemedText
+              style={[styles.emptySubtitle, { color: theme.textSecondary }]}
+            >
               Try different keywords or change the filter
             </ThemedText>
           </View>
@@ -289,15 +320,19 @@ export default function SearchScreen() {
             )}
             contentContainerStyle={{
               paddingHorizontal: Spacing.lg,
-              paddingBottom: tabBarHeight + Spacing.xl,
+              paddingBottom: bottomLayout.contentBottomInset,
             }}
-            scrollIndicatorInsets={{ bottom: insets.bottom }}
+            scrollIndicatorInsets={{
+              bottom: bottomLayout.scrollIndicatorBottomInset,
+            }}
             keyboardShouldPersistTaps="handled"
             ItemSeparatorComponent={() => (
               <View style={{ height: Spacing.sm }} />
             )}
             ListHeaderComponent={
-              <ThemedText style={[styles.resultsCount, { color: theme.textMuted }]}>
+              <ThemedText
+                style={[styles.resultsCount, { color: theme.textMuted }]}
+              >
                 {filteredResults.length} result
                 {filteredResults.length !== 1 ? "s" : ""} found
               </ThemedText>

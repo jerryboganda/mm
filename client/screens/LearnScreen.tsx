@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +15,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type LearnScreenNavigationProp = NativeStackNavigationProp<
   LearnStackParamList,
@@ -34,12 +33,11 @@ interface Book {
 }
 
 export default function LearnScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<LearnScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: books,
@@ -60,6 +58,9 @@ export default function LearnScreen() {
     <GlassCard
       title={item.title}
       subtitle={`${item.chaptersCount} Chapters`}
+      density="compact"
+      titleNumberOfLines={2}
+      subtitleNumberOfLines={1}
       onPress={() =>
         navigation.navigate("Chapters", {
           bookId: item.id,
@@ -92,11 +93,13 @@ export default function LearnScreen() {
         </View>
       }
       testID={`card-book-${item.id}`}
-      style={{ marginBottom: Spacing.md }}
+      style={{ marginBottom: Spacing.sm }}
     >
       <View style={styles.progressContainer}>
         <ProgressBar progress={item.progress} height={6} />
-        <ThemedText style={[styles.progressText, { color: theme.textSecondary }]}>
+        <ThemedText
+          style={[styles.progressText, { color: theme.textSecondary }]}
+        >
           {item.progress}% Complete
         </ThemedText>
       </View>
@@ -124,7 +127,9 @@ export default function LearnScreen() {
       <BackgroundGradient>
         <View style={[styles.centered, { paddingTop: headerHeight }]}>
           <Feather name="alert-circle" size={48} color={theme.error} />
-          <ThemedText style={[styles.errorText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.errorText, { color: theme.textSecondary }]}
+          >
             Failed to load content
           </ThemedText>
         </View>
@@ -142,11 +147,13 @@ export default function LearnScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: tabBarHeight + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
           (!books || books.length === 0) && !isLoading && styles.emptyList,
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -184,7 +191,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   progressContainer: {
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
   },
   progressText: {
     fontSize: 12,

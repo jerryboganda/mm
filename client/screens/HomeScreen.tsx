@@ -8,10 +8,9 @@ import {
   RefreshControl,
   ActivityIndicator,
   Platform,
+  useWindowDimensions,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigation } from "@react-navigation/native";
@@ -27,6 +26,7 @@ import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 import { useMobileContent } from "@/lib/mobile-content";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type NavigationProp = NativeStackNavigationProp<HomeStackParamList>;
 
@@ -53,7 +53,7 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
 
   // Use theme colors with opacity for glow effects
   const glowColor = {
-    accent: `${theme.primary}1A`,   // 10% opacity
+    accent: `${theme.primary}1A`, // 10% opacity
     success: `${theme.success}1A`,
     warning: `${theme.warning}1A`,
     purple: `${theme.purple || "#a855f7"}1A`,
@@ -74,7 +74,11 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
     }
 
     return (
-      <BlurView intensity={18} tint={isDark ? "dark" : "light"} style={styles.bentoBackground}>
+      <BlurView
+        intensity={18}
+        tint={isDark ? "dark" : "light"}
+        style={styles.bentoBackground}
+      >
         <LinearGradient
           colors={[glowColor, theme.glass]}
           style={StyleSheet.absoluteFill}
@@ -127,49 +131,89 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
 function ContinueLearningCard({
   topic,
   onPress,
+  isNarrow,
 }: {
   topic: RecommendedTopic;
   onPress: () => void;
+  isNarrow: boolean;
 }) {
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
 
   return (
     <GlassCard onPress={onPress} variant="glow" style={styles.continueCard}>
-      <View style={styles.continueContent}>
-        <Text style={[styles.continueLabel, { color: theme.primary }]}>
-          {resolveText("CONTINUE LEARNING")}
-        </Text>
-        <Text
-          style={[styles.continueTitle, { color: theme.text }]}
-          numberOfLines={1}
+      <View style={styles.continueLayout}>
+        <View
+          style={[
+            styles.continueContent,
+            isNarrow && styles.continueContentNarrow,
+          ]}
         >
-          {topic.title}
-        </Text>
-        <Text
-          style={[styles.continueSubtitle, { color: theme.textSecondary }]}
-          numberOfLines={1}
-        >
-          {topic.chapterTitle} - {topic.bookTitle}
-        </Text>
-        <View style={styles.progressContainer}>
-          <View
-            style={[styles.progressBar, { backgroundColor: theme.glassBorder }]}
+          <Text style={[styles.continueLabel, { color: theme.primary }]}>
+            {resolveText("CONTINUE LEARNING")}
+          </Text>
+          <Text
+            style={[
+              styles.continueTitle,
+              isNarrow && styles.continueTitleNarrow,
+              { color: theme.text },
+            ]}
+            numberOfLines={isNarrow ? 2 : 1}
           >
+            {topic.title}
+          </Text>
+          <Text
+            style={[
+              styles.continueSubtitle,
+              isNarrow && styles.continueSubtitleNarrow,
+              { color: theme.textSecondary },
+            ]}
+            numberOfLines={1}
+          >
+            {topic.chapterTitle} - {topic.bookTitle}
+          </Text>
+          <View style={styles.progressContainer}>
             <View
               style={[
-                styles.progressFill,
-                { width: `${topic.progress}%`, backgroundColor: theme.primary },
+                styles.progressBar,
+                { backgroundColor: theme.glassBorder },
               ]}
+            >
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${topic.progress}%`,
+                    backgroundColor: theme.primary,
+                  },
+                ]}
+              />
+            </View>
+            <Text style={[styles.progressText, { color: theme.textMuted }]}>
+              {topic.progress}%
+            </Text>
+          </View>
+        </View>
+        <View
+          style={[
+            styles.continueActionRail,
+            isNarrow && styles.continueActionRailNarrow,
+          ]}
+        >
+          <View
+            style={[
+              styles.continueArrow,
+              isNarrow && styles.continueArrowNarrow,
+              { backgroundColor: theme.primary },
+            ]}
+          >
+            <Feather
+              name="arrow-right"
+              size={isNarrow ? 18 : 20}
+              color={theme.buttonText}
             />
           </View>
-          <Text style={[styles.progressText, { color: theme.textMuted }]}>
-            {topic.progress}%
-          </Text>
         </View>
-      </View>
-      <View style={[styles.continueArrow, { backgroundColor: theme.primary }]}>
-        <Feather name="arrow-right" size={20} color={theme.buttonText} />
       </View>
     </GlassCard>
   );
@@ -200,7 +244,7 @@ function RecommendedCard({
         <View style={styles.recommendedContent}>
           <Text
             style={[styles.recommendedTitle, { color: theme.text }]}
-            numberOfLines={1}
+            numberOfLines={2}
           >
             {topic.title}
           </Text>
@@ -218,15 +262,18 @@ function RecommendedCard({
 }
 
 export default function HomeScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
+  const { width } = useWindowDimensions();
   const t = resolveText;
   const { user } = useAuth();
   const navigation = useNavigation<NavigationProp>();
   const [refreshing, setRefreshing] = React.useState(false);
+  const isNarrow = width < 360;
+  const bottomLayout = useBottomLayout({
+    extraContentPadding: Spacing.xl,
+  });
 
   const {
     data: progressData,
@@ -241,7 +288,10 @@ export default function HomeScreen() {
     queryFn: async () => {
       try {
         const { apiRequest } = await import("@/lib/query-client");
-        const res = await apiRequest("GET", "/api/profile/recent-activity?limit=5");
+        const res = await apiRequest(
+          "GET",
+          "/api/profile/recent-activity?limit=5",
+        );
         const activities = await res.json();
         return activities.map((activity: any) => ({
           id: activity.topicId,
@@ -450,6 +500,7 @@ export default function HomeScreen() {
             <View style={styles.continueSection}>
               <ContinueLearningCard
                 topic={item.data as RecommendedTopic}
+                isNarrow={isNarrow}
                 onPress={() => handleTopicPress(item.data as RecommendedTopic)}
               />
             </View>
@@ -480,11 +531,7 @@ export default function HomeScreen() {
                     { backgroundColor: `${theme.purple}33` },
                   ]}
                 >
-                  <Feather
-                    name="repeat"
-                    size={20}
-                    color={theme.purple}
-                  />
+                  <Feather name="repeat" size={20} color={theme.purple} />
                 </View>
                 <View>
                   <Text
@@ -505,11 +552,7 @@ export default function HomeScreen() {
                   </Text>
                 </View>
               </View>
-              <Feather
-                name="chevron-right"
-                size={20}
-                color={theme.purple}
-              />
+              <Feather name="chevron-right" size={20} color={theme.purple} />
             </Pressable>
           </AnimatedListItem>
         );
@@ -543,10 +586,12 @@ export default function HomeScreen() {
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
       contentContainerStyle={{
         paddingTop: headerHeight + Spacing.lg,
-        paddingBottom: tabBarHeight + Spacing.xl,
+        paddingBottom: bottomLayout.contentBottomInset,
         paddingHorizontal: Spacing.lg,
       }}
-      scrollIndicatorInsets={{ bottom: insets.bottom }}
+      scrollIndicatorInsets={{
+        bottom: bottomLayout.scrollIndicatorBottomInset,
+      }}
       data={sections}
       keyExtractor={(item, index) => `${item.type}-${index}`}
       renderItem={renderItem}
@@ -651,14 +696,22 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   continueCard: {
-    flexDirection: "row",
-    alignItems: "center",
     padding: 0,
+  },
+  continueLayout: {
+    flexDirection: "row",
+    alignItems: "stretch",
   },
   continueContent: {
     flex: 1,
     padding: Spacing.lg,
-    paddingRight: 0,
+    paddingRight: Spacing.md,
+    minWidth: 0,
+  },
+  continueContentNarrow: {
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    paddingRight: Spacing.sm,
   },
   continueLabel: {
     ...Typography.caption,
@@ -670,9 +723,15 @@ const styles = StyleSheet.create({
     ...Typography.h4,
     marginBottom: Spacing.xs,
   },
+  continueTitleNarrow: {
+    lineHeight: 24,
+  },
   continueSubtitle: {
     ...Typography.small,
     marginBottom: Spacing.md,
+  },
+  continueSubtitleNarrow: {
+    marginBottom: Spacing.sm,
   },
   progressContainer: {
     flexDirection: "row",
@@ -694,13 +753,26 @@ const styles = StyleSheet.create({
     width: 32,
     textAlign: "right",
   },
+  continueActionRail: {
+    width: 72,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: Spacing.lg,
+  },
+  continueActionRailNarrow: {
+    width: 60,
+    paddingRight: Spacing.md,
+  },
   continueArrow: {
     width: 44,
     height: 44,
     borderRadius: BorderRadius.full,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: Spacing.lg,
+  },
+  continueArrowNarrow: {
+    width: 40,
+    height: 40,
   },
   recommendedSection: {
     marginBottom: Spacing.xl,
@@ -709,27 +781,32 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.xs,
   },
   recommendedIcon: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     borderRadius: BorderRadius.sm,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: Spacing.md,
+    marginRight: Spacing.sm,
   },
   recommendedContent: {
     flex: 1,
+    minWidth: 0,
   },
   recommendedTitle: {
-    ...Typography.body,
-    fontWeight: "500",
-    marginBottom: 2,
+    ...Typography.small,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: "600",
+    marginBottom: 1,
   },
   recommendedSubtitle: {
     ...Typography.caption,
+    lineHeight: 16,
   },
   reviewBanner: {
     flexDirection: "row",

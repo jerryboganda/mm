@@ -1,17 +1,18 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
+import { type Server } from "http";
 import { storage } from "./storage";
 import {
   insertWaitlistSchema,
   insertNewsletterSchema,
   insertContactSchema,
+  insertAccountDeletionRequestSchema,
   insertInstitutionalRequestSchema,
 } from "@shared/schema";
 import { fromError } from "zod-validation-error";
 
 export async function registerRoutes(
   httpServer: Server,
-  app: Express
+  app: Express,
 ): Promise<Server> {
   app.post("/api/waitlist", async (req, res) => {
     try {
@@ -21,7 +22,7 @@ export async function registerRoutes(
       }
       const entry = await storage.createWaitlistEntry(parsed.data);
       res.status(201).json({ success: true, id: entry.id });
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "Failed to process request" });
     }
   });
@@ -34,7 +35,20 @@ export async function registerRoutes(
       }
       const message = await storage.createContactMessage(parsed.data);
       res.status(201).json({ success: true, id: message.id });
-    } catch (error) {
+    } catch {
+      res.status(500).json({ error: "Failed to process request" });
+    }
+  });
+
+  app.post("/api/account-deletion-request", async (req, res) => {
+    try {
+      const parsed = insertAccountDeletionRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: fromError(parsed.error).message });
+      }
+      const request = await storage.createAccountDeletionRequest(parsed.data);
+      res.status(201).json({ success: true, id: request.id });
+    } catch {
       res.status(500).json({ error: "Failed to process request" });
     }
   });
@@ -47,7 +61,7 @@ export async function registerRoutes(
       }
       const entry = await storage.createNewsletterEntry(parsed.data);
       res.status(201).json({ success: true, id: entry.id });
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "Failed to process request" });
     }
   });
@@ -60,7 +74,7 @@ export async function registerRoutes(
       }
       const request = await storage.createInstitutionalRequest(parsed.data);
       res.status(201).json({ success: true, id: request.id });
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "Failed to process request" });
     }
   });

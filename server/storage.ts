@@ -31,7 +31,7 @@ import {
   type AppSetting,
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, count, avg, gt, lte, inArray } from "drizzle-orm";
+import { eq, and, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
 import crypto from "crypto";
 
 export interface IStorage {
@@ -92,6 +92,11 @@ export interface IStorage {
       subscriptionPlan?: string;
       subscriptionExpiresAt?: Date | null;
     },
+  ): Promise<User | undefined>;
+  deactivateUser(userId: string, reason?: string): Promise<User | undefined>;
+  requestAccountDeletion(
+    userId: string,
+    note?: string,
   ): Promise<User | undefined>;
 
   recordTopicView(userId: string, topicId: string): Promise<void>;
@@ -435,10 +440,7 @@ export class DatabaseStorage implements IStorage {
     email: string,
     otp: string,
   ): Promise<PasswordResetToken | undefined> {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email));
+    const [user] = await db.select().from(users).where(eq(users.email, email));
     if (!user) return undefined;
 
     const [resetToken] = await db
@@ -503,6 +505,37 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db
       .update(users)
       .set(setData)
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  async deactivateUser(
+    userId: string,
+    reason?: string,
+  ): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        isActive: false,
+        deactivatedAt: new Date(),
+        deactivationReason: reason?.trim() || null,
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || undefined;
+  }
+
+  async requestAccountDeletion(
+    userId: string,
+    _note?: string,
+  ): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        deletionRequestedAt: new Date(),
+        deletionStatus: "requested",
+      })
       .where(eq(users.id, userId))
       .returning();
     return user || undefined;
@@ -976,10 +1009,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   /** Get content reports (for admin), enriched with user name and topic title */
-  async getContentReports(
-    status?: string,
-    limit: number = 50,
-  ) {
+  async getContentReports(status?: string, limit: number = 50) {
     const baseQuery = db
       .select({
         id: contentReports.id,
@@ -1096,6 +1126,7 @@ export class DatabaseStorage implements IStorage {
       message: string;
       type: string;
       createdAt: string;
+      isRead: boolean;
     }[]
   > {
     const now = new Date();
@@ -1115,6 +1146,7 @@ export class DatabaseStorage implements IStorage {
       message: r.message,
       type: r.type,
       createdAt: r.createdAt.toISOString(),
+      isRead: false,
     }));
   }
 

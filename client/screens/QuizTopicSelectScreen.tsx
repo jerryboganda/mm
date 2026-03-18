@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { StyleSheet, View, FlatList } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,6 +14,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type QuizTopicSelectNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,11 +29,14 @@ interface QuizTopic {
 }
 
 export default function QuizTopicSelectScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<QuizTopicSelectNavigationProp>();
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({
+    footerHeight: 58,
+    footerSpacing: Spacing["2xl"],
+  });
 
   const { data: topics, isLoading } = useQuery<QuizTopic[]>({
     queryKey: ["/api/quiz/topics"],
@@ -59,9 +62,7 @@ export default function QuizTopicSelectScreen() {
           name="file-text"
           size={24}
           color={
-            selectedTopicId === item.id
-              ? theme.primary
-              : theme.textSecondary
+            selectedTopicId === item.id ? theme.primary : theme.textSecondary
           }
         />
       }
@@ -88,10 +89,12 @@ export default function QuizTopicSelectScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + 100,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         ListHeaderComponent={
           <View style={styles.header}>
             <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
@@ -112,7 +115,7 @@ export default function QuizTopicSelectScreen() {
         style={[
           styles.footer,
           {
-            paddingBottom: insets.bottom + Spacing.lg,
+            paddingBottom: bottomLayout.baseBottomInset + Spacing.lg,
             backgroundColor: "transparent",
           },
         ]}

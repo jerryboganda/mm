@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,6 +14,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type RecentActivityScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -29,11 +29,11 @@ interface Activity {
 }
 
 export default function RecentActivityScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<RecentActivityScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: activities,
@@ -115,13 +115,15 @@ export default function RecentActivityScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
           (!activities || activities.length === 0) &&
-          !isLoading &&
-          styles.emptyList,
+            !isLoading &&
+            styles.emptyList,
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

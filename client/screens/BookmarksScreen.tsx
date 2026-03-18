@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { StyleSheet, View, FlatList, RefreshControl } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -15,6 +14,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type BookmarksScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -29,11 +29,11 @@ interface Bookmark {
 }
 
 export default function BookmarksScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<BookmarksScreenNavigationProp>();
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
     data: bookmarks,
@@ -61,7 +61,10 @@ export default function BookmarksScreen() {
   const renderBookmark = ({ item }: { item: Bookmark }) => (
     <GlassCard
       title={item.topicTitle}
-      subtitle={`${item.bookTitle} • ${item.chapterTitle}`}
+      subtitle={`${item.bookTitle} - ${item.chapterTitle}`}
+      density="compact"
+      titleNumberOfLines={2}
+      subtitleNumberOfLines={1}
       onPress={() =>
         navigation.navigate("TopicReader", {
           topicId: item.topicId,
@@ -75,7 +78,7 @@ export default function BookmarksScreen() {
         </ThemedText>
       }
       testID={`card-bookmark-${item.id}`}
-      style={{ marginBottom: Spacing.md }}
+      style={{ marginBottom: Spacing.sm }}
     />
   );
 
@@ -105,13 +108,15 @@ export default function BookmarksScreen() {
           styles.listContent,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
           (!bookmarks || bookmarks.length === 0) &&
-          !isLoading &&
-          styles.emptyList,
+            !isLoading &&
+            styles.emptyList,
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

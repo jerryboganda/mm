@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import { apiRequest, getApiUrl, queryClient } from "@/lib/query-client";
+import { getApiUrl, queryClient } from "@/lib/query-client";
 
 interface User {
   id: string;
@@ -17,6 +17,15 @@ interface User {
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionPlan?: string;
   isEmailVerified: boolean;
+  isActive: boolean;
+  deactivatedAt?: string | null;
+  deletionRequestedAt?: string | null;
+  deletionStatus?:
+    | "none"
+    | "requested"
+    | "processing"
+    | "completed"
+    | "rejected";
   createdAt: string;
 }
 
@@ -37,6 +46,8 @@ interface AuthContextType {
   dismissSessionExpired: () => void;
   verifyEmail: (email: string, code: string) => Promise<void>;
   resendVerificationEmail: (email: string) => Promise<void>;
+  deactivateAccount: (reason?: string) => Promise<void>;
+  requestAccountDeletion: (note?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -127,6 +138,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const parseErrorResponse = async (response: Response) => {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+      return await response.json();
+    }
+
+    const raw = await response.text();
+    return { message: raw.trim() || `Request failed (${response.status})` };
   };
 
   const login = async (email: string, password: string) => {
@@ -231,6 +253,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const performAccountAction = async (
+    route: string,
+    payload?: Record<string, string>,
+  ) => {
+    const token = await getToken(TOKEN_KEY);
+    if (!token) {
+      throw new Error("You must be signed in to perform this action.");
+    }
+
+    const baseUrl = getApiUrl();
+    const response = await fetch(new URL(route, baseUrl), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload ?? {}),
+    });
+
+    if (!response.ok) {
+      throw await parseErrorResponse(response);
+    }
+  };
+
+  const deactivateAccount = async (reason?: string) => {
+    await performAccountAction(
+      "/api/user/deactivate",
+      reason ? { reason } : undefined,
+    );
+  };
+
+  const requestAccountDeletion = async (note?: string) => {
+    await performAccountAction(
+      "/api/user/request-account-deletion",
+      note ? { note } : undefined,
+    );
+  };
+
   const logout = async () => {
     try {
       const token = await getToken(TOKEN_KEY);
@@ -276,6 +336,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         dismissSessionExpired,
         verifyEmail,
         resendVerificationEmail,
+        deactivateAccount,
+        requestAccountDeletion,
       }}
     >
       {children}

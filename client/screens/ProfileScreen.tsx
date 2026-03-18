@@ -1,52 +1,48 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Image,
-  Pressable,
-  Alert,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, View, ScrollView, Image, Pressable } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
+import { DangerActionModal } from "@/components/DangerActionModal";
 import { GlassCard } from "@/components/GlassCard";
-import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/lib/auth";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type ProfileScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
+type ProfileActionType = "deactivate" | "delete" | "logout";
+
 export default function ProfileScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const { user, logout } = useAuth();
+  const { user, logout, deactivateAccount, requestAccountDeletion } = useAuth();
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
+  const [isProcessingProfileAction, setIsProcessingProfileAction] =
+    React.useState(false);
+  const [activeProfileAction, setActiveProfileAction] =
+    React.useState<ProfileActionType | null>(null);
+  const [profileModalMode, setProfileModalMode] = React.useState<
+    "confirm" | "success"
+  >("confirm");
+  const [checkedAcknowledgements, setCheckedAcknowledgements] = React.useState<
+    string[]
+  >([]);
+  const [profileActionError, setProfileActionError] = React.useState<
+    string | null
+  >(null);
 
   const handleLogout = () => {
-    Alert.alert("Log Out", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Log Out",
-        style: "destructive",
-        onPress: async () => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          await logout();
-        },
-      },
-    ]);
+    openProfileAction("logout");
   };
 
   const getSubscriptionBadge = () => {
@@ -61,6 +57,204 @@ export default function ProfileScreen() {
   };
 
   const subscriptionBadge = getSubscriptionBadge();
+
+  const openProfileAction = (action: ProfileActionType) => {
+    setActiveProfileAction(action);
+    setProfileModalMode("confirm");
+    setCheckedAcknowledgements([]);
+    setProfileActionError(null);
+  };
+
+  const closeProfileAction = () => {
+    if (isProcessingProfileAction || profileModalMode === "success") {
+      return;
+    }
+
+    setActiveProfileAction(null);
+    setCheckedAcknowledgements([]);
+    setProfileActionError(null);
+  };
+
+  const performProfileAction = async (action: ProfileActionType) => {
+    if (isProcessingProfileAction) {
+      return;
+    }
+
+    setIsProcessingProfileAction(true);
+    setProfileActionError(null);
+
+    try {
+      if (action === "deactivate") {
+        await deactivateAccount();
+        setProfileModalMode("success");
+      } else if (action === "delete") {
+        await requestAccountDeletion();
+        setProfileModalMode("success");
+      } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        await logout();
+      }
+    } catch (error: any) {
+      setProfileActionError(
+        error?.message ||
+          "Please try again or contact support if this continues.",
+      );
+    } finally {
+      setIsProcessingProfileAction(false);
+    }
+  };
+
+  const handleDeactivateAccount = () => {
+    openProfileAction("deactivate");
+  };
+
+  const handleDeleteAccount = () => {
+    openProfileAction("delete");
+  };
+
+  const profileActionConfig = activeProfileAction
+    ? {
+        logout: {
+          tone: "warning" as const,
+          icon: "log-out" as const,
+          eyebrowLabel: "Session",
+          title: "Log Out",
+          description:
+            "You will be signed out of Maternal Mind on this device. Your progress and account data will remain available when you sign back in.",
+          confirmLabel: "Log Out",
+          confirmIcon: "log-out" as const,
+          cancelLabel: "Stay Signed In",
+          consequenceTitle: "What happens next",
+          consequences: [
+            "You can sign back in anytime using your existing account credentials.",
+            "Your progress, bookmarks, and subscription access remain attached to your account.",
+          ],
+          acknowledgements: [],
+        },
+        deactivate: {
+          tone: "warning" as const,
+          icon:
+            profileModalMode === "success"
+              ? ("check-circle" as const)
+              : ("pause-circle" as const),
+          eyebrowLabel: undefined,
+          title:
+            profileModalMode === "success"
+              ? "Account Deactivated"
+              : "Deactivate Account",
+          description:
+            profileModalMode === "success"
+              ? "Your account has been deactivated. Sign out now to finish this action."
+              : "This will immediately disable access to your account. You will need support assistance to reactivate it later.",
+          confirmLabel:
+            profileModalMode === "success"
+              ? "Sign Out Now"
+              : "Deactivate Account",
+          confirmIcon:
+            profileModalMode === "success"
+              ? ("log-out" as const)
+              : ("pause-circle" as const),
+          cancelLabel: "Keep Account",
+          consequenceTitle:
+            profileModalMode === "success" ? "Next step" : "What happens next",
+          consequences:
+            profileModalMode === "success"
+              ? [
+                  "You will be signed out immediately after confirming below.",
+                  "Future sign-ins will be blocked until support reactivates the account.",
+                ]
+              : [
+                  "You will lose access to the app until support reactivates your account.",
+                  "Your data stays preserved, but normal app usage is blocked.",
+                ],
+          acknowledgements:
+            profileModalMode === "success"
+              ? []
+              : [
+                  {
+                    id: "deactivate-access",
+                    label:
+                      "I understand I will be signed out and need support to regain access.",
+                  },
+                ],
+        },
+        delete: {
+          tone: "danger" as const,
+          icon:
+            profileModalMode === "success"
+              ? ("check-circle" as const)
+              : ("trash-2" as const),
+          eyebrowLabel: undefined,
+          title:
+            profileModalMode === "success"
+              ? "Deletion Requested"
+              : "Delete Account",
+          description:
+            profileModalMode === "success"
+              ? "Your deletion request has been received. Sign out now to complete this flow."
+              : "This submits a verified request to remove your account and associated data. We may contact you to confirm identity before processing the deletion.",
+          confirmLabel:
+            profileModalMode === "success"
+              ? "Sign Out Now"
+              : "Request Deletion",
+          confirmIcon:
+            profileModalMode === "success"
+              ? ("log-out" as const)
+              : ("trash-2" as const),
+          cancelLabel: "Keep Account",
+          consequenceTitle:
+            profileModalMode === "success"
+              ? "What to expect"
+              : "Before you continue",
+          consequences:
+            profileModalMode === "success"
+              ? [
+                  "Your request is now pending review and processing.",
+                  "Subscription billing must still be canceled separately in Google Play or the App Store.",
+                ]
+              : [
+                  "This does not automatically cancel Google Play or App Store billing.",
+                  "Progress, bookmarks, preferences, and associated account data are part of the deletion request.",
+                ],
+          acknowledgements:
+            profileModalMode === "success"
+              ? []
+              : [
+                  {
+                    id: "delete-data",
+                    label:
+                      "I understand this requests deletion of my account and associated data.",
+                  },
+                  {
+                    id: "delete-billing",
+                    label:
+                      "I understand subscription billing must be canceled separately in Google Play or the App Store.",
+                  },
+                ],
+        },
+      }[activeProfileAction]
+    : null;
+
+  const toggleAcknowledgement = (id: string) => {
+    setCheckedAcknowledgements((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id],
+    );
+  };
+
+  const handleDangerModalConfirm = () => {
+    if (!activeProfileAction) {
+      return;
+    }
+
+    if (profileModalMode === "success") {
+      void logout();
+      return;
+    }
+
+    void performProfileAction(activeProfileAction);
+  };
 
   const settingsItems = [
     {
@@ -111,28 +305,75 @@ export default function ProfileScreen() {
   const adminItems =
     user?.role === "admin"
       ? [
-        {
-          id: "admin-email",
-          title: "Email Settings",
-          subtitle: "Configure Brevo SMTP & test emails",
-          icon: "mail" as const,
-          onPress: () => navigation.navigate("AdminEmailSettings" as any),
-        },
-      ]
+          {
+            id: "admin-email",
+            title: "Email Settings",
+            subtitle: "Configure Brevo SMTP & test emails",
+            icon: "mail" as const,
+            onPress: () => navigation.navigate("AdminEmailSettings" as any),
+          },
+        ]
       : [];
+
+  const dangerItems = [
+    {
+      id: "deactivate",
+      title: "Deactivate Account",
+      subtitle: "Temporarily disable access and sign out",
+      icon: "pause-circle" as const,
+      color: theme.warning,
+      onPress: handleDeactivateAccount,
+    },
+    {
+      id: "delete",
+      title: "Delete Account",
+      subtitle: "Request permanent removal of your account and data",
+      icon: "trash-2" as const,
+      color: theme.error,
+      onPress: handleDeleteAccount,
+    },
+  ];
 
   return (
     <BackgroundGradient>
+      {profileActionConfig ? (
+        <DangerActionModal
+          visible
+          mode={profileModalMode}
+          tone={profileActionConfig.tone}
+          icon={profileActionConfig.icon}
+          eyebrowLabel={profileActionConfig.eyebrowLabel}
+          title={profileActionConfig.title}
+          description={profileActionConfig.description}
+          confirmLabel={profileActionConfig.confirmLabel}
+          confirmIcon={profileActionConfig.confirmIcon}
+          cancelLabel={profileActionConfig.cancelLabel}
+          consequenceTitle={profileActionConfig.consequenceTitle}
+          consequences={profileActionConfig.consequences}
+          acknowledgements={profileActionConfig.acknowledgements}
+          checkedAcknowledgements={checkedAcknowledgements}
+          onToggleAcknowledgement={toggleAcknowledgement}
+          onClose={closeProfileAction}
+          onConfirm={handleDangerModalConfirm}
+          loading={isProcessingProfileAction}
+          errorMessage={profileActionError}
+          dismissible={
+            profileModalMode === "confirm" && !isProcessingProfileAction
+          }
+        />
+      ) : null}
       <ScrollView
         style={styles.container}
         contentContainerStyle={[
           styles.content,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: tabBarHeight + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
       >
         <View style={styles.profileSection}>
           <Pressable
@@ -285,13 +526,63 @@ export default function ProfileScreen() {
           </View>
         ) : null}
 
-        <PrimaryButton
-          title="Log Out"
-          onPress={handleLogout}
-          variant="ghost"
-          style={styles.logoutButton}
-          testID="button-logout"
-        />
+        <View style={styles.settingsSection}>
+          <ThemedText style={[styles.sectionLabel, { color: theme.error }]}>
+            DANGER ZONE
+          </ThemedText>
+          {dangerItems.map((item) => (
+            <GlassCard
+              key={item.id}
+              title={item.title}
+              subtitle={item.subtitle}
+              onPress={isProcessingProfileAction ? undefined : item.onPress}
+              icon={<Feather name={item.icon} size={20} color={item.color} />}
+              rightElement={
+                <Feather
+                  name="chevron-right"
+                  size={20}
+                  color={theme.textSecondary}
+                />
+              }
+              style={[
+                styles.dangerCard,
+                {
+                  marginBottom: Spacing.md,
+                  borderColor: `${item.color}4D`,
+                  opacity: isProcessingProfileAction ? 0.7 : 1,
+                },
+              ]}
+              testID={`card-danger-${item.id}`}
+            />
+          ))}
+        </View>
+
+        <View style={styles.settingsSection}>
+          <ThemedText style={[styles.sectionLabel, { color: theme.warning }]}>
+            SESSION
+          </ThemedText>
+          <GlassCard
+            title="Log Out"
+            subtitle="Sign out on this device"
+            onPress={isProcessingProfileAction ? undefined : handleLogout}
+            icon={<Feather name="log-out" size={20} color={theme.warning} />}
+            rightElement={
+              <Feather
+                name="chevron-right"
+                size={20}
+                color={theme.textSecondary}
+              />
+            }
+            style={[
+              styles.logoutCard,
+              {
+                borderColor: `${theme.warning}40`,
+                opacity: isProcessingProfileAction ? 0.7 : 1,
+              },
+            ]}
+            testID="button-logout"
+          />
+        </View>
       </ScrollView>
     </BackgroundGradient>
   );
@@ -382,6 +673,9 @@ const styles = StyleSheet.create({
   settingsSection: {
     marginBottom: Spacing["2xl"],
   },
+  dangerCard: {
+    borderWidth: 1,
+  },
   sectionLabel: {
     fontSize: 12,
     fontWeight: "500",
@@ -389,7 +683,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     marginBottom: Spacing.lg,
   },
-  logoutButton: {
-    marginTop: Spacing.lg,
+  logoutCard: {
+    borderWidth: 1,
   },
 });

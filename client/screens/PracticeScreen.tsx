@@ -1,8 +1,6 @@
 import React from "react";
 import { StyleSheet, View, ScrollView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +13,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { useBottomLayout } from "@/hooks/useBottomLayout";
 
 type PracticeScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -26,11 +25,10 @@ interface QuizStats {
 }
 
 export default function PracticeScreen() {
-  const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const tabBarHeight = useBottomTabBarHeight();
   const navigation = useNavigation<PracticeScreenNavigationProp>();
   const { theme } = useTheme();
+  const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const { data: stats } = useQuery<QuizStats>({
     queryKey: ["/api/quiz/stats"],
@@ -76,10 +74,12 @@ export default function PracticeScreen() {
           styles.content,
           {
             paddingTop: headerHeight + Spacing.xl,
-            paddingBottom: tabBarHeight + Spacing.xl,
+            paddingBottom: bottomLayout.contentBottomInset,
           },
         ]}
-        scrollIndicatorInsets={{ bottom: insets.bottom }}
+        scrollIndicatorInsets={{
+          bottom: bottomLayout.scrollIndicatorBottomInset,
+        }}
       >
         <View style={styles.statsRow}>
           <StatCard
@@ -98,7 +98,9 @@ export default function PracticeScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>QUIZ MODES</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            QUIZ MODES
+          </ThemedText>
           {quizModes.map((mode) => (
             <GlassCard
               key={mode.id}
@@ -129,17 +131,15 @@ export default function PracticeScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>SETTINGS</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            SETTINGS
+          </ThemedText>
           <GlassCard
             title="Quiz Settings"
             subtitle="Timer, question count, difficulty"
             onPress={() => navigation.navigate("QuizSettings")}
             icon={
-              <Feather
-                name="settings"
-                size={24}
-                color={theme.textSecondary}
-              />
+              <Feather name="settings" size={24} color={theme.textSecondary} />
             }
             testID="card-quiz-settings"
           />

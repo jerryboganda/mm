@@ -28,6 +28,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/auth", authRoutes);
   app.use("/api/mobile-content", generalLimiter, mobileContentRoutes);
   app.use("/api/profile", generalLimiter, userRoutes);
+  app.use("/api/user", generalLimiter, userRoutes);
   app.use("/api", generalLimiter, contentRoutes);
   app.use("/api/quiz", quizLimiter, quizRoutes);
   app.use("/api/progress", generalLimiter, progressRoutes);
