@@ -1,10 +1,48 @@
-import { QueryClient, QueryFunction, onlineManager } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryFunction,
+  onlineManager,
+} from "@tanstack/react-query";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 
 const TOKEN_KEY = "auth_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
+const ADMIN_API_ORIGIN = "https://admin.maternalmind.com.pk";
+
+function getHostedWebApiOrigin(): string | null {
+  if (Platform.OS !== "web" || typeof window === "undefined") {
+    return null;
+  }
+
+  const { hostname, origin, pathname } = window.location;
+  const isLocalHost =
+    hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+
+  if (isLocalHost) {
+    return null;
+  }
+
+  const isMaternalMindHost =
+    hostname === "maternalmind.com.pk" ||
+    hostname === "www.maternalmind.com.pk" ||
+    hostname.endsWith(".maternalmind.com.pk");
+
+  if (!isMaternalMindHost) {
+    return null;
+  }
+
+  const isDedicatedAppHost =
+    hostname !== "maternalmind.com.pk" &&
+    hostname !== "www.maternalmind.com.pk";
+
+  if (isDedicatedAppHost || pathname.startsWith("/app")) {
+    return origin;
+  }
+
+  return null;
+}
 
 // ── Wire TanStack Query's onlineManager to NetInfo ──────────────
 // When offline: queries serve from cache, mutations are paused.
@@ -46,9 +84,14 @@ async function removeToken(key: string): Promise<void> {
  * @returns {string} The API base URL
  */
 export function getApiUrl(): string {
+  const hostedWebOrigin = getHostedWebApiOrigin();
+  if (hostedWebOrigin) {
+    return hostedWebOrigin;
+  }
+
   const configured = process.env.EXPO_PUBLIC_API_URL?.trim();
   if (!configured) {
-    return "https://admin.maternalmind.com.pk";
+    return ADMIN_API_ORIGIN;
   }
 
   try {
@@ -60,13 +103,13 @@ export function getApiUrl(): string {
       parsed.hostname === "maternalmind.com.pk" ||
       parsed.hostname === "www.maternalmind.com.pk"
     ) {
-      return "https://admin.maternalmind.com.pk";
+      return ADMIN_API_ORIGIN;
     }
 
     return parsed.origin;
   } catch {
     // Invalid URL in env: fall back to known-good production API host.
-    return "https://admin.maternalmind.com.pk";
+    return ADMIN_API_ORIGIN;
   }
 }
 
