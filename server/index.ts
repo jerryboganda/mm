@@ -16,20 +16,42 @@ declare module "http" {
 }
 
 function setupCors(app: express.Application) {
-  const ALLOWED_ORIGINS = [
+  const ALLOWED_ORIGINS = new Set([
     process.env.ALLOWED_ORIGIN || "https://maternalmind.com.pk",
     "https://maternalmind.com.pk",
+    "https://www.maternalmind.com.pk",
+    "https://admin.maternalmind.com.pk",
     "http://localhost:8081", // Expo dev
     "http://localhost:19006", // Expo web
-  ];
+    "http://127.0.0.1:8081",
+    "http://127.0.0.1:19006",
+  ]);
+
+  function isAllowedOrigin(origin: string) {
+    if (ALLOWED_ORIGINS.has(origin)) {
+      return true;
+    }
+
+    try {
+      const parsed = new URL(origin);
+      return (
+        parsed.hostname === "maternalmind.com.pk" ||
+        parsed.hostname === "www.maternalmind.com.pk" ||
+        parsed.hostname.endsWith(".maternalmind.com.pk")
+      );
+    } catch {
+      return false;
+    }
+  }
 
   app.use((req, res, next) => {
     const origin = req.header("origin");
 
     // For mobile apps without origin header, allow the request
     // For web requests, validate origin against allowlist
-    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    if (origin && isAllowedOrigin(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
+      res.header("Vary", "Origin");
     } else if (!origin) {
       // Mobile apps typically don't send Origin header - allow these
       res.header("Access-Control-Allow-Origin", "*");
