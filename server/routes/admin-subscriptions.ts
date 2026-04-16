@@ -838,7 +838,16 @@ router.get("/analytics/overview", async (_req: AuthRequest, res: Response) => {
 router.get("/analytics/kpis", async (_req: AuthRequest, res: Response) => {
   try {
     const stats = await subscriptionService.getSubscriptionStats();
-    res.json(stats);
+    // Map to frontend expected shape
+    res.json({
+      activeSubscribers: stats.totalActive ?? 0,
+      mrr: stats.mrr ?? 0,
+      mrrCurrency: "USD",
+      churnRate: stats.churnRate ?? 0,
+      newThisMonth: stats.newSubscriptionsThisMonth ?? 0,
+      trialUsers: stats.totalTrialing ?? 0,
+      cancelledThisMonth: stats.totalCanceled ?? 0,
+    });
   } catch (error) {
     console.error("Error fetching subscription KPIs:", error);
     res.status(500).json({ message: "Error fetching subscription KPIs" });
@@ -861,7 +870,21 @@ router.get(
   async (_req: AuthRequest, res: Response) => {
     try {
       const revenue = await subscriptionService.getRevenueByPackage();
-      res.json(revenue);
+      const totalRev = revenue.reduce((s, r) => s + (r.totalRevenue ?? 0), 0);
+      // Map to frontend expected shape
+      res.json(
+        revenue.map((r) => ({
+          packageId: r.packageId,
+          packageName: r.packageName,
+          subscriberCount: r.activeSubscribers ?? 0,
+          revenue: r.totalRevenue ?? 0,
+          currency: "USD",
+          percentOfTotal:
+            totalRev > 0
+              ? Math.round(((r.totalRevenue ?? 0) / totalRev) * 100)
+              : 0,
+        })),
+      );
     } catch (error) {
       console.error("Error fetching revenue analytics:", error);
       res.status(500).json({ message: "Error fetching revenue analytics" });
@@ -907,7 +930,19 @@ router.get(
         : (period as "7d" | "30d" | "90d" | "1y" | undefined);
       const growth =
         await subscriptionService.getSubscriberGrowth(effectivePeriod);
-      res.json(growth);
+      // Map to frontend expected shape: [{ date, total, new, churned }]
+      let running = 0;
+      res.json(
+        (growth.growthByDay || []).map((d) => {
+          running += d.newSubscribers ?? 0;
+          return {
+            date: d.date,
+            total: running,
+            new: d.newSubscribers ?? 0,
+            churned: 0,
+          };
+        }),
+      );
     } catch (error) {
       console.error("Error fetching subscriber growth:", error);
       res.status(500).json({ message: "Error fetching subscriber growth" });
@@ -923,11 +958,35 @@ router.get("/analytics/events", async (req: AuthRequest, res: Response) => {
       ? Math.min(500, Math.max(1, parseInt(limitParam, 10)))
       : 20;
     const logs = await db
-      .select()
+      .select({
+        id: subscriptionAuditLogs.id,
+        action: subscriptionAuditLogs.action,
+        userId: subscriptionAuditLogs.userId,
+        userName: users.name,
+        previousStatus: subscriptionAuditLogs.previousStatus,
+        newStatus: subscriptionAuditLogs.newStatus,
+        source: subscriptionAuditLogs.source,
+        details: subscriptionAuditLogs.details,
+        createdAt: subscriptionAuditLogs.createdAt,
+      })
       .from(subscriptionAuditLogs)
+      .leftJoin(users, eq(subscriptionAuditLogs.userId, users.id))
       .orderBy(desc(subscriptionAuditLogs.createdAt))
       .limit(maxRows);
-    res.json(logs);
+
+    // Map to frontend expected shape
+    res.json(
+      logs.map((l) => ({
+        id: l.id,
+        type: l.action,
+        description: `${l.action}${l.previousStatus ? ` (${l.previousStatus} → ${l.newStatus})` : ""}`,
+        userId: l.userId,
+        userName: l.userName || "Unknown",
+        packageName: null,
+        createdAt:
+          l.createdAt instanceof Date ? l.createdAt.toISOString() : l.createdAt,
+      })),
+    );
   } catch (error) {
     console.error("Error fetching analytics events:", error);
     res.status(500).json({ message: "Error fetching analytics events" });
