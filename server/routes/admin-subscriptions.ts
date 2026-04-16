@@ -62,20 +62,6 @@ router.get("/comparison", async (_req: AuthRequest, res: Response) => {
   }
 });
 
-// GET /:id — Get single package with prices and features
-router.get("/:id", async (req: AuthRequest, res: Response) => {
-  try {
-    const pkg = await subscriptionService.getPackage(
-      getParamValue(req.params.id),
-    );
-    if (!pkg) return res.status(404).json({ message: "Package not found" });
-    res.json(pkg);
-  } catch (error) {
-    console.error("Error fetching package:", error);
-    res.status(500).json({ message: "Error fetching package" });
-  }
-});
-
 // POST / — Create package
 router.post("/", async (req: AuthRequest, res: Response) => {
   try {
@@ -1097,6 +1083,38 @@ router.get("/audit-log", async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Error fetching audit log:", error);
     res.status(500).json({ message: "Error fetching audit log" });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════════
+// ══  CATCH-ALL PARAMETRIC ROUTE (must be LAST)                 ══
+// ══════════════════════════════════════════════════════════════════
+
+// GET /:id — Get single package by ID
+// This MUST be the last GET route to avoid catching /packages, /coupons,
+// /add-ons, /subscribers, /audit-log, /analytics/* as :id params
+router.get("/:id", async (req: AuthRequest, res: Response) => {
+  try {
+    const id = getParamValue(req.params.id);
+    // Skip if the id matches known sub-paths (safety net)
+    const reserved = [
+      "packages",
+      "coupons",
+      "add-ons",
+      "subscribers",
+      "audit-log",
+      "analytics",
+      "comparison",
+    ];
+    if (reserved.includes(id)) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    const pkg = await subscriptionService.getPackage(id);
+    if (!pkg) return res.status(404).json({ message: "Package not found" });
+    res.json(pkg);
+  } catch (error) {
+    console.error("Error fetching package:", error);
+    res.status(500).json({ message: "Error fetching package" });
   }
 });
 
