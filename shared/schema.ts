@@ -7,6 +7,9 @@ import {
   boolean,
   timestamp,
   jsonb,
+  numeric,
+  index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -41,6 +44,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   progress: many(userProgress),
   bookmarks: many(bookmarks),
   quizAttempts: many(quizAttempts),
+  subscriptions: many(subscriptions),
 }));
 
 export const books = pgTable("books", {
@@ -394,6 +398,631 @@ export const contentReportsRelations = relations(contentReports, ({ one }) => ({
   }),
 }));
 
+// ══════════════════════════════════════════════════════════════════
+// ══  SUBSCRIPTION MANAGEMENT SYSTEM                            ══
+// ══════════════════════════════════════════════════════════════════
+
+// ── 1. Subscription Packages ──────────────────────────────────
+export const subscriptionPackages = pgTable(
+  "subscription_packages",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    description: text("description"),
+    shortDescription: text("short_description"),
+    iconUrl: text("icon_url"),
+    // Status: active (purchasable), inactive (hidden), archived (soft-deleted, existing subs honored)
+    status: text("status").notNull().default("active"),
+    isVisibleToUsers: boolean("is_visible_to_users").default(true).notNull(),
+    displayOrder: integer("display_order").default(0).notNull(),
+    // Trial configuration
+    trialDays: integer("trial_days").default(0).notNull(),
+    trialRequiresPaymentMethod: boolean("trial_requires_payment_method")
+      .default(false)
+      .notNull(),
+    // Grace period (days after expiry before feature lockout)
+    gracePeriodDays: integer("grace_period_days").default(0).notNull(),
+    // Subscriber limits (0 = unlimited)
+    maxSubscribers: integer("max_subscribers").default(0).notNull(),
+    // Package versioning — version increments when pricing/features change
+    version: integer("version").default(1).notNull(),
+    // Extensible metadata (for gateway-specific IDs, feature flags, etc.)
+    metadata: jsonb("metadata"),
+    // RevenueCat product mapping
+    revenuecatProductId: text("revenuecat_product_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_sub_pkg_status").on(table.status),
+    index("idx_sub_pkg_display_order").on(table.displayOrder),
+  ],
+);
+
+export const subscriptionPackagesRelations = relations(
+  subscriptionPackages,
+  ({ many }) => ({
+    prices: many(packagePrices),
+    features: many(packageFeatures),
+    subscriptions: many(subscriptions),
+  }),
+);
+
+// ── 2. Package Prices (polymorphic billing cycles) ────────────
+export const packagePrices = pgTable(
+  "package_prices",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    packageId: varchar("package_id")
+      .notNull()
+      .references(() => subscriptionPackages.id, { onDelete: "cascade" }),
+    // Billing cycle: monthly, quarterly, semi_annual, annual, lifetime, custom
+    billingCycle: text("billing_cycle").notNull(),
+    // Custom cycle duration in days (used when billingCycle = 'custom')
+    customDurationDays: integer("custom_duration_days"),
+    // Price in smallest currency unit (e.g., cents). Use numeric for precision.
+    price: numeric("price", { precision: 12, scale: 2 }).notNull(),
+    currency: text("currency").notNull().default("USD"),
+    // Original price for strike-through display
+    originalPrice: numeric("original_price", { precision: 12, scale: 2 }),
+    isActive: boolean("is_active").default(true).notNull(),
+    // RevenueCat offering/package mapping
+    revenuecatOfferingId: text("revenuecat_offering_id"),
+    // Versioning — ties to package version when this price was created
+    packageVersion: integer("package_version").default(1).notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pkg_price_package").on(table.packageId),
+    index("idx_pkg_price_cycle").on(table.billingCycle),
+  ],
+);
+
+export const packagePricesRelations = relations(packagePrices, ({ one }) => ({
+  package: one(subscriptionPackages, {
+    fields: [packagePrices.packageId],
+    references: [subscriptionPackages.id],
+  }),
+}));
+
+// ── 3. Package Features (for comparison matrix) ───────────────
+export const packageFeatures = pgTable(
+  "package_features",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    packageId: varchar("package_id")
+      .notNull()
+      .references(() => subscriptionPackages.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    // For comparison matrix: check, cross, limited, number (e.g., "50 MCQs/day")
+    valueType: text("value_type").notNull().default("check"),
+    value: text("value"),
+    displayOrder: integer("display_order").default(0).notNull(),
+    // Feature key for programmatic checking (e.g., "full_content_access", "unlimited_mcqs")
+    featureKey: text("feature_key"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_pkg_feature_package").on(table.packageId)],
+);
+
+export const packageFeaturesRelations = relations(
+  packageFeatures,
+  ({ one }) => ({
+    package: one(subscriptionPackages, {
+      fields: [packageFeatures.packageId],
+      references: [subscriptionPackages.id],
+    }),
+  }),
+);
+
+// ── 4. Add-Ons ────────────────────────────────────────────────
+export const addOns = pgTable(
+  "add_ons",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    description: text("description"),
+    // Pricing: one_time or recurring
+    pricingType: text("pricing_type").notNull().default("one_time"),
+    price: numeric("price", { precision: 12, scale: 2 }).notNull(),
+    currency: text("currency").notNull().default("USD"),
+    // If recurring, how often
+    billingCycle: text("billing_cycle"),
+    // Quantity limits per user (0 = unlimited)
+    maxQuantityPerUser: integer("max_quantity_per_user").default(1).notNull(),
+    // Compatibility: null = compatible with all packages, otherwise JSON array of package IDs
+    compatiblePackageIds: jsonb("compatible_package_ids"),
+    isActive: boolean("is_active").default(true).notNull(),
+    displayOrder: integer("display_order").default(0).notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_addon_status").on(table.isActive)],
+);
+
+// ── 5. Add-On Bundles ─────────────────────────────────────────
+export const addOnBundles = pgTable("add_on_bundles", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  // Discounted bundle price
+  price: numeric("price", { precision: 12, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("USD"),
+  // JSON array of add-on IDs in this bundle
+  addOnIds: jsonb("add_on_ids").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  displayOrder: integer("display_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ── 6. Coupons / Discount Engine ──────────────────────────────
+export const coupons = pgTable(
+  "coupons",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    code: text("code").notNull().unique(),
+    description: text("description"),
+    // Campaign grouping for bulk-generated codes
+    campaignId: varchar("campaign_id"),
+    // Discount type: percentage, fixed_amount, trial_extension
+    discountType: text("discount_type").notNull(),
+    // Discount value (percentage 0-100, or fixed amount, or trial days to add)
+    discountValue: numeric("discount_value", {
+      precision: 12,
+      scale: 2,
+    }).notNull(),
+    // Minimum purchase amount required
+    minPurchaseAmount: numeric("min_purchase_amount", {
+      precision: 12,
+      scale: 2,
+    }),
+    // Maximum discount cap (for percentage discounts)
+    maxDiscountAmount: numeric("max_discount_amount", {
+      precision: 12,
+      scale: 2,
+    }),
+    // Applicability: null = all packages/add-ons, otherwise JSON arrays of IDs
+    applicablePackageIds: jsonb("applicable_package_ids"),
+    applicableAddOnIds: jsonb("applicable_add_on_ids"),
+    // Usage limits
+    maxTotalUses: integer("max_total_uses"), // null = unlimited
+    maxUsesPerUser: integer("max_uses_per_user").default(1).notNull(),
+    currentUseCount: integer("current_use_count").default(0).notNull(),
+    // Validity period
+    validFrom: timestamp("valid_from"),
+    validUntil: timestamp("valid_until"),
+    // Stacking rules
+    isStackable: boolean("is_stackable").default(false).notNull(),
+    // Referral/affiliate tracking
+    referralUserId: varchar("referral_user_id").references(() => users.id),
+    isActive: boolean("is_active").default(true).notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_coupon_code").on(table.code),
+    index("idx_coupon_campaign").on(table.campaignId),
+    index("idx_coupon_active").on(table.isActive),
+    index("idx_coupon_validity").on(table.validFrom, table.validUntil),
+  ],
+);
+
+export const couponsRelations = relations(coupons, ({ one, many }) => ({
+  referrer: one(users, {
+    fields: [coupons.referralUserId],
+    references: [users.id],
+  }),
+  usage: many(couponUsage),
+}));
+
+// ── 7. Coupon Usage Tracking ──────────────────────────────────
+export const couponUsage = pgTable(
+  "coupon_usage",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    couponId: varchar("coupon_id")
+      .notNull()
+      .references(() => coupons.id, { onDelete: "cascade" }),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    subscriptionId: varchar("subscription_id"),
+    // Amount discounted
+    discountApplied: numeric("discount_applied", {
+      precision: 12,
+      scale: 2,
+    }).notNull(),
+    usedAt: timestamp("used_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_coupon_usage_coupon").on(table.couponId),
+    index("idx_coupon_usage_user").on(table.userId),
+  ],
+);
+
+export const couponUsageRelations = relations(couponUsage, ({ one }) => ({
+  coupon: one(coupons, {
+    fields: [couponUsage.couponId],
+    references: [coupons.id],
+  }),
+  user: one(users, {
+    fields: [couponUsage.userId],
+    references: [users.id],
+  }),
+}));
+
+// ── 8. Subscriptions (lifecycle tracking) ─────────────────────
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    packageId: varchar("package_id")
+      .notNull()
+      .references(() => subscriptionPackages.id),
+    priceId: varchar("price_id").references(() => packagePrices.id),
+    // State machine: trialing → active → past_due → paused → canceled → expired
+    status: text("status").notNull().default("trialing"),
+    // Dates for every lifecycle transition
+    trialStartAt: timestamp("trial_start_at"),
+    trialEndAt: timestamp("trial_end_at"),
+    activatedAt: timestamp("activated_at"),
+    currentPeriodStart: timestamp("current_period_start"),
+    currentPeriodEnd: timestamp("current_period_end"),
+    canceledAt: timestamp("canceled_at"),
+    cancelReason: text("cancel_reason"),
+    // cancel_at_period_end: true = cancel at end of current period, false = immediate
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").default(true).notNull(),
+    pausedAt: timestamp("paused_at"),
+    resumedAt: timestamp("resumed_at"),
+    expiredAt: timestamp("expired_at"),
+    // Grace period tracking
+    gracePeriodEndAt: timestamp("grace_period_end_at"),
+    // Dunning management (failed payment retries)
+    failedPaymentCount: integer("failed_payment_count").default(0).notNull(),
+    lastPaymentFailedAt: timestamp("last_payment_failed_at"),
+    nextRetryAt: timestamp("next_retry_at"),
+    // Billing
+    billingCycle: text("billing_cycle").notNull(),
+    priceAtPurchase: numeric("price_at_purchase", {
+      precision: 12,
+      scale: 2,
+    }).notNull(),
+    currency: text("currency").notNull().default("USD"),
+    // Applied coupon
+    couponId: varchar("coupon_id").references(() => coupons.id),
+    discountAmount: numeric("discount_amount", { precision: 12, scale: 2 }),
+    // External references
+    externalSubscriptionId: text("external_subscription_id"), // RevenueCat/Stripe/etc ID
+    paymentGateway: text("payment_gateway").default("revenuecat"), // revenuecat, stripe, paypal, manual
+    // Package version at time of subscription (for grandfathering)
+    packageVersionAtPurchase: integer("package_version_at_purchase")
+      .default(1)
+      .notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_sub_user").on(table.userId),
+    index("idx_sub_package").on(table.packageId),
+    index("idx_sub_status").on(table.status),
+    index("idx_sub_period_end").on(table.currentPeriodEnd),
+    index("idx_sub_external_id").on(table.externalSubscriptionId),
+  ],
+);
+
+export const subscriptionsRelations = relations(
+  subscriptions,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [subscriptions.userId],
+      references: [users.id],
+    }),
+    package: one(subscriptionPackages, {
+      fields: [subscriptions.packageId],
+      references: [subscriptionPackages.id],
+    }),
+    price: one(packagePrices, {
+      fields: [subscriptions.priceId],
+      references: [packagePrices.id],
+    }),
+    coupon: one(coupons, {
+      fields: [subscriptions.couponId],
+      references: [coupons.id],
+    }),
+    addOns: many(subscriptionAddOns),
+    invoices: many(invoices),
+  }),
+);
+
+// ── 9. Subscription Add-Ons (attached to a subscription) ─────
+export const subscriptionAddOns = pgTable(
+  "subscription_add_ons",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    subscriptionId: varchar("subscription_id")
+      .notNull()
+      .references(() => subscriptions.id, { onDelete: "cascade" }),
+    addOnId: varchar("add_on_id")
+      .notNull()
+      .references(() => addOns.id),
+    quantity: integer("quantity").default(1).notNull(),
+    priceAtPurchase: numeric("price_at_purchase", {
+      precision: 12,
+      scale: 2,
+    }).notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    activatedAt: timestamp("activated_at").defaultNow().notNull(),
+    canceledAt: timestamp("canceled_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_sub_addon_subscription").on(table.subscriptionId),
+    index("idx_sub_addon_addon").on(table.addOnId),
+  ],
+);
+
+export const subscriptionAddOnsRelations = relations(
+  subscriptionAddOns,
+  ({ one }) => ({
+    subscription: one(subscriptions, {
+      fields: [subscriptionAddOns.subscriptionId],
+      references: [subscriptions.id],
+    }),
+    addOn: one(addOns, {
+      fields: [subscriptionAddOns.addOnId],
+      references: [addOns.id],
+    }),
+  }),
+);
+
+// ── 10. Invoices ──────────────────────────────────────────────
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    // Human-readable invoice number (e.g., INV-2026-0001)
+    invoiceNumber: text("invoice_number").notNull().unique(),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    subscriptionId: varchar("subscription_id").references(
+      () => subscriptions.id,
+    ),
+    // Status: draft, open, paid, void, uncollectible
+    status: text("status").notNull().default("draft"),
+    // Amounts
+    subtotal: numeric("subtotal", { precision: 12, scale: 2 }).notNull(),
+    discountTotal: numeric("discount_total", {
+      precision: 12,
+      scale: 2,
+    }).default("0"),
+    taxTotal: numeric("tax_total", { precision: 12, scale: 2 }).default("0"),
+    total: numeric("total", { precision: 12, scale: 2 }).notNull(),
+    currency: text("currency").notNull().default("USD"),
+    // Payment tracking
+    paidAt: timestamp("paid_at"),
+    dueAt: timestamp("due_at"),
+    // Period covered
+    periodStart: timestamp("period_start"),
+    periodEnd: timestamp("period_end"),
+    // Applied coupon for reference
+    couponId: varchar("coupon_id").references(() => coupons.id),
+    notes: text("notes"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_invoice_user").on(table.userId),
+    index("idx_invoice_subscription").on(table.subscriptionId),
+    index("idx_invoice_status").on(table.status),
+  ],
+);
+
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  user: one(users, {
+    fields: [invoices.userId],
+    references: [users.id],
+  }),
+  subscription: one(subscriptions, {
+    fields: [invoices.subscriptionId],
+    references: [subscriptions.id],
+  }),
+  coupon: one(coupons, {
+    fields: [invoices.couponId],
+    references: [coupons.id],
+  }),
+  lineItems: many(invoiceLineItems),
+  transactions: many(paymentTransactions),
+}));
+
+// ── 11. Invoice Line Items ────────────────────────────────────
+export const invoiceLineItems = pgTable(
+  "invoice_line_items",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    invoiceId: varchar("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    // Type: subscription, add_on, proration_credit, proration_charge
+    type: text("type").notNull(),
+    description: text("description").notNull(),
+    // Reference to package/add-on
+    packageId: varchar("package_id").references(() => subscriptionPackages.id),
+    addOnId: varchar("add_on_id").references(() => addOns.id),
+    quantity: integer("quantity").default(1).notNull(),
+    unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull(),
+    total: numeric("total", { precision: 12, scale: 2 }).notNull(),
+    // Period for prorations
+    periodStart: timestamp("period_start"),
+    periodEnd: timestamp("period_end"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_line_item_invoice").on(table.invoiceId)],
+);
+
+export const invoiceLineItemsRelations = relations(
+  invoiceLineItems,
+  ({ one }) => ({
+    invoice: one(invoices, {
+      fields: [invoiceLineItems.invoiceId],
+      references: [invoices.id],
+    }),
+    package: one(subscriptionPackages, {
+      fields: [invoiceLineItems.packageId],
+      references: [subscriptionPackages.id],
+    }),
+    addOn: one(addOns, {
+      fields: [invoiceLineItems.addOnId],
+      references: [addOns.id],
+    }),
+  }),
+);
+
+// ── 12. Payment Transactions ──────────────────────────────────
+export const paymentTransactions = pgTable(
+  "payment_transactions",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    invoiceId: varchar("invoice_id").references(() => invoices.id),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // Status: pending, succeeded, failed, refunded, disputed
+    status: text("status").notNull().default("pending"),
+    // Amount and currency
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+    currency: text("currency").notNull().default("USD"),
+    // Gateway details
+    paymentGateway: text("payment_gateway").notNull(), // revenuecat, stripe, paypal, manual
+    gatewayTransactionId: text("gateway_transaction_id"),
+    gatewayResponse: jsonb("gateway_response"),
+    // Failure details
+    failureReason: text("failure_reason"),
+    failureCode: text("failure_code"),
+    // Refund tracking
+    refundedAmount: numeric("refunded_amount", { precision: 12, scale: 2 }),
+    refundedAt: timestamp("refunded_at"),
+    refundReason: text("refund_reason"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_txn_invoice").on(table.invoiceId),
+    index("idx_txn_user").on(table.userId),
+    index("idx_txn_status").on(table.status),
+    index("idx_txn_gateway_id").on(table.gatewayTransactionId),
+  ],
+);
+
+export const paymentTransactionsRelations = relations(
+  paymentTransactions,
+  ({ one }) => ({
+    invoice: one(invoices, {
+      fields: [paymentTransactions.invoiceId],
+      references: [invoices.id],
+    }),
+    user: one(users, {
+      fields: [paymentTransactions.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+// ── 13. Subscription Audit Log ────────────────────────────────
+export const subscriptionAuditLogs = pgTable(
+  "subscription_audit_logs",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    subscriptionId: varchar("subscription_id").references(
+      () => subscriptions.id,
+    ),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // Who performed this action (null = system/webhook, non-null = admin/user)
+    performedBy: varchar("performed_by").references(() => users.id),
+    // Action: created, activated, renewed, upgraded, downgraded, paused, resumed,
+    //         canceled, expired, reactivated, payment_failed, payment_succeeded,
+    //         coupon_applied, add_on_added, add_on_removed, admin_override
+    action: text("action").notNull(),
+    // Previous and new status for state transitions
+    previousStatus: text("previous_status"),
+    newStatus: text("new_status"),
+    // Additional context
+    details: jsonb("details"),
+    // Source: webhook, client_sync, admin_panel, system_cron, api
+    source: text("source").notNull().default("system"),
+    ipAddress: text("ip_address"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_sub_audit_subscription").on(table.subscriptionId),
+    index("idx_sub_audit_user").on(table.userId),
+    index("idx_sub_audit_action").on(table.action),
+    index("idx_sub_audit_created").on(table.createdAt),
+  ],
+);
+
+export const subscriptionAuditLogsRelations = relations(
+  subscriptionAuditLogs,
+  ({ one }) => ({
+    subscription: one(subscriptions, {
+      fields: [subscriptionAuditLogs.subscriptionId],
+      references: [subscriptions.id],
+    }),
+    user: one(users, {
+      fields: [subscriptionAuditLogs.userId],
+      references: [users.id],
+    }),
+    performer: one(users, {
+      fields: [subscriptionAuditLogs.performedBy],
+      references: [users.id],
+    }),
+  }),
+);
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -425,6 +1054,147 @@ export const resetPasswordSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+// ── Subscription Zod Schemas ──────────────────────────────────
+
+export const subscriptionStatusEnum = z.enum([
+  "trialing",
+  "active",
+  "past_due",
+  "paused",
+  "canceled",
+  "expired",
+  "none",
+]);
+
+export const billingCycleEnum = z.enum([
+  "monthly",
+  "quarterly",
+  "semi_annual",
+  "annual",
+  "lifetime",
+  "custom",
+]);
+
+export const packageStatusEnum = z.enum(["active", "inactive", "archived"]);
+
+export const discountTypeEnum = z.enum([
+  "percentage",
+  "fixed_amount",
+  "trial_extension",
+]);
+
+export const createPackageSchema = z.object({
+  name: z.string().min(1, "Package name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  description: z.string().optional(),
+  shortDescription: z.string().optional(),
+  iconUrl: z.string().url().optional().or(z.literal("")),
+  status: packageStatusEnum.default("active"),
+  isVisibleToUsers: z.boolean().default(true),
+  displayOrder: z.number().int().default(0),
+  trialDays: z.number().int().min(0).default(0),
+  trialRequiresPaymentMethod: z.boolean().default(false),
+  gracePeriodDays: z.number().int().min(0).default(0),
+  maxSubscribers: z.number().int().min(0).default(0),
+  revenuecatProductId: z.string().optional(),
+  metadata: z.any().optional(),
+});
+
+export const updatePackageSchema = createPackageSchema.partial();
+
+export const createPackagePriceSchema = z.object({
+  packageId: z.string().min(1),
+  billingCycle: billingCycleEnum,
+  customDurationDays: z.number().int().min(1).optional(),
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
+  currency: z.string().default("USD"),
+  originalPrice: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  isActive: z.boolean().default(true),
+  revenuecatOfferingId: z.string().optional(),
+  metadata: z.any().optional(),
+});
+
+export const createPackageFeatureSchema = z.object({
+  packageId: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().optional(),
+  valueType: z.enum(["check", "cross", "limited", "number"]).default("check"),
+  value: z.string().optional(),
+  displayOrder: z.number().int().default(0),
+  featureKey: z.string().optional(),
+});
+
+export const createAddOnSchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().optional(),
+  pricingType: z.enum(["one_time", "recurring"]).default("one_time"),
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/),
+  currency: z.string().default("USD"),
+  billingCycle: billingCycleEnum.optional(),
+  maxQuantityPerUser: z.number().int().min(1).default(1),
+  compatiblePackageIds: z.array(z.string()).optional(),
+  isActive: z.boolean().default(true),
+  displayOrder: z.number().int().default(0),
+  metadata: z.any().optional(),
+});
+
+export const updateAddOnSchema = createAddOnSchema.partial();
+
+export const createCouponSchema = z.object({
+  code: z.string().min(1).max(50),
+  description: z.string().optional(),
+  campaignId: z.string().optional(),
+  discountType: discountTypeEnum,
+  discountValue: z.string().regex(/^\d+(\.\d{1,2})?$/),
+  minPurchaseAmount: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  maxDiscountAmount: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  applicablePackageIds: z.array(z.string()).optional(),
+  applicableAddOnIds: z.array(z.string()).optional(),
+  maxTotalUses: z.number().int().min(1).optional(),
+  maxUsesPerUser: z.number().int().min(1).default(1),
+  validFrom: z.string().datetime().optional(),
+  validUntil: z.string().datetime().optional(),
+  isStackable: z.boolean().default(false),
+  referralUserId: z.string().optional(),
+  isActive: z.boolean().default(true),
+  metadata: z.any().optional(),
+});
+
+export const updateCouponSchema = createCouponSchema.partial();
+
+export const validateCouponSchema = z.object({
+  code: z.string().min(1),
+  packageId: z.string().optional(),
+  addOnId: z.string().optional(),
+});
+
+export const bulkCouponGenerationSchema = z.object({
+  count: z.number().int().min(1).max(10000),
+  prefix: z.string().min(1).max(20),
+  campaignId: z.string().optional(),
+  discountType: discountTypeEnum,
+  discountValue: z.string().regex(/^\d+(\.\d{1,2})?$/),
+  maxUsesPerUser: z.number().int().min(1).default(1),
+  maxTotalUses: z.number().int().min(1).optional(),
+  validFrom: z.string().datetime().optional(),
+  validUntil: z.string().datetime().optional(),
+  applicablePackageIds: z.array(z.string()).optional(),
+  isStackable: z.boolean().default(false),
+  metadata: z.any().optional(),
+});
+
+// ── Type Exports ──────────────────────────────────────────────
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Book = typeof books.$inferSelect;
@@ -442,3 +1212,18 @@ export type ContentReport = typeof contentReports.$inferSelect;
 export type AppSetting = typeof appSettings.$inferSelect;
 export type Announcement = typeof announcements.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
+
+// Subscription System Types
+export type SubscriptionPackage = typeof subscriptionPackages.$inferSelect;
+export type PackagePrice = typeof packagePrices.$inferSelect;
+export type PackageFeature = typeof packageFeatures.$inferSelect;
+export type AddOn = typeof addOns.$inferSelect;
+export type AddOnBundle = typeof addOnBundles.$inferSelect;
+export type Coupon = typeof coupons.$inferSelect;
+export type CouponUsage = typeof couponUsage.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type SubscriptionAddOn = typeof subscriptionAddOns.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;
+export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
+export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
+export type SubscriptionAuditLog = typeof subscriptionAuditLogs.$inferSelect;
