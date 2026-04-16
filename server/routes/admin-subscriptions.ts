@@ -371,10 +371,54 @@ router.get("/coupons", async (req: AuthRequest, res: Response) => {
         active !== undefined ? active === "true" || active === "1" : undefined,
       discountType: type,
     });
-    res.json(result);
+    // Map to frontend expected flat array with field name mapping
+    const coupons = (result.data || result || []).map((c: any) => ({
+      id: c.id,
+      code: c.code,
+      discountType: c.discountType,
+      discountValue: parseFloat(c.discountValue) || 0,
+      currency: "USD",
+      maxUses: c.maxTotalUses,
+      currentUses: c.currentUseCount ?? 0,
+      validFrom: c.validFrom,
+      validUntil: c.validUntil,
+      campaign: c.campaignId || "",
+      isActive: c.isActive ?? true,
+      minimumAmount: parseFloat(c.minPurchaseAmount) || 0,
+      applicablePackages: c.applicablePackageIds || [],
+      createdAt: c.createdAt,
+    }));
+    res.json(coupons);
   } catch (error) {
     console.error("Error listing coupons:", error);
     res.status(500).json({ message: "Error listing coupons" });
+  }
+});
+
+// GET /coupons/analytics — General coupon analytics overview
+// MUST be before /coupons/:id to avoid matching "analytics" as an id
+router.get("/coupons/analytics", async (_req: AuthRequest, res: Response) => {
+  try {
+    const overview = await couponService.getCouponAnalytics();
+    // Map to frontend expected shape
+    const analytics = overview as any;
+    res.json({
+      totalRedemptions:
+        analytics.totalRedemptions ?? analytics.redemptionCount ?? 0,
+      totalDiscountGiven:
+        analytics.totalDiscountGiven ?? analytics.totalDiscount ?? 0,
+      averageOrderValue: analytics.averageOrderValue ?? 0,
+      topCoupons: (analytics.topCoupons || analytics.topPerformers || []).map(
+        (t: any) => ({
+          code: t.code || t.couponCode || "",
+          redemptions: t.redemptions || t.useCount || 0,
+          discountGiven: t.discountGiven || t.totalDiscount || 0,
+        }),
+      ),
+    });
+  } catch (error) {
+    console.error("Error fetching coupon analytics:", error);
+    res.status(500).json({ message: "Error fetching coupon analytics" });
   }
 });
 
@@ -1012,13 +1056,59 @@ router.get(
 // ══════════════════════════════════════════════════════════════════
 
 // GET /packages — List all packages (alias for / root route)
+// Returns enriched packages with nested prices, features, and subscriber counts
 router.get("/packages", async (req: AuthRequest, res: Response) => {
   try {
     const { status } = req.query as { status?: string };
     const packages = await subscriptionService.getPackages(
       status ? { status } : undefined,
     );
-    res.json(packages);
+
+    // Enrich each package with prices, features, and subscriber count
+    const enriched = await Promise.all(
+      packages.map(async (pkg) => {
+        const full = await subscriptionService.getPackage(pkg.id);
+        // Count active subscriptions for this package
+        const [subCount] = await db
+          .select({ count: count() })
+          .from(subscriptions)
+          .where(
+            and(
+              eq(subscriptions.packageId, pkg.id),
+              or(
+                eq(subscriptions.status, "active"),
+                eq(subscriptions.status, "trialing"),
+              ),
+            ),
+          );
+        return {
+          ...pkg,
+          subscriberCount: Number(subCount?.count ?? 0),
+          features: (full?.prices ? [] : []).concat([] as any),
+          prices: [] as any[],
+          ...(full
+            ? {
+                features: ((full as any).features || []).map((f: any) => ({
+                  id: f.id,
+                  key: f.featureKey || f.name,
+                  label: f.name,
+                  included: f.valueType !== "cross",
+                  sortOrder: f.displayOrder ?? 0,
+                })),
+                prices: ((full as any).prices || []).map((p: any) => ({
+                  id: p.id,
+                  billingCycle: p.billingCycle,
+                  price: parseFloat(p.price) || 0,
+                  currency: p.currency || "USD",
+                  stripePriceId: p.revenuecatOfferingId || "",
+                  isActive: p.isActive ?? true,
+                })),
+              }
+            : {}),
+        };
+      }),
+    );
+    res.json(enriched);
   } catch (error) {
     console.error("Error fetching packages:", error);
     res.status(500).json({ message: "Error fetching packages" });
