@@ -1,19 +1,22 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
-import Layout from './components/Layout';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-import BooksPage from './pages/BooksPage';
-import ChaptersPage from './pages/ChaptersPage';
-import TopicsPage from './pages/TopicsPage';
-import TopicEditorPage from './pages/TopicEditorPage';
-import McqsPage from './pages/McqsPage';
-import UsersPage from './pages/UsersPage';
-import AnalyticsPage from './pages/AnalyticsPage';
-import AnnouncementsPage from './pages/AnnouncementsPage';
-import ContentReportsPage from './pages/ContentReportsPage';
-import SettingsPage from './pages/SettingsPage';
-import MobileAppContentPage from './pages/MobileAppContentPage';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import Layout from "./components/Layout";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import BooksPage from "./pages/BooksPage";
+import ChaptersPage from "./pages/ChaptersPage";
+import TopicsPage from "./pages/TopicsPage";
+import TopicEditorPage from "./pages/TopicEditorPage";
+import McqsPage from "./pages/McqsPage";
+import UsersPage from "./pages/UsersPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import AnnouncementsPage from "./pages/AnnouncementsPage";
+import ContentReportsPage from "./pages/ContentReportsPage";
+import SettingsPage from "./pages/SettingsPage";
+import MobileAppContentPage from "./pages/MobileAppContentPage";
+import SubscriptionDashboardPage from "./pages/SubscriptionDashboardPage";
+import SubscriptionPackagesPage from "./pages/SubscriptionPackagesPage";
+import SubscriptionCouponsPage from "./pages/SubscriptionCouponsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -45,15 +48,42 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/books" element={<BooksPage />} />
-                <Route path="/books/:bookId/chapters" element={<ChaptersPage />} />
-                <Route path="/chapters/:chapterId/topics" element={<TopicsPage />} />
-                <Route path="/topics/:topicId/edit" element={<TopicEditorPage />} />
+                <Route
+                  path="/books/:bookId/chapters"
+                  element={<ChaptersPage />}
+                />
+                <Route
+                  path="/chapters/:chapterId/topics"
+                  element={<TopicsPage />}
+                />
+                <Route
+                  path="/topics/:topicId/edit"
+                  element={<TopicEditorPage />}
+                />
                 <Route path="/mcqs" element={<McqsPage />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/announcements" element={<AnnouncementsPage />} />
-                <Route path="/content-reports" element={<ContentReportsPage />} />
-                <Route path="/mobile-app-content" element={<MobileAppContentPage />} />
+                <Route
+                  path="/content-reports"
+                  element={<ContentReportsPage />}
+                />
+                <Route
+                  path="/mobile-app-content"
+                  element={<MobileAppContentPage />}
+                />
+                <Route
+                  path="/subscriptions"
+                  element={<SubscriptionDashboardPage />}
+                />
+                <Route
+                  path="/subscription-packages"
+                  element={<SubscriptionPackagesPage />}
+                />
+                <Route
+                  path="/subscription-coupons"
+                  element={<SubscriptionCouponsPage />}
+                />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

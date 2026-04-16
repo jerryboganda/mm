@@ -3,6 +3,7 @@ import { storage } from "../storage";
 import { sendEmail, supportIssueEmailHtml } from "../email";
 import { AuthRequest, authMiddleware } from "../middleware";
 import { getSupportContactSettings } from "../lib/support-contact";
+import { subscriptionService } from "../services/subscription-service";
 
 const router = Router();
 
@@ -250,6 +251,10 @@ router.post(
           .json({ message: "subscriptionStatus is required" });
       }
 
+      // Get previous status for audit logging
+      const existingUser = await storage.getUser(req.userId!);
+      const previousStatus = existingUser?.subscriptionStatus || "none";
+
       const data: {
         subscriptionStatus: string;
         subscriptionPlan?: string;
@@ -263,6 +268,28 @@ router.post(
       const user = await storage.updateSubscription(req.userId!, data);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
+      }
+
+      // Log to subscription audit trail
+      if (previousStatus !== subscriptionStatus) {
+        try {
+          await subscriptionService.logSubscriptionEvent({
+            userId: req.userId!,
+            action:
+              subscriptionStatus === "active"
+                ? "activated"
+                : subscriptionStatus,
+            previousStatus,
+            newStatus: subscriptionStatus,
+            source: "client_sync",
+            details: {
+              subscriptionPlan,
+              expiresAt,
+            },
+          });
+        } catch (auditErr) {
+          console.error("Subscription audit log error:", auditErr);
+        }
       }
 
       res.json({
