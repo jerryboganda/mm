@@ -16,32 +16,28 @@ function getHostedWebApiOrigin(): string | null {
     return null;
   }
 
-  const { hostname, origin, pathname } = window.location;
+  const { hostname, origin } = window.location;
   const isLocalHost =
     hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
 
+  // Local dev: use configured EXPO_PUBLIC_API_URL (usually a different port).
   if (isLocalHost) {
     return null;
   }
 
-  const isMaternalMindHost =
+  // The marketing site (maternalmind.com.pk / www.) does NOT serve the mobile
+  // auth API — it's a Laravel site. Force those visits to the admin API origin.
+  if (
     hostname === "maternalmind.com.pk" ||
-    hostname === "www.maternalmind.com.pk" ||
-    hostname.endsWith(".maternalmind.com.pk");
-
-  if (!isMaternalMindHost) {
+    hostname === "www.maternalmind.com.pk"
+  ) {
     return null;
   }
 
-  const isDedicatedAppHost =
-    hostname !== "maternalmind.com.pk" &&
-    hostname !== "www.maternalmind.com.pk";
-
-  if (isDedicatedAppHost || pathname.startsWith("/app")) {
-    return origin;
-  }
-
-  return null;
+  // Any other hosted web deployment (admin.maternalmind.com.pk, app.maternalmind.com.pk,
+  // raw VPS IP, preview deployments, etc.) serves the API from its own origin.
+  // Using same-origin requests eliminates CORS entirely for the web build.
+  return origin;
 }
 
 // ── Wire TanStack Query's onlineManager to NetInfo ──────────────

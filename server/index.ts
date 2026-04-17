@@ -81,7 +81,18 @@ function setupSecurityHeaders(app: express.Application) {
     );
     res.setHeader(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https:;",
+      "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://m.stripe.network; " +
+        "script-src-elem 'self' 'unsafe-inline' https://js.stripe.com https://m.stripe.network; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "img-src 'self' data: blob: https:; " +
+        "font-src 'self' data: https://fonts.gstatic.com https:; " +
+        "connect-src 'self' https: wss:; " +
+        "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network; " +
+        "worker-src 'self' blob:; " +
+        "object-src 'none'; " +
+        "base-uri 'self'; " +
+        "form-action 'self';",
     );
     res.setHeader(
       "Permissions-Policy",
