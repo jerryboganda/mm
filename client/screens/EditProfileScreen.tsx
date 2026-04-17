@@ -98,7 +98,12 @@ export default function EditProfileScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (isOffline) {
-      Alert.alert(t("No Internet"), t("Updating your profile requires an internet connection. Please try again when you're online."));
+      Alert.alert(
+        t("No Internet"),
+        t(
+          "Updating your profile requires an internet connection. Please try again when you're online.",
+        ),
+      );
       return;
     }
 
@@ -145,7 +150,13 @@ export default function EditProfileScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.photoSection}>
-          <Pressable onPress={handlePickImage} style={styles.photoContainer}>
+          <Pressable
+            onPress={handlePickImage}
+            style={styles.photoContainer}
+            accessibilityRole="button"
+            accessibilityLabel="Change profile photo"
+            accessibilityHint="Opens photo library to select a new profile picture"
+          >
             <Image
               source={
                 photoUri
@@ -192,6 +203,7 @@ export default function EditProfileScreen() {
               autoCapitalize="words"
               autoCorrect={false}
               testID="input-name"
+              accessibilityLabel="Full Name"
             />
           </GlassCard>
 
@@ -220,10 +232,13 @@ export default function EditProfileScreen() {
             style={styles.saveButton}
             testID="button-save-profile"
           />
-          <Pressable onPress={handleCancel} style={styles.cancelButton}>
-            <ThemedText
-              style={[styles.cancelText, { color: theme.textMuted }]}
-            >
+          <Pressable
+            onPress={handleCancel}
+            style={styles.cancelButton}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel editing"
+          >
+            <ThemedText style={[styles.cancelText, { color: theme.textMuted }]}>
               Cancel
             </ThemedText>
           </Pressable>

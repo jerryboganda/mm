@@ -1,13 +1,13 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { pool } from "./db";
+import { pool, ensureDatabaseConnection } from "./db";
+import { logger } from "./lib/logger";
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
 
 const app = express();
-const log = console.log;
 
 declare module "http" {
   interface IncomingMessage {
@@ -47,25 +47,22 @@ function setupCors(app: express.Application) {
   app.use((req, res, next) => {
     const origin = req.header("origin");
 
-    // For mobile apps without origin header, allow the request
-    // For web requests, validate origin against allowlist
+    // For web requests, validate origin against allowlist.
+    // Mobile apps without an Origin header don't need CORS headers at all —
+    // skip setting them so we never pair "Allow-Origin: *" with credentials.
     if (origin && isAllowedOrigin(origin)) {
       res.header("Access-Control-Allow-Origin", origin);
       res.header("Vary", "Origin");
-    } else if (!origin) {
-      // Mobile apps typically don't send Origin header - allow these
-      res.header("Access-Control-Allow-Origin", "*");
-    }
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      );
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.header("Access-Control-Allow-Credentials", "true");
 
-    res.header(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-    );
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(200);
+      if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+      }
     }
 
     next();
@@ -73,7 +70,7 @@ function setupCors(app: express.Application) {
 }
 
 function setupSecurityHeaders(app: express.Application) {
-  app.use((_req, res, next) => {
+  app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("X-XSS-Protection", "1; mode=block");
@@ -82,7 +79,31 @@ function setupSecurityHeaders(app: express.Application) {
       "Strict-Transport-Security",
       "max-age=31536000; includeSubDomains",
     );
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https:;",
+    );
+    res.setHeader(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=()",
+    );
+    res.setHeader("X-API-Version", "1.0.0");
     res.removeHeader("X-Powered-By");
+
+    // Prevent caching of API responses
+    if (req.path.startsWith("/api")) {
+      res.setHeader(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate, proxy-revalidate",
+      );
+      res.setHeader("Pragma", "no-cache");
+    }
+
+    // Signal client to enforce session timeout for admin routes
+    if (req.path.startsWith("/api/admin")) {
+      res.setHeader("X-Session-Timeout", "3600"); // 1 hour
+    }
+
     next();
   });
 }
@@ -101,11 +122,24 @@ function setupHealthCheck(app: express.Application) {
       const client = await pool.connect();
       await client.query("SELECT 1");
       client.release();
+
+      const mem = process.memoryUsage();
       res.json({
         status: "healthy",
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         version: process.env.npm_package_version || "1.0.0",
+        db: {
+          totalCount: pool.totalCount,
+          idleCount: pool.idleCount,
+          waitingCount: pool.waitingCount,
+        },
+        memory: {
+          rss: mem.rss,
+          heapUsed: mem.heapUsed,
+          heapTotal: mem.heapTotal,
+          external: mem.external,
+        },
       });
     } catch {
       res.status(503).json({
@@ -140,6 +174,19 @@ function setupRequestLogging(app: express.Application) {
     const path = req.path;
     const requestId = (req as any).id;
 
+    // Set request ID header immediately so it's included in the response
+    if (requestId) {
+      res.setHeader("X-Request-Id", requestId);
+    }
+
+    // Intercept writeHead to inject Server-Timing with accurate duration
+    const originalWriteHead = res.writeHead.bind(res);
+    (res as any).writeHead = function (statusCode: number, ...args: any[]) {
+      const duration = Date.now() - start;
+      res.setHeader("Server-Timing", `total;dur=${duration}`);
+      return originalWriteHead(statusCode, ...args);
+    };
+
     res.on("finish", () => {
       if (!path.startsWith("/api")) return;
 
@@ -154,7 +201,7 @@ function setupRequestLogging(app: express.Application) {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      logger.info(logLine);
     });
 
     next();
@@ -212,8 +259,8 @@ function serveLandingPage({
   const baseUrl = `${protocol}://${host}`;
   const expsUrl = `${host}`;
 
-  log(`baseUrl`, baseUrl);
-  log(`expsUrl`, expsUrl);
+  logger.info("baseUrl", { baseUrl });
+  logger.info("expsUrl", { expsUrl });
 
   const html = landingPageTemplate
     .replace(/BASE_URL_PLACEHOLDER/g, baseUrl)
@@ -235,7 +282,7 @@ function configureExpoAndLanding(app: express.Application) {
   const appName = getAppName();
   const webDistPath = path.resolve(process.cwd(), "web_dist");
 
-  log("Serving static Expo files with dynamic manifest routing");
+  logger.info("Serving static Expo files with dynamic manifest routing");
 
   // ── Serve Admin Panel SPA at /admin/* ──
   const adminDistPath = path.resolve(process.cwd(), "admin_dist");
@@ -250,9 +297,9 @@ function configureExpoAndLanding(app: express.Application) {
         res.status(404).send("Admin panel not built");
       }
     });
-    log("Admin panel: serving from /admin/");
+    logger.info("Admin panel: serving from /admin/");
   } else {
-    log("Admin panel: admin_dist not found — skipping");
+    logger.info("Admin panel: admin_dist not found — skipping");
   }
 
   if (fs.existsSync(webDistPath)) {
@@ -263,9 +310,9 @@ function configureExpoAndLanding(app: express.Application) {
     app.get("/app/{*splat}", (_req: Request, res: Response) => {
       res.sendFile(path.join(webDistPath, "index.html"));
     });
-    log("Mobile web app: serving from /app/");
+    logger.info("Mobile web app: serving from /app/");
   } else {
-    log("Mobile web app: web_dist not found — skipping");
+    logger.info("Mobile web app: web_dist not found — skipping");
   }
 
   app.use((req: Request, res: Response, next: NextFunction) => {
@@ -297,7 +344,7 @@ function configureExpoAndLanding(app: express.Application) {
   app.use("/assets", express.static(path.resolve(process.cwd(), "assets")));
   app.use(express.static(path.resolve(process.cwd(), "static-build")));
 
-  log("Expo routing: Checking expo-platform header on / and /manifest");
+  logger.info("Expo routing: Checking expo-platform header on / and /manifest");
 }
 
 function setupErrorHandler(app: express.Application) {
@@ -307,7 +354,7 @@ function setupErrorHandler(app: express.Application) {
   });
 
   // Global error handler
-  app.use((err: unknown, _req: Request, res: Response, next: NextFunction) => {
+  app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     const error = err as {
       status?: number;
       statusCode?: number;
@@ -321,18 +368,35 @@ function setupErrorHandler(app: express.Application) {
         : error.message || "Internal Server Error";
 
     if (status >= 500) {
-      console.error("Internal Server Error:", err);
+      logger.error("Internal Server Error", { error: String(err) });
     }
 
     if (res.headersSent) {
       return next(err);
     }
 
-    return res.status(status).json({ message });
+    const requestId = (req as any).id;
+    return res
+      .status(status)
+      .json({ message, ...(requestId && { requestId }) });
   });
 }
 
+process.on("unhandledRejection", (reason) => {
+  logger.error("Unhandled Promise rejection", { reason: String(reason) });
+});
+
+process.on("uncaughtException", (error) => {
+  logger.error("Uncaught exception — shutting down", {
+    error: error.message,
+    stack: error.stack,
+  });
+  process.exit(1);
+});
+
 (async () => {
+  await ensureDatabaseConnection();
+
   setupSecurityHeaders(app);
   setupRequestId(app);
   setupCors(app);
@@ -358,29 +422,29 @@ function setupErrorHandler(app: express.Application) {
   }
 
   server.listen(listenOptions, () => {
-    log(`express server serving on port ${port}`);
+    logger.info(`express server serving on port ${port}`);
   });
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {
-    log(`\n${signal} received — shutting down gracefully...`);
+    logger.info(`${signal} received — shutting down gracefully...`);
     server.close(() => {
-      log("HTTP server closed");
+      logger.info("HTTP server closed");
       pool
         .end()
         .then(() => {
-          log("DB pool drained");
+          logger.info("DB pool drained");
           process.exit(0);
         })
         .catch((err) => {
-          console.error("Error draining DB pool:", err);
+          logger.error("Error draining DB pool", { error: String(err) });
           process.exit(1);
         });
     });
 
     // Force exit after 10s
     setTimeout(() => {
-      console.error("Forced shutdown after timeout");
+      logger.error("Forced shutdown after timeout");
       process.exit(1);
     }, 10_000);
   };

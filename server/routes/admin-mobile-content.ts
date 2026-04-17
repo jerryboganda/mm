@@ -5,6 +5,7 @@ import {
   getMobileAppContent,
   setMobileAppTextOverrides,
 } from "../lib/mobile-app-content";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -15,7 +16,9 @@ router.get("/", async (_req: AuthRequest, res) => {
     const content = await getMobileAppContent();
     res.json(content);
   } catch (error) {
-    console.error("Admin get mobile app content error:", error);
+    logger.error("Admin get mobile app content error", {
+      error: String(error),
+    });
     res.status(500).json({ message: "Failed to load mobile app content" });
   }
 });
@@ -29,7 +32,9 @@ router.put("/", async (req: AuthRequest, res) => {
     if (!parsed.success) {
       return res.status(400).json({
         message: "Invalid payload",
-        errors: parsed.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+        errors: parsed.error.errors.map(
+          (e) => `${e.path.join(".")}: ${e.message}`,
+        ),
       });
     }
 
@@ -46,10 +51,11 @@ router.put("/", async (req: AuthRequest, res) => {
       ...content,
     });
   } catch (error) {
-    console.error("Admin save mobile app content error:", error);
+    logger.error("Admin save mobile app content error", {
+      error: String(error),
+    });
     res.status(500).json({ message: "Failed to save mobile app content" });
   }
 });
 
 export default router;
-

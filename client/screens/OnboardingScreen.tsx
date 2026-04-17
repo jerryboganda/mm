@@ -128,16 +128,14 @@ export default function OnboardingScreen() {
               { backgroundColor: `${item.color}14` },
             ]}
           >
-            <Feather
-              name={item.icon as any}
-              size={64}
-              color={item.color}
-            />
+            <Feather name={item.icon as any} size={64} color={item.color} />
           </View>
           <ThemedText type="h2" style={styles.slideTitle}>
             {item.title}
           </ThemedText>
-          <ThemedText style={[styles.slideDescription, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.slideDescription, { color: theme.textSecondary }]}
+          >
             {item.description}
           </ThemedText>
         </View>
@@ -177,8 +175,12 @@ export default function OnboardingScreen() {
           onPress={handleSkip}
           style={styles.skipButton}
           testID="button-skip"
+          accessibilityRole="button"
+          accessibilityLabel="Skip onboarding"
         >
-          <ThemedText style={[styles.skipText, { color: theme.textSecondary }]}>Skip</ThemedText>
+          <ThemedText style={[styles.skipText, { color: theme.textSecondary }]}>
+            Skip
+          </ThemedText>
         </Pressable>
       </View>
 

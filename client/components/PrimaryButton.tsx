@@ -123,8 +123,7 @@ export function PrimaryButton({
   };
 
   const iconSize = isSmall ? 16 : isLarge ? 24 : 20;
-  const iconColor =
-    isPrimary || isSuccess || isDanger ? "#fff" : theme.primary;
+  const iconColor = isPrimary || isSuccess || isDanger ? "#fff" : theme.primary;
 
   return (
     <AnimatedPressable
@@ -134,7 +133,7 @@ export function PrimaryButton({
       disabled={disabled || loading}
       testID={testID}
       accessibilityRole="button"
-      accessibilityLabel={resolvedTitle}
+      accessibilityLabel={loading ? `${resolvedTitle}, loading` : resolvedTitle}
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[
         styles.button,
@@ -162,9 +161,7 @@ export function PrimaryButton({
       ) : null}
       {loading ? (
         <ActivityIndicator
-          color={
-            isPrimary || isSuccess || isDanger ? "#fff" : theme.primary
-          }
+          color={isPrimary || isSuccess || isDanger ? "#fff" : theme.primary}
           size={isSmall ? "small" : "small"}
         />
       ) : (

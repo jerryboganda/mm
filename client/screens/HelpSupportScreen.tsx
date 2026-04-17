@@ -169,7 +169,10 @@ export default function HelpSupportScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const canOpen = await Linking.canOpenURL(url);
     if (!canOpen) {
-      Alert.alert(t("Unavailable"), `Unable to open ${channel} on this device.`);
+      Alert.alert(
+        t("Unavailable"),
+        `Unable to open ${channel} on this device.`,
+      );
       return;
     }
     await Linking.openURL(url);
@@ -188,7 +191,9 @@ export default function HelpSupportScreen() {
   }, [openExternalLink, supportContactSettings.phoneNumber]);
 
   const handleContactSupportWhatsApp = useCallback(() => {
-    const number = normalizeWhatsappNumber(supportContactSettings.whatsappNumber);
+    const number = normalizeWhatsappNumber(
+      supportContactSettings.whatsappNumber,
+    );
     if (!number) {
       Alert.alert(t("Unavailable"), t("WhatsApp number is not configured."));
       return;
@@ -255,7 +260,12 @@ export default function HelpSupportScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (isOffline) {
-      Alert.alert(t("No Internet"), t("Submitting a support request requires an internet connection. Please try again when you're online."));
+      Alert.alert(
+        t("No Internet"),
+        t(
+          "Submitting a support request requires an internet connection. Please try again when you're online.",
+        ),
+      );
       return;
     }
 
@@ -317,7 +327,9 @@ export default function HelpSupportScreen() {
                 />
               </View>
               {expandedFaq === index ? (
-                <ThemedText style={[styles.faqAnswer, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.faqAnswer, { color: theme.textSecondary }]}
+                >
                   {faq.answer}
                 </ThemedText>
               ) : null}
@@ -326,30 +338,57 @@ export default function HelpSupportScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CONTACT US</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            CONTACT US
+          </ThemedText>
           {isSupportContactLoading ? (
-            <ThemedText style={[styles.contactLoadingText, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[
+                styles.contactLoadingText,
+                { color: theme.textSecondary },
+              ]}
+            >
               Loading support contacts...
             </ThemedText>
           ) : null}
           {contactMethods.length === 0 ? (
             <GlassCard style={styles.contactCard}>
-              <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.contactSubtitle, { color: theme.textSecondary }]}
+              >
                 Support contact details are currently unavailable.
               </ThemedText>
             </GlassCard>
           ) : (
             contactMethods.map((method) => (
-              <GlassCard key={method.id} style={styles.contactCard} onPress={method.onPress}>
+              <GlassCard
+                key={method.id}
+                style={styles.contactCard}
+                onPress={method.onPress}
+              >
                 <View style={styles.contactRow}>
-                  <View style={[styles.contactIcon, { backgroundColor: `${theme.primary}15` }]}>
-                    <Feather name={method.icon as any} size={20} color={theme.primary} />
+                  <View
+                    style={[
+                      styles.contactIcon,
+                      { backgroundColor: `${theme.primary}15` },
+                    ]}
+                  >
+                    <Feather
+                      name={method.icon as any}
+                      size={20}
+                      color={theme.primary}
+                    />
                   </View>
                   <View style={styles.contactContent}>
                     <ThemedText style={styles.contactTitle}>
                       {method.title}
                     </ThemedText>
-                    <ThemedText style={[styles.contactSubtitle, { color: theme.textSecondary }]}>
+                    <ThemedText
+                      style={[
+                        styles.contactSubtitle,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
                       {method.subtitle}
                     </ThemedText>
                   </View>
@@ -365,7 +404,9 @@ export default function HelpSupportScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>REPORT AN ISSUE</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            REPORT AN ISSUE
+          </ThemedText>
 
           <View style={styles.issueTypes}>
             {issueTypes.map((type) => (
@@ -383,14 +424,15 @@ export default function HelpSupportScreen() {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setIssueType(type.id);
                 }}
+                accessibilityRole="radio"
+                accessibilityLabel={`Issue type: ${type.label}`}
+                accessibilityState={{ selected: issueType === type.id }}
               >
                 <Feather
                   name={type.icon as any}
                   size={16}
                   color={
-                    issueType === type.id
-                      ? theme.primary
-                      : theme.textSecondary
+                    issueType === type.id ? theme.primary : theme.textSecondary
                   }
                 />
                 <ThemedText
@@ -420,6 +462,8 @@ export default function HelpSupportScreen() {
               numberOfLines={5}
               textAlignVertical="top"
               testID="input-issue-description"
+              accessibilityLabel="Issue description"
+              accessibilityHint="Describe your issue in detail"
             />
           </GlassCard>
 

@@ -56,9 +56,11 @@ export default function SecuritySettingsScreen() {
     },
     onSuccess: () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t("Success"), t("Your password has been changed successfully."), [
-        { text: "OK", onPress: () => navigation.goBack() },
-      ]);
+      Alert.alert(
+        t("Success"),
+        t("Your password has been changed successfully."),
+        [{ text: "OK", onPress: () => navigation.goBack() }],
+      );
     },
     onError: (error: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -81,7 +83,10 @@ export default function SecuritySettingsScreen() {
     },
     onError: (error: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t("Error"), error.message || t("Failed to logout all devices"));
+      Alert.alert(
+        t("Error"),
+        error.message || t("Failed to logout all devices"),
+      );
     },
   });
 
@@ -89,7 +94,12 @@ export default function SecuritySettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (isOffline) {
-      Alert.alert(t("No Internet"), t("Changing your password requires an internet connection. Please try again when you're online."));
+      Alert.alert(
+        t("No Internet"),
+        t(
+          "Changing your password requires an internet connection. Please try again when you're online.",
+        ),
+      );
       return;
     }
 
@@ -115,7 +125,12 @@ export default function SecuritySettingsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (isOffline) {
-      Alert.alert(t("No Internet"), t("This action requires an internet connection. Please try again when you're online."));
+      Alert.alert(
+        t("No Internet"),
+        t(
+          "This action requires an internet connection. Please try again when you're online.",
+        ),
+      );
       return;
     }
 
@@ -170,12 +185,19 @@ export default function SecuritySettingsScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 testID="input-current-password"
+                accessibilityLabel="Current Password"
               />
               <Feather
                 name={showCurrentPassword ? "eye-off" : "eye"}
                 size={20}
                 color={theme.textMuted}
                 onPress={() => setShowCurrentPassword(!showCurrentPassword)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showCurrentPassword
+                    ? "Hide current password"
+                    : "Show current password"
+                }
               />
             </View>
           </GlassCard>
@@ -197,12 +219,17 @@ export default function SecuritySettingsScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 testID="input-new-password"
+                accessibilityLabel="New Password"
               />
               <Feather
                 name={showNewPassword ? "eye-off" : "eye"}
                 size={20}
                 color={theme.textMuted}
                 onPress={() => setShowNewPassword(!showNewPassword)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showNewPassword ? "Hide new password" : "Show new password"
+                }
               />
             </View>
           </GlassCard>
@@ -224,12 +251,19 @@ export default function SecuritySettingsScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 testID="input-confirm-password"
+                accessibilityLabel="Confirm New Password"
               />
               <Feather
                 name={showConfirmPassword ? "eye-off" : "eye"}
                 size={20}
                 color={theme.textMuted}
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showConfirmPassword
+                    ? "Hide confirm password"
+                    : "Show confirm password"
+                }
               />
             </View>
           </GlassCard>
@@ -260,18 +294,17 @@ export default function SecuritySettingsScreen() {
                   { backgroundColor: `${theme.warning}15` },
                 ]}
               >
-                <Feather
-                  name="smartphone"
-                  size={20}
-                  color={theme.warning}
-                />
+                <Feather name="smartphone" size={20} color={theme.warning} />
               </View>
               <View style={styles.sessionContent}>
                 <ThemedText style={styles.sessionTitle}>
                   Logout All Devices
                 </ThemedText>
                 <ThemedText
-                  style={[styles.sessionSubtitle, { color: theme.textSecondary }]}
+                  style={[
+                    styles.sessionSubtitle,
+                    { color: theme.textSecondary },
+                  ]}
                 >
                   Sign out from all devices including this one
                 </ThemedText>
@@ -293,12 +326,7 @@ export default function SecuritySettingsScreen() {
           />
         </View>
 
-        <View
-          style={[
-            styles.infoSection,
-            { backgroundColor: theme.glass },
-          ]}
-        >
+        <View style={[styles.infoSection, { backgroundColor: theme.glass }]}>
           <Feather name="info" size={16} color={theme.textMuted} />
           <ThemedText style={[styles.infoText, { color: theme.textMuted }]}>
             Keep your account secure by using a strong password and logging out

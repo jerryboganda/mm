@@ -20,8 +20,44 @@ import {
   getRateLimitClientId,
   rateLimiter,
 } from "../middleware";
+import { sanitizeString } from "../lib/api-response";
+import { logger } from "../lib/logger";
 
 const router = Router();
+
+// ── OTP Attempt Lockout ──────────────────────────────────────
+const OTP_MAX_ATTEMPTS = 5;
+const OTP_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+const otpAttemptStore = new Map<string, { count: number; resetTime: number }>();
+
+function checkOtpAttempts(email: string): boolean {
+  const key = email.toLowerCase();
+  const entry = otpAttemptStore.get(key);
+  if (!entry) return false;
+  if (Date.now() > entry.resetTime) {
+    otpAttemptStore.delete(key);
+    return false;
+  }
+  return entry.count >= OTP_MAX_ATTEMPTS;
+}
+
+function recordOtpAttempt(email: string): void {
+  const key = email.toLowerCase();
+  const entry = otpAttemptStore.get(key);
+  if (!entry || Date.now() > entry.resetTime) {
+    otpAttemptStore.set(key, {
+      count: 1,
+      resetTime: Date.now() + OTP_WINDOW_MS,
+    });
+  } else {
+    entry.count++;
+  }
+}
+
+function clearOtpAttempts(email: string): void {
+  otpAttemptStore.delete(email.toLowerCase());
+}
 
 const JWT_SECRET = process.env.SESSION_SECRET;
 if (!JWT_SECRET) {
@@ -101,12 +137,16 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
   try {
     const data = registerSchema.parse(req.body);
 
+    // Sanitize user-supplied strings before use
+    data.name = sanitizeString(data.name);
+    data.email = sanitizeString(data.email);
+
     const existingUser = await storage.getUserByEmail(data.email);
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.password, 12);
     const emailOtp = generateOTP();
     const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
@@ -128,7 +168,7 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
     });
 
     if (!emailSent && process.env.NODE_ENV !== "production") {
-      console.log(`[DEV] Email OTP for ${user.email}: ${emailOtp}`);
+      logger.debug("Email OTP generated", { email: user.email, otp: emailOtp });
     }
 
     // Do NOT return access token yet. User must verify email first.
@@ -141,7 +181,9 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: error.errors[0].message });
     }
-    console.error("Register error:", error);
+    logger.error("Register error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Registration failed" });
   }
 });
@@ -156,7 +198,18 @@ router.post(
         return res.status(400).json({ message: "Email and code are required" });
       }
 
-      const user = await storage.getUserByEmail(email);
+      // Sanitize user-supplied strings before use
+      const sanitizedEmail = sanitizeString(email);
+      const sanitizedCode = sanitizeString(code);
+
+      // Check OTP attempt lockout before any verification logic
+      if (checkOtpAttempts(sanitizedEmail)) {
+        return res.status(429).json({
+          message: "Too many verification attempts. Please wait 15 minutes.",
+        });
+      }
+
+      const user = await storage.getUserByEmail(sanitizedEmail);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -173,14 +226,16 @@ router.post(
       }
 
       if (
-        user.emailVerificationToken !== code ||
+        user.emailVerificationToken !== sanitizedCode ||
         !user.emailTokenExpiresAt ||
         new Date() > user.emailTokenExpiresAt
       ) {
+        recordOtpAttempt(sanitizedEmail);
         return res.status(400).json({ message: "Invalid or expired code" });
       }
 
       // Mark verified
+      clearOtpAttempts(sanitizedEmail);
       await storage.updateUserVerification(user.id, {
         isEmailVerified: true,
         emailVerificationToken: null,
@@ -193,7 +248,9 @@ router.post(
         user: serializeUser({ ...user, isEmailVerified: true }),
       });
     } catch (error) {
-      console.error("Verify email error:", error);
+      logger.error("Verify email error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Verification failed" });
     }
   },
@@ -237,12 +294,17 @@ router.post(
       });
 
       if (!emailSent && process.env.NODE_ENV !== "production") {
-        console.log(`[DEV] Resend OTP for ${user.email}: ${emailOtp}`);
+        logger.debug("Resend OTP generated", {
+          email: user.email,
+          otp: emailOtp,
+        });
       }
 
       res.json({ message: "If an account exists, a new code has been sent." });
     } catch (error) {
-      console.error("Resend verification error:", error);
+      logger.error("Resend verification error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to resend verification email" });
     }
   },
@@ -263,6 +325,9 @@ router.post(
   async (req, res) => {
     try {
       const data = loginSchema.parse(req.body);
+
+      // Sanitize email (trim/normalize) before use
+      data.email = sanitizeString(data.email);
 
       const user = await storage.getUserByEmail(data.email);
       if (!user) {
@@ -302,7 +367,9 @@ router.post(
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
-      console.error("Login error:", error);
+      logger.error("Login error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Login failed" });
     }
   },
@@ -336,7 +403,7 @@ router.post(
       });
 
       if (!emailSent && process.env.NODE_ENV !== "production") {
-        console.log(`[DEV] Reset OTP for ${user.email}: ${otp}`);
+        logger.debug("Reset OTP generated", { email: user.email, otp });
       }
 
       res.json({
@@ -344,7 +411,9 @@ router.post(
           "If an account exists with this email, a reset code has been sent.",
       });
     } catch (error) {
-      console.error("Forgot password error:", error);
+      logger.error("Forgot password error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to process request" });
     }
   },
@@ -360,13 +429,27 @@ router.post(
       if (!email || !code) {
         return res.status(400).json({ message: "Email and code are required" });
       }
+
+      // Check OTP attempt lockout before any verification logic
+      const normalizedEmail =
+        typeof email === "string" ? email.trim().toLowerCase() : email;
+      if (checkOtpAttempts(normalizedEmail)) {
+        return res.status(429).json({
+          message: "Too many verification attempts. Please wait 15 minutes.",
+        });
+      }
+
       const resetToken = await storage.getPasswordResetByOtp(email, code);
       if (!resetToken) {
+        recordOtpAttempt(normalizedEmail);
         return res.status(400).json({ message: "Invalid or expired code" });
       }
+      clearOtpAttempts(normalizedEmail);
       res.json({ valid: true, message: "Code verified" });
     } catch (error) {
-      console.error("Verify reset OTP error:", error);
+      logger.error("Verify reset OTP error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Verification failed" });
     }
   },
@@ -390,12 +473,14 @@ router.post("/reset-password", async (req, res) => {
     if (!resetToken) {
       return res.status(400).json({ message: "Invalid or expired reset code" });
     }
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.password, 12);
     await storage.updateUserPassword(resetToken.userId, hashedPassword);
     await storage.markTokenUsed(resetToken.id);
     res.json({ message: "Password reset successfully" });
   } catch (error) {
-    console.error("Reset password error:", error);
+    logger.error("Reset password error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Failed to reset password" });
   }
 });
@@ -445,12 +530,14 @@ router.post(
         });
       }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
       await storage.updateUserPassword(userId, hashedPassword);
 
       res.json({ message: "Password changed successfully" });
     } catch (error) {
-      console.error("Change password error:", error);
+      logger.error("Change password error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to change password" });
     }
   },
@@ -524,7 +611,9 @@ router.post("/refresh", rateLimiter(20, 60 * 1000), async (req, res) => {
         .status(401)
         .json({ message: "Invalid or expired refresh token" });
     }
-    console.error("Token refresh error:", error);
+    logger.error("Token refresh error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Token refresh failed" });
   }
 });

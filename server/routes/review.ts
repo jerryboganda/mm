@@ -7,6 +7,7 @@ import {
   resolveAnswerLabel,
   resolveCorrectLabel,
 } from "../lib/mcq-options";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.get("/due-count", authMiddleware, async (req: AuthRequest, res) => {
     const count = await storage.getDueReviewCount(req.userId!);
     res.json({ count });
   } catch (error) {
-    console.error("Get due review count error:", error);
+    logger.error("Get due review count error", { error: String(error) });
     res.status(500).json({ message: "Failed to get due review count" });
   }
 });
@@ -54,7 +55,7 @@ router.get("/due", authMiddleware, async (req: AuthRequest, res) => {
 
     res.json({ questions });
   } catch (error) {
-    console.error("Get due reviews error:", error);
+    logger.error("Get due reviews error", { error: String(error) });
     res.status(500).json({ message: "Failed to get due reviews" });
   }
 });
@@ -120,7 +121,10 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
     // fallback to correctness mapping for legacy callers.
     const normalizedQuality = hasExplicitQuality ? quality : isCorrect ? 4 : 1;
 
-    const updated = await storage.updateReview(actualReviewId, normalizedQuality);
+    const updated = await storage.updateReview(
+      actualReviewId,
+      normalizedQuality,
+    );
 
     res.json({
       isCorrect,
@@ -131,7 +135,7 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
       interval: updated.interval,
     });
   } catch (error) {
-    console.error("Submit review error:", error);
+    logger.error("Submit review error", { error: String(error) });
     res.status(500).json({ message: "Failed to submit review" });
   }
 });
@@ -161,7 +165,7 @@ router.post("/enqueue", authMiddleware, async (req: AuthRequest, res) => {
       message: `${enqueued} questions added to review queue`,
     });
   } catch (error) {
-    console.error("Enqueue reviews error:", error);
+    logger.error("Enqueue reviews error", { error: String(error) });
     res.status(500).json({ message: "Failed to enqueue reviews" });
   }
 });

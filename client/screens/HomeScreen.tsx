@@ -24,6 +24,7 @@ import { useAuth } from "@/lib/auth";
 import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
+import { CardSkeleton } from "@/components/LoadingSkeleton";
 import type { HomeStackParamList } from "@/navigation/HomeStackNavigator";
 import { useMobileContent } from "@/lib/mobile-content";
 import { useBottomLayout } from "@/hooks/useBottomLayout";
@@ -307,11 +308,15 @@ export default function HomeScreen() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: recommendedTopics = [], refetch: refetchRecommended } =
-    useQuery<RecommendedTopic[]>({
-      queryKey: ["/api/recommended-topics"],
-      staleTime: 10 * 60 * 1000,
-    });
+  const {
+    data: recommendedTopics = [],
+    isLoading: recommendedLoading,
+    isError: recommendedError,
+    refetch: refetchRecommended,
+  } = useQuery<RecommendedTopic[]>({
+    queryKey: ["/api/recommended-topics"],
+    staleTime: 10 * 60 * 1000,
+  });
 
   const { data: dueReviewData } = useQuery<{ count: number }>({
     queryKey: ["/api/reviews/due-count"],
@@ -441,6 +446,7 @@ export default function HomeScreen() {
                   <Text
                     style={[styles.userName, { color: theme.text }]}
                     numberOfLines={1}
+                    accessibilityRole="header"
                   >
                     {firstName}
                   </Text>
@@ -474,7 +480,10 @@ export default function HomeScreen() {
         return (
           <View style={styles.statsSection}>
             <AnimatedListItem index={1} delay={50}>
-              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              <Text
+                style={[styles.sectionTitle, { color: theme.text }]}
+                accessibilityRole="header"
+              >
                 {t("Your Progress")}
               </Text>
             </AnimatedListItem>
@@ -561,18 +570,79 @@ export default function HomeScreen() {
         return (
           <View style={styles.recommendedSection}>
             <AnimatedListItem index={8} delay={60}>
-              <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              <Text
+                style={[styles.sectionTitle, { color: theme.text }]}
+                accessibilityRole="header"
+              >
                 {t("Recommended Topics")}
               </Text>
             </AnimatedListItem>
-            {recommendedTopics.map((topic, idx) => (
-              <RecommendedCard
-                key={topic.id}
-                topic={topic}
-                onPress={() => handleTopicPress(topic)}
-                index={idx + 9}
-              />
-            ))}
+            {recommendedLoading ? (
+              <>
+                <CardSkeleton />
+                <CardSkeleton />
+                <CardSkeleton />
+              </>
+            ) : recommendedError ? (
+              <View style={styles.errorContainer}>
+                <Feather
+                  name="wifi-off"
+                  size={24}
+                  color={theme.textMuted}
+                  style={{ marginBottom: Spacing.sm }}
+                />
+                <Text
+                  style={[styles.errorText, { color: theme.textSecondary }]}
+                >
+                  {t("Couldn't load recommendations")}
+                </Text>
+                <Pressable
+                  style={[
+                    styles.retryButton,
+                    {
+                      backgroundColor: theme.glass,
+                      borderColor: theme.glassBorder,
+                    },
+                  ]}
+                  onPress={() => refetchRecommended()}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("Retry loading recommendations")}
+                >
+                  <Feather name="refresh-cw" size={14} color={theme.primary} />
+                  <Text style={[styles.retryText, { color: theme.primary }]}>
+                    {t("Retry")}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : recommendedTopics.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Feather
+                  name="compass"
+                  size={32}
+                  color={theme.textMuted}
+                  style={{ marginBottom: Spacing.md }}
+                />
+                <Text style={[styles.emptyTitle, { color: theme.text }]}>
+                  {t("No recommendations yet")}
+                </Text>
+                <Text
+                  style={[styles.emptyText, { color: theme.textSecondary }]}
+                >
+                  {t(
+                    "Start reading topics to get personalized recommendations",
+                  )}
+                </Text>
+              </View>
+            ) : (
+              recommendedTopics.map((topic, idx) => (
+                <RecommendedCard
+                  key={topic.id}
+                  topic={topic}
+                  onPress={() => handleTopicPress(topic)}
+                  index={idx + 9}
+                />
+              ))
+            )}
           </View>
         );
 
@@ -836,5 +906,42 @@ const styles = StyleSheet.create({
   reviewBannerSubtitle: {
     ...Typography.caption,
     marginTop: 2,
+  },
+  errorContainer: {
+    alignItems: "center",
+    paddingVertical: Spacing.xl,
+  },
+  errorText: {
+    ...Typography.body,
+    textAlign: "center",
+    marginBottom: Spacing.md,
+  },
+  retryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    gap: Spacing.xs,
+  },
+  retryText: {
+    ...Typography.small,
+    fontWeight: "600",
+  },
+  emptyContainer: {
+    alignItems: "center",
+    paddingVertical: Spacing["2xl"],
+  },
+  emptyTitle: {
+    ...Typography.body,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: Spacing.xs,
+  },
+  emptyText: {
+    ...Typography.small,
+    textAlign: "center",
+    paddingHorizontal: Spacing.xl,
   },
 });

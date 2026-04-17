@@ -39,6 +39,7 @@ import {
   adminGetAllTopicsFlat,
   createAuditLog,
 } from "../admin-storage";
+import { logger } from "../lib/logger";
 
 // ── Validation Schemas ──────────────────────────
 const bookSchema = z.object({
@@ -132,9 +133,11 @@ router.get("/books", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetBooks();
     res.json(data);
-  } catch (err: any) {
-    console.error("Admin get books error:", err);
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    logger.error("Admin get books error", { error: String(err) });
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -151,9 +154,11 @@ router.post("/books", async (req: AuthRequest, res) => {
       details: { title: book.title },
     });
     res.status(201).json(book);
-  } catch (err: any) {
-    console.error("Admin create book error:", err);
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    logger.error("Admin create book error", { error: String(err) });
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -172,9 +177,11 @@ router.put("/books/:id", async (req: AuthRequest, res) => {
       details: req.body,
     });
     res.json(book);
-  } catch (err: any) {
-    console.error("Admin update book error:", err);
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    logger.error("Admin update book error", { error: String(err) });
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -192,9 +199,11 @@ router.delete("/books/:id", async (req: AuthRequest, res) => {
       details: { title: book.title },
     });
     res.json({ message: "Book deleted" });
-  } catch (err: any) {
-    console.error("Admin delete book error:", err);
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    logger.error("Admin delete book error", { error: String(err) });
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -204,8 +213,10 @@ router.post("/books/reorder", async (req: AuthRequest, res) => {
     if (!data) return;
     await adminReorderBooks(data.orderedIds);
     res.json({ message: "Books reordered" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -218,8 +229,10 @@ router.get("/books/:bookId/chapters", async (req: AuthRequest, res) => {
     const bookId = getParamValue(req.params.bookId);
     const data = await adminGetChapters(bookId);
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -236,8 +249,10 @@ router.post("/chapters", async (req: AuthRequest, res) => {
       details: { title: ch.title },
     });
     res.status(201).json(ch);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -256,8 +271,10 @@ router.put("/chapters/:id", async (req: AuthRequest, res) => {
       details: req.body,
     });
     res.json(ch);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -272,8 +289,10 @@ router.delete("/chapters/:id", async (req: AuthRequest, res) => {
       entityId: chapterId,
     });
     res.json({ message: "Chapter deleted" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -281,8 +300,10 @@ router.post("/chapters/reorder", async (req: AuthRequest, res) => {
   try {
     await adminReorderChapters(req.body.bookId, req.body.orderedIds);
     res.json({ message: "Chapters reordered" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -295,8 +316,10 @@ router.get("/chapters/:chapterId/topics", async (req: AuthRequest, res) => {
     const chapterId = getParamValue(req.params.chapterId);
     const data = await adminGetTopics(chapterId);
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -304,8 +327,10 @@ router.get("/topics/all", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetAllTopicsFlat();
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -315,8 +340,10 @@ router.get("/topics/:id", async (req: AuthRequest, res) => {
     const t = await adminGetTopic(topicId);
     if (!t) return res.status(404).json({ message: "Topic not found" });
     res.json(t);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -333,8 +360,10 @@ router.post("/topics", async (req: AuthRequest, res) => {
       details: { title: t.title },
     });
     res.status(201).json(t);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -353,8 +382,10 @@ router.put("/topics/:id", async (req: AuthRequest, res) => {
       details: data,
     });
     res.json(t);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -369,8 +400,10 @@ router.delete("/topics/:id", async (req: AuthRequest, res) => {
       entityId: topicId,
     });
     res.json({ message: "Topic deleted" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -378,8 +411,10 @@ router.post("/topics/reorder", async (req: AuthRequest, res) => {
   try {
     await adminReorderTopics(req.body.chapterId, req.body.orderedIds);
     res.json({ message: "Topics reordered" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -392,8 +427,10 @@ router.get("/topics/:topicId/blocks", async (req: AuthRequest, res) => {
     const topicId = getParamValue(req.params.topicId);
     const data = await adminGetContentBlocks(topicId);
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -412,8 +449,10 @@ router.post("/blocks", async (req: AuthRequest, res) => {
       entityId: cb.id,
     });
     res.status(201).json(cb);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -432,8 +471,10 @@ router.put("/blocks/:id", async (req: AuthRequest, res) => {
       entityId: cb.id,
     });
     res.json(cb);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -448,8 +489,10 @@ router.delete("/blocks/:id", async (req: AuthRequest, res) => {
       entityId: blockId,
     });
     res.json({ message: "Content block deleted" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -457,8 +500,10 @@ router.post("/blocks/reorder", async (req: AuthRequest, res) => {
   try {
     await adminReorderContentBlocks(req.body.topicId, req.body.orderedIds);
     res.json({ message: "Blocks reordered" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -472,7 +517,9 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
     };
 
     if (!topicId || !Array.isArray(orderedIds)) {
-      return res.status(400).json({ message: "topicId and orderedIds are required" });
+      return res
+        .status(400)
+        .json({ message: "topicId and orderedIds are required" });
     }
 
     // Update each changed block
@@ -498,8 +545,10 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
     });
 
     res.json({ message: "Batch save complete", updated: results.length });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -525,8 +574,10 @@ router.get("/mcqs", async (req: AuthRequest, res) => {
       pageSize: pageSize ? parseInt(pageSize) : undefined,
     });
     res.json(result);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -536,8 +587,10 @@ router.get("/mcqs/:id", async (req: AuthRequest, res) => {
     const m = await adminGetMcq(mcqId);
     if (!m) return res.status(404).json({ message: "MCQ not found" });
     res.json(m);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -553,8 +606,10 @@ router.post("/mcqs", async (req: AuthRequest, res) => {
       entityId: m.id,
     });
     res.status(201).json(m);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -572,8 +627,10 @@ router.put("/mcqs/:id", async (req: AuthRequest, res) => {
       entityId: m.id,
     });
     res.json(m);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -588,8 +645,10 @@ router.delete("/mcqs/:id", async (req: AuthRequest, res) => {
       entityId: mcqId,
     });
     res.json({ message: "MCQ deleted" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -613,8 +672,10 @@ router.post("/mcqs/bulk", async (req: AuthRequest, res) => {
     res
       .status(201)
       .json({ message: `${created} MCQs created`, count: created });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 

@@ -29,11 +29,11 @@ export default function QuizSettingsScreen() {
     id: "all" | "easy" | "medium" | "hard";
     label: string;
   }[] = [
-      { id: "all", label: "All" },
-      { id: "easy", label: "Easy" },
-      { id: "medium", label: "Medium" },
-      { id: "hard", label: "Hard" },
-    ];
+    { id: "all", label: "All" },
+    { id: "easy", label: "Easy" },
+    { id: "medium", label: "Medium" },
+    { id: "hard", label: "Hard" },
+  ];
 
   const handleToggleTimer = (value: boolean) => {
     setTimerEnabled(value);
@@ -70,6 +70,8 @@ export default function QuizSettingsScreen() {
                   true: theme.primary,
                 }}
                 thumbColor="#fff"
+                accessibilityLabel="Enable Timer"
+                accessibilityRole="switch"
               />
             </View>
             {timerEnabled ? (
@@ -83,9 +85,21 @@ export default function QuizSettingsScreen() {
                     }}
                     style={[
                       styles.optionChip,
-                      { backgroundColor: theme.glass, borderColor: theme.glassBorder },
-                      timerMinutes === mins && [styles.optionChipSelected, { backgroundColor: theme.primary, borderColor: theme.primary }],
+                      {
+                        backgroundColor: theme.glass,
+                        borderColor: theme.glassBorder,
+                      },
+                      timerMinutes === mins && [
+                        styles.optionChipSelected,
+                        {
+                          backgroundColor: theme.primary,
+                          borderColor: theme.primary,
+                        },
+                      ],
                     ]}
+                    accessibilityRole="radio"
+                    accessibilityLabel={`${mins} minutes`}
+                    accessibilityState={{ selected: timerMinutes === mins }}
                   >
                     <ThemedText
                       style={[
@@ -118,9 +132,21 @@ export default function QuizSettingsScreen() {
                   }}
                   style={[
                     styles.optionChip,
-                    { backgroundColor: theme.glass, borderColor: theme.glassBorder },
-                    questionsCount === count && [styles.optionChipSelected, { backgroundColor: theme.primary, borderColor: theme.primary }],
+                    {
+                      backgroundColor: theme.glass,
+                      borderColor: theme.glassBorder,
+                    },
+                    questionsCount === count && [
+                      styles.optionChipSelected,
+                      {
+                        backgroundColor: theme.primary,
+                        borderColor: theme.primary,
+                      },
+                    ],
                   ]}
+                  accessibilityRole="radio"
+                  accessibilityLabel={`${count} questions`}
+                  accessibilityState={{ selected: questionsCount === count }}
                 >
                   <ThemedText
                     style={[
@@ -151,9 +177,21 @@ export default function QuizSettingsScreen() {
                   style={[
                     styles.optionChip,
                     styles.difficultyChip,
-                    { backgroundColor: theme.glass, borderColor: theme.glassBorder },
-                    difficulty === opt.id && [styles.optionChipSelected, { backgroundColor: theme.primary, borderColor: theme.primary }],
+                    {
+                      backgroundColor: theme.glass,
+                      borderColor: theme.glassBorder,
+                    },
+                    difficulty === opt.id && [
+                      styles.optionChipSelected,
+                      {
+                        backgroundColor: theme.primary,
+                        borderColor: theme.primary,
+                      },
+                    ],
                   ]}
+                  accessibilityRole="radio"
+                  accessibilityLabel={`Difficulty: ${opt.label}`}
+                  accessibilityState={{ selected: difficulty === opt.id }}
                 >
                   <ThemedText
                     style={[
@@ -229,8 +267,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
     borderWidth: 1,
   },
-  optionChipSelected: {
-  },
+  optionChipSelected: {},
   difficultyChip: {
     flex: 1,
     alignItems: "center",

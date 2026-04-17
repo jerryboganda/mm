@@ -6,6 +6,7 @@ import {
   sendPaymentFailedEmail,
   sendSubscriptionCanceledEmail,
 } from "../services/subscription-emails";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -93,7 +94,7 @@ router.post("/revenuecat", async (req: Request, res: Response) => {
     if (WEBHOOK_SECRET) {
       const authHeader = req.headers.authorization;
       if (authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
-        console.warn("RevenueCat webhook: Invalid auth header");
+        logger.warn("RC Webhook invalid auth header");
         return res.status(401).json({ message: "Unauthorized" });
       }
     }
@@ -105,9 +106,12 @@ router.post("/revenuecat", async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid webhook payload" });
     }
 
-    console.log(
-      `[RC Webhook] ${event.type} for user ${event.app_user_id} (product: ${event.product_id}, env: ${event.environment})`,
-    );
+    logger.info("RC Webhook event", {
+      type: event.type,
+      userId: event.app_user_id,
+      productId: event.product_id,
+      environment: event.environment,
+    });
 
     // Resolve the user ID — RevenueCat app_user_id should match our server user ID
     const userId = event.app_user_id;
@@ -143,12 +147,12 @@ router.post("/revenuecat", async (req: Request, res: Response) => {
 
       case "TEST":
         // Just acknowledge test events
-        console.log("[RC Webhook] Test event received");
+        logger.info("RC Webhook test event received");
         return res.json({ received: true });
 
       default:
         // Events like PRODUCT_CHANGE, TRANSFER, SUBSCRIBER_ALIAS
-        console.log(`[RC Webhook] Unhandled event type: ${event.type}`);
+        logger.info("RC Webhook unhandled event type", { type: event.type });
         return res.json({ received: true });
     }
 
@@ -194,7 +198,9 @@ router.post("/revenuecat", async (req: Request, res: Response) => {
             },
           });
         } catch (auditErr) {
-          console.error("[RC Webhook] Failed to log audit event:", auditErr);
+          logger.error("RC Webhook failed to log audit event", {
+            error: String(auditErr),
+          });
         }
 
         // Send email notifications for key events
@@ -237,24 +243,26 @@ router.post("/revenuecat", async (req: Request, res: Response) => {
             );
           }
         } catch (emailErr) {
-          console.error("[RC Webhook] Failed to send email:", emailErr);
+          logger.error("RC Webhook failed to send email", {
+            error: String(emailErr),
+          });
         }
 
-        console.log(
-          `[RC Webhook] Updated user ${userId} → ${subscriptionStatus} (${event.product_id})`,
-        );
+        logger.info("RC Webhook updated user subscription", {
+          userId,
+          status: subscriptionStatus,
+          productId: event.product_id,
+        });
       } else {
         // Try matching by aliases if direct user ID doesn't work
-        console.warn(
-          `[RC Webhook] User not found: ${userId}. This may happen if user hasn't been linked yet.`,
-        );
+        logger.warn("RC Webhook user not found", { userId });
       }
     }
 
     // Always respond 200 to acknowledge receipt
     res.json({ received: true });
   } catch (error) {
-    console.error("[RC Webhook] Error processing event:", error);
+    logger.error("RC Webhook error processing event", { error: String(error) });
     // Still respond 200 to prevent retries for permanent errors
     res.json({ received: true, error: "Internal processing error" });
   }

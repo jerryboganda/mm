@@ -64,19 +64,25 @@ export const booksRelations = relations(books, ({ many }) => ({
   chapters: many(chapters),
 }));
 
-export const chapters = pgTable("chapters", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  bookId: varchar("book_id")
-    .notNull()
-    .references(() => books.id, { onDelete: "cascade" }),
-  title: text("title").notNull(),
-  description: text("description"),
-  order: integer("order").default(0),
-  isPublished: boolean("is_published").default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const chapters = pgTable(
+  "chapters",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    bookId: varchar("book_id")
+      .notNull()
+      .references(() => books.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    order: integer("order").default(0),
+    isPublished: boolean("is_published").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_chapters_book_published").on(table.bookId, table.isPublished),
+  ],
+);
 
 export const chaptersRelations = relations(chapters, ({ one, many }) => ({
   book: one(books, {
@@ -86,24 +92,33 @@ export const chaptersRelations = relations(chapters, ({ one, many }) => ({
   topics: many(topics),
 }));
 
-export const topics = pgTable("topics", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  chapterId: varchar("chapter_id")
-    .notNull()
-    .references(() => chapters.id, { onDelete: "cascade" }),
-  title: text("title").notNull(),
-  description: text("description"),
-  order: integer("order").default(0),
-  isPublished: boolean("is_published").default(false),
-  author: text("author"),
-  source: text("source"),
-  references: text("references"),
-  lastReviewedAt: timestamp("last_reviewed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const topics = pgTable(
+  "topics",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    chapterId: varchar("chapter_id")
+      .notNull()
+      .references(() => chapters.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    order: integer("order").default(0),
+    isPublished: boolean("is_published").default(false),
+    author: text("author"),
+    source: text("source"),
+    references: text("references"),
+    lastReviewedAt: timestamp("last_reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_topics_chapter_published").on(
+      table.chapterId,
+      table.isPublished,
+    ),
+  ],
+);
 
 export const topicsRelations = relations(topics, ({ one, many }) => ({
   chapter: one(chapters, {
@@ -161,20 +176,30 @@ export const mcqsRelations = relations(mcqs, ({ one }) => ({
   }),
 }));
 
-export const userProgress = pgTable("user_progress", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  topicId: varchar("topic_id")
-    .notNull()
-    .references(() => topics.id, { onDelete: "cascade" }),
-  isCompleted: boolean("is_completed").default(false),
-  completedAt: timestamp("completed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const userProgress = pgTable(
+  "user_progress",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    isCompleted: boolean("is_completed").default(false),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_user_progress_user_topic").on(table.userId, table.topicId),
+    index("idx_user_progress_user_completed").on(
+      table.userId,
+      table.isCompleted,
+    ),
+  ],
+);
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({
   user: one(users, {
@@ -187,18 +212,24 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
   }),
 }));
 
-export const bookmarks = pgTable("bookmarks", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  topicId: varchar("topic_id")
-    .notNull()
-    .references(() => topics.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const bookmarks = pgTable(
+  "bookmarks",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_bookmarks_user_topic").on(table.userId, table.topicId),
+  ],
+);
 
 export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   user: one(users, {
@@ -211,25 +242,31 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   }),
 }));
 
-export const quizAttempts = pgTable("quiz_attempts", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  topicId: varchar("topic_id").references(() => topics.id, {
-    onDelete: "set null",
-  }),
-  mode: text("mode").notNull(),
-  score: integer("score").notNull(),
-  totalQuestions: integer("total_questions").notNull(),
-  correctCount: integer("correct_count").notNull(),
-  wrongCount: integer("wrong_count").notNull(),
-  timeTaken: integer("time_taken"),
-  answers: jsonb("answers").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const quizAttempts = pgTable(
+  "quiz_attempts",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").references(() => topics.id, {
+      onDelete: "set null",
+    }),
+    mode: text("mode").notNull(),
+    score: integer("score").notNull(),
+    totalQuestions: integer("total_questions").notNull(),
+    correctCount: integer("correct_count").notNull(),
+    wrongCount: integer("wrong_count").notNull(),
+    timeTaken: integer("time_taken"),
+    answers: jsonb("answers").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_quiz_attempts_user_created").on(table.userId, table.createdAt),
+  ],
+);
 
 export const quizAttemptsRelations = relations(quizAttempts, ({ one }) => ({
   user: one(users, {
@@ -242,18 +279,28 @@ export const quizAttemptsRelations = relations(quizAttempts, ({ one }) => ({
   }),
 }));
 
-export const passwordResetTokens = pgTable("password_reset_tokens", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  token: text("token").notNull().unique(),
-  expiresAt: timestamp("expires_at").notNull(),
-  used: boolean("used").default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const passwordResetTokens = pgTable(
+  "password_reset_tokens",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    token: text("token").notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+    used: boolean("used").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_password_reset_token_lookup").on(
+      table.token,
+      table.used,
+      table.expiresAt,
+    ),
+  ],
+);
 
 export const passwordResetTokensRelations = relations(
   passwordResetTokens,
@@ -265,18 +312,24 @@ export const passwordResetTokensRelations = relations(
   }),
 );
 
-export const recentActivity = pgTable("recent_activity", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  topicId: varchar("topic_id")
-    .notNull()
-    .references(() => topics.id, { onDelete: "cascade" }),
-  viewedAt: timestamp("viewed_at").defaultNow().notNull(),
-});
+export const recentActivity = pgTable(
+  "recent_activity",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_recent_activity_user_viewed").on(table.userId, table.viewedAt),
+  ],
+);
 
 export const recentActivityRelations = relations(recentActivity, ({ one }) => ({
   user: one(users, {
@@ -290,23 +343,29 @@ export const recentActivityRelations = relations(recentActivity, ({ one }) => ({
 }));
 
 // ── Spaced Repetition (SM-2 algorithm) ──────────────────────────
-export const reviewSchedule = pgTable("review_schedule", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  mcqId: varchar("mcq_id")
-    .notNull()
-    .references(() => mcqs.id, { onDelete: "cascade" }),
-  easeFactor: integer("ease_factor").notNull().default(250), // stored as int × 100 (2.50 → 250)
-  interval: integer("interval").notNull().default(1), // days until next review
-  repetitions: integer("repetitions").notNull().default(0),
-  nextReviewAt: timestamp("next_review_at").defaultNow().notNull(),
-  lastReviewedAt: timestamp("last_reviewed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const reviewSchedule = pgTable(
+  "review_schedule",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    mcqId: varchar("mcq_id")
+      .notNull()
+      .references(() => mcqs.id, { onDelete: "cascade" }),
+    easeFactor: integer("ease_factor").notNull().default(250), // stored as int × 100 (2.50 → 250)
+    interval: integer("interval").notNull().default(1), // days until next review
+    repetitions: integer("repetitions").notNull().default(0),
+    nextReviewAt: timestamp("next_review_at").defaultNow().notNull(),
+    lastReviewedAt: timestamp("last_reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_review_schedule_user_next").on(table.userId, table.nextReviewAt),
+  ],
+);
 
 export const reviewScheduleRelations = relations(reviewSchedule, ({ one }) => ({
   user: one(users, {
@@ -330,19 +389,28 @@ export const appSettings = pgTable("app_settings", {
 });
 
 // ── Announcements ──────────────────────────
-export const announcements = pgTable("announcements", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: text("title").notNull(),
-  message: text("message").notNull(),
-  type: text("type").notNull().default("info"), // 'info' | 'warning' | 'update' | 'promo'
-  isActive: boolean("is_active").default(true),
-  expiresAt: timestamp("expires_at"),
-  createdBy: varchar("created_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+export const announcements = pgTable(
+  "announcements",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    type: text("type").notNull().default("info"), // 'info' | 'warning' | 'update' | 'promo'
+    isActive: boolean("is_active").default(true),
+    expiresAt: timestamp("expires_at"),
+    createdBy: varchar("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_announcements_active_created").on(
+      table.isActive,
+      table.createdAt,
+    ),
+  ],
+);
 
 export const announcementsRelations = relations(announcements, ({ one }) => ({
   creator: one(users, {
@@ -374,22 +442,31 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
 }));
 
 // ── Content Error Reports (TRUST-003) ──────────────────────────
-export const contentReports = pgTable("content_reports", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: varchar("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  contentType: text("content_type").notNull(), // 'topic' | 'mcq' | 'content_block'
-  contentId: varchar("content_id").notNull(),
-  reportType: text("report_type").notNull(), // 'error' | 'outdated' | 'unclear' | 'other'
-  description: text("description").notNull(),
-  status: text("status").notNull().default("pending"), // 'pending' | 'reviewed' | 'resolved' | 'dismissed'
-  reviewedBy: varchar("reviewed_by").references(() => users.id),
-  reviewedAt: timestamp("reviewed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const contentReports = pgTable(
+  "content_reports",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    contentType: text("content_type").notNull(), // 'topic' | 'mcq' | 'content_block'
+    contentId: varchar("content_id").notNull(),
+    reportType: text("report_type").notNull(), // 'error' | 'outdated' | 'unclear' | 'other'
+    description: text("description").notNull(),
+    status: text("status").notNull().default("pending"), // 'pending' | 'reviewed' | 'resolved' | 'dismissed'
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_content_reports_status_created").on(
+      table.status,
+      table.createdAt,
+    ),
+  ],
+);
 
 export const contentReportsRelations = relations(contentReports, ({ one }) => ({
   user: one(users, {
@@ -1034,13 +1111,18 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z.string().min(1),
 });
 
 export const registerSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -1051,7 +1133,12 @@ export const resetPasswordSchema = z.object({
   token: z.string().optional(),
   email: z.string().email().optional(),
   code: z.string().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
 });
 
 // ── Subscription Zod Schemas ──────────────────────────────────

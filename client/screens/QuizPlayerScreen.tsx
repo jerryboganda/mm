@@ -74,6 +74,8 @@ export default function QuizPlayerScreen() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const timerStartRef = useRef<number | null>(null);
   const totalTimerSecondsRef = useRef<number>(0);
+  const warned60Ref = useRef(false);
+  const warned30Ref = useRef(false);
 
   const { data: quizData, isLoading } = useQuery<QuizData>({
     queryKey: [
@@ -121,6 +123,26 @@ export default function QuizPlayerScreen() {
     totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
   const answeredCount = Object.keys(answers).length;
   const unansweredCount = totalQuestions - answeredCount;
+
+  const confirmSubmit = useCallback(() => {
+    if (!quizData) return;
+    if (isOffline) {
+      Alert.alert(
+        "No Internet",
+        "Quiz submission requires an internet connection. Your answers are saved \u2014 please submit when you\u2019re back online.",
+      );
+      return;
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    feedback.playSound("success");
+    setShowSubmitModal(false);
+    submitMutation.mutate({
+      quizId: quizData.quizId,
+      answers,
+      mode,
+      topicId,
+    });
+  }, [answers, feedback, isOffline, mode, quizData, submitMutation, topicId]);
 
   useEffect(() => {
     if (quizData?.timeLimit) {
@@ -173,6 +195,19 @@ export default function QuizPlayerScreen() {
 
     return () => clearInterval(timer);
   }, [confirmSubmit, timeRemaining]);
+
+  // Haptic pulse at timer warning thresholds
+  useEffect(() => {
+    if (timeRemaining === null) return;
+    if (timeRemaining <= 60 && timeRemaining > 30 && !warned60Ref.current) {
+      warned60Ref.current = true;
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+    if (timeRemaining <= 30 && !warned30Ref.current) {
+      warned30Ref.current = true;
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  }, [timeRemaining]);
 
   useFocusEffect(
     useCallback(() => {
@@ -232,26 +267,6 @@ export default function QuizPlayerScreen() {
     setShowNavigator(false);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
-
-  const confirmSubmit = useCallback(() => {
-    if (!quizData) return;
-    if (isOffline) {
-      Alert.alert(
-        "No Internet",
-        "Quiz submission requires an internet connection. Your answers are saved — please submit when you\u2019re back online.",
-      );
-      return;
-    }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    feedback.playSound("success");
-    setShowSubmitModal(false);
-    submitMutation.mutate({
-      quizId: quizData.quizId,
-      answers,
-      mode,
-      topicId,
-    });
-  }, [answers, feedback, isOffline, mode, quizData, submitMutation, topicId]);
 
   const handleSubmitPress = () => {
     setShowSubmitModal(true);
@@ -340,6 +355,8 @@ export default function QuizPlayerScreen() {
               ]);
             }}
             style={[styles.closeButton, { backgroundColor: theme.glass }]}
+            accessibilityRole="button"
+            accessibilityLabel="Quit quiz"
           >
             <Feather name="x" size={24} color={theme.text} />
           </Pressable>
@@ -348,6 +365,8 @@ export default function QuizPlayerScreen() {
             <Pressable
               onPress={() => setShowNavigator(true)}
               style={[styles.questionCounter, { backgroundColor: theme.glass }]}
+              accessibilityRole="button"
+              accessibilityLabel={`Question ${currentIndex + 1} of ${totalQuestions}. Open question navigator`}
             >
               <ThemedText
                 style={[styles.questionNumber, { color: theme.textSecondary }]}
@@ -366,7 +385,11 @@ export default function QuizPlayerScreen() {
                 style={[
                   styles.timer,
                   { backgroundColor: theme.glass },
-                  timeRemaining < 60 && {
+                  timeRemaining <= 60 &&
+                    timeRemaining > 30 && {
+                      backgroundColor: `${theme.warning}33`,
+                    },
+                  timeRemaining <= 30 && {
                     backgroundColor: `${theme.error}33`,
                   },
                 ]}
@@ -374,12 +397,20 @@ export default function QuizPlayerScreen() {
                 <Feather
                   name="clock"
                   size={14}
-                  color={timeRemaining < 60 ? theme.error : theme.text}
+                  color={
+                    timeRemaining <= 30
+                      ? theme.error
+                      : timeRemaining <= 60
+                        ? theme.warning
+                        : theme.text
+                  }
                 />
                 <ThemedText
                   style={[
                     styles.timerText,
-                    timeRemaining < 60 && { color: theme.error },
+                    timeRemaining <= 60 &&
+                      timeRemaining > 30 && { color: theme.warning },
+                    timeRemaining <= 30 && { color: theme.error },
                   ]}
                 >
                   {formatTime(timeRemaining)}
@@ -438,6 +469,9 @@ export default function QuizPlayerScreen() {
                 { backgroundColor: theme.glass },
                 currentIndex === 0 && styles.navButtonDisabled,
               ]}
+              accessibilityRole="button"
+              accessibilityLabel="Previous question"
+              accessibilityState={{ disabled: currentIndex === 0 }}
             >
               <Feather name="chevron-left" size={24} color={theme.text} />
             </Pressable>
@@ -468,6 +502,7 @@ export default function QuizPlayerScreen() {
         visible={showNavigator}
         animationType="slide"
         transparent
+        accessibilityViewIsModal={true}
         onRequestClose={() => setShowNavigator(false)}
       >
         <View style={styles.modalOverlay}>
@@ -493,8 +528,14 @@ export default function QuizPlayerScreen() {
               style={[styles.navigatorHandle, { backgroundColor: theme.glass }]}
             />
             <View style={styles.navigatorHeader}>
-              <ThemedText type="h4">Question Navigator</ThemedText>
-              <Pressable onPress={() => setShowNavigator(false)}>
+              <ThemedText type="h4" accessibilityRole="header">
+                Question Navigator
+              </ThemedText>
+              <Pressable
+                onPress={() => setShowNavigator(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Close question navigator"
+              >
                 <Feather name="x" size={24} color={theme.text} />
               </Pressable>
             </View>
@@ -544,6 +585,8 @@ export default function QuizPlayerScreen() {
                           borderWidth: 2,
                         },
                       ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Question ${index + 1}${isAnswered ? ", answered" : ", unanswered"}${isCurrent ? ", current" : ""}`}
                     >
                       <ThemedText
                         style={[
@@ -568,6 +611,7 @@ export default function QuizPlayerScreen() {
         visible={showSubmitModal}
         animationType="fade"
         transparent
+        accessibilityViewIsModal={true}
         onRequestClose={() => setShowSubmitModal(false)}
       >
         <View style={styles.modalOverlay}>
@@ -637,6 +681,8 @@ export default function QuizPlayerScreen() {
                   styles.submitModalCancelButton,
                   { backgroundColor: theme.glass },
                 ]}
+                accessibilityRole="button"
+                accessibilityLabel="Review answers"
               >
                 <ThemedText
                   style={[styles.submitModalCancelText, { color: theme.text }]}

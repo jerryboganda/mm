@@ -89,6 +89,8 @@ function SearchResultCard({
         { backgroundColor: theme.glass, borderColor: theme.glassBorder },
       ]}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${getTypeLabel()}: ${item.title}`}
     >
       <View
         style={[styles.resultIcon, { backgroundColor: `${theme.primary}1A` }]}
@@ -238,9 +240,16 @@ export default function SearchScreen() {
               autoFocus
               returnKeyType="search"
               testID="input-search"
+              accessibilityLabel="Search"
+              accessibilityHint="Search topics, chapters, and books"
             />
             {query.length > 0 && (
-              <Pressable onPress={handleClear} hitSlop={10}>
+              <Pressable
+                onPress={handleClear}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel="Clear search"
+              >
                 <Feather name="x" size={18} color={theme.textMuted} />
               </Pressable>
             )}
@@ -263,6 +272,9 @@ export default function SearchScreen() {
                 },
               ]}
               onPress={() => handleFilterPress(filter.key)}
+              accessibilityRole="radio"
+              accessibilityLabel={`Filter by ${filter.label}`}
+              accessibilityState={{ selected: activeFilter === filter.key }}
             >
               <ThemedText
                 style={[

@@ -128,7 +128,7 @@ export default function LoginScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText type="h1" style={styles.title}>
+          <ThemedText type="h1" style={styles.title} accessibilityRole="header">
             Welcome Back
           </ThemedText>
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -158,6 +158,7 @@ export default function LoginScreen() {
             autoCapitalize="none"
             autoComplete="email"
             error={errors.email}
+            accessibilityLabel="Email address"
           />
           <GlassInput
             label="Password"
@@ -167,11 +168,15 @@ export default function LoginScreen() {
             secureTextEntry
             autoComplete="password"
             error={errors.password}
+            accessibilityLabel="Password"
           />
 
           <Pressable
             style={styles.rememberMeContainer}
             onPress={() => setRememberMe(!rememberMe)}
+            accessibilityRole="checkbox"
+            accessibilityLabel="Remember me"
+            accessibilityState={{ checked: rememberMe }}
           >
             <View
               style={[
@@ -196,6 +201,8 @@ export default function LoginScreen() {
           <Pressable
             style={styles.forgotPassword}
             onPress={() => navigation.navigate("ForgotPassword")}
+            accessibilityRole="link"
+            accessibilityLabel="Forgot Password?"
           >
             <ThemedText
               style={[
@@ -223,7 +230,11 @@ export default function LoginScreen() {
           >
             Don&apos;t have an account?
           </ThemedText>
-          <Pressable onPress={() => navigation.navigate("Register")}>
+          <Pressable
+            onPress={() => navigation.navigate("Register")}
+            accessibilityRole="link"
+            accessibilityLabel="Sign Up"
+          >
             <ThemedText style={[styles.signUpLink, { color: theme.primary }]}>
               {" "}
               Sign Up

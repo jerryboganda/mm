@@ -44,13 +44,24 @@ export function LoadingSkeleton({
     <View
       style={[
         styles.container,
-        { width: width as any, height, borderRadius, backgroundColor: theme.glass },
+        {
+          width: width as any,
+          height,
+          borderRadius,
+          backgroundColor: theme.glass,
+        },
         style,
       ]}
+      accessibilityLabel="Loading content"
+      accessibilityState={{ busy: true }}
     >
       <Animated.View style={[styles.shimmer, animatedStyle]}>
         <LinearGradient
-          colors={["transparent", isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", "transparent"]}
+          colors={[
+            "transparent",
+            isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+            "transparent",
+          ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.gradient}
@@ -64,7 +75,14 @@ export function CardSkeleton() {
   const { theme } = useTheme();
 
   return (
-    <View style={[styles.cardContainer, { backgroundColor: theme.glass, borderColor: theme.glassBorder }]}>
+    <View
+      style={[
+        styles.cardContainer,
+        { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+      ]}
+      accessibilityLabel="Loading content"
+      accessibilityState={{ busy: true }}
+    >
       <View style={styles.cardHeader}>
         <LoadingSkeleton
           width={48}

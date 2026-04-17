@@ -297,6 +297,7 @@ export default function TopicReaderScreen() {
         "/api/topics",
         topicId,
       ]);
+      const wasBookmarked = previous?.isBookmarked ?? false;
       // Optimistic toggle
       if (previous) {
         queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
@@ -304,7 +305,7 @@ export default function TopicReaderScreen() {
           isBookmarked: !previous.isBookmarked,
         });
       }
-      return { previous };
+      return { previous, wasBookmarked };
     },
     onError: (_err, _vars, context) => {
       // Rollback
@@ -312,11 +313,16 @@ export default function TopicReaderScreen() {
         queryClient.setQueryData(["/api/topics", topicId], context.previous);
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, _vars, context) => {
       if (!isOffline) {
         queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
       }
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Adding bookmark → success haptic; removing → light tap
+      if (context?.wasBookmarked) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
       feedback.playSound("tap");
     },
   });
@@ -489,6 +495,9 @@ export default function TopicReaderScreen() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setViewerImage(block.content);
             }}
+            accessibilityRole="button"
+            accessibilityLabel="View image fullscreen"
+            accessibilityHint="Opens image in fullscreen viewer"
           >
             <Image
               source={{ uri: block.content }}
@@ -594,12 +603,17 @@ export default function TopicReaderScreen() {
         }}
       >
         <View style={styles.header}>
-          <ThemedText type="h2" style={styles.title}>
+          <ThemedText type="h2" style={styles.title} accessibilityRole="header">
             {topic?.title || topicTitle}
           </ThemedText>
           <Pressable
             onPress={() => bookmarkMutation.mutate()}
             style={styles.bookmarkButton}
+            accessibilityRole="button"
+            accessibilityLabel={
+              topic?.isBookmarked ? "Remove bookmark" : "Add bookmark"
+            }
+            accessibilityState={{ selected: topic?.isBookmarked }}
           >
             <Feather
               name="bookmark"
@@ -760,6 +774,9 @@ export default function TopicReaderScreen() {
                     : 1,
               },
             ]}
+            accessibilityRole="button"
+            accessibilityLabel="Mark for revision"
+            accessibilityHint="Tap to mark this topic as not completed"
           >
             <Feather name="check-circle" size={20} color={theme.success} />
             <ThemedText
@@ -794,6 +811,8 @@ export default function TopicReaderScreen() {
                 topicTitle: topic?.title || topicTitle,
               })
             }
+            accessibilityRole="button"
+            accessibilityLabel="Previous topic"
           >
             <Feather name="chevron-left" size={24} color={theme.text} />
             <ThemedText style={[styles.navButtonText, { color: theme.text }]}>
@@ -816,6 +835,8 @@ export default function TopicReaderScreen() {
                 topicTitle: topic?.title || topicTitle,
               })
             }
+            accessibilityRole="button"
+            accessibilityLabel="Next topic"
           >
             <ThemedText style={styles.navButtonTextPrimary}>
               Next Topic
@@ -850,8 +871,14 @@ export default function TopicReaderScreen() {
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <ThemedText type="h3">Report an Error</ThemedText>
-              <Pressable onPress={() => setReportVisible(false)}>
+              <ThemedText type="h3" accessibilityRole="header">
+                Report an Error
+              </ThemedText>
+              <Pressable
+                onPress={() => setReportVisible(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Close report dialog"
+              >
                 <Feather name="x" size={24} color={theme.text} />
               </Pressable>
             </View>
@@ -882,6 +909,9 @@ export default function TopicReaderScreen() {
                     },
                   ]}
                   onPress={() => setReportType(opt.value)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={`Error type: ${opt.label}`}
+                  accessibilityState={{ selected: reportType === opt.value }}
                 >
                   <ThemedText
                     style={[
@@ -920,6 +950,8 @@ export default function TopicReaderScreen() {
               value={reportDescription}
               onChangeText={setReportDescription}
               textAlignVertical="top"
+              accessibilityLabel="Error description"
+              accessibilityHint="Describe the error you found in this topic"
             />
 
             <PrimaryButton

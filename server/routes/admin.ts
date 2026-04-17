@@ -12,6 +12,7 @@ import {
   getSupportContactSettings,
   SUPPORT_CONTACT_KEYS,
 } from "../lib/support-contact";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -20,8 +21,12 @@ const getSupportContactHandler = async (_req: AuthRequest, res: Response) => {
     const supportContactSettings = await getSupportContactSettings();
     res.json(supportContactSettings);
   } catch (error) {
-    console.error("Get support contact settings error:", error);
-    res.status(500).json({ message: "Failed to load support contact settings" });
+    logger.error("Get support contact settings error", {
+      error: String(error),
+    });
+    res
+      .status(500)
+      .json({ message: "Failed to load support contact settings" });
   }
 };
 
@@ -54,8 +59,12 @@ const putSupportContactHandler = async (req: AuthRequest, res: Response) => {
       ...updated,
     });
   } catch (error) {
-    console.error("Save support contact settings error:", error);
-    res.status(500).json({ message: "Failed to save support contact settings" });
+    logger.error("Save support contact settings error", {
+      error: String(error),
+    });
+    res
+      .status(500)
+      .json({ message: "Failed to save support contact settings" });
   }
 };
 
@@ -116,7 +125,7 @@ router.get(
         fromName: settingsMap["brevo_from_name"] || "Maternal Mind",
       });
     } catch (error) {
-      console.error("Get email settings error:", error);
+      logger.error("Get email settings error", { error: String(error) });
       res.status(500).json({ message: "Failed to load email settings" });
     }
   },
@@ -149,7 +158,7 @@ router.put(
 
       res.json({ message: "Email settings saved successfully" });
     } catch (error) {
-      console.error("Save email settings error:", error);
+      logger.error("Save email settings error", { error: String(error) });
       res.status(500).json({ message: "Failed to save email settings" });
     }
   },
@@ -196,10 +205,10 @@ router.post(
           message: `SMTP test failed: ${result.error}`,
         });
       }
-    } catch (error: any) {
-      console.error("Email test error:", error);
+    } catch (error: unknown) {
+      logger.error("Email test error", { error: String(error) });
       res.status(500).json({
-        message: `Email test failed: ${error.message || "Unknown error"}`,
+        message: `Email test failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       });
     }
   },

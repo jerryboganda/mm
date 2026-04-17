@@ -3,11 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/query-client";
 import { Alert, AlertButton } from "react-native";
 
+/** Payload returned from the mobile-content API endpoint. */
 interface MobileAppContentPayload {
   textOverrides: Record<string, string>;
   updatedAt: string | null;
 }
 
+/** Context value exposing text overrides and a resolver function. */
 interface MobileContentContextValue {
   textOverrides: Record<string, string>;
   resolveText: (value: string) => string;
@@ -25,6 +27,14 @@ const MobileContentContext = createContext<MobileContentContextValue>({
   updatedAt: null,
 });
 
+/**
+ * Context provider that fetches server-managed text overrides and makes them
+ * available to the component tree. Also patches `Alert.alert` so that native
+ * alerts respect the same text overrides.
+ *
+ * @param props.children - Child components that will have access to the mobile content context.
+ * @returns A provider component wrapping children with text override capabilities.
+ */
 export function MobileContentProvider({
   children,
 }: {
@@ -55,7 +65,10 @@ export function MobileContentProvider({
       }
 
       const trimmed = input.trim();
-      if (trimmed && Object.prototype.hasOwnProperty.call(textOverrides, trimmed)) {
+      if (
+        trimmed &&
+        Object.prototype.hasOwnProperty.call(textOverrides, trimmed)
+      ) {
         const normalized = textOverrides[trimmed];
         if (typeof normalized === "string" && normalized.length > 0) {
           return normalized;
@@ -87,7 +100,12 @@ export function MobileContentProvider({
             : button.text,
       }));
 
-      return nativeAlert(resolvedTitle, resolvedMessage, resolvedButtons, options);
+      return nativeAlert(
+        resolvedTitle,
+        resolvedMessage,
+        resolvedButtons,
+        options,
+      );
     };
 
     Alert.alert = patchedAlert;
@@ -103,6 +121,11 @@ export function MobileContentProvider({
   );
 }
 
+/**
+ * Hook to access server-managed text overrides and the `resolveText` helper.
+ *
+ * @returns The current {@link MobileContentContextValue}.
+ */
 export function useMobileContent() {
   return useContext(MobileContentContext);
 }

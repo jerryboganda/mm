@@ -61,16 +61,10 @@ function getPackageLabel(pkg: PurchasesPackage): {
   ) {
     return { name: "6 Months", period: "/6 months", savings: "Save 25%" };
   }
-  if (
-    type === PACKAGE_TYPE.TWO_MONTH ||
-    id.includes("2month")
-  ) {
+  if (type === PACKAGE_TYPE.TWO_MONTH || id.includes("2month")) {
     return { name: "2 Months", period: "/2 months", savings: "Save 10%" };
   }
-  if (
-    type === PACKAGE_TYPE.WEEKLY ||
-    id.includes("weekly")
-  ) {
+  if (type === PACKAGE_TYPE.WEEKLY || id.includes("weekly")) {
     return { name: "Weekly", period: "/week" };
   }
   // Default: Monthly
@@ -214,13 +208,8 @@ export default function SubscriptionScreen() {
             onPress={() => navigation.replace("Subscription")}
             style={styles.continueButton}
           />
-          <Pressable
-            style={styles.restoreButton}
-            onPress={handleRestore}
-          >
-            <ThemedText
-              style={[styles.restoreText, { color: theme.primary }]}
-            >
+          <Pressable style={styles.restoreButton} onPress={handleRestore}>
+            <ThemedText style={[styles.restoreText, { color: theme.primary }]}>
               Restore Purchases
             </ThemedText>
           </Pressable>
@@ -245,17 +234,14 @@ export default function SubscriptionScreen() {
           <ThemedText type="h2" style={styles.title}>
             Choose Your Plan
           </ThemedText>
-          <ThemedText
-            style={[styles.subtitle, { color: theme.textSecondary }]}
-          >
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
             Unlock full access to all OB-GYN learning materials
           </ThemedText>
         </View>
 
         <View style={styles.plansContainer}>
           {packages.map((pkg) => {
-            const isSelected =
-              selectedPackage?.identifier === pkg.identifier;
+            const isSelected = selectedPackage?.identifier === pkg.identifier;
             const label = getPackageLabel(pkg);
 
             return (
@@ -279,6 +265,9 @@ export default function SubscriptionScreen() {
                     borderColor: theme.primary,
                   },
                 ]}
+                accessibilityRole="radio"
+                accessibilityLabel={`${label.name} plan, ${pkg.product.priceString}${label.period}${label.savings ? `, ${label.savings}` : ""}${label.popular ? ", best value" : ""}`}
+                accessibilityState={{ selected: isSelected }}
               >
                 {label.popular ? (
                   <View
@@ -322,10 +311,7 @@ export default function SubscriptionScreen() {
                         ]}
                       >
                         <ThemedText
-                          style={[
-                            styles.savingsText,
-                            { color: theme.success },
-                          ]}
+                          style={[styles.savingsText, { color: theme.success }]}
                         >
                           {label.savings}
                         </ThemedText>
@@ -340,10 +326,7 @@ export default function SubscriptionScreen() {
                       {pkg.product.priceString}
                     </ThemedText>
                     <ThemedText
-                      style={[
-                        styles.period,
-                        { color: theme.textSecondary },
-                      ]}
+                      style={[styles.period, { color: theme.textSecondary }]}
                     >
                       {label.period}
                     </ThemedText>
@@ -389,14 +372,13 @@ export default function SubscriptionScreen() {
         <Pressable
           style={styles.restoreButton}
           onPress={handleRestore}
-          disabled={restoring}
+          accessibilityRole="button"
+          accessibilityLabel="Restore purchases"
         >
           {restoring ? (
             <ActivityIndicator size="small" color={theme.primary} />
           ) : (
-            <ThemedText
-              style={[styles.restoreText, { color: theme.primary }]}
-            >
+            <ThemedText style={[styles.restoreText, { color: theme.primary }]}>
               Restore Purchases
             </ThemedText>
           )}

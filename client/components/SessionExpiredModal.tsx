@@ -41,8 +41,13 @@ export function SessionExpiredModal({
       animationType="fade"
       statusBarTranslucent
       onRequestClose={onDismiss}
+      accessibilityLabel="Session expired"
     >
-      <BlurView intensity={20} tint={isDark ? "dark" : "light"} style={styles.overlay}>
+      <BlurView
+        intensity={20}
+        tint={isDark ? "dark" : "light"}
+        style={styles.overlay}
+      >
         <Pressable style={styles.backdrop} onPress={handleDismiss}>
           <View style={styles.centeredView}>
             <Pressable onPress={(e) => e.stopPropagation()}>
@@ -60,14 +65,21 @@ export function SessionExpiredModal({
                   Session Expired
                 </ThemedText>
 
-                <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.description, { color: theme.textSecondary }]}
+                  accessibilityLiveRegion="polite"
+                >
                   Your session has expired for security reasons. Please log in
                   again to continue using Maternal Mind.
                 </ThemedText>
 
-                <View style={[styles.infoBox, { backgroundColor: theme.glass }]}>
+                <View
+                  style={[styles.infoBox, { backgroundColor: theme.glass }]}
+                >
                   <Feather name="shield" size={18} color={theme.info} />
-                  <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
+                  <ThemedText
+                    style={[styles.infoText, { color: theme.textSecondary }]}
+                  >
                     Your progress and data are safely saved.
                   </ThemedText>
                 </View>
@@ -84,8 +96,12 @@ export function SessionExpiredModal({
                     <Pressable
                       style={styles.dismissButton}
                       onPress={handleDismiss}
+                      accessibilityRole="button"
+                      accessibilityLabel="Dismiss session expired dialog"
                     >
-                      <ThemedText style={[styles.dismissText, { color: theme.textMuted }]}>
+                      <ThemedText
+                        style={[styles.dismissText, { color: theme.textMuted }]}
+                      >
                         Dismiss
                       </ThemedText>
                     </Pressable>

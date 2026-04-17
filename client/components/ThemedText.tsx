@@ -64,9 +64,15 @@ export function ThemedText({ style, type = "body", ...rest }: ThemedTextProps) {
     }
   };
 
+  const isHeading =
+    type === "h1" || type === "h2" || type === "h3" || type === "h4";
+
   return (
     <Text
       maxFontSizeMultiplier={1.5}
+      {...(isHeading && !rest.accessibilityRole
+        ? { accessibilityRole: "header" as const }
+        : {})}
       style={[{ color: getColor() }, getTypeStyle(), style]}
       {...rest}
     >

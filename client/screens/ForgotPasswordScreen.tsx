@@ -1,5 +1,10 @@
 import React, { useState, useRef } from "react";
-import { StyleSheet, View, Image, TextInput as RNTextInput } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  TextInput as RNTextInput,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -180,7 +185,11 @@ export default function ForgotPasswordScreen() {
             >
               <Feather name="mail" size={48} color={theme.primary} />
             </View>
-            <ThemedText type="h2" style={styles.title}>
+            <ThemedText
+              type="h2"
+              style={styles.title}
+              accessibilityRole="header"
+            >
               Enter Reset Code
             </ThemedText>
             <ThemedText
@@ -205,7 +214,7 @@ export default function ForgotPasswordScreen() {
                       ? theme.primary
                       : otpError
                         ? theme.error
-                        : theme.border,
+                        : theme.glassBorder,
                     backgroundColor: theme.glass,
                     color: theme.text,
                   },
@@ -217,12 +226,15 @@ export default function ForgotPasswordScreen() {
                 maxLength={index === 0 ? 6 : 1}
                 selectTextOnFocus
                 textAlign="center"
+                accessibilityLabel={`Reset code digit ${index + 1}`}
               />
             ))}
           </View>
 
           {otpError ? (
-            <ThemedText style={[styles.errorText, { color: theme.error }]}>{otpError}</ThemedText>
+            <ThemedText style={[styles.errorText, { color: theme.error }]}>
+              {otpError}
+            </ThemedText>
           ) : null}
 
           <PrimaryButton
@@ -278,7 +290,7 @@ export default function ForgotPasswordScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText type="h1" style={styles.title}>
+          <ThemedText type="h1" style={styles.title} accessibilityRole="header">
             Forgot Password
           </ThemedText>
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -299,6 +311,7 @@ export default function ForgotPasswordScreen() {
             autoCapitalize="none"
             icon="mail"
             error={error}
+            accessibilityLabel="Email address"
           />
 
           <PrimaryButton

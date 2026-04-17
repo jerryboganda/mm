@@ -4,10 +4,21 @@ import { isLiquidGlassAvailable } from "expo-glass-effect";
 
 import { useTheme } from "@/hooks/useTheme";
 
+/**
+ * Configuration options for {@link useScreenOptions}.
+ */
 interface UseScreenOptionsParams {
   transparent?: boolean;
 }
 
+/**
+ * React hook that returns consistent NativeStack navigation options
+ * adapted to the current theme and platform.
+ * Provides transparent headers with blur on iOS and solid backgrounds on Android/web.
+ *
+ * @param options - Optional configuration. Pass `transparent: false` to disable header transparency.
+ * @returns A `NativeStackNavigationOptions` object ready for use in screen configuration
+ */
 export function useScreenOptions({
   transparent = true,
 }: UseScreenOptionsParams = {}): NativeStackNavigationOptions {

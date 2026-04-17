@@ -20,8 +20,10 @@ router.get("/dashboard", async (_req: AuthRequest, res) => {
   try {
     const stats = await adminGetDashboardStats();
     res.json(stats);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -31,8 +33,10 @@ router.get("/user-growth", async (req: AuthRequest, res) => {
     const days = parseInt((req.query.days as string) || "30");
     const data = await adminGetUserGrowth(days);
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -41,8 +45,10 @@ router.get("/quiz", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetQuizAnalytics();
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -51,8 +57,10 @@ router.get("/content", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetContentStats();
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -63,8 +71,10 @@ router.get("/audit-logs", async (req: AuthRequest, res) => {
     const limit = parseInt((req.query.limit as string) || "100");
     const data = await getAuditLogs(limit, page);
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 

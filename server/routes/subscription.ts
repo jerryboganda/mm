@@ -3,6 +3,7 @@ import { authMiddleware, type AuthRequest } from "../middleware";
 import { subscriptionService } from "../services/subscription-service";
 import { couponService } from "../services/coupon-service";
 import { validateCouponSchema } from "../../shared/schema";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -51,7 +52,7 @@ router.get("/packages", async (_req, res) => {
 
     res.json({ packages: userFacing });
   } catch (error) {
-    console.error("[Subscription Routes] GET /packages error:", error);
+    logger.error("GET /packages error", { error: String(error) });
     res.status(500).json({ message: "Failed to load packages" });
   }
 });
@@ -116,7 +117,7 @@ router.get("/packages/compare", async (_req, res) => {
 
     res.json({ packages: matrix, featureKeys: allFeatureKeys });
   } catch (error) {
-    console.error("[Subscription Routes] GET /packages/compare error:", error);
+    logger.error("GET /packages/compare error", { error: String(error) });
     res.status(500).json({ message: "Failed to load package comparison" });
   }
 });
@@ -175,7 +176,7 @@ router.get(
         },
       });
     } catch (error) {
-      console.error("[Subscription Routes] GET /my-subscription error:", error);
+      logger.error("GET /my-subscription error", { error: String(error) });
       res.status(500).json({ message: "Failed to load subscription" });
     }
   },
@@ -190,7 +191,7 @@ router.get("/invoices", authMiddleware, async (req: AuthRequest, res) => {
     const invoices = await subscriptionService.getUserInvoices(req.userId!);
     res.json({ invoices });
   } catch (error) {
-    console.error("[Subscription Routes] GET /invoices error:", error);
+    logger.error("GET /invoices error", { error: String(error) });
     res.status(500).json({ message: "Failed to load invoices" });
   }
 });
@@ -216,7 +217,7 @@ router.get("/invoices/:id", authMiddleware, async (req: AuthRequest, res) => {
 
     res.json({ invoice });
   } catch (error) {
-    console.error("[Subscription Routes] GET /invoices/:id error:", error);
+    logger.error("GET /invoices/:id error", { error: String(error) });
     res.status(500).json({ message: "Failed to load invoice" });
   }
 });
@@ -256,10 +257,7 @@ router.post(
         error: result.error ?? null,
       });
     } catch (error) {
-      console.error(
-        "[Subscription Routes] POST /validate-coupon error:",
-        error,
-      );
+      logger.error("POST /validate-coupon error", { error: String(error) });
       res.status(500).json({
         valid: false,
         error: "Failed to validate coupon",
@@ -345,9 +343,10 @@ router.post("/subscribe", authMiddleware, async (req: AuthRequest, res) => {
     }
 
     res.status(201).json({ subscription });
-  } catch (error: any) {
-    console.error("[Subscription Routes] POST /subscribe error:", error);
-    const message = error?.message || "Failed to create subscription";
+  } catch (error: unknown) {
+    logger.error("POST /subscribe error", { error: String(error) });
+    const message =
+      error instanceof Error ? error.message : "Failed to create subscription";
     const status = message.includes("not found")
       ? 404
       : message.includes("limit")
@@ -386,7 +385,7 @@ router.post("/cancel", authMiddleware, async (req: AuthRequest, res) => {
         : "Subscription will be canceled at the end of the current billing period",
     });
   } catch (error) {
-    console.error("[Subscription Routes] POST /cancel error:", error);
+    logger.error("POST /cancel error", { error: String(error) });
     res.status(500).json({ message: "Failed to cancel subscription" });
   }
 });
@@ -417,7 +416,7 @@ router.post("/pause", authMiddleware, async (req: AuthRequest, res) => {
 
     res.json({ subscription: updated });
   } catch (error) {
-    console.error("[Subscription Routes] POST /pause error:", error);
+    logger.error("POST /pause error", { error: String(error) });
     res.status(500).json({ message: "Failed to pause subscription" });
   }
 });
@@ -442,9 +441,10 @@ router.post("/resume", authMiddleware, async (req: AuthRequest, res) => {
     const updated = await subscriptionService.resumeSubscription(pausedSub.id);
 
     res.json({ subscription: updated });
-  } catch (error: any) {
-    console.error("[Subscription Routes] POST /resume error:", error);
-    const message = error?.message || "Failed to resume subscription";
+  } catch (error: unknown) {
+    logger.error("POST /resume error", { error: String(error) });
+    const message =
+      error instanceof Error ? error.message : "Failed to resume subscription";
     res.status(500).json({ message });
   }
 });
@@ -482,9 +482,10 @@ router.post("/upgrade", authMiddleware, async (req: AuthRequest, res) => {
       subscription: result.subscription,
       prorationAmount: result.prorationAmount,
     });
-  } catch (error: any) {
-    console.error("[Subscription Routes] POST /upgrade error:", error);
-    const message = error?.message || "Failed to upgrade subscription";
+  } catch (error: unknown) {
+    logger.error("POST /upgrade error", { error: String(error) });
+    const message =
+      error instanceof Error ? error.message : "Failed to upgrade subscription";
     const status = message.includes("not found") ? 404 : 500;
     res.status(status).json({ message });
   }
@@ -524,9 +525,12 @@ router.post("/downgrade", authMiddleware, async (req: AuthRequest, res) => {
       message:
         "Downgrade scheduled. Changes will take effect at the end of your current billing period.",
     });
-  } catch (error: any) {
-    console.error("[Subscription Routes] POST /downgrade error:", error);
-    const message = error?.message || "Failed to downgrade subscription";
+  } catch (error: unknown) {
+    logger.error("POST /downgrade error", { error: String(error) });
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to downgrade subscription";
     const status = message.includes("not found") ? 404 : 500;
     res.status(status).json({ message });
   }
@@ -544,7 +548,7 @@ router.get("/history", authMiddleware, async (req: AuthRequest, res) => {
 
     res.json({ subscriptions });
   } catch (error) {
-    console.error("[Subscription Routes] GET /history error:", error);
+    logger.error("GET /history error", { error: String(error) });
     res.status(500).json({ message: "Failed to load subscription history" });
   }
 });
@@ -574,9 +578,12 @@ router.post("/reactivate", authMiddleware, async (req: AuthRequest, res) => {
     );
 
     res.json({ subscription: updated });
-  } catch (error: any) {
-    console.error("[Subscription Routes] POST /reactivate error:", error);
-    const message = error?.message || "Failed to reactivate subscription";
+  } catch (error: unknown) {
+    logger.error("POST /reactivate error", { error: String(error) });
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to reactivate subscription";
     res.status(500).json({ message });
   }
 });

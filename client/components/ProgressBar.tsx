@@ -35,8 +35,17 @@ export function ProgressBar({
   }));
 
   return (
-    <View style={[styles.container, { height }, style]}>
-        <View style={[styles.track, { height, borderRadius: height / 2, backgroundColor: theme.glass }]}>
+    <View
+      style={[styles.container, { height }, style]}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: clampedProgress }}
+    >
+      <View
+        style={[
+          styles.track,
+          { height, borderRadius: height / 2, backgroundColor: theme.glass },
+        ]}
+      >
         <Animated.View
           style={[
             styles.fill,

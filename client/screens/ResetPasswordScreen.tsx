@@ -168,7 +168,7 @@ export default function ResetPasswordScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText type="h1" style={styles.title}>
+          <ThemedText type="h1" style={styles.title} accessibilityRole="header">
             Reset Password
           </ThemedText>
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -188,6 +188,7 @@ export default function ResetPasswordScreen() {
             secureTextEntry
             icon="lock"
             error={errors.password}
+            accessibilityLabel="New Password"
           />
 
           <GlassInput
@@ -201,6 +202,7 @@ export default function ResetPasswordScreen() {
             secureTextEntry
             icon="lock"
             error={errors.confirmPassword}
+            accessibilityLabel="Confirm Password"
           />
 
           <PrimaryButton

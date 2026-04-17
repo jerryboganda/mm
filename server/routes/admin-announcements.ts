@@ -21,8 +21,10 @@ router.get("/", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetAnnouncements();
     res.json(data);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -50,8 +52,10 @@ router.post("/", async (req: AuthRequest, res) => {
       details: { title },
     });
     res.status(201).json(ann);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -68,8 +72,10 @@ router.put("/:id", async (req: AuthRequest, res) => {
       entityId: ann.id,
     });
     res.json(ann);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -84,8 +90,10 @@ router.delete("/:id", async (req: AuthRequest, res) => {
       entityId: announcementId,
     });
     res.json({ message: "Announcement deleted" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 

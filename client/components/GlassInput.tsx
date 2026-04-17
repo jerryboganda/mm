@@ -96,9 +96,7 @@ export function GlassInput({
             <Feather
               name={icon}
               size={20}
-              color={
-                isFocused ? theme.primary : theme.textSecondary
-              }
+              color={isFocused ? theme.primary : theme.textSecondary}
             />
           </View>
         ) : null}
@@ -134,6 +132,10 @@ export function GlassInput({
           <Pressable
             style={styles.rightIcon}
             onPress={() => setShowPassword(!showPassword)}
+            accessibilityRole="button"
+            accessibilityLabel={
+              showPassword ? `Hide ${resolvedLabel}` : `Show ${resolvedLabel}`
+            }
           >
             <Feather
               name={showPassword ? "eye-off" : "eye"}
@@ -142,12 +144,20 @@ export function GlassInput({
             />
           </Pressable>
         ) : rightIcon ? (
-          <Pressable style={styles.rightIcon} onPress={onRightIconPress}>
+          <Pressable
+            style={styles.rightIcon}
+            onPress={onRightIconPress}
+            accessibilityRole="button"
+          >
             <Feather name={rightIcon} size={20} color={theme.primary} />
           </Pressable>
         ) : null}
       </Pressable>
-      {error ? <ThemedText style={[styles.errorText, { color: theme.error }]}>{error}</ThemedText> : null}
+      {error ? (
+        <ThemedText style={[styles.errorText, { color: theme.error }]}>
+          {error}
+        </ThemedText>
+      ) : null}
     </View>
   );
 }

@@ -34,57 +34,235 @@ import { db } from "./db";
 import { eq, and, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
 import crypto from "crypto";
 
+/**
+ * Storage interface defining all data-access operations for the application.
+ * Implementations must provide persistence for users, content, progress, quizzes, and settings.
+ */
 export interface IStorage {
+  /**
+   * Retrieve a user by their unique ID.
+   * @param id - The user's UUID
+   * @returns The user record, or undefined if not found
+   */
   getUser(id: string): Promise<User | undefined>;
+
+  /**
+   * Retrieve a user by their email address.
+   * @param email - The user's email
+   * @returns The user record, or undefined if no user has that email
+   */
   getUserByEmail(email: string): Promise<User | undefined>;
+
+  /**
+   * Create a new user account.
+   * @param user - The user data to insert
+   * @returns The newly created user record
+   */
   createUser(user: InsertUser): Promise<User>;
 
+  /**
+   * Retrieve all published books, ordered by their display order.
+   * @returns An array of published books
+   */
   getBooks(): Promise<Book[]>;
+
+  /**
+   * Retrieve a single book by its ID.
+   * @param id - The book's UUID
+   * @returns The book record, or undefined if not found
+   */
   getBook(id: string): Promise<Book | undefined>;
 
+  /**
+   * Retrieve all published chapters belonging to a specific book.
+   * @param bookId - The parent book's UUID
+   * @returns An array of chapters ordered by display order
+   */
   getChaptersByBook(bookId: string): Promise<Chapter[]>;
+
+  /**
+   * Retrieve a single chapter by its ID.
+   * @param id - The chapter's UUID
+   * @returns The chapter record, or undefined if not found
+   */
   getChapter(id: string): Promise<Chapter | undefined>;
 
+  /**
+   * Retrieve all published topics belonging to a specific chapter.
+   * @param chapterId - The parent chapter's UUID
+   * @returns An array of topics ordered by display order
+   */
   getTopicsByChapter(chapterId: string): Promise<Topic[]>;
+
+  /**
+   * Retrieve a single topic by its ID.
+   * @param id - The topic's UUID
+   * @returns The topic record, or undefined if not found
+   */
   getTopic(id: string): Promise<Topic | undefined>;
 
+  /**
+   * Retrieve all content blocks for a topic, ordered by display order.
+   * @param topicId - The parent topic's UUID
+   * @returns An array of content blocks
+   */
   getContentBlocksByTopic(topicId: string): Promise<ContentBlock[]>;
 
+  /**
+   * Retrieve all published MCQs belonging to a specific topic.
+   * @param topicId - The parent topic's UUID
+   * @returns An array of MCQ records
+   */
   getMCQsByTopic(topicId: string): Promise<MCQ[]>;
+
+  /**
+   * Retrieve a random set of published MCQs, optionally filtered by difficulty.
+   * @param limit - Maximum number of MCQs to return (default varies by implementation)
+   * @param difficulty - Difficulty level filter; pass "all" or omit to include all difficulties
+   * @returns An array of MCQ records in random order
+   */
   getMCQs(limit?: number, difficulty?: string): Promise<MCQ[]>;
+
+  /**
+   * Retrieve a single MCQ by its ID.
+   * @param id - The MCQ's UUID
+   * @returns The MCQ record, or undefined if not found
+   */
   getMCQ(id: string): Promise<MCQ | undefined>;
 
+  /**
+   * Retrieve all progress records for a user across all topics.
+   * @param userId - The user's UUID
+   * @returns An array of user progress records
+   */
   getUserProgress(userId: string): Promise<UserProgress[]>;
+
+  /**
+   * Retrieve progress for a specific user on a specific topic.
+   * @param userId - The user's UUID
+   * @param topicId - The topic's UUID
+   * @returns The progress record, or undefined if none exists
+   */
   getTopicProgress(
     userId: string,
     topicId: string,
   ): Promise<UserProgress | undefined>;
+
+  /**
+   * Mark a topic as completed for a user. Creates a progress record if none exists.
+   * @param userId - The user's UUID
+   * @param topicId - The topic's UUID
+   */
   markTopicComplete(userId: string, topicId: string): Promise<void>;
 
+  /**
+   * Retrieve all bookmarks for a user, ordered by most recently created first.
+   * @param userId - The user's UUID
+   * @returns An array of bookmark records
+   */
   getBookmarks(userId: string): Promise<Bookmark[]>;
+
+  /**
+   * Toggle a bookmark for a user on a topic. Creates the bookmark if it doesn't exist, removes it if it does.
+   * @param userId - The user's UUID
+   * @param topicId - The topic's UUID
+   * @returns `true` if the bookmark was created, `false` if it was removed
+   */
   toggleBookmark(userId: string, topicId: string): Promise<boolean>;
+
+  /**
+   * Check whether a user has bookmarked a specific topic.
+   * @param userId - The user's UUID
+   * @param topicId - The topic's UUID
+   * @returns `true` if the topic is bookmarked
+   */
   isBookmarked(userId: string, topicId: string): Promise<boolean>;
 
+  /**
+   * Record a new quiz attempt.
+   * @param attempt - The quiz attempt data (id and createdAt are auto-generated)
+   * @returns The newly created quiz attempt record
+   */
   createQuizAttempt(
     attempt: Omit<QuizAttempt, "id" | "createdAt">,
   ): Promise<QuizAttempt>;
+
+  /**
+   * Retrieve a single quiz attempt by its ID.
+   * @param id - The quiz attempt's UUID
+   * @returns The quiz attempt record, or undefined if not found
+   */
   getQuizAttempt(id: string): Promise<QuizAttempt | undefined>;
+
+  /**
+   * Retrieve all quiz attempts for a user, ordered by most recent first.
+   * @param userId - The user's UUID
+   * @returns An array of quiz attempt records
+   */
   getQuizAttempts(userId: string): Promise<QuizAttempt[]>;
+
+  /**
+   * Compute aggregate quiz statistics for a user.
+   * @param userId - The user's UUID
+   * @returns An object containing totalAttempts, averageScore, and wrongQuestionsCount
+   */
   getQuizStats(userId: string): Promise<{
     totalAttempts: number;
     averageScore: number;
     wrongQuestionsCount: number;
   }>;
+
+  /**
+   * Retrieve MCQs that the user answered incorrectly and has not yet corrected in a later attempt.
+   * @param userId - The user's UUID
+   * @returns An array of MCQ records the user still has wrong
+   */
   getWrongQuestions(userId: string): Promise<MCQ[]>;
 
+  /**
+   * Generate and store a cryptographically random password-reset token for a user.
+   * @param userId - The user's UUID
+   * @returns The generated hex token string (valid for 1 hour)
+   */
   createPasswordResetToken(userId: string): Promise<string>;
+
+  /**
+   * Look up a valid (unused, non-expired) password-reset token.
+   * @param token - The token string to look up
+   * @returns The token record, or undefined if invalid/expired/used
+   */
   getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+
+  /**
+   * Mark a password-reset token as used so it cannot be reused.
+   * @param tokenId - The token record's UUID
+   */
   markTokenUsed(tokenId: string): Promise<void>;
+
+  /**
+   * Update a user's password hash.
+   * @param userId - The user's UUID
+   * @param hashedPassword - The new bcrypt-hashed password
+   */
   updateUserPassword(userId: string, hashedPassword: string): Promise<void>;
+
+  /**
+   * Update a user's profile information.
+   * @param userId - The user's UUID
+   * @param data - An object containing the fields to update
+   * @returns The updated user record, or undefined if the user was not found
+   */
   updateUserProfile(
     userId: string,
     data: { name: string },
   ): Promise<User | undefined>;
+
+  /**
+   * Update a user's subscription status and plan details.
+   * @param userId - The user's UUID
+   * @param data - Subscription fields to update
+   * @returns The updated user record, or undefined if the user was not found
+   */
   updateSubscription(
     userId: string,
     data: {
@@ -93,15 +271,47 @@ export interface IStorage {
       subscriptionExpiresAt?: Date | null;
     },
   ): Promise<User | undefined>;
+
+  /**
+   * Deactivate a user's account, optionally recording a reason.
+   * @param userId - The user's UUID
+   * @param reason - Optional reason for deactivation
+   * @returns The updated user record, or undefined if the user was not found
+   */
   deactivateUser(userId: string, reason?: string): Promise<User | undefined>;
+
+  /**
+   * Request deletion of a user's account. Sets the deletion status to "requested".
+   * @param userId - The user's UUID
+   * @param note - Optional note from the user about the deletion request
+   * @returns The updated user record, or undefined if the user was not found
+   */
   requestAccountDeletion(
     userId: string,
     note?: string,
   ): Promise<User | undefined>;
 
+  /**
+   * Record that a user viewed a topic. Updates the timestamp if a record already exists.
+   * @param userId - The user's UUID
+   * @param topicId - The topic's UUID
+   */
   recordTopicView(userId: string, topicId: string): Promise<void>;
+
+  /**
+   * Retrieve recent topic-view activity for a user, ordered by most recent first.
+   * @param userId - The user's UUID
+   * @param limit - Maximum number of records to return (default varies by implementation)
+   * @returns An array of recent activity records
+   */
   getRecentActivity(userId: string, limit?: number): Promise<RecentActivity[]>;
 
+  /**
+   * Update a user's email verification status and/or verification token.
+   * @param userId - The user's UUID
+   * @param data - Verification fields to update
+   * @returns The updated user record, or undefined if the user was not found
+   */
   updateUserVerification(
     userId: string,
     data: {
@@ -111,6 +321,12 @@ export interface IStorage {
     },
   ): Promise<User | undefined>;
 
+  /**
+   * Get recommended (incomplete) topics for a user, drawn randomly from published content.
+   * @param userId - The user's UUID
+   * @param limit - Maximum number of recommendations to return
+   * @returns An array of topic recommendations with hierarchy info and progress
+   */
   getRecommendedTopics(
     userId: string,
     limit?: number,
@@ -124,6 +340,10 @@ export interface IStorage {
     }[]
   >;
 
+  /**
+   * Retrieve all active, non-expired announcements for display to users.
+   * @returns An array of announcement objects with isRead defaulting to false
+   */
   getAnnouncements(): Promise<
     {
       id: string;
@@ -136,28 +356,56 @@ export interface IStorage {
   >;
 
   // App Settings (admin config)
+
+  /**
+   * Retrieve application settings, optionally filtered by keys.
+   * @param keys - Optional array of setting keys to filter by. If omitted, all settings are returned.
+   * @returns An array of app setting records
+   */
   getAppSettings(keys?: string[]): Promise<AppSetting[]>;
+
+  /**
+   * Retrieve the value of a single application setting.
+   * @param key - The setting key
+   * @returns The setting value, or null if the key does not exist
+   */
   getAppSetting(key: string): Promise<string | null>;
+
+  /**
+   * Create or update a single application setting.
+   * @param key - The setting key
+   * @param value - The setting value
+   */
   setAppSetting(key: string, value: string): Promise<void>;
+
+  /**
+   * Create or update multiple application settings in sequence.
+   * @param settings - An array of key-value pairs to set
+   */
   setAppSettings(settings: { key: string; value: string }[]): Promise<void>;
 }
 
+/** Database-backed implementation of {@link IStorage} using Drizzle ORM. */
 export class DatabaseStorage implements IStorage {
+  /** @inheritdoc */
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
+  /** @inheritdoc */
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
+  /** @inheritdoc */
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
+  /** @inheritdoc */
   async getBooks(): Promise<Book[]> {
     return await db
       .select()
@@ -166,11 +414,13 @@ export class DatabaseStorage implements IStorage {
       .orderBy(books.order);
   }
 
+  /** @inheritdoc */
   async getBook(id: string): Promise<Book | undefined> {
     const [book] = await db.select().from(books).where(eq(books.id, id));
     return book || undefined;
   }
 
+  /** @inheritdoc */
   async getChaptersByBook(bookId: string): Promise<Chapter[]> {
     return await db
       .select()
@@ -179,6 +429,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(chapters.order);
   }
 
+  /** @inheritdoc */
   async getChapter(id: string): Promise<Chapter | undefined> {
     const [chapter] = await db
       .select()
@@ -187,6 +438,7 @@ export class DatabaseStorage implements IStorage {
     return chapter || undefined;
   }
 
+  /** @inheritdoc */
   async getTopicsByChapter(chapterId: string): Promise<Topic[]> {
     return await db
       .select()
@@ -195,11 +447,13 @@ export class DatabaseStorage implements IStorage {
       .orderBy(topics.order);
   }
 
+  /** @inheritdoc */
   async getTopic(id: string): Promise<Topic | undefined> {
     const [topic] = await db.select().from(topics).where(eq(topics.id, id));
     return topic || undefined;
   }
 
+  /** @inheritdoc */
   async getContentBlocksByTopic(topicId: string): Promise<ContentBlock[]> {
     return await db
       .select()
@@ -208,6 +462,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(contentBlocks.order);
   }
 
+  /** @inheritdoc */
   async getMCQsByTopic(topicId: string): Promise<MCQ[]> {
     return await db
       .select()
@@ -215,6 +470,7 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(mcqs.topicId, topicId), eq(mcqs.isPublished, true)));
   }
 
+  /** @inheritdoc */
   async getMCQs(limit = 10, difficulty?: string): Promise<MCQ[]> {
     let query = db.select().from(mcqs).where(eq(mcqs.isPublished, true));
     if (difficulty && difficulty !== "all") {
@@ -228,11 +484,13 @@ export class DatabaseStorage implements IStorage {
     return await query.limit(limit).orderBy(sql`RANDOM()`);
   }
 
+  /** @inheritdoc */
   async getMCQ(id: string): Promise<MCQ | undefined> {
     const [mcq] = await db.select().from(mcqs).where(eq(mcqs.id, id));
     return mcq || undefined;
   }
 
+  /** @inheritdoc */
   async getUserProgress(userId: string): Promise<UserProgress[]> {
     return await db
       .select()
@@ -240,6 +498,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(userProgress.userId, userId));
   }
 
+  /** @inheritdoc */
   async getTopicProgress(
     userId: string,
     topicId: string,
@@ -253,6 +512,7 @@ export class DatabaseStorage implements IStorage {
     return progress || undefined;
   }
 
+  /** @inheritdoc */
   async markTopicComplete(userId: string, topicId: string): Promise<void> {
     const existing = await this.getTopicProgress(userId, topicId);
     if (existing) {
@@ -270,6 +530,11 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  /**
+   * Mark a topic as incomplete for a user. No-op if no progress record exists.
+   * @param userId - The user's UUID
+   * @param topicId - The topic's UUID
+   */
   async markTopicUncomplete(userId: string, topicId: string): Promise<void> {
     const existing = await this.getTopicProgress(userId, topicId);
     if (existing) {
@@ -280,6 +545,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  /** @inheritdoc */
   async getBookmarks(userId: string): Promise<Bookmark[]> {
     return await db
       .select()
@@ -288,6 +554,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(bookmarks.createdAt));
   }
 
+  /** @inheritdoc */
   async toggleBookmark(userId: string, topicId: string): Promise<boolean> {
     const [existing] = await db
       .select()
@@ -303,6 +570,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  /** @inheritdoc */
   async isBookmarked(userId: string, topicId: string): Promise<boolean> {
     const [existing] = await db
       .select()
@@ -311,6 +579,7 @@ export class DatabaseStorage implements IStorage {
     return !!existing;
   }
 
+  /** @inheritdoc */
   async createQuizAttempt(
     attempt: Omit<QuizAttempt, "id" | "createdAt">,
   ): Promise<QuizAttempt> {
@@ -318,6 +587,7 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  /** @inheritdoc */
   async getQuizAttempt(id: string): Promise<QuizAttempt | undefined> {
     const [attempt] = await db
       .select()
@@ -326,6 +596,7 @@ export class DatabaseStorage implements IStorage {
     return attempt || undefined;
   }
 
+  /** @inheritdoc */
   async getQuizAttempts(userId: string): Promise<QuizAttempt[]> {
     return await db
       .select()
@@ -334,6 +605,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(quizAttempts.createdAt));
   }
 
+  /** @inheritdoc */
   async getQuizStats(userId: string): Promise<{
     totalAttempts: number;
     averageScore: number;
@@ -356,6 +628,7 @@ export class DatabaseStorage implements IStorage {
     return { totalAttempts, averageScore, wrongQuestionsCount };
   }
 
+  /** @inheritdoc */
   async getWrongQuestions(userId: string): Promise<MCQ[]> {
     const attempts = await this.getQuizAttempts(userId);
 
@@ -396,6 +669,7 @@ export class DatabaseStorage implements IStorage {
     return allMcqs.filter((m) => wrongIds.includes(m.id));
   }
 
+  /** @inheritdoc */
   async createPasswordResetToken(userId: string): Promise<string> {
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
@@ -409,7 +683,11 @@ export class DatabaseStorage implements IStorage {
     return token;
   }
 
-  /** Store a 6-digit OTP for password reset (in the same table, using `token` column) */
+  /**
+   * Store a 6-digit OTP for password reset (in the same table, using `token` column).
+   * @param userId - The user's UUID
+   * @param otp - The 6-digit OTP code to store
+   */
   async createPasswordResetOtp(userId: string, otp: string): Promise<void> {
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
     await db.insert(passwordResetTokens).values({
@@ -419,6 +697,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
+  /** @inheritdoc */
   async getPasswordResetToken(
     token: string,
   ): Promise<PasswordResetToken | undefined> {
@@ -435,7 +714,13 @@ export class DatabaseStorage implements IStorage {
     return resetToken || undefined;
   }
 
-  /** Look up a password reset OTP by the user's email + OTP code */
+  /**
+   * Look up a password-reset OTP by the user's email and OTP code.
+   * Validates that the OTP is unused and not expired.
+   * @param email - The user's email address
+   * @param otp - The 6-digit OTP code
+   * @returns The token record, or undefined if invalid/expired/used or user not found
+   */
   async getPasswordResetByOtp(
     email: string,
     otp: string,
@@ -457,6 +742,7 @@ export class DatabaseStorage implements IStorage {
     return resetToken || undefined;
   }
 
+  /** @inheritdoc */
   async markTokenUsed(tokenId: string): Promise<void> {
     await db
       .update(passwordResetTokens)
@@ -464,6 +750,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(passwordResetTokens.id, tokenId));
   }
 
+  /** @inheritdoc */
   async updateUserPassword(
     userId: string,
     hashedPassword: string,
@@ -474,6 +761,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId));
   }
 
+  /** @inheritdoc */
   async updateUserProfile(
     userId: string,
     data: { name: string },
@@ -486,6 +774,7 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  /** @inheritdoc */
   async updateSubscription(
     userId: string,
     data: {
@@ -510,6 +799,7 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  /** @inheritdoc */
   async deactivateUser(
     userId: string,
     reason?: string,
@@ -526,6 +816,7 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  /** @inheritdoc */
   async requestAccountDeletion(
     userId: string,
     _note?: string,
@@ -541,6 +832,7 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  /** @inheritdoc */
   async recordTopicView(userId: string, topicId: string): Promise<void> {
     // Check if there's an existing view for this topic by this user
     const [existing] = await db
@@ -565,6 +857,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  /** @inheritdoc */
   async getRecentActivity(
     userId: string,
     limit: number = 20,
@@ -577,6 +870,7 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
 
+  /** @inheritdoc */
   async updateUserVerification(
     userId: string,
     data: {
@@ -595,7 +889,11 @@ export class DatabaseStorage implements IStorage {
 
   // ── Efficient batch queries (P1 — eliminate N+1) ──────────────────────
 
-  /** Get all chapters with topic counts using LEFT JOIN + GROUP BY */
+  /**
+   * Get all published chapters with topic counts using LEFT JOIN + GROUP BY.
+   * Eliminates N+1 queries when listing chapters across books.
+   * @returns An array of chapter summaries grouped by book, including topic counts
+   */
   async getAllChaptersGroupedByBook(): Promise<
     {
       bookId: string;
@@ -634,7 +932,11 @@ export class DatabaseStorage implements IStorage {
     return rows;
   }
 
-  /** Get all topics for a book (across all its chapters) in one query */
+  /**
+   * Get all published topics for a book (across all its chapters) in a single query.
+   * @param bookId - The book's UUID
+   * @returns An array of topics ordered by chapter order then topic order
+   */
   async getTopicsByBook(bookId: string): Promise<Topic[]> {
     return await db
       .select({ topic: topics })
@@ -645,7 +947,31 @@ export class DatabaseStorage implements IStorage {
       .then((rows) => rows.map((r) => r.topic));
   }
 
-  /** Full-text search using SQL ILIKE — no table scan */
+  /**
+   * Get all published topic IDs grouped by their parent book ID in a single query.
+   * Used to compute per-book completion counts without N+1 queries.
+   * @returns An array of { bookId, topicId } pairs
+   */
+  async getAllTopicIdsGroupedByBook(): Promise<
+    { bookId: string; topicId: string }[]
+  > {
+    return await db
+      .select({
+        bookId: chapters.bookId,
+        topicId: topics.id,
+      })
+      .from(topics)
+      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .where(and(eq(topics.isPublished, true), eq(chapters.isPublished, true)));
+  }
+
+  /**
+   * Full-text search across books, chapters, and topics using SQL ILIKE.
+   * @param query - The search term to match against titles and descriptions
+   * @param filter - Content type filter: "all", "books", "chapters", or "topics"
+   * @param limit - Maximum number of results to return (default 50)
+   * @returns An array of search result objects with type, title, and hierarchy info
+   */
   async searchContent(
     query: string,
     filter: string,
@@ -663,7 +989,16 @@ export class DatabaseStorage implements IStorage {
     }[]
   > {
     const pattern = `%${query}%`;
-    const results: any[] = [];
+    const results: {
+      id: string;
+      type: "book" | "chapter" | "topic";
+      title: string;
+      subtitle: string;
+      bookId?: string;
+      bookTitle?: string;
+      chapterId?: string;
+      chapterTitle?: string;
+    }[] = [];
 
     if (filter === "all" || filter === "books") {
       const bookResults = await db
@@ -754,7 +1089,11 @@ export class DatabaseStorage implements IStorage {
     return results.slice(0, limit);
   }
 
-  /** Get quiz topics with question counts using a JOIN instead of N+1 */
+  /**
+   * Get all topics that have published MCQs, along with the question count per topic.
+   * Uses a JOIN instead of N+1 queries.
+   * @returns An array of topic objects with their chapter title and question count
+   */
   async getQuizTopicsWithCounts(): Promise<
     { id: string; title: string; chapterTitle: string; questionCount: number }[]
   > {
@@ -780,7 +1119,11 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  /** Get multiple MCQs by ID in one query (batch for quiz results) */
+  /**
+   * Get multiple MCQs by their IDs in a single query.
+   * @param ids - An array of MCQ UUIDs to fetch
+   * @returns An array of MCQ records. Returns an empty array if ids is empty.
+   */
   async getMCQsByIds(ids: string[]): Promise<MCQ[]> {
     if (ids.length === 0) return [];
     return await db
@@ -789,7 +1132,11 @@ export class DatabaseStorage implements IStorage {
       .where(sql`${mcqs.id} IN ${ids}`);
   }
 
-  /** Get bookmarks with full topic→chapter→book details via JOINs */
+  /**
+   * Get all bookmarks for a user with full topic → chapter → book details via JOINs.
+   * @param userId - The user's UUID
+   * @returns An array of enriched bookmark objects ordered by most recent first
+   */
   async getBookmarksWithDetails(userId: string): Promise<
     {
       id: string;
@@ -817,7 +1164,12 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(bookmarks.createdAt));
   }
 
-  /** Get recent activity with full topic→chapter→book details via JOINs */
+  /**
+   * Get recent topic-view activity for a user with full topic → chapter → book details via JOINs.
+   * @param userId - The user's UUID
+   * @param limit - Maximum number of records to return (default 20)
+   * @returns An array of enriched activity objects ordered by most recent first
+   */
   async getRecentActivityWithDetails(
     userId: string,
     limit: number = 20,
@@ -849,7 +1201,13 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
 
-  /** Get quiz attempts with pagination */
+  /**
+   * Get quiz attempts for a user with pagination support.
+   * @param userId - The user's UUID
+   * @param page - Page number (1-indexed, default 1)
+   * @param pageSize - Number of records per page (default 20)
+   * @returns A paginated result with data, total count, page, and pageSize
+   */
   async getQuizAttemptsPaginated(
     userId: string,
     page: number = 1,
@@ -885,7 +1243,12 @@ export class DatabaseStorage implements IStorage {
 
   // ── Spaced Repetition (SM-2) ──────────────────────────────────
 
-  /** Get cards due for review */
+  /**
+   * Get MCQ review cards that are due for spaced repetition review.
+   * @param userId - The user's UUID
+   * @param limit - Maximum number of due reviews to return (default 20)
+   * @returns An array of review schedule records ordered by next review date
+   */
   async getDueReviews(
     userId: string,
     limit: number = 20,
@@ -903,7 +1266,13 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
 
-  /** Get or create a review schedule entry */
+  /**
+   * Get or create a spaced repetition review schedule entry for a user–MCQ pair.
+   * If no entry exists, one is created with default SM-2 values.
+   * @param userId - The user's UUID
+   * @param mcqId - The MCQ's UUID
+   * @returns The existing or newly created review schedule record
+   */
   async getOrCreateReview(
     userId: string,
     mcqId: string,
@@ -924,7 +1293,14 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
-  /** Update review schedule after answering (SM-2 algorithm) */
+  /**
+   * Update a review schedule entry after answering, applying the SM-2 spaced repetition algorithm.
+   * Quality ≥ 3 counts as correct (interval grows); quality < 3 resets repetitions.
+   * @param reviewId - The review schedule record's UUID
+   * @param quality - Quality rating from 0 to 5 (0 = complete blackout, 5 = perfect response)
+   * @returns The updated review schedule record with new interval and next review date
+   * @throws Error if the review record is not found
+   */
   async updateReview(
     reviewId: string,
     quality: number, // 0-5 quality rating
@@ -980,7 +1356,11 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
 
-  /** Count due reviews for a user */
+  /**
+   * Count the number of MCQ reviews currently due for a user.
+   * @param userId - The user's UUID
+   * @returns The count of due review cards
+   */
   async getDueReviewCount(userId: string): Promise<number> {
     const [result] = await db
       .select({ count: count() })
@@ -996,7 +1376,11 @@ export class DatabaseStorage implements IStorage {
 
   // ── Content Error Reports ─────────────────────────────────────
 
-  /** Create a content error report */
+  /**
+   * Create a content error report submitted by a user.
+   * @param data - The report details including user, content reference, type, and description
+   * @returns The newly created content report record
+   */
   async createContentReport(data: {
     userId: string;
     contentType: string;
@@ -1008,7 +1392,12 @@ export class DatabaseStorage implements IStorage {
     return report;
   }
 
-  /** Get content reports (for admin), enriched with user name and topic title */
+  /**
+   * Get content error reports (for admin), enriched with user name and topic title.
+   * @param status - Optional status filter (e.g. "pending", "resolved"). If omitted, all reports are returned.
+   * @param limit - Maximum number of reports to return (default 50)
+   * @returns An array of enriched content report objects ordered by most recent first
+   */
   async getContentReports(status?: string, limit: number = 50) {
     const baseQuery = db
       .select({
@@ -1057,7 +1446,13 @@ export class DatabaseStorage implements IStorage {
     return await baseQuery;
   }
 
-  /** Update report status */
+  /**
+   * Update the status of a content error report (admin action).
+   * @param reportId - The report's UUID
+   * @param status - The new status (e.g. "resolved", "dismissed")
+   * @param reviewedBy - The admin user's UUID who reviewed the report
+   * @returns The updated content report record, or undefined if not found
+   */
   async updateContentReportStatus(
     reportId: string,
     status: string,
@@ -1071,7 +1466,7 @@ export class DatabaseStorage implements IStorage {
     return updated || undefined;
   }
 
-  /** Get recommended topics: incomplete topics from books the user has been active in */
+  /** @inheritdoc */
   async getRecommendedTopics(
     userId: string,
     limit: number = 5,
@@ -1118,7 +1513,7 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  /** Get active, non-expired announcements for mobile users */
+  /** @inheritdoc */
   async getAnnouncements(): Promise<
     {
       id: string;
@@ -1152,6 +1547,7 @@ export class DatabaseStorage implements IStorage {
 
   // ── App Settings ──────────────────────────
 
+  /** @inheritdoc */
   async getAppSettings(keys?: string[]): Promise<AppSetting[]> {
     if (keys && keys.length > 0) {
       return db
@@ -1162,6 +1558,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(appSettings);
   }
 
+  /** @inheritdoc */
   async getAppSetting(key: string): Promise<string | null> {
     const [setting] = await db
       .select()
@@ -1170,6 +1567,7 @@ export class DatabaseStorage implements IStorage {
     return setting?.value ?? null;
   }
 
+  /** @inheritdoc */
   async setAppSetting(key: string, value: string): Promise<void> {
     const existing = await this.getAppSetting(key);
     if (existing !== null) {
@@ -1182,6 +1580,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  /** @inheritdoc */
   async setAppSettings(
     settings: { key: string; value: string }[],
   ): Promise<void> {
