@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { paymentTransactions } from "../../shared/schema";
+import { logger } from "../lib/logger";
 
 // ══════════════════════════════════════════════════════════════════
 // ══  TYPES                                                      ══
@@ -238,9 +239,7 @@ class StripeAdapter implements PaymentGatewayAdapter {
     metadata?: Record<string, any>;
   }): Promise<PaymentResult> {
     if (!this.isConfigured()) {
-      console.warn(
-        "[StripeAdapter] Stripe is not configured — STRIPE_SECRET_KEY is missing",
-      );
+      logger.warn("Stripe is not configured — STRIPE_SECRET_KEY is missing");
       return {
         success: false,
         error:

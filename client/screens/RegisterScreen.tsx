@@ -111,7 +111,7 @@ export default function RegisterScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText type="h1" style={styles.title}>
+          <ThemedText type="h1" style={styles.title} accessibilityRole="header">
             Create Account
           </ThemedText>
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -140,6 +140,7 @@ export default function RegisterScreen() {
             autoCapitalize="words"
             autoComplete="name"
             error={errors.name}
+            accessibilityLabel="Full Name"
           />
           <GlassInput
             label="Email"
@@ -150,6 +151,7 @@ export default function RegisterScreen() {
             autoCapitalize="none"
             autoComplete="email"
             error={errors.email}
+            accessibilityLabel="Email address"
           />
           <GlassInput
             label="Password"
@@ -159,6 +161,7 @@ export default function RegisterScreen() {
             secureTextEntry
             autoComplete="new-password"
             error={errors.password}
+            accessibilityLabel="Password"
           />
           <GlassInput
             label="Confirm Password"
@@ -168,6 +171,7 @@ export default function RegisterScreen() {
             secureTextEntry
             autoComplete="new-password"
             error={errors.confirmPassword}
+            accessibilityLabel="Confirm Password"
           />
 
           <PrimaryButton
@@ -186,7 +190,11 @@ export default function RegisterScreen() {
           >
             Already have an account?
           </ThemedText>
-          <Pressable onPress={() => navigation.navigate("Login")}>
+          <Pressable
+            onPress={() => navigation.navigate("Login")}
+            accessibilityRole="link"
+            accessibilityLabel="Sign In"
+          >
             <ThemedText style={[styles.signInLink, { color: theme.primary }]}>
               {" "}
               Sign In

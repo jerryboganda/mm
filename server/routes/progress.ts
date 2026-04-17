@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
+import { logger } from "../lib/logger";
 
 /** Calculate study streak: consecutive days (from today backwards) that had quiz activity or topic views */
 function calculateStudyStreak(
@@ -113,7 +114,7 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
     }));
 
     // Calculate study streak from quiz attempts + topic views
-    const studyStreak = calculateStudyStreak(attempts, recentActivity as any);
+    const studyStreak = calculateStudyStreak(attempts, recentActivity);
 
     res.json({
       totalAttempts: stats.totalAttempts,
@@ -127,7 +128,7 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
       recentAttempts,
     });
   } catch (error) {
-    console.error("Get progress error:", error);
+    logger.error("Get progress error", { error: String(error) });
     res.status(500).json({ message: "Failed to get progress" });
   }
 });
@@ -189,7 +190,7 @@ router.get("/topic/:topicId", authMiddleware, async (req: AuthRequest, res) => {
       recentAttempts,
     });
   } catch (error) {
-    console.error("Get topic progress error:", error);
+    logger.error("Get topic progress error", { error: String(error) });
     res.status(500).json({ message: "Failed to get topic progress" });
   }
 });

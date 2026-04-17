@@ -58,3 +58,27 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Playwright generated files
+.playwright-cli/
+.playwright-mcp/
+
+# Temp build output
+server_dist_check/
+
+# Test output files
+test_output*.txt
+
+# SSH keys and sensitive credentials
+*.pub
+office_pc_ed25519
+OFFICE_VPS_SSH_COPY_PASTE.txt
+VPS SSH Login Details.md
+
+# Output and temp directories
+output/
+.tmp_*/
+screenshots/
+
+# Misc generated files
+subscription-dashboard.png

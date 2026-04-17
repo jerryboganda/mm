@@ -79,6 +79,12 @@ async function removeToken(key: string) {
   }
 }
 
+/**
+ * Save the user's email for login convenience. The password is intentionally
+ * NOT persisted for security — only the email is stored.
+ * @param email - The user's email address
+ * @param _password - Ignored; included for API symmetry only
+ */
 export async function saveCredentials(email: string, _password: string) {
   // Only save email for convenience. Never store passwords.
   if (Platform.OS === "web") {
@@ -88,6 +94,11 @@ export async function saveCredentials(email: string, _password: string) {
   }
 }
 
+/**
+ * Retrieve the previously saved email credential.
+ * Password is always returned as null (never stored).
+ * @returns An object with `email` (string | null) and `password` (always null)
+ */
 export async function getSavedCredentials() {
   if (Platform.OS === "web") {
     const email = localStorage.getItem("saved_email");
@@ -98,6 +109,9 @@ export async function getSavedCredentials() {
   }
 }
 
+/**
+ * Clear all saved credentials from secure/local storage.
+ */
 export async function clearSavedCredentials() {
   if (Platform.OS === "web") {
     localStorage.removeItem("saved_email");
@@ -345,6 +359,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * React hook that provides access to the authentication context.
+ * Must be called within an {@link AuthProvider}.
+ *
+ * @returns The full auth context including user, login/logout/register functions,
+ *          session-expiry state, and account management actions.
+ * @throws Error if called outside of an AuthProvider
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -353,6 +375,11 @@ export function useAuth() {
   return context;
 }
 
+/**
+ * Retrieve the current authentication JWT from secure/local storage.
+ * Useful for making authenticated requests outside of React components.
+ * @returns The bearer token string, or null if the user is not authenticated
+ */
 export async function getAuthToken(): Promise<string | null> {
   return await getToken(TOKEN_KEY);
 }

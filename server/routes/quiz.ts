@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { storage } from "../storage";
+import type { MCQ } from "../../shared/schema";
 import { AuthRequest, authMiddleware } from "../middleware";
 import {
   getOptionTextByLabel,
@@ -7,6 +8,7 @@ import {
   resolveAnswerLabel,
   resolveCorrectLabel,
 } from "../lib/mcq-options";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -15,7 +17,7 @@ router.get("/stats", authMiddleware, async (req: AuthRequest, res) => {
     const stats = await storage.getQuizStats(req.userId!);
     res.json(stats);
   } catch (error) {
-    console.error("Get quiz stats error:", error);
+    logger.error("Get quiz stats error", { error: String(error) });
     res.status(500).json({ message: "Failed to get quiz stats" });
   }
 });
@@ -26,7 +28,7 @@ router.get("/topics", authMiddleware, async (req: AuthRequest, res) => {
     const quizTopics = await storage.getQuizTopicsWithCounts();
     res.json(quizTopics);
   } catch (error) {
-    console.error("Get quiz topics error:", error);
+    logger.error("Get quiz topics error", { error: String(error) });
     res.status(500).json({ message: "Failed to get quiz topics" });
   }
 });
@@ -39,7 +41,7 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
       Math.max(parseInt(req.query.count as string) || 10, 1),
       50, // cap at 50
     );
-    let questions: any[] = [];
+    let questions: MCQ[] = [];
 
     if (mode === "topic" && topicId) {
       questions = await storage.getMCQsByTopic(topicId);
@@ -66,7 +68,7 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
       timeLimit: questionCount, // 1 minute per question
     });
   } catch (error) {
-    console.error("Start quiz error:", error);
+    logger.error("Start quiz error", { error: String(error) });
     res.status(500).json({ message: "Failed to start quiz" });
   }
 });
@@ -100,7 +102,10 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
       const mcq = mcqMap.get(mcqId);
       if (mcq) {
         const selectedLabel = resolveAnswerLabel(selectedAnswer, mcq.options);
-        const correctLabel = resolveCorrectLabel(mcq.correctAnswer, mcq.options);
+        const correctLabel = resolveCorrectLabel(
+          mcq.correctAnswer,
+          mcq.options,
+        );
         const isNormalizedCorrect = selectedLabel === correctLabel;
         if (isNormalizedCorrect) correctCount++;
 
@@ -141,7 +146,7 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
 
     res.json({ id: attempt.id });
   } catch (error) {
-    console.error("Submit quiz error:", error);
+    logger.error("Submit quiz error", { error: String(error) });
     res.status(500).json({ message: "Failed to submit quiz" });
   }
 });
@@ -199,7 +204,7 @@ router.get(
         questions,
       });
     } catch (error) {
-      console.error("Get quiz results error:", error);
+      logger.error("Get quiz results error", { error: String(error) });
       res.status(500).json({ message: "Failed to get quiz results" });
     }
   },

@@ -25,6 +25,7 @@ import {
 } from "../../shared/schema";
 import { db } from "../db";
 import { eq, and, desc, sql, count, or } from "drizzle-orm";
+import { logger } from "../lib/logger";
 
 const router = Router();
 const getParamValue = (param: string | string[]) =>
@@ -45,7 +46,7 @@ router.get("/", async (req: AuthRequest, res: Response) => {
     );
     res.json(packages);
   } catch (error) {
-    console.error("Error listing packages:", error);
+    logger.error("Error listing packages", { error: String(error) });
     res.status(500).json({ message: "Error listing packages" });
   }
 });
@@ -57,7 +58,7 @@ router.get("/comparison", async (_req: AuthRequest, res: Response) => {
     const comparison = await subscriptionService.getPackageComparison();
     res.json(comparison);
   } catch (error) {
-    console.error("Error fetching package comparison:", error);
+    logger.error("Error fetching package comparison", { error: String(error) });
     res.status(500).json({ message: "Error fetching package comparison" });
   }
 });
@@ -75,7 +76,7 @@ router.post("/", async (req: AuthRequest, res: Response) => {
     const pkg = await subscriptionService.createPackage(parsed.data as any);
     res.status(201).json(pkg);
   } catch (error) {
-    console.error("Error creating package:", error);
+    logger.error("Error creating package", { error: String(error) });
     res.status(500).json({ message: "Error creating package" });
   }
 });
@@ -97,7 +98,7 @@ router.put("/:id", async (req: AuthRequest, res: Response) => {
     if (!pkg) return res.status(404).json({ message: "Package not found" });
     res.json(pkg);
   } catch (error) {
-    console.error("Error updating package:", error);
+    logger.error("Error updating package", { error: String(error) });
     res.status(500).json({ message: "Error updating package" });
   }
 });
@@ -111,7 +112,7 @@ router.delete("/:id", async (req: AuthRequest, res: Response) => {
     if (!pkg) return res.status(404).json({ message: "Package not found" });
     res.json({ message: "Package archived", package: pkg });
   } catch (error) {
-    console.error("Error archiving package:", error);
+    logger.error("Error archiving package", { error: String(error) });
     res.status(500).json({ message: "Error archiving package" });
   }
 });
@@ -136,7 +137,7 @@ router.post("/:packageId/prices", async (req: AuthRequest, res: Response) => {
     const price = await subscriptionService.createPrice(parsed.data as any);
     res.status(201).json(price);
   } catch (error) {
-    console.error("Error creating price:", error);
+    logger.error("Error creating price", { error: String(error) });
     res.status(500).json({ message: "Error creating price" });
   }
 });
@@ -151,7 +152,7 @@ router.put("/prices/:id", async (req: AuthRequest, res: Response) => {
     if (!price) return res.status(404).json({ message: "Price not found" });
     res.json(price);
   } catch (error) {
-    console.error("Error updating price:", error);
+    logger.error("Error updating price", { error: String(error) });
     res.status(500).json({ message: "Error updating price" });
   }
 });
@@ -162,7 +163,7 @@ router.delete("/prices/:id", async (req: AuthRequest, res: Response) => {
     await subscriptionService.deletePrice(getParamValue(req.params.id));
     res.json({ message: "Price deleted" });
   } catch (error) {
-    console.error("Error deleting price:", error);
+    logger.error("Error deleting price", { error: String(error) });
     res.status(500).json({ message: "Error deleting price" });
   }
 });
@@ -187,7 +188,7 @@ router.post("/:packageId/features", async (req: AuthRequest, res: Response) => {
     const feature = await subscriptionService.createFeature(parsed.data as any);
     res.status(201).json(feature);
   } catch (error) {
-    console.error("Error creating feature:", error);
+    logger.error("Error creating feature", { error: String(error) });
     res.status(500).json({ message: "Error creating feature" });
   }
 });
@@ -202,7 +203,7 @@ router.put("/features/:id", async (req: AuthRequest, res: Response) => {
     if (!feature) return res.status(404).json({ message: "Feature not found" });
     res.json(feature);
   } catch (error) {
-    console.error("Error updating feature:", error);
+    logger.error("Error updating feature", { error: String(error) });
     res.status(500).json({ message: "Error updating feature" });
   }
 });
@@ -213,7 +214,7 @@ router.delete("/features/:id", async (req: AuthRequest, res: Response) => {
     await subscriptionService.deleteFeature(getParamValue(req.params.id));
     res.json({ message: "Feature deleted" });
   } catch (error) {
-    console.error("Error deleting feature:", error);
+    logger.error("Error deleting feature", { error: String(error) });
     res.status(500).json({ message: "Error deleting feature" });
   }
 });
@@ -231,7 +232,7 @@ router.get("/add-ons", async (_req: AuthRequest, res: Response) => {
       .orderBy(addOns.displayOrder);
     res.json(allAddOns);
   } catch (error) {
-    console.error("Error listing add-ons:", error);
+    logger.error("Error listing add-ons", { error: String(error) });
     res.status(500).json({ message: "Error listing add-ons" });
   }
 });
@@ -246,7 +247,7 @@ router.get("/add-ons/:id", async (req: AuthRequest, res: Response) => {
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json(addOn);
   } catch (error) {
-    console.error("Error fetching add-on:", error);
+    logger.error("Error fetching add-on", { error: String(error) });
     res.status(500).json({ message: "Error fetching add-on" });
   }
 });
@@ -267,7 +268,7 @@ router.post("/add-ons", async (req: AuthRequest, res: Response) => {
       .returning();
     res.status(201).json(addOn);
   } catch (error) {
-    console.error("Error creating add-on:", error);
+    logger.error("Error creating add-on", { error: String(error) });
     res.status(500).json({ message: "Error creating add-on" });
   }
 });
@@ -290,7 +291,7 @@ router.put("/add-ons/:id", async (req: AuthRequest, res: Response) => {
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json(addOn);
   } catch (error) {
-    console.error("Error updating add-on:", error);
+    logger.error("Error updating add-on", { error: String(error) });
     res.status(500).json({ message: "Error updating add-on" });
   }
 });
@@ -306,7 +307,7 @@ router.delete("/add-ons/:id", async (req: AuthRequest, res: Response) => {
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json({ message: "Add-on deactivated", addOn });
   } catch (error) {
-    console.error("Error deactivating add-on:", error);
+    logger.error("Error deactivating add-on", { error: String(error) });
     res.status(500).json({ message: "Error deactivating add-on" });
   }
 });
@@ -333,7 +334,7 @@ router.post(
       );
       res.status(201).json(result);
     } catch (error) {
-      console.error("Error bulk generating coupons:", error);
+      logger.error("Error bulk generating coupons", { error: String(error) });
       res.status(500).json({ message: "Error bulk generating coupons" });
     }
   },
@@ -349,7 +350,7 @@ router.get(
       );
       res.json(analytics);
     } catch (error) {
-      console.error("Error fetching campaign analytics:", error);
+      logger.error("Error fetching campaign analytics", { error: String(error) });
       res.status(500).json({ message: "Error fetching campaign analytics" });
     }
   },
@@ -390,7 +391,7 @@ router.get("/coupons", async (req: AuthRequest, res: Response) => {
     }));
     res.json(coupons);
   } catch (error) {
-    console.error("Error listing coupons:", error);
+    logger.error("Error listing coupons", { error: String(error) });
     res.status(500).json({ message: "Error listing coupons" });
   }
 });
@@ -417,7 +418,7 @@ router.get("/coupons/analytics", async (_req: AuthRequest, res: Response) => {
       ),
     });
   } catch (error) {
-    console.error("Error fetching coupon analytics:", error);
+    logger.error("Error fetching coupon analytics", { error: String(error) });
     res.status(500).json({ message: "Error fetching coupon analytics" });
   }
 });
@@ -432,7 +433,7 @@ router.get(
       );
       res.json(analytics);
     } catch (error) {
-      console.error("Error fetching coupon analytics:", error);
+      logger.error("Error fetching coupon analytics", { error: String(error) });
       res.status(500).json({ message: "Error fetching coupon analytics" });
     }
   },
@@ -445,7 +446,7 @@ router.get("/coupons/:id", async (req: AuthRequest, res: Response) => {
     if (!coupon) return res.status(404).json({ message: "Coupon not found" });
     res.json(coupon);
   } catch (error) {
-    console.error("Error fetching coupon:", error);
+    logger.error("Error fetching coupon", { error: String(error) });
     res.status(500).json({ message: "Error fetching coupon" });
   }
 });
@@ -463,7 +464,7 @@ router.post("/coupons", async (req: AuthRequest, res: Response) => {
     const coupon = await couponService.createCoupon(parsed.data as any);
     res.status(201).json(coupon);
   } catch (error) {
-    console.error("Error creating coupon:", error);
+    logger.error("Error creating coupon", { error: String(error) });
     res.status(500).json({ message: "Error creating coupon" });
   }
 });
@@ -485,7 +486,7 @@ router.put("/coupons/:id", async (req: AuthRequest, res: Response) => {
     if (!coupon) return res.status(404).json({ message: "Coupon not found" });
     res.json(coupon);
   } catch (error) {
-    console.error("Error updating coupon:", error);
+    logger.error("Error updating coupon", { error: String(error) });
     res.status(500).json({ message: "Error updating coupon" });
   }
 });
@@ -499,7 +500,7 @@ router.delete("/coupons/:id", async (req: AuthRequest, res: Response) => {
     if (!coupon) return res.status(404).json({ message: "Coupon not found" });
     res.json({ message: "Coupon deactivated", coupon });
   } catch (error) {
-    console.error("Error deactivating coupon:", error);
+    logger.error("Error deactivating coupon", { error: String(error) });
     res.status(500).json({ message: "Error deactivating coupon" });
   }
 });
@@ -610,7 +611,7 @@ router.get("/subscribers", async (req: AuthRequest, res: Response) => {
       });
     }
   } catch (error) {
-    console.error("Error listing subscribers:", error);
+    logger.error("Error listing subscribers", { error: String(error) });
     res.status(500).json({ message: "Error listing subscribers" });
   }
 });
@@ -646,7 +647,7 @@ router.get("/subscribers/:userId", async (req: AuthRequest, res: Response) => {
       auditLog,
     });
   } catch (error) {
-    console.error("Error fetching subscriber details:", error);
+    logger.error("Error fetching subscriber details", { error: String(error) });
     res.status(500).json({ message: "Error fetching subscriber details" });
   }
 });
@@ -689,7 +690,7 @@ router.post(
 
       res.status(201).json(subscription);
     } catch (error) {
-      console.error("Error assigning subscription:", error);
+      logger.error("Error assigning subscription", { error: String(error) });
       res.status(500).json({ message: "Error assigning subscription" });
     }
   },
@@ -749,7 +750,7 @@ router.put(
 
       res.json(updated);
     } catch (error) {
-      console.error("Error extending subscription:", error);
+      logger.error("Error extending subscription", { error: String(error) });
       res.status(500).json({ message: "Error extending subscription" });
     }
   },
@@ -794,7 +795,7 @@ router.put(
 
       res.json(canceledSub);
     } catch (error) {
-      console.error("Error canceling subscription:", error);
+      logger.error("Error canceling subscription", { error: String(error) });
       res.status(500).json({ message: "Error canceling subscription" });
     }
   },
@@ -858,7 +859,7 @@ router.put(
 
       res.json(result);
     } catch (error) {
-      console.error("Error changing subscription plan:", error);
+      logger.error("Error changing subscription plan", { error: String(error) });
       res.status(500).json({ message: "Error changing subscription plan" });
     }
   },
@@ -875,7 +876,7 @@ router.get("/analytics/overview", async (_req: AuthRequest, res: Response) => {
     const stats = await subscriptionService.getSubscriptionStats();
     res.json(stats);
   } catch (error) {
-    console.error("Error fetching subscription overview:", error);
+    logger.error("Error fetching subscription overview", { error: String(error) });
     res.status(500).json({ message: "Error fetching subscription overview" });
   }
 });
@@ -893,7 +894,7 @@ router.get("/analytics/kpis", async (_req: AuthRequest, res: Response) => {
       cancelledThisMonth: stats.totalCanceled ?? 0,
     });
   } catch (error) {
-    console.error("Error fetching subscription KPIs:", error);
+    logger.error("Error fetching subscription KPIs", { error: String(error) });
     res.status(500).json({ message: "Error fetching subscription KPIs" });
   }
 });
@@ -905,7 +906,7 @@ router.get("/analytics/revenue", async (_req: AuthRequest, res: Response) => {
     const revenue = await subscriptionService.getRevenueByPackage();
     res.json(revenue);
   } catch (error) {
-    console.error("Error fetching revenue analytics:", error);
+    logger.error("Error fetching revenue analytics", { error: String(error) });
     res.status(500).json({ message: "Error fetching revenue analytics" });
   }
 });
@@ -930,7 +931,7 @@ router.get(
         })),
       );
     } catch (error) {
-      console.error("Error fetching revenue analytics:", error);
+      logger.error("Error fetching revenue analytics", { error: String(error) });
       res.status(500).json({ message: "Error fetching revenue analytics" });
     }
   },
@@ -945,7 +946,7 @@ router.get("/analytics/churn", async (req: AuthRequest, res: Response) => {
     );
     res.json(churn);
   } catch (error) {
-    console.error("Error fetching churn analytics:", error);
+    logger.error("Error fetching churn analytics", { error: String(error) });
     res.status(500).json({ message: "Error fetching churn analytics" });
   }
 });
@@ -960,7 +961,7 @@ router.get("/analytics/growth", async (req: AuthRequest, res: Response) => {
     );
     res.json(growth);
   } catch (error) {
-    console.error("Error fetching growth analytics:", error);
+    logger.error("Error fetching growth analytics", { error: String(error) });
     res.status(500).json({ message: "Error fetching growth analytics" });
   }
 });
@@ -988,7 +989,7 @@ router.get(
         }),
       );
     } catch (error) {
-      console.error("Error fetching subscriber growth:", error);
+      logger.error("Error fetching subscriber growth", { error: String(error) });
       res.status(500).json({ message: "Error fetching subscriber growth" });
     }
   },
@@ -1032,7 +1033,7 @@ router.get("/analytics/events", async (req: AuthRequest, res: Response) => {
       })),
     );
   } catch (error) {
-    console.error("Error fetching analytics events:", error);
+    logger.error("Error fetching analytics events", { error: String(error) });
     res.status(500).json({ message: "Error fetching analytics events" });
   }
 });
@@ -1045,7 +1046,7 @@ router.get(
       const overview = await couponService.getCouponAnalytics();
       res.json(overview);
     } catch (error) {
-      console.error("Error fetching coupon overview:", error);
+      logger.error("Error fetching coupon overview", { error: String(error) });
       res.status(500).json({ message: "Error fetching coupon overview" });
     }
   },
@@ -1110,7 +1111,7 @@ router.get("/packages", async (req: AuthRequest, res: Response) => {
     );
     res.json(enriched);
   } catch (error) {
-    console.error("Error fetching packages:", error);
+    logger.error("Error fetching packages", { error: String(error) });
     res.status(500).json({ message: "Error fetching packages" });
   }
 });
@@ -1131,7 +1132,7 @@ router.post("/packages", async (req: AuthRequest, res: Response) => {
     } as any);
     res.status(201).json(pkg);
   } catch (error) {
-    console.error("Error creating package:", error);
+    logger.error("Error creating package", { error: String(error) });
     res.status(500).json({ message: "Error creating package" });
   }
 });
@@ -1151,7 +1152,7 @@ router.put("/packages/:id", async (req: AuthRequest, res: Response) => {
     if (!pkg) return res.status(404).json({ message: "Package not found" });
     res.json(pkg);
   } catch (error) {
-    console.error("Error updating package:", error);
+    logger.error("Error updating package", { error: String(error) });
     res.status(500).json({ message: "Error updating package" });
   }
 });
@@ -1164,7 +1165,7 @@ router.delete("/packages/:id", async (req: AuthRequest, res: Response) => {
     if (!pkg) return res.status(404).json({ message: "Package not found" });
     res.json(pkg);
   } catch (error) {
-    console.error("Error archiving package:", error);
+    logger.error("Error archiving package", { error: String(error) });
     res.status(500).json({ message: "Error archiving package" });
   }
 });
@@ -1182,7 +1183,7 @@ router.post("/coupons/bulk", async (req: AuthRequest, res: Response) => {
     const result = await couponService.generateBulkCoupons(parsed.data as any);
     res.status(201).json(result);
   } catch (error) {
-    console.error("Error generating bulk coupons:", error);
+    logger.error("Error generating bulk coupons", { error: String(error) });
     res.status(500).json({ message: "Error generating bulk coupons" });
   }
 });
@@ -1230,7 +1231,7 @@ router.get("/audit-log", async (req: AuthRequest, res: Response) => {
 
     res.json(logs);
   } catch (error) {
-    console.error("Error fetching audit log:", error);
+    logger.error("Error fetching audit log", { error: String(error) });
     res.status(500).json({ message: "Error fetching audit log" });
   }
 });
@@ -1262,7 +1263,7 @@ router.get("/:id", async (req: AuthRequest, res: Response) => {
     if (!pkg) return res.status(404).json({ message: "Package not found" });
     res.json(pkg);
   } catch (error) {
-    console.error("Error fetching package:", error);
+    logger.error("Error fetching package", { error: String(error) });
     res.status(500).json({ message: "Error fetching package" });
   }
 });

@@ -163,6 +163,16 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+/**
+ * Make an authenticated API request to the backend.
+ * Automatically attaches the bearer token and retries once on 401 via token refresh.
+ *
+ * @param method - HTTP method (e.g. "GET", "POST", "PATCH", "DELETE")
+ * @param route - The API route path (e.g. "/api/books")
+ * @param data - Optional request body. Will be JSON-serialized.
+ * @returns The fetch Response object
+ * @throws Error if the response status is not ok (after potential token refresh)
+ */
 export async function apiRequest(
   method: string,
   route: string,
@@ -180,32 +190,51 @@ export async function apiRequest(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  let res = await fetch(url, {
-    method,
-    headers,
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    let res = await fetch(url, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+      signal: controller.signal,
+    });
 
-  // Auto-refresh on 401
-  if (res.status === 401 && token) {
-    const newToken = await attemptTokenRefresh();
-    if (newToken) {
-      headers["Authorization"] = `Bearer ${newToken}`;
-      res = await fetch(url, {
-        method,
-        headers,
-        body: data ? JSON.stringify(data) : undefined,
-        credentials: "include",
-      });
+    // Auto-refresh on 401
+    if (res.status === 401 && token) {
+      const newToken = await attemptTokenRefresh();
+      if (newToken) {
+        headers["Authorization"] = `Bearer ${newToken}`;
+        res = await fetch(url, {
+          method,
+          headers,
+          body: data ? JSON.stringify(data) : undefined,
+          credentials: "include",
+          signal: controller.signal,
+        });
+      }
     }
-  }
 
-  await throwIfResNotOk(res);
-  return res;
+    await throwIfResNotOk(res);
+    return res;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
+
+/**
+ * Factory that creates a TanStack Query `queryFn` with configurable 401 handling.
+ * The returned function builds the URL from `queryKey` segments, attaches auth headers,
+ * and automatically attempts a token refresh on 401.
+ *
+ * @typeParam T - The expected JSON response type
+ * @param options - Configuration object
+ * @param options.on401 - How to handle 401 responses: "returnNull" returns null, "throw" raises an error
+ * @returns A `QueryFunction<T>` suitable for use with `useQuery` or as a default query function
+ */
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =

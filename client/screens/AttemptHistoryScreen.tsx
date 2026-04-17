@@ -261,6 +261,11 @@ export default function AttemptHistoryScreen() {
                           : theme.glass,
                     },
                   ]}
+                  accessibilityRole="radio"
+                  accessibilityLabel={`Filter: ${filter.label}`}
+                  accessibilityState={{
+                    selected: selectedFilter === filter.id,
+                  }}
                 >
                   <ThemedText
                     style={[

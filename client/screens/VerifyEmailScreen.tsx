@@ -89,7 +89,7 @@ export default function VerifyEmailScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <ThemedText type="h1" style={styles.title}>
+          <ThemedText type="h1" style={styles.title} accessibilityRole="header">
             Verify Email
           </ThemedText>
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
@@ -106,6 +106,8 @@ export default function VerifyEmailScreen() {
             keyboardType="number-pad"
             maxLength={6}
             placeholder="123456"
+            accessibilityLabel="Verification code"
+            accessibilityHint="Enter the 6-digit code sent to your email"
           />
 
           <PrimaryButton

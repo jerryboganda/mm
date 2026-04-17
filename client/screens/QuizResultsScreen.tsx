@@ -72,12 +72,21 @@ export default function QuizResultsScreen() {
           },
         ]}
       >
-        <View style={styles.scoreSection}>
+        <View
+          style={styles.scoreSection}
+          accessibilityRole="summary"
+          accessibilityLabel={
+            result
+              ? `You scored ${result.correctCount} out of ${result.totalQuestions}, that's ${result.score} percent`
+              : undefined
+          }
+        >
           {isHighScore ? (
             <Image
               source={require("../../assets/images/quiz-success.png")}
               style={styles.successImage}
               resizeMode="contain"
+              accessibilityLabel="Quiz success celebration"
             />
           ) : null}
 
@@ -103,7 +112,11 @@ export default function QuizResultsScreen() {
             <ThemedText style={styles.scoreLabel}>Your Score</ThemedText>
           </View>
 
-          <ThemedText type="h2" style={styles.resultTitle}>
+          <ThemedText
+            type="h2"
+            style={styles.resultTitle}
+            accessibilityRole="header"
+          >
             {isHighScore ? "Excellent Work!" : "Keep Practicing!"}
           </ThemedText>
           <ThemedText

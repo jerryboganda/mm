@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ─── Pre-commit: TypeScript type-checking ────────────────
+# Runs tsc --noEmit on staged .ts/.tsx files.
+# If any type errors are found the commit is aborted.
+
+STAGED_TS_FILES=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' | head -200)
+
+if [ -z "$STAGED_TS_FILES" ]; then
+  # No TypeScript files staged — nothing to check
+  exit 0
+fi
+
+echo "🔍 Running TypeScript type-check on staged files..."
+
+# Full project type-check (tsc cannot reliably check individual files
+# when there are path aliases / project references, so we run --noEmit
+# on the whole project — still fast for incremental builds).
+if ! npx tsc --noEmit 2>&1; then
+  echo ""
+  echo "❌ TypeScript type-check failed."
+  echo "   Fix the errors above before committing."
+  echo ""
+  exit 1
+fi
+
+echo "✅ TypeScript type-check passed."

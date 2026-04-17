@@ -2,13 +2,22 @@ import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
 import { z } from "zod";
+import { sanitizeString } from "../lib/api-response";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
 const reportSchema = z.object({
   contentType: z.enum(["topic", "mcq", "content_block"]),
   contentId: z.string().min(1),
-  reportType: z.enum(["factual_error", "typo", "outdated", "unclear", "error", "other"]),
+  reportType: z.enum([
+    "factual_error",
+    "typo",
+    "outdated",
+    "unclear",
+    "error",
+    "other",
+  ]),
   description: z.string().min(3, "Description must be at least 3 characters"),
 });
 
@@ -16,6 +25,9 @@ const reportSchema = z.object({
 router.post("/", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const data = reportSchema.parse(req.body);
+
+    // Sanitize user-supplied description before storing
+    data.description = sanitizeString(data.description);
 
     const report = await storage.createContentReport({
       userId: req.userId!,
@@ -30,7 +42,9 @@ router.post("/", authMiddleware, async (req: AuthRequest, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ message: error.errors[0].message });
     }
-    console.error("Create report error:", error);
+    logger.error("Create report error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Failed to submit report" });
   }
 });
@@ -46,7 +60,9 @@ router.get(
       const reports = await storage.getContentReports(status);
       res.json(reports);
     } catch (error) {
-      console.error("Get reports error:", error);
+      logger.error("Get reports error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to get reports" });
     }
   },
@@ -78,7 +94,9 @@ router.patch(
 
       res.json(updated);
     } catch (error) {
-      console.error("Update report error:", error);
+      logger.error("Update report error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to update report" });
     }
   },

@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "../shared/schema";
+import { logger } from "./lib/logger";
 
 const { Pool } = pg;
 
@@ -20,7 +21,50 @@ export const pool = new Pool({
 
 // Log pool errors so they don't crash the process silently
 pool.on("error", (err) => {
-  console.error("[DB Pool] Unexpected client error:", err.message);
+  logger.error("[DB Pool] Unexpected client error", { error: err.message });
 });
+
+// Warn when pool usage exceeds 80%
+setInterval(() => {
+  const { totalCount, idleCount, waitingCount } = pool;
+  const usage =
+    ((totalCount - idleCount) / parseInt(process.env.DB_POOL_MAX || "20", 10)) *
+    100;
+  if (usage > 80 || waitingCount > 0) {
+    logger.warn("DB pool pressure", {
+      totalCount,
+      idleCount,
+      waitingCount,
+      usagePercent: Math.round(usage),
+    });
+  }
+}, 30_000);
+
+/**
+ * Verify database connectivity at startup with retries.
+ * Prevents the server from starting if the DB is unreachable.
+ */
+export async function ensureDatabaseConnection(maxRetries = 5): Promise<void> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const client = await pool.connect();
+      await client.query("SELECT 1");
+      client.release();
+      logger.info(`[DB] Connected successfully (attempt ${attempt})`);
+      return;
+    } catch (error) {
+      logger.error(`[DB] Connection attempt ${attempt}/${maxRetries} failed`, {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      if (attempt === maxRetries) {
+        throw new Error(
+          `Failed to connect to database after ${maxRetries} attempts`,
+        );
+      }
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
 
 export const db = drizzle(pool, { schema });

@@ -33,12 +33,8 @@ export default function SettingsScreen() {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
 
   const { theme, themeMode, setThemeMode } = useTheme();
-  const {
-    soundEnabled,
-    hapticEnabled,
-    setSoundEnabled,
-    setHapticEnabled,
-  } = useFeedback();
+  const { soundEnabled, hapticEnabled, setSoundEnabled, setHapticEnabled } =
+    useFeedback();
   const [pushNotifications, setPushNotifications] = React.useState(true);
   const [studyReminders, setStudyReminders] = React.useState(true);
   const [quizReminders, setQuizReminders] = React.useState(false);
@@ -226,9 +222,12 @@ export default function SettingsScreen() {
                 onPress={
                   item.type === "navigation" || item.type === "selection"
                     ? () => {
-                      if (hapticEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      item.onPress?.();
-                    }
+                        if (hapticEnabled)
+                          Haptics.impactAsync(
+                            Haptics.ImpactFeedbackStyle.Light,
+                          );
+                        item.onPress?.();
+                      }
                     : undefined
                 }
               >
@@ -243,11 +242,7 @@ export default function SettingsScreen() {
                     <Feather
                       name={item.icon}
                       size={18}
-                      color={
-                        item.disabled
-                          ? theme.textMuted
-                          : theme.primary
-                      }
+                      color={item.disabled ? theme.textMuted : theme.primary}
                     />
                   </View>
                   <View style={styles.settingContent}>
@@ -277,11 +272,7 @@ export default function SettingsScreen() {
                     />
                   ) : item.type === "selection" ? (
                     item.selected && (
-                      <Feather
-                        name="check"
-                        size={20}
-                        color={theme.primary}
-                      />
+                      <Feather name="check" size={20} color={theme.primary} />
                     )
                   ) : (
                     <Switch
@@ -294,6 +285,8 @@ export default function SettingsScreen() {
                       }}
                       thumbColor="#fff"
                       ios_backgroundColor={theme.glass}
+                      accessibilityLabel={item.title}
+                      accessibilityRole="switch"
                     />
                   )}
                 </View>

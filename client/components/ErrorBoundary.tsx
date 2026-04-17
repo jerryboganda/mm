@@ -30,6 +30,10 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: { componentStack: string }): void {
+    // Always log the error and component stack for diagnostics
+    console.error("[ErrorBoundary] Uncaught error:", error);
+    console.error("[ErrorBoundary] Component stack:", info.componentStack);
+
     if (typeof this.props.onError === "function") {
       this.props.onError(error, info.componentStack);
     }

@@ -383,6 +383,9 @@ export default function ProfileScreen() {
               navigation.navigate("EditProfile");
             }}
             testID="button-edit-profile"
+            accessibilityRole="button"
+            accessibilityLabel="Edit profile"
+            accessibilityHint="Navigate to edit your profile details"
           >
             <Image
               source={require("../../assets/images/default-avatar.png")}

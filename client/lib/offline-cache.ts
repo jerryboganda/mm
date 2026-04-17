@@ -33,12 +33,12 @@ const OFFLINE_QUERY_KEYS = [
 
 // Prefix matches — any query starting with these will be cached
 const OFFLINE_QUERY_PREFIXES = [
-  "/api/books/",     // chapters within a book
-  "/api/chapters/",  // topics within a chapter
-  "/api/topics/",    // topic content + detail
-  "/api/quiz/",      // quiz questions for topics
-  "/api/attempts/",  // quiz attempt history & detail
-  "/api/progress/",  // progress details
+  "/api/books/", // chapters within a book
+  "/api/chapters/", // topics within a chapter
+  "/api/topics/", // topic content + detail
+  "/api/quiz/", // quiz questions for topics
+  "/api/attempts/", // quiz attempt history & detail
+  "/api/progress/", // progress details
 ];
 
 function shouldPersistQuery(queryKey: readonly unknown[]): boolean {
@@ -65,15 +65,17 @@ async function getStorage() {
   }
 
   // Lazy import for native
-  const AsyncStorage = await import(
-    "@react-native-async-storage/async-storage"
-  );
+  const AsyncStorage =
+    await import("@react-native-async-storage/async-storage");
   return AsyncStorage.default;
 }
 
 /**
  * Save eligible query cache entries to persistent storage.
+ * Only caches successful responses for content endpoints (books, chapters, topics, etc.).
  * Call this periodically or on app background.
+ *
+ * @param queryClient - The TanStack QueryClient instance whose cache to persist
  */
 export async function persistQueryCache(
   queryClient: QueryClient,
@@ -104,7 +106,9 @@ export async function persistQueryCache(
 
 /**
  * Restore query cache from persistent storage.
- * Call this on app startup, before any queries run.
+ * Call this on app startup, before any queries run, to hydrate the cache for offline use.
+ *
+ * @param queryClient - The TanStack QueryClient instance to hydrate
  */
 export async function restoreQueryCache(
   queryClient: QueryClient,
@@ -136,7 +140,7 @@ export async function restoreQueryCache(
 }
 
 /**
- * Clear the offline cache.
+ * Clear all persisted offline cache data from storage.
  */
 export async function clearOfflineCache(): Promise<void> {
   try {
@@ -149,8 +153,11 @@ export async function clearOfflineCache(): Promise<void> {
 
 /**
  * Start a periodic cache persistence interval.
- * Persists every `intervalMs` milliseconds (default 60 s).
- * Returns a cleanup function to stop the interval.
+ * Persists the query cache every `intervalMs` milliseconds (default 60 s).
+ *
+ * @param queryClient - The TanStack QueryClient instance whose cache to persist
+ * @param intervalMs - Interval in milliseconds between persist operations (default 60000)
+ * @returns A cleanup function that stops the interval when called
  */
 export function startPeriodicPersist(
   queryClient: QueryClient,
@@ -164,9 +171,12 @@ export function startPeriodicPersist(
 }
 
 /**
- * Subscribe to query-cache changes and persist when new data arrives.
+ * Subscribe to query-cache changes and persist when new data arrives for offline-eligible queries.
  * Uses a debounce window so rapid successive fetches don't hammer storage.
- * Returns an unsubscribe function.
+ *
+ * @param queryClient - The TanStack QueryClient instance to observe
+ * @param debounceMs - Debounce window in milliseconds (default 3000)
+ * @returns An unsubscribe function that stops listening and clears any pending debounce timer
  */
 export function persistOnQuerySuccess(
   queryClient: QueryClient,

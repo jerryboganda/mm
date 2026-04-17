@@ -26,12 +26,23 @@ export function EmptyState({
   const { theme } = useTheme();
 
   return (
-    <View style={[styles.container, style]}>
-      <Image source={image} style={styles.image} resizeMode="contain" />
+    <View
+      style={[styles.container, style]}
+      accessibilityRole="summary"
+      accessibilityLabel={`${title}. ${description}`}
+    >
+      <Image
+        source={image}
+        style={styles.image}
+        resizeMode="contain"
+        accessibilityElementsHidden
+      />
       <ThemedText type="h3" style={styles.title}>
         {title}
       </ThemedText>
-      <ThemedText style={[styles.description, { color: theme.textSecondary }]}>{description}</ThemedText>
+      <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
+        {description}
+      </ThemedText>
       {actionLabel && onAction ? (
         <PrimaryButton
           title={actionLabel}

@@ -98,6 +98,8 @@ function AnnouncementCard({ item }: { item: Announcement }) {
         },
       ]}
       onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={`${item.type} announcement: ${item.title}. ${item.message}`}
     >
       <View
         style={[styles.iconContainer, { backgroundColor: `${typeColor}20` }]}

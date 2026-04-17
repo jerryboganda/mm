@@ -12,10 +12,19 @@ const THEME_STORAGE_KEY = "@theme_mode";
 let currentMode: ThemeMode = "system";
 const listeners = new Set<(mode: ThemeMode) => void>();
 
+/**
+ * Get the current theme mode without subscribing to changes.
+ * @returns The current theme mode: "light", "dark", or "system"
+ */
 export function getThemeMode(): ThemeMode {
   return currentMode;
 }
 
+/**
+ * Imperatively set the theme mode. Persists the choice to AsyncStorage
+ * and notifies all active `useTheme` subscribers.
+ * @param mode - The desired theme mode: "light", "dark", or "system"
+ */
 export function setThemeMode(mode: ThemeMode) {
   currentMode = mode;
   AsyncStorage.setItem(THEME_STORAGE_KEY, mode).catch((err) =>
@@ -31,6 +40,17 @@ AsyncStorage.getItem(THEME_STORAGE_KEY).then((saved) => {
   }
 });
 
+/**
+ * React hook that provides the resolved theme colors and controls for toggling theme mode.
+ * Subscribes to global theme mode changes and resolves "system" to the device color scheme.
+ *
+ * @returns An object containing:
+ *  - `theme` — The resolved color palette (light or dark)
+ *  - `isDark` — Whether the resolved scheme is dark
+ *  - `themeMode` — The raw mode setting ("light" | "dark" | "system")
+ *  - `setThemeMode` — Function to change the mode
+ *  - `toggleTheme` — Convenience function to flip between light and dark
+ */
 export function useTheme() {
   const systemScheme = useColorScheme();
   const [mode, setMode] = useState<ThemeMode>(currentMode);
@@ -43,8 +63,7 @@ export function useTheme() {
     };
   }, []);
 
-  const resolvedScheme =
-    mode === "system" ? systemScheme ?? "dark" : mode;
+  const resolvedScheme = mode === "system" ? (systemScheme ?? "dark") : mode;
 
   const isDark = resolvedScheme === "dark";
   const theme = isDark ? Colors.dark : Colors.light;

@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { type AuthRequest } from "../middleware";
 import { subscriptionService } from "../services/subscription-service";
+import { logger } from "../lib/logger";
 
 // ══════════════════════════════════════════════════════════════
 // Types
@@ -116,7 +117,9 @@ export function requireSubscription() {
 
       next();
     } catch (error) {
-      console.error("[SubscriptionGate] requireSubscription error:", error);
+      logger.error("SubscriptionGate requireSubscription error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to verify subscription access" });
     }
   };
@@ -176,7 +179,9 @@ export function requireFeature(featureKey: string) {
 
       next();
     } catch (error) {
-      console.error("[SubscriptionGate] requireFeature error:", error);
+      logger.error("SubscriptionGate requireFeature error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to verify feature access" });
     }
   };
@@ -211,10 +216,9 @@ export function optionalSubscriptionInfo() {
       next();
     } catch (error) {
       // Non-blocking — log and continue without subscription info
-      console.error(
-        "[SubscriptionGate] optionalSubscriptionInfo error:",
-        error,
-      );
+      logger.error("SubscriptionGate optionalSubscriptionInfo error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       next();
     }
   };

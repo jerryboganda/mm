@@ -28,8 +28,10 @@ router.get("/", async (req: AuthRequest, res) => {
       pageSize: pageSize ? parseInt(pageSize) : undefined,
     });
     res.json(result);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -40,8 +42,10 @@ router.get("/:id", async (req: AuthRequest, res) => {
     const user = await adminGetUserDetail(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -57,7 +61,14 @@ router.put("/:id", async (req: AuthRequest, res) => {
       name,
       isEmailVerified,
     } = req.body;
-    const data: any = {};
+    const data: Partial<{
+      role: string;
+      subscriptionStatus: string;
+      subscriptionPlan: string | null;
+      subscriptionExpiresAt: Date | null;
+      name: string;
+      isEmailVerified: boolean;
+    }> = {};
     if (role !== undefined) data.role = role;
     if (name !== undefined) data.name = name;
     if (isEmailVerified !== undefined) data.isEmailVerified = isEmailVerified;
@@ -81,8 +92,10 @@ router.put("/:id", async (req: AuthRequest, res) => {
       details: data,
     });
     res.json({ ...user, password: undefined });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 
@@ -104,8 +117,10 @@ router.delete("/:id", async (req: AuthRequest, res) => {
       entityId: userId,
     });
     res.json({ message: "User deleted" });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
   }
 });
 

@@ -166,11 +166,7 @@ export default function SpacedReviewScreen() {
       <BackgroundGradient>
         <View style={[styles.emptyContainer, { paddingTop: insets.top + 60 }]}>
           <View style={styles.emptyIcon}>
-            <Feather
-              name="check-circle"
-              size={64}
-              color={theme.success}
-            />
+            <Feather name="check-circle" size={64} color={theme.success} />
           </View>
           <ThemedText type="h2" style={styles.emptyTitle}>
             All Caught Up!
@@ -211,9 +207,7 @@ export default function SpacedReviewScreen() {
 
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <ThemedText
-                style={[styles.statValue, { color: theme.success }]}
-              >
+              <ThemedText style={[styles.statValue, { color: theme.success }]}>
                 {sessionStats.easy}
               </ThemedText>
               <ThemedText
@@ -223,9 +217,7 @@ export default function SpacedReviewScreen() {
               </ThemedText>
             </View>
             <View style={styles.statItem}>
-              <ThemedText
-                style={[styles.statValue, { color: theme.info }]}
-              >
+              <ThemedText style={[styles.statValue, { color: theme.info }]}>
                 {sessionStats.good}
               </ThemedText>
               <ThemedText
@@ -235,9 +227,7 @@ export default function SpacedReviewScreen() {
               </ThemedText>
             </View>
             <View style={styles.statItem}>
-              <ThemedText
-                style={[styles.statValue, { color: theme.warning }]}
-              >
+              <ThemedText style={[styles.statValue, { color: theme.warning }]}>
                 {sessionStats.hard}
               </ThemedText>
               <ThemedText
@@ -247,9 +237,7 @@ export default function SpacedReviewScreen() {
               </ThemedText>
             </View>
             <View style={styles.statItem}>
-              <ThemedText
-                style={[styles.statValue, { color: theme.error }]}
-              >
+              <ThemedText style={[styles.statValue, { color: theme.error }]}>
                 {sessionStats.again}
               </ThemedText>
               <ThemedText
@@ -315,6 +303,8 @@ export default function SpacedReviewScreen() {
           <Pressable
             onPress={() => navigation.goBack()}
             style={styles.closeButton}
+            accessibilityRole="button"
+            accessibilityLabel="Close review session"
           >
             <Feather name="x" size={24} color={theme.text} />
           </Pressable>
@@ -413,6 +403,8 @@ export default function SpacedReviewScreen() {
                       },
                     ]}
                     onPress={() => handleQualityRating(opt.value)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Rate as ${opt.label}`}
                   >
                     <Feather
                       name={opt.icon as any}
@@ -434,21 +426,19 @@ export default function SpacedReviewScreen() {
         {/* Review info */}
         {currentQuestion && (
           <View style={styles.reviewInfo}>
-            <Feather
-              name="repeat"
-              size={14}
-              color={theme.textSecondary}
-            />
+            <Feather name="repeat" size={14} color={theme.textSecondary} />
             <ThemedText
               style={[styles.reviewInfoText, { color: theme.textSecondary }]}
             >
               {currentQuestion.repetitions === 0
                 ? "First review"
-                : `Reviewed ${currentQuestion.repetitions} time${currentQuestion.repetitions > 1 ? "s" : ""
-                }`}
+                : `Reviewed ${currentQuestion.repetitions} time${
+                    currentQuestion.repetitions > 1 ? "s" : ""
+                  }`}
               {currentQuestion.interval > 0
-                ? ` · Next in ${currentQuestion.interval} day${currentQuestion.interval > 1 ? "s" : ""
-                }`
+                ? ` · Next in ${currentQuestion.interval} day${
+                    currentQuestion.interval > 1 ? "s" : ""
+                  }`
                 : ""}
             </ThemedText>
           </View>

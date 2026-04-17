@@ -11,6 +11,7 @@ import type { Transporter } from "nodemailer";
 import { db } from "./db";
 import { appSettings } from "../shared/schema";
 import { inArray } from "drizzle-orm";
+import { logger } from "./lib/logger";
 
 // Setting keys in app_settings table
 const SETTING_KEYS = {
@@ -81,7 +82,7 @@ async function getSmtpConfig(): Promise<SmtpConfig | null> {
       fromName,
     };
   } catch (error) {
-    console.error("Failed to load SMTP config:", error);
+    logger.error("Failed to load SMTP config", { error: String(error) });
     return null;
   }
 }
@@ -120,11 +121,12 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
   const config = await getSmtpConfig();
   if (!config) {
     if (process.env.NODE_ENV !== "production") {
-      console.log(
-        `[DEV] Email not sent (no SMTP config). To: ${Array.isArray(options.to) ? options.to.join(", ") : options.to}, Subject: ${options.subject}`,
-      );
+      logger.debug("Email not sent (no SMTP config)", {
+        to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
+        subject: options.subject,
+      });
     } else {
-      console.warn("[EMAIL] SMTP not configured â€” email not sent.");
+      logger.warn("SMTP not configured, email not sent");
     }
     return false;
   }
@@ -142,7 +144,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
     });
     return true;
   } catch (error) {
-    console.error("[EMAIL] Send failed:", error);
+    logger.error("Email send failed", { error: String(error) });
     return false;
   }
 }
@@ -207,10 +209,10 @@ export async function testSmtpConnection(config: {
     });
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message || "Unknown SMTP error",
+      error: error instanceof Error ? error.message : "Unknown SMTP error",
     };
   }
 }

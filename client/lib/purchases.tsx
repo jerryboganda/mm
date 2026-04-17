@@ -15,6 +15,7 @@ import Purchases, {
 import { apiRequest } from "@/lib/query-client";
 import { useAuth } from "@/lib/auth";
 
+/** Describes the subscription/purchase state and actions available through the purchases context. */
 interface PurchasesContextType {
   isSubscribed: boolean;
   customerInfo: CustomerInfo | null;
@@ -41,8 +42,7 @@ const REVENUECAT_API_KEY_ANDROID =
   process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID ||
   "";
 // Fallback to the test key if no platform-specific key is set
-const REVENUECAT_API_KEY_TEST =
-  process.env.EXPO_PUBLIC_RC_API_KEY_TEST || "";
+const REVENUECAT_API_KEY_TEST = process.env.EXPO_PUBLIC_RC_API_KEY_TEST || "";
 const REVENUECAT_ENTITLEMENT_ID =
   process.env.EXPO_PUBLIC_RC_ENTITLEMENT_ID ||
   process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID ||
@@ -50,9 +50,7 @@ const REVENUECAT_ENTITLEMENT_ID =
 
 function getApiKey(): string {
   const platformKey =
-    Platform.OS === "ios"
-      ? REVENUECAT_API_KEY_IOS
-      : REVENUECAT_API_KEY_ANDROID;
+    Platform.OS === "ios" ? REVENUECAT_API_KEY_IOS : REVENUECAT_API_KEY_ANDROID;
   // Use platform-specific key first; only fall back to test key in dev mode
   if (platformKey) return platformKey;
   if (__DEV__) return REVENUECAT_API_KEY_TEST;
@@ -60,6 +58,15 @@ function getApiKey(): string {
   return "";
 }
 
+/**
+ * Context provider that initialises RevenueCat, manages subscription state,
+ * and exposes purchase/restore actions to descendant components.
+ * Automatically identifies the authenticated user to RevenueCat and syncs
+ * subscription status with the backend.
+ *
+ * @param props.children - Child components that will have access to the purchases context.
+ * @returns A provider component wrapping children with purchase state and actions.
+ */
 export function PurchasesProvider({ children }: { children: ReactNode }) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
@@ -76,14 +83,16 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   // When user logs in, identify them to RevenueCat
   useEffect(() => {
     if (initialized && user?.id) {
-      Purchases.logIn(user.id).then(({ customerInfo: info }) => {
-        setCustomerInfo(info);
-        const entitlement =
-          info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
-        setIsSubscribed(!!entitlement);
-      }).catch((err) => {
-        console.error("RevenueCat logIn error:", err);
-      });
+      Purchases.logIn(user.id)
+        .then(({ customerInfo: info }) => {
+          setCustomerInfo(info);
+          const entitlement =
+            info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
+          setIsSubscribed(!!entitlement);
+        })
+        .catch((err) => {
+          console.error("RevenueCat logIn error:", err);
+        });
     }
   }, [initialized, user?.id]);
 
@@ -149,26 +158,22 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   };
 
   // Sync subscription status to our backend after any purchase/restore
-  const syncSubscriptionToServer = useCallback(
-    async (info: CustomerInfo) => {
-      try {
-        const entitlement =
-          info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
-        if (entitlement) {
-          await apiRequest("POST", "/api/profile/subscription/sync", {
-            subscriptionStatus: "active",
-            subscriptionPlan: entitlement.productIdentifier || "premium",
-            expiresAt: entitlement.expirationDate || null,
-            revenueCatId: info.originalAppUserId,
-          });
-        }
-      } catch (err) {
-        // Non-critical — server webhook will also sync
-        console.warn("Failed to sync subscription to server:", err);
+  const syncSubscriptionToServer = useCallback(async (info: CustomerInfo) => {
+    try {
+      const entitlement = info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
+      if (entitlement) {
+        await apiRequest("POST", "/api/profile/subscription/sync", {
+          subscriptionStatus: "active",
+          subscriptionPlan: entitlement.productIdentifier || "premium",
+          expiresAt: entitlement.expirationDate || null,
+          revenueCatId: info.originalAppUserId,
+        });
       }
-    },
-    [],
-  );
+    } catch (err) {
+      // Non-critical — server webhook will also sync
+      console.warn("Failed to sync subscription to server:", err);
+    }
+  }, []);
 
   const purchase = async (
     packageToPurchase: PurchasesPackage,
@@ -277,6 +282,13 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Hook to access subscription state and purchase actions.
+ * Must be used within a {@link PurchasesProvider}.
+ *
+ * @returns The current {@link PurchasesContextType} value.
+ * @throws If used outside of a PurchasesProvider.
+ */
 export function usePurchases() {
   const context = useContext(PurchasesContext);
   if (context === undefined) {

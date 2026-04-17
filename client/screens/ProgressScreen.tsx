@@ -172,6 +172,8 @@ export default function ProgressScreen() {
                 })
               }
               style={styles.topicRow}
+              accessibilityRole="button"
+              accessibilityLabel={`${topic.title}, ${topic.accuracy}% accuracy, ${topic.attempts} attempts`}
             >
               <View style={styles.topicInfo}>
                 <ThemedText style={styles.topicTitle} numberOfLines={1}>
@@ -208,7 +210,11 @@ export default function ProgressScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionLabel}>RECENT ATTEMPTS</ThemedText>
-            <Pressable onPress={() => navigation.navigate("AttemptHistory")}>
+            <Pressable
+              onPress={() => navigation.navigate("AttemptHistory")}
+              accessibilityRole="link"
+              accessibilityLabel="View all attempts"
+            >
               <ThemedText
                 style={[styles.viewAllText, { color: theme.primary }]}
               >

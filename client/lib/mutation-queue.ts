@@ -16,10 +16,10 @@ const QUEUE_KEY = "maternal-mind-mutation-queue";
 
 export interface QueuedMutation {
   id: string;
-  method: string;       // "POST" | "PATCH" | "DELETE"
-  route: string;        // e.g. "/api/topics/abc/complete"
+  method: string; // "POST" | "PATCH" | "DELETE"
+  route: string; // e.g. "/api/topics/abc/complete"
   data?: unknown;
-  createdAt: number;     // unix ms
+  createdAt: number; // unix ms
 }
 
 // â”€â”€ Storage helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -34,14 +34,17 @@ async function getStorage() {
       },
     };
   }
-  const AsyncStorage = await import(
-    "@react-native-async-storage/async-storage"
-  );
+  const AsyncStorage =
+    await import("@react-native-async-storage/async-storage");
   return AsyncStorage.default;
 }
 
 // â”€â”€ Queue operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+/**
+ * Retrieve all currently queued mutations from persistent storage.
+ * @returns An array of queued mutation entries, or an empty array on error
+ */
 export async function getQueuedMutations(): Promise<QueuedMutation[]> {
   try {
     const storage = await getStorage();
@@ -62,9 +65,13 @@ async function saveQueue(queue: QueuedMutation[]): Promise<void> {
 }
 
 /**
- * Enqueue a mutation for later execution.
- * Returns true if the mutation was queued (offline), false if it should
- * proceed normally (online).
+ * Enqueue a mutation for later execution if the device is currently offline.
+ * If the same route+method already exists in the queue, it is replaced (last-write-wins).
+ *
+ * @param method - HTTP method (e.g. "POST", "PATCH", "DELETE")
+ * @param route - The API route path (e.g. "/api/topics/abc/complete")
+ * @param data - Optional request body payload
+ * @returns `true` if the mutation was queued (device is offline), `false` if the caller should execute immediately (device is online)
  */
 export async function enqueueMutationIfOffline(
   method: string,
@@ -72,7 +79,9 @@ export async function enqueueMutationIfOffline(
   data?: unknown,
 ): Promise<boolean> {
   const netState = await NetInfo.fetch();
-  const isOnline = !!(netState.isConnected && netState.isInternetReachable !== false);
+  const isOnline = !!(
+    netState.isConnected && netState.isInternetReachable !== false
+  );
 
   if (isOnline) return false; // caller should execute immediately
 
@@ -100,8 +109,11 @@ export async function enqueueMutationIfOffline(
 }
 
 /**
- * Drain the queue â€” replay all queued mutations sequentially.
+ * Drain the queue — replay all queued mutations sequentially.
  * Called automatically when connectivity is restored.
+ * Client errors (4xx) are discarded; server/network errors remain in the queue for retry.
+ *
+ * @returns An object with `succeeded` (count of successful replays) and `failed` (count of failures)
  */
 export async function drainMutationQueue(): Promise<{
   succeeded: number;
@@ -148,14 +160,19 @@ export async function drainMutationQueue(): Promise<{
 }
 
 /**
- * Start a listener that drains the queue whenever connectivity is restored.
- * Call once at app startup. Returns an unsubscribe function.
+ * Start a NetInfo listener that automatically drains the mutation queue
+ * whenever the device transitions from offline to online.
+ * Call once at app startup.
+ *
+ * @returns An unsubscribe function that removes the network listener
  */
 export function startMutationQueueListener(): () => void {
   let wasOffline = false;
 
   const unsubscribe = NetInfo.addEventListener((state) => {
-    const isOnline = !!(state.isConnected && state.isInternetReachable !== false);
+    const isOnline = !!(
+      state.isConnected && state.isInternetReachable !== false
+    );
 
     if (isOnline && wasOffline) {
       // Just came back online â€” drain the queue

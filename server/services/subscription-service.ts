@@ -1,3 +1,4 @@
+import { logger } from "../lib/logger";
 import {
   subscriptionPackages,
   packagePrices,
@@ -100,7 +101,7 @@ class SubscriptionService {
         .from(subscriptionPackages)
         .orderBy(subscriptionPackages.displayOrder);
     } catch (error) {
-      console.error("[SubscriptionService] getPackages error:", error);
+      logger.error("SubscriptionService getPackages error", { error: String(error) });
       throw error;
     }
   }
@@ -135,7 +136,7 @@ class SubscriptionService {
 
       return { ...pkg, prices, features };
     } catch (error) {
-      console.error("[SubscriptionService] getPackage error:", error);
+      logger.error("SubscriptionService getPackage error", { error: String(error) });
       throw error;
     }
   }
@@ -153,7 +154,7 @@ class SubscriptionService {
         .returning();
       return pkg;
     } catch (error) {
-      console.error("[SubscriptionService] createPackage error:", error);
+      logger.error("SubscriptionService createPackage error", { error: String(error) });
       throw error;
     }
   }
@@ -190,7 +191,7 @@ class SubscriptionService {
 
       return updated || undefined;
     } catch (error) {
-      console.error("[SubscriptionService] updatePackage error:", error);
+      logger.error("SubscriptionService updatePackage error", { error: String(error) });
       throw error;
     }
   }
@@ -204,7 +205,7 @@ class SubscriptionService {
         .returning();
       return updated || undefined;
     } catch (error) {
-      console.error("[SubscriptionService] deletePackage error:", error);
+      logger.error("SubscriptionService deletePackage error", { error: String(error) });
       throw error;
     }
   }
@@ -248,7 +249,7 @@ class SubscriptionService {
         features: allFeatures.filter((f) => f.packageId === pkg.id),
       }));
     } catch (error) {
-      console.error("[SubscriptionService] getPackageComparison error:", error);
+      logger.error("SubscriptionService getPackageComparison error", { error: String(error) });
       throw error;
     }
   }
@@ -285,7 +286,7 @@ class SubscriptionService {
 
       return price;
     } catch (error) {
-      console.error("[SubscriptionService] createPrice error:", error);
+      logger.error("SubscriptionService createPrice error", { error: String(error) });
       throw error;
     }
   }
@@ -302,7 +303,7 @@ class SubscriptionService {
         .returning();
       return updated || undefined;
     } catch (error) {
-      console.error("[SubscriptionService] updatePrice error:", error);
+      logger.error("SubscriptionService updatePrice error", { error: String(error) });
       throw error;
     }
   }
@@ -311,7 +312,7 @@ class SubscriptionService {
     try {
       await db.delete(packagePrices).where(eq(packagePrices.id, id));
     } catch (error) {
-      console.error("[SubscriptionService] deletePrice error:", error);
+      logger.error("SubscriptionService deletePrice error", { error: String(error) });
       throw error;
     }
   }
@@ -330,7 +331,7 @@ class SubscriptionService {
         .returning();
       return feature;
     } catch (error) {
-      console.error("[SubscriptionService] createFeature error:", error);
+      logger.error("SubscriptionService createFeature error", { error: String(error) });
       throw error;
     }
   }
@@ -347,7 +348,7 @@ class SubscriptionService {
         .returning();
       return updated || undefined;
     } catch (error) {
-      console.error("[SubscriptionService] updateFeature error:", error);
+      logger.error("SubscriptionService updateFeature error", { error: String(error) });
       throw error;
     }
   }
@@ -356,7 +357,7 @@ class SubscriptionService {
     try {
       await db.delete(packageFeatures).where(eq(packageFeatures.id, id));
     } catch (error) {
-      console.error("[SubscriptionService] deleteFeature error:", error);
+      logger.error("SubscriptionService deleteFeature error", { error: String(error) });
       throw error;
     }
   }
@@ -369,7 +370,7 @@ class SubscriptionService {
         .where(eq(packageFeatures.packageId, packageId))
         .orderBy(packageFeatures.displayOrder);
     } catch (error) {
-      console.error("[SubscriptionService] getFeaturesByPackage error:", error);
+      logger.error("SubscriptionService getFeaturesByPackage error", { error: String(error) });
       throw error;
     }
   }
@@ -486,7 +487,7 @@ class SubscriptionService {
 
       return sub;
     } catch (error) {
-      console.error("[SubscriptionService] createSubscription error:", error);
+      logger.error("SubscriptionService createSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -527,7 +528,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] activateSubscription error:", error);
+      logger.error("SubscriptionService activateSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -585,7 +586,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] renewSubscription error:", error);
+      logger.error("SubscriptionService renewSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -664,7 +665,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return { subscription: updated, prorationAmount };
     } catch (error) {
-      console.error("[SubscriptionService] upgradeSubscription error:", error);
+      logger.error("SubscriptionService upgradeSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -735,10 +736,7 @@ class SubscriptionService {
 
       return updated;
     } catch (error) {
-      console.error(
-        "[SubscriptionService] downgradeSubscription error:",
-        error,
-      );
+      logger.error("SubscriptionService downgradeSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -776,7 +774,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] pauseSubscription error:", error);
+      logger.error("SubscriptionService pauseSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -829,7 +827,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] resumeSubscription error:", error);
+      logger.error("SubscriptionService resumeSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -906,7 +904,7 @@ class SubscriptionService {
         return updated;
       }
     } catch (error) {
-      console.error("[SubscriptionService] cancelSubscription error:", error);
+      logger.error("SubscriptionService cancelSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -956,7 +954,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] expireSubscription error:", error);
+      logger.error("SubscriptionService expireSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -1023,10 +1021,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error(
-        "[SubscriptionService] reactivateSubscription error:",
-        error,
-      );
+      logger.error("SubscriptionService reactivateSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -1048,10 +1043,7 @@ class SubscriptionService {
         .limit(1);
       return sub || undefined;
     } catch (error) {
-      console.error(
-        "[SubscriptionService] getUserActiveSubscription error:",
-        error,
-      );
+      logger.error("SubscriptionService getUserActiveSubscription error", { error: String(error) });
       throw error;
     }
   }
@@ -1064,7 +1056,7 @@ class SubscriptionService {
         .where(eq(subscriptions.userId, userId))
         .orderBy(desc(subscriptions.createdAt));
     } catch (error) {
-      console.error("[SubscriptionService] getUserSubscriptions error:", error);
+      logger.error("SubscriptionService getUserSubscriptions error", { error: String(error) });
       throw error;
     }
   }
@@ -1156,10 +1148,7 @@ class SubscriptionService {
 
       return { hasAccess: false };
     } catch (error) {
-      console.error(
-        "[SubscriptionService] checkSubscriptionAccess error:",
-        error,
-      );
+      logger.error("SubscriptionService checkSubscriptionAccess error", { error: String(error) });
       throw error;
     }
   }
@@ -1275,7 +1264,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] handlePaymentFailure error:", error);
+      logger.error("SubscriptionService handlePaymentFailure error", { error: String(error) });
       throw error;
     }
   }
@@ -1316,7 +1305,7 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      console.error("[SubscriptionService] handlePaymentSuccess error:", error);
+      logger.error("SubscriptionService handlePaymentSuccess error", { error: String(error) });
       throw error;
     }
   }
@@ -1336,10 +1325,7 @@ class SubscriptionService {
         )
         .orderBy(subscriptions.nextRetryAt);
     } catch (error) {
-      console.error(
-        "[SubscriptionService] getSubscriptionsForRetry error:",
-        error,
-      );
+      logger.error("SubscriptionService getSubscriptionsForRetry error", { error: String(error) });
       throw error;
     }
   }
@@ -1424,7 +1410,7 @@ class SubscriptionService {
 
       return { ...invoice, lineItems: insertedItems };
     } catch (error) {
-      console.error("[SubscriptionService] createInvoice error:", error);
+      logger.error("SubscriptionService createInvoice error", { error: String(error) });
       throw error;
     }
   }
@@ -1455,10 +1441,7 @@ class SubscriptionService {
 
       return `${prefix}${String(nextSeq).padStart(4, "0")}`;
     } catch (error) {
-      console.error(
-        "[SubscriptionService] generateInvoiceNumber error:",
-        error,
-      );
+      logger.error("SubscriptionService generateInvoiceNumber error", { error: String(error) });
       throw error;
     }
   }
@@ -1471,7 +1454,7 @@ class SubscriptionService {
         .where(eq(invoices.userId, userId))
         .orderBy(desc(invoices.createdAt));
     } catch (error) {
-      console.error("[SubscriptionService] getUserInvoices error:", error);
+      logger.error("SubscriptionService getUserInvoices error", { error: String(error) });
       throw error;
     }
   }
@@ -1494,7 +1477,7 @@ class SubscriptionService {
 
       return { ...invoice, lineItems: items };
     } catch (error) {
-      console.error("[SubscriptionService] getInvoice error:", error);
+      logger.error("SubscriptionService getInvoice error", { error: String(error) });
       throw error;
     }
   }
@@ -1532,7 +1515,7 @@ class SubscriptionService {
       return log;
     } catch (error) {
       // Audit logging should not break the main operation — log and continue
-      console.error("[SubscriptionService] logSubscriptionEvent error:", error);
+      logger.error("SubscriptionService logSubscriptionEvent error", { error: String(error) });
       // Return a minimal object to satisfy the type contract
       return {
         id: "",
@@ -1560,10 +1543,7 @@ class SubscriptionService {
         .where(eq(subscriptionAuditLogs.subscriptionId, subscriptionId))
         .orderBy(desc(subscriptionAuditLogs.createdAt));
     } catch (error) {
-      console.error(
-        "[SubscriptionService] getSubscriptionAuditLog error:",
-        error,
-      );
+      logger.error("SubscriptionService getSubscriptionAuditLog error", { error: String(error) });
       throw error;
     }
   }
@@ -1576,7 +1556,7 @@ class SubscriptionService {
         .where(eq(subscriptionAuditLogs.userId, userId))
         .orderBy(desc(subscriptionAuditLogs.createdAt));
     } catch (error) {
-      console.error("[SubscriptionService] getUserAuditLog error:", error);
+      logger.error("SubscriptionService getUserAuditLog error", { error: String(error) });
       throw error;
     }
   }
@@ -1692,7 +1672,7 @@ class SubscriptionService {
         newSubscriptionsThisMonth,
       };
     } catch (error) {
-      console.error("[SubscriptionService] getSubscriptionStats error:", error);
+      logger.error("SubscriptionService getSubscriptionStats error", { error: String(error) });
       throw error;
     }
   }
@@ -1773,7 +1753,7 @@ class SubscriptionService {
         mrr: parseFloat(r.mrr.toFixed(2)),
       }));
     } catch (error) {
-      console.error("[SubscriptionService] getRevenueByPackage error:", error);
+      logger.error("SubscriptionService getRevenueByPackage error", { error: String(error) });
       throw error;
     }
   }
@@ -1868,7 +1848,7 @@ class SubscriptionService {
         churnByDay,
       };
     } catch (error) {
-      console.error("[SubscriptionService] getChurnAnalytics error:", error);
+      logger.error("SubscriptionService getChurnAnalytics error", { error: String(error) });
       throw error;
     }
   }
@@ -1911,7 +1891,7 @@ class SubscriptionService {
 
       return { totalNewSubscribers, growthByDay };
     } catch (error) {
-      console.error("[SubscriptionService] getSubscriberGrowth error:", error);
+      logger.error("SubscriptionService getSubscriberGrowth error", { error: String(error) });
       throw error;
     }
   }
@@ -1993,10 +1973,7 @@ class SubscriptionService {
         .where(eq(users.id, userId));
     } catch (error) {
       // Legacy sync should not break the main operation
-      console.error(
-        "[SubscriptionService] syncUserSubscriptionFields error:",
-        error,
-      );
+      logger.error("SubscriptionService syncUserSubscriptionFields error", { error: String(error) });
     }
   }
 }

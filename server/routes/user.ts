@@ -4,6 +4,8 @@ import { sendEmail, supportIssueEmailHtml } from "../email";
 import { AuthRequest, authMiddleware } from "../middleware";
 import { getSupportContactSettings } from "../lib/support-contact";
 import { subscriptionService } from "../services/subscription-service";
+import { sanitizeString } from "../lib/api-response";
+import { logger } from "../lib/logger";
 
 const router = Router();
 
@@ -20,8 +22,10 @@ router.patch("/profile", authMiddleware, async (req: AuthRequest, res) => {
       return res.status(400).json({ message: "Name is required" });
     }
 
+    const sanitizedName = sanitizeString(name);
+
     const updatedUser = await storage.updateUserProfile(req.userId!, {
-      name: name.trim(),
+      name: sanitizedName,
     });
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -36,7 +40,9 @@ router.patch("/profile", authMiddleware, async (req: AuthRequest, res) => {
       subscriptionPlan: updatedUser.subscriptionPlan,
     });
   } catch (error) {
-    console.error("Update profile error:", error);
+    logger.error("Update profile error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Failed to update profile" });
   }
 });
@@ -54,9 +60,17 @@ router.post(
           .json({ message: "Issue type and description are required" });
       }
 
+      // Sanitize user-supplied strings before use
+      const sanitizedType = sanitizeString(type);
+      const sanitizedDescription = sanitizeString(description);
+      const sanitizedEmail = email ? sanitizeString(email) : email;
+
       // Log the issue (structured, no PII leaks in production)
       if (process.env.NODE_ENV !== "production") {
-        console.log(`[SUPPORT] Issue reported by ${email}: ${type}`);
+        logger.debug("Support issue reported", {
+          email: sanitizedEmail,
+          type: sanitizedType,
+        });
       }
 
       // Send email to support via Brevo SMTP
@@ -64,16 +78,27 @@ router.post(
         const supportContactSettings = await getSupportContactSettings();
         await sendEmail({
           to: supportContactSettings.supportEmail,
-          subject: `[${type.toUpperCase()}] New Issue Report`,
-          html: supportIssueEmailHtml(type, email, description),
+          subject: `[${sanitizedType.toUpperCase()}] New Issue Report`,
+          html: supportIssueEmailHtml(
+            sanitizedType,
+            sanitizedEmail,
+            sanitizedDescription,
+          ),
         });
       } catch (emailError) {
-        console.error("Failed to send support email:", emailError);
+        logger.error("Failed to send support email", {
+          error:
+            emailError instanceof Error
+              ? emailError.message
+              : String(emailError),
+        });
       }
 
       res.json({ message: "Issue reported successfully" });
     } catch (error) {
-      console.error("Report issue error:", error);
+      logger.error("Report issue error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to report issue" });
     }
   },
@@ -104,7 +129,9 @@ router.post("/deactivate", authMiddleware, async (req: AuthRequest, res) => {
     }
 
     const reason =
-      typeof req.body?.reason === "string" ? req.body.reason.trim() : undefined;
+      typeof req.body?.reason === "string"
+        ? sanitizeString(req.body.reason)
+        : undefined;
 
     const updatedUser = await storage.deactivateUser(req.userId!, reason);
     if (!updatedUser) {
@@ -122,7 +149,9 @@ router.post("/deactivate", authMiddleware, async (req: AuthRequest, res) => {
       },
     });
   } catch (error) {
-    console.error("Deactivate account error:", error);
+    logger.error("Deactivate account error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Failed to deactivate account" });
   }
 });
@@ -157,7 +186,9 @@ router.post(
       }
 
       const note =
-        typeof req.body?.note === "string" ? req.body.note.trim() : undefined;
+        typeof req.body?.note === "string"
+          ? sanitizeString(req.body.note)
+          : undefined;
 
       const updatedUser = await storage.requestAccountDeletion(
         req.userId!,
@@ -179,7 +210,9 @@ router.post(
         },
       });
     } catch (error) {
-      console.error("Request account deletion error:", error);
+      logger.error("Request account deletion error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to request account deletion" });
     }
   },
@@ -208,7 +241,9 @@ router.get(
         })),
       );
     } catch (error) {
-      console.error("Get recent activity error:", error);
+      logger.error("Get recent activity error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to get recent activity" });
     }
   },
@@ -232,7 +267,9 @@ router.get("/bookmarks", authMiddleware, async (req: AuthRequest, res) => {
       })),
     );
   } catch (error) {
-    console.error("Get bookmarks error:", error);
+    logger.error("Get bookmarks error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     res.status(500).json({ message: "Failed to get bookmarks" });
   }
 });
@@ -288,7 +325,10 @@ router.post(
             },
           });
         } catch (auditErr) {
-          console.error("Subscription audit log error:", auditErr);
+          logger.error("Subscription audit log error", {
+            error:
+              auditErr instanceof Error ? auditErr.message : String(auditErr),
+          });
         }
       }
 
@@ -298,7 +338,9 @@ router.post(
         subscriptionExpiresAt: user.subscriptionExpiresAt,
       });
     } catch (error) {
-      console.error("Subscription sync error:", error);
+      logger.error("Subscription sync error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to sync subscription" });
     }
   },
@@ -319,7 +361,9 @@ router.get(
         subscriptionExpiresAt: user.subscriptionExpiresAt,
       });
     } catch (error) {
-      console.error("Get subscription status error:", error);
+      logger.error("Get subscription status error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(500).json({ message: "Failed to get subscription status" });
     }
   },

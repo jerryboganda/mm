@@ -29,8 +29,10 @@ const SOUNDS = {
   error: require("../../assets/sounds/error.wav"),
 } as const;
 
+/** Union type of available bundled sound asset names. */
 export type SoundName = keyof typeof SOUNDS;
 
+/** Describes the feedback preferences and playback helpers exposed by the context. */
 // ── Context type ─────────────────────────────────────────────────
 interface FeedbackContextValue {
   soundEnabled: boolean;
@@ -59,13 +61,32 @@ const FeedbackContext = createContext<FeedbackContextValue>({
 let _hapticEnabled = true;
 let _soundEnabled = true;
 
+/**
+ * Returns whether haptic feedback is currently enabled.
+ * Can be called outside the React tree (e.g. from `haptics-wrapper`).
+ *
+ * @returns `true` if haptic feedback is enabled.
+ */
 export function getHapticEnabled(): boolean {
   return _hapticEnabled;
 }
+/**
+ * Returns whether sound effects are currently enabled.
+ * Can be called outside the React tree (e.g. from `haptics-wrapper`).
+ *
+ * @returns `true` if sound effects are enabled.
+ */
 export function getSoundEnabled(): boolean {
   return _soundEnabled;
 }
 
+/**
+ * Context provider that persists sound and haptic preferences to AsyncStorage,
+ * and exposes `playHaptic` / `playSound` helpers that respect those preferences.
+ *
+ * @param props.children - Child components that will have access to the feedback context.
+ * @returns A provider component wrapping children with feedback controls.
+ */
 // ── Provider ─────────────────────────────────────────────────────
 export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const [soundEnabled, _setSoundEnabled] = useState(true);
@@ -197,6 +218,11 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * Hook to access feedback preferences and playback helpers.
+ *
+ * @returns The current {@link FeedbackContextValue}.
+ */
 export function useFeedback() {
   return useContext(FeedbackContext);
 }
