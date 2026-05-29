@@ -436,6 +436,7 @@ export async function adminGetUsers(filters?: {
       id: users.id,
       email: users.email,
       name: users.name,
+      avatarUrl: users.avatarUrl,
       role: users.role,
       password: sql<string>`'***'`.as("password"),
       phoneNumber: users.phoneNumber,

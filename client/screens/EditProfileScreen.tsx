@@ -41,19 +41,19 @@ export default function EditProfileScreen() {
   const { isOffline } = useNetwork();
 
   const [name, setName] = useState(user?.name || "");
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [photoUri, setPhotoUri] = useState<string | null>(user?.avatarUrl || null);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    if (name !== user?.name || photoUri) {
+    if (name !== user?.name || photoUri !== (user?.avatarUrl || null)) {
       setHasChanges(true);
     } else {
       setHasChanges(false);
     }
-  }, [name, photoUri, user?.name]);
+  }, [name, photoUri, user?.avatarUrl, user?.name]);
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: { name: string }) => {
+    mutationFn: async (data: { name: string; avatarUrl?: string | null }) => {
       const response = await apiRequest("PATCH", "/api/profile", data);
       return response.json();
     },
@@ -86,11 +86,18 @@ export default function EditProfileScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.8,
+      quality: 0.55,
+      base64: true,
     });
 
     if (!result.canceled && result.assets[0]) {
-      setPhotoUri(result.assets[0].uri);
+      const asset = result.assets[0];
+      if (asset.base64) {
+        const mimeType = asset.mimeType || "image/jpeg";
+        setPhotoUri(`data:${mimeType};base64,${asset.base64}`);
+      } else {
+        setPhotoUri(asset.uri);
+      }
     }
   };
 
@@ -112,7 +119,10 @@ export default function EditProfileScreen() {
       return;
     }
 
-    updateProfileMutation.mutate({ name: name.trim() });
+    updateProfileMutation.mutate({
+      name: name.trim(),
+      avatarUrl: photoUri,
+    });
   };
 
   const handleCancel = () => {

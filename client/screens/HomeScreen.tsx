@@ -21,7 +21,7 @@ import { BlurView } from "expo-blur";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/lib/auth";
-import { Spacing, BorderRadius, Typography } from "@/constants/theme";
+import { Spacing, BorderRadius, Typography, Shadows } from "@/constants/theme";
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
@@ -233,31 +233,87 @@ function RecommendedCard({
 
   return (
     <AnimatedListItem index={index} delay={80}>
-      <GlassCard onPress={onPress} style={styles.recommendedCard}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.recommendedCard,
+          pressed && styles.recommendedCardPressed,
+          {
+            borderColor: theme.glassBorderLight,
+            backgroundColor: theme.backgroundSecondary,
+          },
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={`${topic.title}, ${topic.chapterTitle}`}
+      >
+        <LinearGradient
+          colors={[
+            `${theme.primary}24`,
+            "rgba(255,255,255,0.045)",
+            "rgba(255,255,255,0.015)",
+          ]}
+          locations={[0, 0.46, 1]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
         <View
           style={[
-            styles.recommendedIcon,
-            { backgroundColor: `${theme.primary}15` },
+            styles.recommendedAccentLine,
+            { backgroundColor: theme.primary },
           ]}
-        >
-          <Feather name="book-open" size={16} color={theme.primary} />
-        </View>
-        <View style={styles.recommendedContent}>
-          <Text
-            style={[styles.recommendedTitle, { color: theme.text }]}
-            numberOfLines={2}
+        />
+        <View style={styles.recommendedBody}>
+          <View
+            style={[
+              styles.recommendedIcon,
+              {
+                backgroundColor: `${theme.primary}1F`,
+                borderColor: `${theme.primary}38`,
+              },
+            ]}
           >
-            {topic.title}
-          </Text>
-          <Text
-            style={[styles.recommendedSubtitle, { color: theme.textMuted }]}
-            numberOfLines={1}
+            <Feather name="book-open" size={17} color={theme.primaryLight} />
+          </View>
+          <View style={styles.recommendedContent}>
+            <Text
+              style={[styles.recommendedEyebrow, { color: theme.primaryLight }]}
+              numberOfLines={1}
+            >
+              RECOMMENDED TOPIC
+            </Text>
+            <Text
+              style={[styles.recommendedTitle, { color: theme.text }]}
+              numberOfLines={2}
+            >
+              {topic.title}
+            </Text>
+            <View style={styles.recommendedMetaRow}>
+              <Feather name="layers" size={12} color={theme.textMuted} />
+              <Text
+                style={[
+                  styles.recommendedSubtitle,
+                  { color: theme.textSecondary },
+                ]}
+                numberOfLines={1}
+              >
+                {topic.chapterTitle}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={[
+              styles.recommendedAction,
+              {
+                backgroundColor: `${theme.primary}18`,
+                borderColor: `${theme.primary}30`,
+              },
+            ]}
           >
-            {topic.chapterTitle}
-          </Text>
+            <Feather name="arrow-right" size={16} color={theme.primaryLight} />
+          </View>
         </View>
-        <Feather name="chevron-right" size={18} color={theme.textMuted} />
-      </GlassCard>
+      </Pressable>
     </AnimatedListItem>
   );
 }
@@ -315,7 +371,9 @@ export default function HomeScreen() {
     refetch: refetchRecommended,
   } = useQuery<RecommendedTopic[]>({
     queryKey: ["/api/recommended-topics"],
-    staleTime: 10 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
 
   const { data: dueReviewData } = useQuery<{ count: number }>({
@@ -571,7 +629,11 @@ export default function HomeScreen() {
           <View style={styles.recommendedSection}>
             <AnimatedListItem index={8} delay={60}>
               <Text
-                style={[styles.sectionTitle, { color: theme.text }]}
+                style={[
+                  styles.sectionTitle,
+                  styles.recommendedSectionTitle,
+                  { color: theme.text },
+                ]}
                 accessibilityRole="header"
               >
                 {t("Recommended Topics")}
@@ -847,36 +909,81 @@ const styles = StyleSheet.create({
   recommendedSection: {
     marginBottom: Spacing.xl,
   },
+  recommendedSectionTitle: {
+    marginBottom: Spacing.md,
+  },
   recommendedCard: {
     width: "100%",
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    overflow: "hidden",
+    marginBottom: Spacing.sm,
+    minHeight: 104,
+    ...Shadows.cardSubtle,
+  },
+  recommendedCardPressed: {
+    transform: [{ scale: 0.985 }],
+  },
+  recommendedAccentLine: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    opacity: 0.9,
+  },
+  recommendedBody: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.xs,
+    paddingVertical: Spacing.md,
+    paddingLeft: Spacing.lg,
+    paddingRight: Spacing.md,
   },
   recommendedIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: BorderRadius.sm,
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: Spacing.sm,
+    marginRight: Spacing.md,
   },
   recommendedContent: {
     flex: 1,
     minWidth: 0,
   },
+  recommendedEyebrow: {
+    ...Typography.caption,
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+    marginBottom: 3,
+  },
   recommendedTitle: {
-    ...Typography.small,
+    ...Typography.bodyMedium,
     fontSize: 15,
     lineHeight: 20,
-    fontWeight: "600",
-    marginBottom: 1,
+    marginBottom: 5,
+  },
+  recommendedMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
   },
   recommendedSubtitle: {
     ...Typography.caption,
     lineHeight: 16,
+    flex: 1,
+  },
+  recommendedAction: {
+    width: 34,
+    height: 34,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: Spacing.md,
   },
   reviewBanner: {
     flexDirection: "row",

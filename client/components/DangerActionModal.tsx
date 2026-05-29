@@ -1,10 +1,9 @@
 import React from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
-import { BlurView } from "expo-blur";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { GlassCard } from "@/components/GlassCard";
+import { AppModalSurface } from "@/components/AppModalSurface";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { BorderRadius, Spacing } from "@/constants/theme";
@@ -60,7 +59,7 @@ export function DangerActionModal({
   errorMessage,
   dismissible = true,
 }: DangerActionModalProps) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const isSuccess = mode === "success";
   const accentColor = isSuccess
     ? theme.success
@@ -80,220 +79,153 @@ export function DangerActionModal({
     }
   };
 
+  const footer = (
+    <View style={styles.buttonGroup}>
+      {!isSuccess ? (
+        <PrimaryButton
+          title={cancelLabel}
+          onPress={onClose}
+          variant="ghost"
+          disabled={loading}
+          style={styles.secondaryButton}
+        />
+      ) : null}
+      <PrimaryButton
+        title={confirmLabel}
+        onPress={onConfirm}
+        variant={actionVariant}
+        icon={confirmIcon}
+        loading={loading}
+        disabled={confirmDisabled}
+        style={styles.primaryButton}
+      />
+    </View>
+  );
+
   return (
-    <Modal
+    <AppModalSurface
       visible={visible}
-      transparent
-      animationType="fade"
-      statusBarTranslucent
-      onRequestClose={handleBackdropPress}
+      variant="center"
+      onClose={handleBackdropPress}
+      dismissible={dismissible && !loading}
+      scrollable
+      showCloseButton={dismissible}
+      accessibilityLabel={title}
+      footer={footer}
     >
-      <BlurView
-        intensity={24}
-        tint={isDark ? "dark" : "light"}
-        style={styles.overlay}
-      >
-        <Pressable style={styles.backdrop} onPress={handleBackdropPress}>
-          <View style={styles.centeredView}>
-            <Pressable onPress={(event) => event.stopPropagation()}>
-              <GlassCard style={styles.modalCard}>
-                <View style={styles.headerRow}>
-                  <View
-                    style={[
-                      styles.eyebrow,
-                      { backgroundColor: `${accentColor}1F` },
-                    ]}
-                  >
-                    <ThemedText
-                      style={[styles.eyebrowText, { color: accentColor }]}
-                    >
-                      {eyebrowLabel ??
-                        (isSuccess ? "Completed" : "Danger Zone")}
-                    </ThemedText>
-                  </View>
-                  {dismissible ? (
-                    <Pressable
-                      onPress={handleBackdropPress}
-                      hitSlop={10}
-                      style={styles.closeButton}
-                    >
-                      <Feather name="x" size={20} color={theme.textSecondary} />
-                    </Pressable>
-                  ) : null}
-                </View>
+      <View style={styles.headerRow}>
+        <View
+          style={[styles.eyebrow, { backgroundColor: `${accentColor}24` }]}
+        >
+          <ThemedText style={[styles.eyebrowText, { color: accentColor }]}>
+            {eyebrowLabel ?? (isSuccess ? "Completed" : "Danger Zone")}
+          </ThemedText>
+        </View>
+      </View>
 
-                <View style={styles.iconWrap}>
-                  <LinearGradient
-                    colors={[accentColor, `${accentColor}CC`]}
-                    style={styles.iconGradient}
-                  >
-                    <Feather name={icon} size={28} color="#fff" />
-                  </LinearGradient>
-                </View>
+      <View style={styles.iconWrap}>
+        <LinearGradient
+          colors={[accentColor, `${accentColor}CC`]}
+          style={styles.iconGradient}
+        >
+          <Feather name={icon} size={28} color="#fff" />
+        </LinearGradient>
+      </View>
 
-                <ThemedText type="h3" style={styles.title}>
-                  {title}
-                </ThemedText>
+      <ThemedText type="h3" style={styles.title}>
+        {title}
+      </ThemedText>
+      <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
+        {description}
+      </ThemedText>
+
+      {!isSuccess && consequences.length > 0 ? (
+        <>
+          <View
+            style={[
+              styles.infoPanel,
+              {
+                backgroundColor: theme.backgroundSecondary,
+                borderColor: theme.glassBorder,
+              },
+            ]}
+          >
+            <ThemedText type="small" style={styles.panelTitle}>
+              {consequenceTitle}
+            </ThemedText>
+            {consequences.map((item) => (
+              <View key={item} style={styles.bulletRow}>
+                <Feather name="arrow-right" size={14} color={accentColor} />
                 <ThemedText
-                  style={[styles.description, { color: theme.textSecondary }]}
+                  style={[styles.bulletText, { color: theme.textSecondary }]}
                 >
-                  {description}
+                  {item}
                 </ThemedText>
+              </View>
+            ))}
+          </View>
 
-                {!isSuccess && consequences.length > 0 ? (
-                  <>
-                    <View
-                      style={[
-                        styles.infoPanel,
-                        { backgroundColor: theme.glassMedium },
-                      ]}
-                    >
-                      <ThemedText type="small" style={styles.panelTitle}>
-                        {consequenceTitle}
-                      </ThemedText>
-                      {consequences.map((item) => (
-                        <View key={item} style={styles.bulletRow}>
-                          <Feather
-                            name="arrow-right"
-                            size={14}
-                            color={accentColor}
-                          />
-                          <ThemedText
-                            style={[
-                              styles.bulletText,
-                              { color: theme.textSecondary },
-                            ]}
-                          >
-                            {item}
-                          </ThemedText>
-                        </View>
-                      ))}
-                    </View>
+          <View style={styles.acknowledgementSection}>
+            {acknowledgements.map((item) => {
+              const checked = checkedAcknowledgements.includes(item.id);
 
-                    <View style={styles.acknowledgementSection}>
-                      {acknowledgements.map((item) => {
-                        const checked = checkedAcknowledgements.includes(
-                          item.id,
-                        );
-
-                        return (
-                          <Pressable
-                            key={item.id}
-                            style={[
-                              styles.acknowledgementRow,
-                              {
-                                backgroundColor: theme.glass,
-                                borderColor: checked
-                                  ? accentColor
-                                  : theme.glassBorder,
-                              },
-                            ]}
-                            onPress={() => onToggleAcknowledgement(item.id)}
-                          >
-                            <View
-                              style={[
-                                styles.checkbox,
-                                {
-                                  borderColor: checked
-                                    ? accentColor
-                                    : theme.glassBorderLight,
-                                  backgroundColor: checked
-                                    ? accentColor
-                                    : "transparent",
-                                },
-                              ]}
-                            >
-                              {checked ? (
-                                <Feather name="check" size={14} color="#fff" />
-                              ) : null}
-                            </View>
-                            <ThemedText
-                              style={[
-                                styles.acknowledgementText,
-                                { color: theme.textSecondary },
-                              ]}
-                            >
-                              {item.label}
-                            </ThemedText>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                  </>
-                ) : null}
-
-                {errorMessage ? (
+              return (
+                <Pressable
+                  key={item.id}
+                  style={[
+                    styles.acknowledgementRow,
+                    {
+                      backgroundColor: theme.backgroundSecondary,
+                      borderColor: checked ? accentColor : theme.glassBorder,
+                    },
+                  ]}
+                  onPress={() => onToggleAcknowledgement(item.id)}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked }}
+                >
                   <View
                     style={[
-                      styles.errorBanner,
-                      { backgroundColor: `${theme.error}1A` },
+                      styles.checkbox,
+                      {
+                        borderColor: checked ? accentColor : theme.glassBorderLight,
+                        backgroundColor: checked ? accentColor : "transparent",
+                      },
                     ]}
                   >
-                    <Feather
-                      name="alert-circle"
-                      size={16}
-                      color={theme.error}
-                    />
-                    <ThemedText
-                      style={[styles.errorText, { color: theme.error }]}
-                    >
-                      {errorMessage}
-                    </ThemedText>
+                    {checked ? <Feather name="check" size={14} color="#fff" /> : null}
                   </View>
-                ) : null}
-
-                <View style={styles.buttonGroup}>
-                  {!isSuccess ? (
-                    <PrimaryButton
-                      title={cancelLabel}
-                      onPress={onClose}
-                      variant="ghost"
-                      disabled={loading}
-                      style={styles.secondaryButton}
-                    />
-                  ) : null}
-                  <PrimaryButton
-                    title={confirmLabel}
-                    onPress={onConfirm}
-                    variant={actionVariant}
-                    icon={confirmIcon}
-                    loading={loading}
-                    disabled={confirmDisabled}
-                    style={styles.primaryButton}
-                  />
-                </View>
-              </GlassCard>
-            </Pressable>
+                  <ThemedText
+                    style={[
+                      styles.acknowledgementText,
+                      { color: theme.text },
+                    ]}
+                  >
+                    {item.label}
+                  </ThemedText>
+                </Pressable>
+              );
+            })}
           </View>
-        </Pressable>
-      </BlurView>
-    </Modal>
+        </>
+      ) : null}
+
+      {errorMessage ? (
+        <View style={[styles.errorBanner, { backgroundColor: `${theme.error}1A` }]}>
+          <Feather name="alert-circle" size={16} color={theme.error} />
+          <ThemedText style={[styles.errorText, { color: theme.error }]}>
+            {errorMessage}
+          </ThemedText>
+        </View>
+      ) : null}
+    </AppModalSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.56)",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: Spacing.xl,
-  },
-  modalCard: {
-    width: "100%",
-    maxWidth: 380,
-    alignSelf: "center",
-    padding: Spacing.xl,
-  },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
     marginBottom: Spacing.lg,
   },
   eyebrow: {
@@ -306,9 +238,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1.4,
     textTransform: "uppercase",
-  },
-  closeButton: {
-    padding: Spacing.xs,
   },
   iconWrap: {
     alignItems: "center",
@@ -332,6 +261,7 @@ const styles = StyleSheet.create({
   },
   infoPanel: {
     borderRadius: BorderRadius.lg,
+    borderWidth: 1,
     padding: Spacing.lg,
     marginBottom: Spacing.lg,
   },
@@ -352,7 +282,6 @@ const styles = StyleSheet.create({
   },
   acknowledgementSection: {
     gap: Spacing.sm,
-    marginBottom: Spacing.lg,
   },
   acknowledgementRow: {
     flexDirection: "row",

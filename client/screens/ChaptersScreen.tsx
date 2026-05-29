@@ -44,6 +44,9 @@ export default function ChaptersScreen() {
     refetch,
   } = useQuery<Chapter[]>({
     queryKey: ["/api/books", bookId, "chapters"],
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
 
   const onRefresh = useCallback(async () => {

@@ -1,11 +1,10 @@
 import React from "react";
-import { StyleSheet, View, Modal, Pressable } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 import * as Haptics from "@/lib/haptics-wrapper";
 
-import { GlassCard } from "@/components/GlassCard";
+import { AppModalSurface } from "@/components/AppModalSurface";
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { Spacing, BorderRadius } from "@/constants/theme";
@@ -22,7 +21,7 @@ export function SessionExpiredModal({
   onLogin,
   onDismiss,
 }: SessionExpiredModalProps) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
 
   const handleLogin = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -34,110 +33,84 @@ export function SessionExpiredModal({
     onDismiss?.();
   };
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      statusBarTranslucent
-      onRequestClose={onDismiss}
-      accessibilityLabel="Session expired"
-    >
-      <BlurView
-        intensity={20}
-        tint={isDark ? "dark" : "light"}
-        style={styles.overlay}
-      >
-        <Pressable style={styles.backdrop} onPress={handleDismiss}>
-          <View style={styles.centeredView}>
-            <Pressable onPress={(e) => e.stopPropagation()}>
-              <GlassCard style={styles.modalContent}>
-                <View style={styles.iconContainer}>
-                  <LinearGradient
-                    colors={[theme.warning, "#f59e0b"]}
-                    style={styles.iconGradient}
-                  >
-                    <Feather name="clock" size={32} color="#fff" />
-                  </LinearGradient>
-                </View>
-
-                <ThemedText type="h3" style={styles.title}>
-                  Session Expired
-                </ThemedText>
-
-                <ThemedText
-                  style={[styles.description, { color: theme.textSecondary }]}
-                  accessibilityLiveRegion="polite"
-                >
-                  Your session has expired for security reasons. Please log in
-                  again to continue using Maternal Mind.
-                </ThemedText>
-
-                <View
-                  style={[styles.infoBox, { backgroundColor: theme.glass }]}
-                >
-                  <Feather name="shield" size={18} color={theme.info} />
-                  <ThemedText
-                    style={[styles.infoText, { color: theme.textSecondary }]}
-                  >
-                    Your progress and data are safely saved.
-                  </ThemedText>
-                </View>
-
-                <View style={styles.buttonContainer}>
-                  <PrimaryButton
-                    title="Log In Again"
-                    onPress={handleLogin}
-                    icon="log-in"
-                    style={styles.loginButton}
-                    testID="button-session-login"
-                  />
-                  {onDismiss ? (
-                    <Pressable
-                      style={styles.dismissButton}
-                      onPress={handleDismiss}
-                      accessibilityRole="button"
-                      accessibilityLabel="Dismiss session expired dialog"
-                    >
-                      <ThemedText
-                        style={[styles.dismissText, { color: theme.textMuted }]}
-                      >
-                        Dismiss
-                      </ThemedText>
-                    </Pressable>
-                  ) : null}
-                </View>
-              </GlassCard>
-            </Pressable>
-          </View>
+  const footer = (
+    <View style={styles.buttonContainer}>
+      <PrimaryButton
+        title="Log In Again"
+        onPress={handleLogin}
+        icon="log-in"
+        style={styles.loginButton}
+        testID="button-session-login"
+      />
+      {onDismiss ? (
+        <Pressable
+          style={styles.dismissButton}
+          onPress={handleDismiss}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss session expired dialog"
+        >
+          <ThemedText style={[styles.dismissText, { color: theme.textMuted }]}>
+            Dismiss
+          </ThemedText>
         </Pressable>
-      </BlurView>
-    </Modal>
+      ) : null}
+    </View>
+  );
+
+  return (
+    <AppModalSurface
+      visible={visible}
+      variant="center"
+      onClose={onDismiss}
+      dismissible={Boolean(onDismiss)}
+      scrollable
+      showCloseButton={Boolean(onDismiss)}
+      accessibilityLabel="Session expired"
+      footer={footer}
+    >
+      <View style={styles.iconContainer}>
+        <LinearGradient
+          colors={[theme.warning, "#f59e0b"]}
+          style={styles.iconGradient}
+        >
+          <Feather name="clock" size={32} color="#fff" />
+        </LinearGradient>
+      </View>
+
+      <ThemedText type="h3" style={styles.title}>
+        Session Expired
+      </ThemedText>
+
+      <ThemedText
+        style={[styles.description, { color: theme.textSecondary }]}
+        accessibilityLiveRegion="polite"
+      >
+        Your session has expired for security reasons. Please log in again to
+        continue using Maternal Mind.
+      </ThemedText>
+
+      <View
+        style={[
+          styles.infoBox,
+          {
+            backgroundColor: theme.backgroundSecondary,
+            borderColor: theme.glassBorder,
+          },
+        ]}
+      >
+        <Feather name="shield" size={18} color={theme.info} />
+        <ThemedText style={[styles.infoText, { color: theme.textSecondary }]}>
+          Your progress and data are safely saved.
+        </ThemedText>
+      </View>
+    </AppModalSurface>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: Spacing.xl,
-  },
-  modalContent: {
-    width: "100%",
-    maxWidth: 340,
-    padding: Spacing.xl,
-    alignItems: "center",
-  },
   iconContainer: {
     marginBottom: Spacing.lg,
+    alignItems: "center",
   },
   iconGradient: {
     width: 72,
@@ -162,7 +135,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.md,
-    marginBottom: Spacing.xl,
+    borderWidth: 1,
     width: "100%",
   },
   infoText: {

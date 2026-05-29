@@ -46,6 +46,9 @@ export default function LearnScreen() {
     refetch,
   } = useQuery<Book[]>({
     queryKey: ["/api/books"],
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
 
   const onRefresh = useCallback(async () => {

@@ -159,6 +159,9 @@ export default function SearchScreen() {
       return res.json();
     },
     enabled: debouncedQuery.length >= 2,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
 
   const filteredResults = useMemo(() => {

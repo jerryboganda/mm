@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Pressable,
@@ -13,6 +13,8 @@ import Animated, {
   withSpring,
   WithSpringConfig,
   interpolateColor,
+  withTiming,
+  useReducedMotion,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -74,11 +76,27 @@ export function GlassCard({
   subtitleNumberOfLines,
 }: GlassCardProps) {
   const { theme, isDark } = useTheme();
+  const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
   const pressed = useSharedValue(0);
+  const hover = useSharedValue(0);
+  const entrance = useSharedValue(reduceMotion ? 1 : 0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    entrance.value = withTiming(1, { duration: 360 });
+  }, [entrance, reduceMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    opacity: entrance.value,
+    transform: [
+      { translateY: (1 - entrance.value) * 10 - hover.value * 2 },
+      { scale: scale.value * (0.985 + entrance.value * 0.015) },
+    ],
+  }));
+
+  const hoverOverlayStyle = useAnimatedStyle(() => ({
+    opacity: hover.value,
   }));
 
   const activeBorderColor = active ? theme.primary : theme.glassBorder;
@@ -109,6 +127,18 @@ export function GlassCard({
     }
   };
 
+  const handleHoverIn = () => {
+    if (!disabled && onPress && Platform.OS === "web") {
+      hover.value = withTiming(1, { duration: 180 });
+    }
+  };
+
+  const handleHoverOut = () => {
+    if (Platform.OS === "web") {
+      hover.value = withTiming(0, { duration: 180 });
+    }
+  };
+
   const handlePress = () => {
     if (!disabled && onPress) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -128,7 +158,7 @@ export function GlassCard({
     animatedStyle,
     borderStyle,
     disabled && styles.cardDisabled,
-    isElevated && Shadows.cardSubtle,
+    (isElevated || onPress) && Shadows.cardSubtle,
     isGlow && active && Shadows.glowSmall,
     style,
   ];
@@ -140,12 +170,14 @@ export function GlassCard({
           <LinearGradient
             colors={[
               active
-                ? "rgba(17,164,212,0.10)"
+                ? "rgba(17,164,212,0.16)"
                 : isSubtle
                   ? "rgba(255,255,255,0.02)"
-                  : "rgba(255,255,255,0.03)",
-              active ? "rgba(17,164,212,0.03)" : "rgba(255,255,255,0.01)",
+                  : "rgba(17,164,212,0.07)",
+              active ? "rgba(17,164,212,0.05)" : "rgba(255,255,255,0.025)",
+              isDark ? "rgba(255,255,255,0.015)" : "rgba(255,255,255,0.45)",
             ]}
+            locations={[0, 0.58, 1]}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -162,9 +194,11 @@ export function GlassCard({
       >
         <LinearGradient
           colors={[
-            active ? "rgba(17,164,212,0.20)" : "rgba(255,255,255,0.08)",
-            active ? "rgba(17,164,212,0.08)" : "rgba(255,255,255,0.03)",
+            active ? "rgba(17,164,212,0.24)" : "rgba(17,164,212,0.11)",
+            active ? "rgba(17,164,212,0.08)" : "rgba(255,255,255,0.04)",
+            "rgba(255,255,255,0.02)",
           ]}
+          locations={[0, 0.62, 1]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -178,6 +212,8 @@ export function GlassCard({
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      onHoverIn={handleHoverIn}
+      onHoverOut={handleHoverOut}
       disabled={disabled || !onPress}
       testID={testID}
       style={cardStyles}
@@ -188,6 +224,17 @@ export function GlassCard({
       accessibilityState={{ disabled, selected: active }}
     >
       {renderBackground()}
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.hoverOverlay, hoverOverlayStyle]}
+      >
+        <LinearGradient
+          colors={["rgba(255,255,255,0.08)", "rgba(17,164,212,0.06)"]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+      </Animated.View>
       <View style={[styles.content, isCompact && styles.contentCompact]}>
         {icon ? (
           <View
@@ -251,6 +298,9 @@ const styles = StyleSheet.create({
   },
   cardDisabled: {
     opacity: 0.45,
+  },
+  hoverOverlay: {
+    ...StyleSheet.absoluteFillObject,
   },
   content: {
     flexDirection: "row",

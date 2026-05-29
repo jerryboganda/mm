@@ -4,7 +4,6 @@ import {
   View,
   ScrollView,
   Pressable,
-  Modal,
   TextInput,
   Alert,
   Platform,
@@ -23,6 +22,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
+import { AppModalSurface } from "@/components/AppModalSurface";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
@@ -853,120 +853,98 @@ export default function TopicReaderScreen() {
       />
 
       {/* Report Error Modal */}
-      <Modal
+      <AppModalSurface
         visible={reportVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setReportVisible(false)}
+        variant="sheet"
+        onClose={() => setReportVisible(false)}
+        dismissible={!reportMutation.isPending}
+        scrollable
+        accessibilityLabel="Report an error"
+        footer={
+          <PrimaryButton
+            title="Submit Report"
+            onPress={() => reportMutation.mutate()}
+            loading={reportMutation.isPending}
+            icon="send"
+            disabled={
+              !reportDescription.trim() || reportDescription.trim().length < 3
+            }
+          />
+        }
       >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setReportVisible(false)}
-        >
-          <Pressable
-            style={[
-              styles.modalContent,
-              { backgroundColor: theme.backgroundElevated },
-            ]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.modalHeader}>
-              <ThemedText type="h3" accessibilityRole="header">
-                Report an Error
-              </ThemedText>
-              <Pressable
-                onPress={() => setReportVisible(false)}
-                accessibilityRole="button"
-                accessibilityLabel="Close report dialog"
-              >
-                <Feather name="x" size={24} color={theme.text} />
-              </Pressable>
-            </View>
+        <View style={styles.modalHeader}>
+          <ThemedText type="h3" accessibilityRole="header">
+            Report an Error
+          </ThemedText>
+        </View>
 
-            <ThemedText
-              style={[styles.modalLabel, { color: theme.textSecondary }]}
-            >
-              Error Type
-            </ThemedText>
-            <View style={styles.reportTypeRow}>
-              {[
-                { value: "factual_error", label: "Factual" },
-                { value: "typo", label: "Typo" },
-                { value: "outdated", label: "Outdated" },
-                { value: "other", label: "Other" },
-              ].map((opt) => (
-                <Pressable
-                  key={opt.value}
-                  style={[
-                    styles.reportTypeChip,
-                    {
-                      borderColor: theme.glassBorder,
-                      backgroundColor: theme.glass,
-                    },
-                    reportType === opt.value && {
-                      borderColor: theme.primary,
-                      backgroundColor: `${theme.primary}26`,
-                    },
-                  ]}
-                  onPress={() => setReportType(opt.value)}
-                  accessibilityRole="radio"
-                  accessibilityLabel={`Error type: ${opt.label}`}
-                  accessibilityState={{ selected: reportType === opt.value }}
-                >
-                  <ThemedText
-                    style={[
-                      styles.reportTypeChipText,
-                      { color: theme.textSecondary },
-                      reportType === opt.value && {
-                        color: theme.primary,
-                        fontWeight: "600",
-                      },
-                    ]}
-                  >
-                    {opt.label}
-                  </ThemedText>
-                </Pressable>
-              ))}
-            </View>
-
-            <ThemedText
-              style={[styles.modalLabel, { color: theme.textSecondary }]}
-            >
-              Description
-            </ThemedText>
-            <TextInput
+        <ThemedText style={[styles.modalLabel, { color: theme.textSecondary }]}>
+          Error Type
+        </ThemedText>
+        <View style={styles.reportTypeRow}>
+          {[
+            { value: "factual_error", label: "Factual" },
+            { value: "typo", label: "Typo" },
+            { value: "outdated", label: "Outdated" },
+            { value: "other", label: "Other" },
+          ].map((opt) => (
+            <Pressable
+              key={opt.value}
               style={[
-                styles.reportInput,
+                styles.reportTypeChip,
                 {
-                  backgroundColor: theme.glass,
                   borderColor: theme.glassBorder,
-                  color: theme.text,
+                  backgroundColor: theme.backgroundSecondary,
+                },
+                reportType === opt.value && {
+                  borderColor: theme.primary,
+                  backgroundColor: `${theme.primary}26`,
                 },
               ]}
-              placeholder={t("Describe the error...")}
-              placeholderTextColor={theme.textSecondary}
-              multiline
-              numberOfLines={4}
-              value={reportDescription}
-              onChangeText={setReportDescription}
-              textAlignVertical="top"
-              accessibilityLabel="Error description"
-              accessibilityHint="Describe the error you found in this topic"
-            />
+              onPress={() => setReportType(opt.value)}
+              accessibilityRole="radio"
+              accessibilityLabel={`Error type: ${opt.label}`}
+              accessibilityState={{ selected: reportType === opt.value }}
+            >
+              <ThemedText
+                style={[
+                  styles.reportTypeChipText,
+                  { color: theme.textSecondary },
+                  reportType === opt.value && {
+                    color: theme.primary,
+                    fontWeight: "600",
+                  },
+                ]}
+              >
+                {opt.label}
+              </ThemedText>
+            </Pressable>
+          ))}
+        </View>
 
-            <PrimaryButton
-              title="Submit Report"
-              onPress={() => reportMutation.mutate()}
-              loading={reportMutation.isPending}
-              icon="send"
-              disabled={
-                !reportDescription.trim() || reportDescription.trim().length < 3
-              }
-              style={{ marginTop: Spacing.lg }}
-            />
-          </Pressable>
-        </Pressable>
-      </Modal>
+        <ThemedText style={[styles.modalLabel, { color: theme.textSecondary }]}>
+          Description
+        </ThemedText>
+        <TextInput
+          style={[
+            styles.reportInput,
+            {
+              backgroundColor: theme.backgroundSecondary,
+              borderColor: theme.glassBorder,
+              color: theme.text,
+            },
+          ]}
+          placeholder={t("Describe the error...")}
+          placeholderTextColor={theme.textSecondary}
+          multiline
+          numberOfLines={4}
+          value={reportDescription}
+          onChangeText={setReportDescription}
+          textAlignVertical="top"
+          accessibilityLabel="Error description"
+          accessibilityHint="Describe the error you found in this topic"
+        />
+      </AppModalSurface>
     </BackgroundGradient>
   );
 }

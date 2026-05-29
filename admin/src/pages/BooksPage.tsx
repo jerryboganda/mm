@@ -163,7 +163,7 @@ export default function BooksPage() {
                     <ChevronRight className="w-5 h-5" />
                   </Link>
                   <button onClick={() => togglePublish(book)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title={book.isPublished ? 'Unpublish' : 'Publish'}>
-                    {book.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {book.isPublished ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
                   <button onClick={() => openEdit(book)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
                     <Pencil className="w-4 h-4" />

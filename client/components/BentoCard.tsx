@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Pressable, ViewStyle, View, Platform } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
   WithSpringConfig,
+  useReducedMotion,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
@@ -50,10 +52,21 @@ export function BentoCard({
   testID,
 }: BentoCardProps) {
   const { theme, isDark } = useTheme();
+  const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
+  const entrance = useSharedValue(reduceMotion ? 1 : 0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    entrance.value = withTiming(1, { duration: 360 });
+  }, [entrance, reduceMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    opacity: entrance.value,
+    transform: [
+      { translateY: (1 - entrance.value) * 10 },
+      { scale: scale.value * (0.985 + entrance.value * 0.015) },
+    ],
   }));
 
   const handlePressIn = () => {
@@ -117,7 +130,8 @@ export function BentoCard({
       return (
         <View style={styles.background}>
           <LinearGradient
-            colors={[glowColor, "rgba(255,255,255,0.02)"]}
+            colors={[glowColor, "rgba(17,164,212,0.035)", "rgba(255,255,255,0.02)"]}
+            locations={[0, 0.55, 1]}
             style={StyleSheet.absoluteFill}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -130,6 +144,7 @@ export function BentoCard({
       <BlurView intensity={18} tint={isDark ? "dark" : "light"} style={styles.background}>
         <LinearGradient
           colors={[glowColor, "rgba(255,255,255,0.03)"]}
+          locations={[0, 1]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}

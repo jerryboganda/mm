@@ -20,6 +20,13 @@ interface Chapter {
   id: string;
   title: string;
   bookId: string;
+  isPublished: boolean;
+}
+
+interface Book {
+  id: string;
+  title: string;
+  isPublished: boolean;
 }
 
 export default function TopicsPage() {
@@ -29,7 +36,8 @@ export default function TopicsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editTopic, setEditTopic] = useState<Topic | null>(null);
-  const [form, setForm] = useState({ title: '', description: '', author: '' });
+  const [parentBook, setParentBook] = useState<Book | null>(null);
+  const [form, setForm] = useState({ title: '', description: '', author: '', isPublished: true });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -40,11 +48,11 @@ export default function TopicsPage() {
       // Try to get chapter info
       try {
         // We'll get all books and find the chapter
-        const books = await api.get<any[]>('/admin/content/books');
+        const books = await api.get<Book[]>('/admin/content/books');
         for (const book of books) {
           const chs = await api.get<Chapter[]>(`/admin/content/books/${book.id}/chapters`);
           const ch = chs.find((c: any) => c.id === chapterId);
-          if (ch) { setChapter({ ...ch, bookId: book.id }); break; }
+          if (ch) { setChapter({ ...ch, bookId: book.id }); setParentBook(book); break; }
         }
       } catch {}
     } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -52,8 +60,8 @@ export default function TopicsPage() {
 
   useEffect(() => { load(); }, [chapterId]);
 
-  const openCreate = () => { setEditTopic(null); setForm({ title: '', description: '', author: '' }); setShowForm(true); setError(''); };
-  const openEdit = (t: Topic) => { setEditTopic(t); setForm({ title: t.title, description: t.description || '', author: t.author || '' }); setShowForm(true); setError(''); };
+  const openCreate = () => { setEditTopic(null); setForm({ title: '', description: '', author: '', isPublished: true }); setShowForm(true); setError(''); };
+  const openEdit = (t: Topic) => { setEditTopic(t); setForm({ title: t.title, description: t.description || '', author: t.author || '', isPublished: t.isPublished }); setShowForm(true); setError(''); };
 
   const handleSave = async () => {
     if (!form.title.trim()) { setError('Title is required'); return; }
@@ -114,6 +122,29 @@ export default function TopicsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
                 <input value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none" />
               </div>
+              <label className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.isPublished}
+                  onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <span>
+                  <span className="block text-sm font-semibold text-gray-900">Published in app</span>
+                  <span className="block text-xs text-gray-500 mt-0.5">
+                    Published topics appear in the mobile app when their parent book and chapter are also published.
+                  </span>
+                </span>
+              </label>
+              {form.isPublished && (!chapter?.isPublished || !parentBook?.isPublished) && (
+                <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>
+                    This topic is published, but it will stay hidden in the app until the parent
+                    {!parentBook?.isPublished && !chapter?.isPublished ? ' book and chapter are' : !parentBook?.isPublished ? ' book is' : ' chapter is'} published.
+                  </span>
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-3 mt-6">
               <button onClick={() => setShowForm(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">Cancel</button>
@@ -150,8 +181,8 @@ export default function TopicsPage() {
                   <Link to={`/topics/${t.id}/edit`} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Edit content">
                     <Edit3 className="w-4 h-4" />
                   </Link>
-                  <button onClick={() => togglePublish(t)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                    {t.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <button onClick={() => togglePublish(t)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title={t.isPublished ? 'Unpublish topic' : 'Publish topic'}>
+                    {t.isPublished ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
                   <button onClick={() => openEdit(t)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                     <Pencil className="w-4 h-4" />

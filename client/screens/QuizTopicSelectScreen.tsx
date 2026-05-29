@@ -40,6 +40,9 @@ export default function QuizTopicSelectScreen() {
 
   const { data: topics, isLoading } = useQuery<QuizTopic[]>({
     queryKey: ["/api/quiz/topics"],
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
 
   const handleStartQuiz = () => {

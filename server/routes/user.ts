@@ -14,18 +14,42 @@ const ACCOUNT_DEACTIVATED_MESSAGE =
 const ACCOUNT_DELETION_PENDING_MESSAGE =
   "Your account deletion request is in progress. Please contact support if you need help.";
 
-router.patch("/profile", authMiddleware, async (req: AuthRequest, res) => {
+router.patch(["/", "/profile"], authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { name } = req.body;
+    const { name, avatarUrl } = req.body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return res.status(400).json({ message: "Name is required" });
     }
 
     const sanitizedName = sanitizeString(name);
+    let sanitizedAvatarUrl: string | null | undefined;
+
+    if (avatarUrl !== undefined) {
+      if (avatarUrl !== null && typeof avatarUrl !== "string") {
+        return res.status(400).json({ message: "Invalid profile photo" });
+      }
+
+      if (typeof avatarUrl === "string") {
+        const trimmedAvatarUrl = avatarUrl.trim();
+        const isDataImage = /^data:image\/(png|jpe?g|webp);base64,/i.test(
+          trimmedAvatarUrl,
+        );
+        if (!isDataImage || trimmedAvatarUrl.length > 1_500_000) {
+          return res.status(400).json({
+            message:
+              "Profile photo must be a PNG, JPG, or WebP image under 1.5 MB.",
+          });
+        }
+        sanitizedAvatarUrl = trimmedAvatarUrl;
+      } else {
+        sanitizedAvatarUrl = null;
+      }
+    }
 
     const updatedUser = await storage.updateUserProfile(req.userId!, {
       name: sanitizedName,
+      avatarUrl: sanitizedAvatarUrl,
     });
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -35,6 +59,7 @@ router.patch("/profile", authMiddleware, async (req: AuthRequest, res) => {
       id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name,
+      avatarUrl: updatedUser.avatarUrl,
       role: updatedUser.role,
       subscriptionStatus: updatedUser.subscriptionStatus,
       subscriptionPlan: updatedUser.subscriptionPlan,
