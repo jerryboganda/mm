@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Pressable, ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
   WithSpringConfig,
+  useReducedMotion,
 } from "react-native-reanimated";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -55,12 +57,23 @@ export function Card({
   style,
 }: CardProps) {
   const { theme } = useTheme();
+  const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
+  const entrance = useSharedValue(reduceMotion ? 1 : 0);
 
   const cardBackgroundColor = getBackgroundColorForElevation(elevation, theme);
 
+  useEffect(() => {
+    if (reduceMotion) return;
+    entrance.value = withTiming(1, { duration: 320 });
+  }, [entrance, reduceMotion]);
+
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    opacity: entrance.value,
+    transform: [
+      { translateY: (1 - entrance.value) * 8 },
+      { scale: scale.value * (0.985 + entrance.value * 0.015) },
+    ],
   }));
 
   const handlePressIn = () => {

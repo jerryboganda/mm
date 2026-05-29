@@ -388,7 +388,11 @@ export default function ProfileScreen() {
             accessibilityHint="Navigate to edit your profile details"
           >
             <Image
-              source={require("../../assets/images/default-avatar.png")}
+              source={
+                user?.avatarUrl
+                  ? { uri: user.avatarUrl }
+                  : require("../../assets/images/default-avatar.png")
+              }
               style={[styles.avatar, { borderColor: theme.primary }]}
               resizeMode="cover"
             />

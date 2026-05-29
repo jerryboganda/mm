@@ -23,6 +23,7 @@ import * as Haptics from "@/lib/haptics-wrapper";
 import { BlurView } from "expo-blur";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
+import { AppModalSurface } from "@/components/AppModalSurface";
 import { OptionButton } from "@/components/OptionButton";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -607,100 +608,87 @@ export default function QuizPlayerScreen() {
         </View>
       </Modal>
 
-      <Modal
+      <AppModalSurface
         visible={showSubmitModal}
-        animationType="fade"
-        transparent
-        accessibilityViewIsModal={true}
-        onRequestClose={() => setShowSubmitModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <Pressable
-            style={styles.modalBackdrop}
-            onPress={() => setShowSubmitModal(false)}
-          />
-          <View
-            style={[
-              styles.submitModalContent,
-              { backgroundColor: theme.backgroundElevated },
-            ]}
-          >
-            <BlurView
-              intensity={80}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            />
-            <View
+        variant="center"
+        onClose={() => setShowSubmitModal(false)}
+        dismissible={!submitMutation.isPending}
+        scrollable
+        accessibilityLabel="Submit quiz confirmation"
+        footer={
+          <View style={styles.submitModalButtons}>
+            <Pressable
+              onPress={() => setShowSubmitModal(false)}
               style={[
-                styles.submitModalIcon,
-                { backgroundColor: `${theme.primary}20` },
+                styles.submitModalCancelButton,
+                {
+                  backgroundColor: theme.backgroundSecondary,
+                  borderColor: theme.glassBorder,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Review answers"
+            >
+              <ThemedText
+                style={[styles.submitModalCancelText, { color: theme.text }]}
+              >
+                Review Answers
+              </ThemedText>
+            </Pressable>
+            <PrimaryButton
+              title="Submit"
+              onPress={confirmSubmit}
+              loading={submitMutation.isPending}
+              style={styles.submitModalConfirmButton}
+              testID="button-confirm-submit"
+            />
+          </View>
+        }
+      >
+        <View
+          style={[
+            styles.submitModalIcon,
+            { backgroundColor: `${theme.primary}20` },
+          ]}
+        >
+          <Feather name="check-circle" size={48} color={theme.primary} />
+        </View>
+        <ThemedText type="h3" style={styles.submitModalTitle}>
+          Submit Quiz?
+        </ThemedText>
+        <ThemedText
+          style={[styles.submitModalText, { color: theme.textSecondary }]}
+        >
+          You&apos;ve answered {answeredCount} of {totalQuestions} questions.
+          {unansweredCount > 0
+            ? ` ${unansweredCount} question${unansweredCount > 1 ? "s" : ""} will be marked as incorrect.`
+            : ""}
+        </ThemedText>
+        <View style={styles.submitModalStats}>
+          <View style={styles.submitModalStat}>
+            <Feather name="check" size={16} color={theme.success} />
+            <ThemedText
+              style={[
+                styles.submitModalStatText,
+                { color: theme.textSecondary },
               ]}
             >
-              <Feather name="check-circle" size={48} color={theme.primary} />
-            </View>
-            <ThemedText type="h3" style={styles.submitModalTitle}>
-              Submit Quiz?
+              {answeredCount} Answered
             </ThemedText>
+          </View>
+          <View style={styles.submitModalStat}>
+            <Feather name="minus" size={16} color={theme.textMuted} />
             <ThemedText
-              style={[styles.submitModalText, { color: theme.textSecondary }]}
+              style={[
+                styles.submitModalStatText,
+                { color: theme.textSecondary },
+              ]}
             >
-              You&apos;ve answered {answeredCount} of {totalQuestions}{" "}
-              questions.
-              {unansweredCount > 0
-                ? ` ${unansweredCount} question${unansweredCount > 1 ? "s" : ""} will be marked as incorrect.`
-                : ""}
+              {unansweredCount} Skipped
             </ThemedText>
-            <View style={styles.submitModalStats}>
-              <View style={styles.submitModalStat}>
-                <Feather name="check" size={16} color={theme.success} />
-                <ThemedText
-                  style={[
-                    styles.submitModalStatText,
-                    { color: theme.textSecondary },
-                  ]}
-                >
-                  {answeredCount} Answered
-                </ThemedText>
-              </View>
-              <View style={styles.submitModalStat}>
-                <Feather name="minus" size={16} color={theme.textMuted} />
-                <ThemedText
-                  style={[
-                    styles.submitModalStatText,
-                    { color: theme.textSecondary },
-                  ]}
-                >
-                  {unansweredCount} Skipped
-                </ThemedText>
-              </View>
-            </View>
-            <View style={styles.submitModalButtons}>
-              <Pressable
-                onPress={() => setShowSubmitModal(false)}
-                style={[
-                  styles.submitModalCancelButton,
-                  { backgroundColor: theme.glass },
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel="Review answers"
-              >
-                <ThemedText
-                  style={[styles.submitModalCancelText, { color: theme.text }]}
-                >
-                  Review Answers
-                </ThemedText>
-              </Pressable>
-              <PrimaryButton
-                title="Submit"
-                onPress={confirmSubmit}
-                loading={submitMutation.isPending}
-                style={styles.submitModalConfirmButton}
-                testID="button-confirm-submit"
-              />
-            </View>
           </View>
         </View>
-      </Modal>
+      </AppModalSurface>
     </BackgroundGradient>
   );
 }
@@ -907,9 +895,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.lg,
+    alignSelf: "center",
   },
   submitModalTitle: {
     marginBottom: Spacing.sm,
+    textAlign: "center",
   },
   submitModalText: {
     textAlign: "center",
@@ -939,6 +929,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: Spacing.buttonHeight,
     borderRadius: BorderRadius.xl,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
   },

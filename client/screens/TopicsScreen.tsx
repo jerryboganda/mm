@@ -45,6 +45,9 @@ export default function TopicsScreen() {
     refetch,
   } = useQuery<Topic[]>({
     queryKey: ["/api/chapters", chapterId, "topics"],
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
 
   const onRefresh = useCallback(async () => {

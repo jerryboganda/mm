@@ -140,8 +140,8 @@ export default function ChaptersPage() {
                   <Link to={`/chapters/${ch.id}/topics`} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Manage topics">
                     <ChevronRight className="w-5 h-5" />
                   </Link>
-                  <button onClick={() => togglePublish(ch)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                    {ch.isPublished ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <button onClick={() => togglePublish(ch)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title={ch.isPublished ? 'Unpublish chapter' : 'Publish chapter'}>
+                    {ch.isPublished ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   </button>
                   <button onClick={() => openEdit(ch)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                     <Pencil className="w-4 h-4" />

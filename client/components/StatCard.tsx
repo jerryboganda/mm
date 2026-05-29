@@ -1,5 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 
@@ -23,16 +29,41 @@ export function StatCard({
   style,
 }: StatCardProps) {
   const { theme } = useTheme();
+  const reduceMotion = useReducedMotion();
+  const entrance = useSharedValue(reduceMotion ? 1 : 0);
   const resolvedColor = color ?? theme.primary;
 
+  useEffect(() => {
+    if (reduceMotion) return;
+    entrance.value = withTiming(1, { duration: 340 });
+  }, [entrance, reduceMotion]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: entrance.value,
+    transform: [
+      { translateY: (1 - entrance.value) * 8 },
+      { scale: 0.985 + entrance.value * 0.015 },
+    ],
+  }));
+
   return (
-    <View
-      style={[styles.container, { borderColor: theme.glassBorder }, style]}
+    <Animated.View
+      style={[
+        styles.container,
+        animatedStyle,
+        { borderColor: theme.glassBorder },
+        style,
+      ]}
       accessibilityRole="text"
       accessibilityLabel={`${label}: ${value}`}
     >
       <LinearGradient
-        colors={[theme.glass, "rgba(255,255,255,0.08)"]}
+        colors={[
+          `${resolvedColor}18`,
+          theme.glass,
+          "rgba(255,255,255,0.06)",
+        ]}
+        locations={[0, 0.62, 1]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -52,7 +83,7 @@ export function StatCard({
       <ThemedText style={[styles.label, { color: theme.textSecondary }]} numberOfLines={2}>
         {label}
       </ThemedText>
-    </View>
+    </Animated.View>
   );
 }
 

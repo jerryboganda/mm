@@ -13,6 +13,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  avatarUrl?: string | null;
   role: "student" | "admin";
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionPlan?: string;

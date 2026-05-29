@@ -5,6 +5,7 @@ import {
   View,
   Pressable,
   TextInputProps,
+  Platform,
 } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -18,6 +19,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { useMobileContent } from "@/lib/mobile-content";
+
+const webInputFocusReset =
+  Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : null;
 
 interface GlassInputProps extends TextInputProps {
   label: string;
@@ -117,7 +121,7 @@ export function GlassInput({
           </Animated.View>
           <TextInput
             ref={inputRef}
-            style={[styles.input, { color: theme.text }]}
+            style={[styles.input, webInputFocusReset, { color: theme.text }]}
             value={value}
             onFocus={handleFocus}
             onBlur={handleBlur}

@@ -254,7 +254,7 @@ export interface IStorage {
    */
   updateUserProfile(
     userId: string,
-    data: { name: string },
+    data: { name: string; avatarUrl?: string | null },
   ): Promise<User | undefined>;
 
   /**
@@ -764,11 +764,18 @@ export class DatabaseStorage implements IStorage {
   /** @inheritdoc */
   async updateUserProfile(
     userId: string,
-    data: { name: string },
+    data: { name: string; avatarUrl?: string | null },
   ): Promise<User | undefined> {
+    const setData: { name: string; avatarUrl?: string | null } = {
+      name: data.name,
+    };
+    if (data.avatarUrl !== undefined) {
+      setData.avatarUrl = data.avatarUrl;
+    }
+
     const [user] = await db
       .update(users)
-      .set({ name: data.name })
+      .set(setData)
       .where(eq(users.id, userId))
       .returning();
     return user || undefined;
