@@ -21,6 +21,20 @@ router.get("/contact", authMiddleware, async (_req: AuthRequest, res) => {
   }
 });
 
+router.get("/public-contact", async (_req, res) => {
+  try {
+    const supportContactSettings = await getSupportContactSettings();
+    res.json(supportContactSettings);
+  } catch (error) {
+    logger.error("Get public support contact settings error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    res
+      .status(500)
+      .json({ message: "Failed to load support contact settings" });
+  }
+});
+
 router.post("/report-issue", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { type, description, email } = req.body;

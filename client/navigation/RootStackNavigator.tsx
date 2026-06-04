@@ -10,6 +10,7 @@ import WelcomeScreen from "@/screens/WelcomeScreen";
 import OnboardingScreen from "@/screens/OnboardingScreen";
 import PermissionsPromptScreen from "@/screens/PermissionsPromptScreen";
 import LoginScreen from "@/screens/LoginScreen";
+import ScanLoginScreen from "@/screens/ScanLoginScreen";
 import RegisterScreen from "@/screens/RegisterScreen";
 import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
 import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
@@ -47,6 +48,7 @@ export type RootStackParamList = {
   PermissionsPrompt: undefined;
   Main: undefined;
   Login: undefined;
+  ScanLogin: undefined;
   Register: undefined;
   ForgotPassword: undefined;
   ResetPassword: { email: string; code: string };
@@ -96,7 +98,12 @@ export default function RootStackNavigator() {
 
   if (authLoading || onboardingLoading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: theme.backgroundRoot }]}>
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.backgroundRoot },
+        ]}
+      >
         <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
@@ -326,6 +333,11 @@ export default function RootStackNavigator() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
+            name="ScanLogin"
+            component={ScanLoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
             name="Register"
             component={RegisterScreen}
             options={{
@@ -383,6 +395,11 @@ export default function RootStackNavigator() {
           <Stack.Screen
             name="Login"
             component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ScanLogin"
+            component={ScanLoginScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen

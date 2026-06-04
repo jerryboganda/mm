@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, Pressable, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  Pressable,
+  Alert,
+  Linking,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -21,6 +28,7 @@ import {
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
+import { getApiUrl } from "@/lib/query-client";
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -38,6 +46,18 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [scanLoginButtonText, setScanLoginButtonText] =
+    useState("Scan to login");
+  const [scanLoginEnabled, setScanLoginEnabled] = useState(false);
+  const [supportContact, setSupportContact] = useState({
+    whatsappNumber: "",
+    phoneNumber: "",
+    supportEmail: "support@maternalmind.com.pk",
+    whatsappDefaultMessage: "Hello Support Team, I need help logging in.",
+    whatsappEnabled: false,
+    phoneEnabled: false,
+    emailEnabled: true,
+  });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {},
   );
@@ -48,6 +68,7 @@ export default function LoginScreen() {
 
   React.useEffect(() => {
     loadCredentials();
+    loadLoginSettings();
   }, []);
 
   const loadCredentials = async () => {
@@ -108,6 +129,71 @@ export default function LoginScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadLoginSettings = async () => {
+    try {
+      const baseUrl = getApiUrl();
+      const [scanResponse, supportResponse] = await Promise.all([
+        fetch(new URL("/api/auth/scan-login-settings", baseUrl)),
+        fetch(new URL("/api/support/public-contact", baseUrl)),
+      ]);
+
+      if (scanResponse.ok) {
+        const scanSettings = await scanResponse.json();
+        setScanLoginEnabled(Boolean(scanSettings.enabled));
+        setScanLoginButtonText(scanSettings.buttonText || "Scan to login");
+      }
+
+      if (supportResponse.ok) {
+        const supportSettings = await supportResponse.json();
+        setSupportContact((prev) => ({
+          ...prev,
+          ...supportSettings,
+          whatsappDefaultMessage:
+            supportSettings.whatsappDefaultMessage ||
+            "Hello Support Team, I need help logging in.",
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to load login settings:", error);
+    }
+  };
+
+  const openSupportContact = async () => {
+    const message = encodeURIComponent(
+      supportContact.whatsappDefaultMessage ||
+        "Hello Support Team, I need help logging in.",
+    );
+    const whatsappNumber = supportContact.whatsappNumber.replace(/[^\d]/g, "");
+    const options = [
+      supportContact.whatsappEnabled && whatsappNumber
+        ? `https://wa.me/${whatsappNumber}?text=${message}`
+        : "",
+      supportContact.phoneEnabled && supportContact.phoneNumber
+        ? `tel:${supportContact.phoneNumber}`
+        : "",
+      supportContact.emailEnabled && supportContact.supportEmail
+        ? `mailto:${supportContact.supportEmail}?subject=${encodeURIComponent(
+            "Trouble logging in",
+          )}&body=${message}`
+        : "",
+    ].filter((url): url is string => Boolean(url));
+
+    for (const url of options) {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        await Linking.openURL(url);
+        return;
+      }
+    }
+
+    Alert.alert(
+      "Contact Support",
+      supportContact.supportEmail
+        ? `Please email ${supportContact.supportEmail} for login help.`
+        : "Support contact is not configured yet.",
+    );
   };
 
   return (
@@ -222,6 +308,50 @@ export default function LoginScreen() {
             style={styles.loginButton}
             testID="button-login"
           />
+
+          {scanLoginEnabled ? (
+            <Pressable
+              style={[
+                styles.scanLoginButton,
+                { borderColor: theme.glassBorder },
+              ]}
+              onPress={() => navigation.navigate("ScanLogin")}
+              accessibilityRole="button"
+              accessibilityLabel={scanLoginButtonText}
+            >
+              <Ionicons
+                name="qr-code-outline"
+                size={18}
+                color={theme.primary}
+              />
+              <ThemedText
+                style={[styles.scanLoginText, { color: theme.primary }]}
+              >
+                {scanLoginButtonText}
+              </ThemedText>
+            </Pressable>
+          ) : null}
+
+          <Pressable
+            style={styles.contactSupport}
+            onPress={openSupportContact}
+            accessibilityRole="link"
+            accessibilityLabel="Contact us for trouble logging in"
+          >
+            <Ionicons
+              name="help-circle-outline"
+              size={16}
+              color={`${theme.primary}CC`}
+            />
+            <ThemedText
+              style={[
+                styles.contactSupportText,
+                { color: `${theme.primary}CC` },
+              ]}
+            >
+              Contact us for trouble logging in
+            </ThemedText>
+          </Pressable>
         </View>
 
         <View style={styles.footer}>
@@ -313,6 +443,31 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginTop: Spacing.md,
+  },
+  scanLoginButton: {
+    marginTop: Spacing.md,
+    minHeight: 48,
+    borderWidth: 1,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: Spacing.sm,
+  },
+  scanLoginText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  contactSupport: {
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    marginTop: Spacing.lg,
+  },
+  contactSupportText: {
+    fontSize: 13,
+    fontWeight: "600",
   },
   footer: {
     flexDirection: "row",

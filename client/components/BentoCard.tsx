@@ -106,15 +106,15 @@ export function BentoCard({
   const getGlowColor = () => {
     switch (variant) {
       case "accent":
-        return "rgba(17,164,212,0.10)";
+        return isDark ? "rgba(17,164,212,0.10)" : "rgba(0,153,204,0.045)";
       case "success":
-        return "rgba(34,197,94,0.10)";
+        return isDark ? "rgba(34,197,94,0.10)" : "rgba(22,163,74,0.045)";
       case "purple":
-        return "rgba(168,85,247,0.10)";
+        return isDark ? "rgba(168,85,247,0.10)" : "rgba(147,51,234,0.04)";
       case "warning":
-        return "rgba(234,179,8,0.10)";
+        return isDark ? "rgba(234,179,8,0.10)" : "rgba(217,119,6,0.045)";
       default:
-        return "rgba(255,255,255,0.03)";
+        return isDark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0)";
     }
   };
 
@@ -126,22 +126,41 @@ export function BentoCard({
   const isWide = size === "wide";
 
   const renderBackground = () => {
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" || !isDark) {
       return (
-        <View style={styles.background}>
-          <LinearGradient
-            colors={[glowColor, "rgba(17,164,212,0.035)", "rgba(255,255,255,0.02)"]}
-            locations={[0, 0.55, 1]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          />
+        <View
+          style={[
+            styles.background,
+            !isDark && { backgroundColor: theme.backgroundElevated },
+          ]}
+        >
+          {!isDark && variant !== "default" ? (
+            <View
+              style={[StyleSheet.absoluteFill, { backgroundColor: glowColor }]}
+            />
+          ) : isDark ? (
+            <LinearGradient
+              colors={[
+                glowColor,
+                "rgba(17,164,212,0.035)",
+                "rgba(255,255,255,0.02)",
+              ]}
+              locations={[0, 0.55, 1]}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+          ) : null}
         </View>
       );
     }
 
     return (
-      <BlurView intensity={18} tint={isDark ? "dark" : "light"} style={styles.background}>
+      <BlurView
+        intensity={18}
+        tint={isDark ? "dark" : "light"}
+        style={styles.background}
+      >
         <LinearGradient
           colors={[glowColor, "rgba(255,255,255,0.03)"]}
           locations={[0, 1]}
@@ -164,12 +183,17 @@ export function BentoCard({
       accessibilityLabel={`${title}: ${value}${subtitle ? `, ${subtitle}` : ""}`}
       style={[
         styles.card,
-        { borderColor: theme.glassBorder },
+        {
+          borderColor: theme.glassBorder,
+          backgroundColor: isDark ? "transparent" : theme.backgroundElevated,
+        },
         animatedStyle,
         isSmall && styles.cardSmall,
         isLarge && styles.cardLarge,
         isWide && styles.cardWide,
-        variant !== "default" && Shadows.cardSubtle,
+        isDark
+          ? variant !== "default" && Shadows.cardSubtle
+          : styles.lightCardShadow,
         style,
       ]}
     >
@@ -192,7 +216,11 @@ export function BentoCard({
           ) : null}
           <ThemedText
             type="label"
-            style={[styles.title, { color: theme.textSecondary }, isSmall && styles.titleSmall]}
+            style={[
+              styles.title,
+              { color: theme.textSecondary },
+              isSmall && styles.titleSmall,
+            ]}
             numberOfLines={1}
           >
             {title}
@@ -228,10 +256,17 @@ export function BentoCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: BorderRadius.xl,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
     overflow: "hidden",
     minHeight: 120,
+  },
+  lightCardShadow: {
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.055,
+    shadowRadius: 7,
+    elevation: 2,
   },
   cardSmall: {
     minHeight: 100,
@@ -275,8 +310,7 @@ const styles = StyleSheet.create({
   valueContainer: {
     marginTop: Spacing.md,
   },
-  value: {
-  },
+  value: {},
   valueSmall: {
     fontSize: 26,
     lineHeight: 32,

@@ -1,0 +1,27 @@
+env: load .env
+env: export SESSION_SECRET POSTGRES_PASSWORD ALLOWED_ORIGIN LOG_LEVEL
+Starting project at D:\Projects\Maternal Mind
+React Compiler enabled
+Starting Metro Bundler
+mode, reloads are disabled. Remove CI=true to enable watch mode.
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web client\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web client\index.js ░░░░░░░░░░░░░░░░  1.0% (1/1)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% ( 85/104)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% (130/268)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% (276/500)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% (313/532)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% (472/690)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% (518/860)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% ( 741/1036)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% ( 875/1189)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% ( 879/1196)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% ( 886/1205)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.6% (1073/1326)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 82.3% (1294/1426)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 84.5% (1364/1782)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 87.5% (1848/1976)
+Web client\index.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 93.8% (2093/2168)
+Web Bundled 63664ms client\index.js (2213 modules)

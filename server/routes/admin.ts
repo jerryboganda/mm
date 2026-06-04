@@ -12,6 +12,7 @@ import {
   getSupportContactSettings,
   SUPPORT_CONTACT_KEYS,
 } from "../lib/support-contact";
+import { getScanLoginSettings, setScanLoginSettings } from "../lib/scan-login";
 import { logger } from "../lib/logger";
 
 const router = Router();
@@ -38,6 +39,12 @@ const putSupportContactHandler = async (req: AuthRequest, res: Response) => {
     const whatsappDefaultMessage = String(
       req.body?.whatsappDefaultMessage || "",
     ).trim();
+    const whatsappEnabled = Boolean(req.body?.whatsappEnabled);
+    const phoneEnabled = Boolean(req.body?.phoneEnabled);
+    const emailEnabled =
+      req.body?.emailEnabled === undefined
+        ? true
+        : Boolean(req.body.emailEnabled);
 
     if (supportEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supportEmail)) {
       return res.status(400).json({ message: "Invalid support email format" });
@@ -51,6 +58,12 @@ const putSupportContactHandler = async (req: AuthRequest, res: Response) => {
         key: SUPPORT_CONTACT_KEYS.whatsappDefaultMessage,
         value: whatsappDefaultMessage,
       },
+      {
+        key: SUPPORT_CONTACT_KEYS.whatsappEnabled,
+        value: String(whatsappEnabled),
+      },
+      { key: SUPPORT_CONTACT_KEYS.phoneEnabled, value: String(phoneEnabled) },
+      { key: SUPPORT_CONTACT_KEYS.emailEnabled, value: String(emailEnabled) },
     ]);
 
     const updated = await getSupportContactSettings();
@@ -95,6 +108,94 @@ router.put(
 );
 
 // â”€â”€ GET /api/admin/email-settings â€” Fetch current Brevo SMTP config â”€â”€
+const getScanLoginHandler = async (_req: AuthRequest, res: Response) => {
+  try {
+    const settings = await getScanLoginSettings();
+    const { codeHash: _codeHash, ...publicSettings } = settings;
+    res.json(publicSettings);
+  } catch (error) {
+    logger.error("Get scan login settings error", { error: String(error) });
+    res.status(500).json({ message: "Failed to load scan login settings" });
+  }
+};
+
+const putScanLoginHandler = async (req: AuthRequest, res: Response) => {
+  try {
+    const targetEmail = String(req.body?.targetEmail || "").trim();
+    const code = String(req.body?.code || "").trim();
+    const enabled = Boolean(req.body?.enabled);
+    const title = String(req.body?.title || "").trim();
+    const instructions = String(req.body?.instructions || "").trim();
+    const buttonText = String(req.body?.buttonText || "").trim();
+    const current = await getScanLoginSettings();
+
+    if (enabled && !targetEmail) {
+      return res
+        .status(400)
+        .json({ message: "Target account email is required when enabled." });
+    }
+    if (targetEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(targetEmail)) {
+      return res.status(400).json({ message: "Invalid target email format" });
+    }
+    if (enabled && !code && !current.hasCode) {
+      return res.status(400).json({
+        message: "Access code is required before enabling scan login.",
+      });
+    }
+
+    if (targetEmail) {
+      const user = await storage.getUserByEmail(targetEmail);
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "Target account was not found." });
+      }
+    }
+
+    const updated = await setScanLoginSettings({
+      enabled,
+      targetEmail,
+      title,
+      instructions,
+      buttonText,
+      code: code || undefined,
+    });
+
+    res.json({
+      message: "Scan login settings saved successfully",
+      ...updated,
+    });
+  } catch (error) {
+    logger.error("Save scan login settings error", { error: String(error) });
+    res.status(500).json({ message: "Failed to save scan login settings" });
+  }
+};
+
+router.get(
+  "/scan-login-settings",
+  authMiddleware,
+  requireRole("admin"),
+  getScanLoginHandler,
+);
+router.get(
+  "/settings/scan-login",
+  authMiddleware,
+  requireRole("admin"),
+  getScanLoginHandler,
+);
+router.put(
+  "/scan-login-settings",
+  authMiddleware,
+  requireRole("admin"),
+  putScanLoginHandler,
+);
+router.put(
+  "/settings/scan-login",
+  authMiddleware,
+  requireRole("admin"),
+  putScanLoginHandler,
+);
+
 router.get(
   "/email-settings",
   authMiddleware,

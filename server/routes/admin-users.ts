@@ -10,6 +10,10 @@ import {
   adminDeleteUser,
   createAuditLog,
 } from "../admin-storage";
+import {
+  enforceDeviceLimit,
+  getEffectiveDeviceLimit,
+} from "../lib/device-sessions";
 
 const router = Router();
 const getParamValue = (param: string | string[]) =>
@@ -60,6 +64,8 @@ router.put("/:id", async (req: AuthRequest, res) => {
       subscriptionExpiresAt,
       name,
       isEmailVerified,
+      deviceLimitOverrideEnabled,
+      deviceLimitMax,
     } = req.body;
     const data: Partial<{
       role: string;
@@ -68,6 +74,8 @@ router.put("/:id", async (req: AuthRequest, res) => {
       subscriptionExpiresAt: Date | null;
       name: string;
       isEmailVerified: boolean;
+      deviceLimitOverrideEnabled: boolean;
+      deviceLimitMax: number | null;
     }> = {};
     if (role !== undefined) data.role = role;
     if (name !== undefined) data.name = name;
@@ -81,9 +89,25 @@ router.put("/:id", async (req: AuthRequest, res) => {
         ? new Date(subscriptionExpiresAt)
         : null;
     }
+    if (deviceLimitOverrideEnabled !== undefined) {
+      data.deviceLimitOverrideEnabled = Boolean(deviceLimitOverrideEnabled);
+    }
+    if (deviceLimitMax !== undefined) {
+      const parsedLimit = Number(deviceLimitMax);
+      if (
+        deviceLimitMax !== null &&
+        (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 20)
+      ) {
+        return res
+          .status(400)
+          .json({ message: "Device limit must be between 1 and 20." });
+      }
+      data.deviceLimitMax = deviceLimitMax === null ? null : parsedLimit;
+    }
 
     const user = await adminUpdateUser(userId, data);
     if (!user) return res.status(404).json({ message: "User not found" });
+    await enforceDeviceLimit(user.id, await getEffectiveDeviceLimit(user));
     await createAuditLog({
       adminUserId: req.userId!,
       action: "update",

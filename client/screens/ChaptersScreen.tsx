@@ -55,33 +55,37 @@ export default function ChaptersScreen() {
     setRefreshing(false);
   }, [refetch]);
 
-  const renderChapter = ({ item, index }: { item: Chapter; index: number }) => (
-    <GlassCard
-      title={`${item.order}. ${item.title}`}
-      subtitle={`${item.topicsCount} Topics`}
-      density="compact"
-      titleNumberOfLines={2}
-      subtitleNumberOfLines={1}
-      onPress={() =>
-        navigation.navigate("Topics", {
-          chapterId: item.id,
-          chapterTitle: item.title,
-          bookId,
-        })
-      }
-      icon={
-        <ThemedText style={[styles.chapterNumber, { color: theme.primary }]}>
-          {item.order}
-        </ThemedText>
-      }
-      testID={`card-chapter-${item.id}`}
-      style={{ marginBottom: Spacing.sm }}
-    >
-      <View style={styles.progressContainer}>
-        <ProgressBar progress={item.progress} height={4} />
-      </View>
-    </GlassCard>
-  );
+  const renderChapter = ({ item, index }: { item: Chapter; index: number }) => {
+    const displayOrder = item.order + 1;
+
+    return (
+      <GlassCard
+        title={`${displayOrder}. ${item.title}`}
+        subtitle={`${item.topicsCount} Topics`}
+        density="compact"
+        titleNumberOfLines={2}
+        subtitleNumberOfLines={1}
+        onPress={() =>
+          navigation.navigate("Topics", {
+            chapterId: item.id,
+            chapterTitle: item.title,
+            bookId,
+          })
+        }
+        icon={
+          <ThemedText style={[styles.chapterNumber, { color: theme.primary }]}>
+            {displayOrder}
+          </ThemedText>
+        }
+        testID={`card-chapter-${item.id}`}
+        style={{ marginBottom: Spacing.sm }}
+      >
+        <View style={styles.progressContainer}>
+          <ProgressBar progress={item.progress} height={4} />
+        </View>
+      </GlassCard>
+    );
+  };
 
   const renderLoading = () => (
     <View>

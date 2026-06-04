@@ -56,7 +56,7 @@ export function Card({
   onPress,
   style,
 }: CardProps) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
   const entrance = useSharedValue(reduceMotion ? 1 : 0);
@@ -93,7 +93,9 @@ export function Card({
         styles.card,
         {
           backgroundColor: cardBackgroundColor,
+          borderColor: theme.glassBorder,
         },
+        !isDark && styles.lightCardShadow,
         animatedStyle,
         style,
       ]}
@@ -120,7 +122,15 @@ export function Card({
 const styles = StyleSheet.create({
   card: {
     padding: Spacing.xl,
-    borderRadius: BorderRadius["2xl"],
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
+  lightCardShadow: {
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 7,
+    elevation: 2,
   },
   cardTitle: {
     marginBottom: Spacing.sm,

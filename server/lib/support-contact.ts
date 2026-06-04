@@ -15,6 +15,9 @@ export const SUPPORT_CONTACT_KEYS = {
   phoneNumber: "support_phone_number",
   supportEmail: "support_email",
   whatsappDefaultMessage: "support_whatsapp_default_message",
+  whatsappEnabled: "support_whatsapp_enabled",
+  phoneEnabled: "support_phone_enabled",
+  emailEnabled: "support_email_enabled",
 } as const;
 
 const DEFAULT_SUPPORT_EMAIL = "support@maternalmind.com.pk";
@@ -46,17 +49,17 @@ const SUPPORT_CONTACT_KEY_ALIASES = {
     "support_whatsapp_message",
   ],
   whatsappEnabled: [
-    "support_whatsapp_enabled",
+    SUPPORT_CONTACT_KEYS.whatsappEnabled,
     "support_contact_whatsapp_enabled",
     "whatsapp_enabled",
   ],
   phoneEnabled: [
-    "support_phone_enabled",
+    SUPPORT_CONTACT_KEYS.phoneEnabled,
     "support_contact_phone_enabled",
     "phone_enabled",
   ],
   emailEnabled: [
-    "support_email_enabled",
+    SUPPORT_CONTACT_KEYS.emailEnabled,
     "support_contact_email_enabled",
     "email_enabled",
   ],
@@ -106,7 +109,9 @@ export async function getSupportContactSettings(): Promise<SupportContactSetting
   );
 
   const settings = await storage.getAppSettings(keys);
-  const settingsMap = new Map(settings.map((entry) => [entry.key, entry.value]));
+  const settingsMap = new Map(
+    settings.map((entry) => [entry.key, entry.value]),
+  );
 
   const whatsappNumber = firstNonEmpty(
     settingsMap,
@@ -120,8 +125,10 @@ export async function getSupportContactSettings(): Promise<SupportContactSetting
     firstNonEmpty(settingsMap, SUPPORT_CONTACT_KEY_ALIASES.supportEmail) ||
     DEFAULT_SUPPORT_EMAIL;
   const whatsappDefaultMessage =
-    firstNonEmpty(settingsMap, SUPPORT_CONTACT_KEY_ALIASES.whatsappDefaultMessage) ||
-    DEFAULT_WHATSAPP_MESSAGE;
+    firstNonEmpty(
+      settingsMap,
+      SUPPORT_CONTACT_KEY_ALIASES.whatsappDefaultMessage,
+    ) || DEFAULT_WHATSAPP_MESSAGE;
   const whatsappEnabledFlag = readBooleanSetting(
     settingsMap,
     SUPPORT_CONTACT_KEY_ALIASES.whatsappEnabled,
@@ -145,8 +152,12 @@ export async function getSupportContactSettings(): Promise<SupportContactSetting
         ? whatsappEnabledFlag
         : whatsappNumber.length > 0,
     phoneEnabled:
-      phoneEnabledFlag !== undefined ? phoneEnabledFlag : phoneNumber.length > 0,
+      phoneEnabledFlag !== undefined
+        ? phoneEnabledFlag
+        : phoneNumber.length > 0,
     emailEnabled:
-      emailEnabledFlag !== undefined ? emailEnabledFlag : supportEmail.length > 0,
+      emailEnabledFlag !== undefined
+        ? emailEnabledFlag
+        : supportEmail.length > 0,
   };
 }

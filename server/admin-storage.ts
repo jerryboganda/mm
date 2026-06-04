@@ -26,6 +26,7 @@ import {
 } from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql, count, ilike, or } from "drizzle-orm";
+import { countActiveSessionsByUserIds } from "./lib/device-sessions";
 
 // ── Books CRUD ────────────────────────────────────────────────
 
@@ -409,7 +410,10 @@ export async function adminGetUsers(filters?: {
   role?: string;
   page?: number;
   pageSize?: number;
-}): Promise<{ data: Omit<User, "password">[]; total: number }> {
+}): Promise<{
+  data: (Omit<User, "password"> & { activeDeviceCount: number })[];
+  total: number;
+}> {
   const page = filters?.page ?? 1;
   const pageSize = filters?.pageSize ?? 50;
   const offset = (page - 1) * pageSize;
@@ -455,6 +459,8 @@ export async function adminGetUsers(filters?: {
       isPhoneVerified: users.isPhoneVerified,
       phoneVerificationToken: users.phoneVerificationToken,
       phoneTokenExpiresAt: users.phoneTokenExpiresAt,
+      deviceLimitOverrideEnabled: users.deviceLimitOverrideEnabled,
+      deviceLimitMax: users.deviceLimitMax,
     })
     .from(users)
     .where(where)
@@ -462,7 +468,17 @@ export async function adminGetUsers(filters?: {
     .limit(pageSize)
     .offset(offset);
 
-  return { data, total: Number(totalRow?.total ?? 0) };
+  const activeDeviceCounts = await countActiveSessionsByUserIds(
+    data.map((user) => user.id),
+  );
+
+  return {
+    data: data.map((user) => ({
+      ...user,
+      activeDeviceCount: activeDeviceCounts.get(user.id) || 0,
+    })),
+    total: Number(totalRow?.total ?? 0),
+  };
 }
 
 export async function adminGetUserDetail(userId: string) {
@@ -497,6 +513,9 @@ export async function adminUpdateUser(
     subscriptionPlan: string | null;
     subscriptionExpiresAt: Date | null;
     name: string;
+    isEmailVerified: boolean;
+    deviceLimitOverrideEnabled: boolean;
+    deviceLimitMax: number | null;
   }>,
 ): Promise<User | undefined> {
   const [user] = await db

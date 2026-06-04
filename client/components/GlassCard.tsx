@@ -155,27 +155,47 @@ export function GlassCard({
 
   const cardStyles = [
     styles.card,
+    {
+      backgroundColor: isDark ? "transparent" : theme.backgroundElevated,
+      borderColor: active ? theme.primary : theme.glassBorder,
+    },
     animatedStyle,
-    borderStyle,
+    isDark && borderStyle,
     disabled && styles.cardDisabled,
-    (isElevated || onPress) && Shadows.cardSubtle,
+    (isElevated || onPress) &&
+      (isDark ? Shadows.cardSubtle : styles.lightCardShadow),
     isGlow && active && Shadows.glowSmall,
     style,
   ];
 
   const renderBackground = () => {
+    if (!isDark) {
+      return (
+        <View style={styles.cardBackground}>
+          {active || isGlow ? (
+            <View
+              style={[
+                styles.lightAccentWash,
+                {
+                  backgroundColor: active
+                    ? "rgba(0,153,204,0.06)"
+                    : "rgba(0,153,204,0.035)",
+                },
+              ]}
+            />
+          ) : null}
+        </View>
+      );
+    }
+
     if (Platform.OS === "web" || isSubtle) {
       return (
         <View style={styles.cardBackground}>
           <LinearGradient
             colors={[
-              active
-                ? "rgba(17,164,212,0.16)"
-                : isSubtle
-                  ? "rgba(255,255,255,0.02)"
-                  : "rgba(17,164,212,0.07)",
-              active ? "rgba(17,164,212,0.05)" : "rgba(255,255,255,0.025)",
-              isDark ? "rgba(255,255,255,0.015)" : "rgba(255,255,255,0.45)",
+              isSubtle ? "rgba(255,255,255,0.02)" : "rgba(17,164,212,0.06)",
+              "rgba(255,255,255,0.025)",
+              "rgba(255,255,255,0.015)",
             ]}
             locations={[0, 0.58, 1]}
             style={StyleSheet.absoluteFill}
@@ -224,24 +244,30 @@ export function GlassCard({
       accessibilityState={{ disabled, selected: active }}
     >
       {renderBackground()}
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.hoverOverlay, hoverOverlayStyle]}
-      >
-        <LinearGradient
-          colors={["rgba(255,255,255,0.08)", "rgba(17,164,212,0.06)"]}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      </Animated.View>
+      {isDark ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.hoverOverlay, hoverOverlayStyle]}
+        >
+          <LinearGradient
+            colors={["rgba(255,255,255,0.08)", "rgba(17,164,212,0.06)"]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </Animated.View>
+      ) : null}
       <View style={[styles.content, isCompact && styles.contentCompact]}>
         {icon ? (
           <View
             style={[
               styles.iconContainer,
               isCompact && styles.iconContainerCompact,
-              { backgroundColor: theme.glassMedium },
+              {
+                backgroundColor: isDark
+                  ? theme.glassMedium
+                  : "rgba(17,164,212,0.09)",
+              },
             ]}
           >
             {icon}
@@ -289,7 +315,7 @@ export function GlassCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: BorderRadius.xl,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
     overflow: "hidden",
   },
@@ -298,6 +324,16 @@ const styles = StyleSheet.create({
   },
   cardDisabled: {
     opacity: 0.45,
+  },
+  lightCardShadow: {
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 7,
+    elevation: 2,
+  },
+  lightAccentWash: {
+    ...StyleSheet.absoluteFillObject,
   },
   hoverOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -314,7 +350,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 52,
     height: 52,
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.md,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Spacing.lg,

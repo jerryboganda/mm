@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { api } from '../lib/api';
-import { Loader2, Mail, Save, FileText, Clock } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { api } from "../lib/api";
+import { Loader2, Mail, Save, FileText, Clock, Shield } from "lucide-react";
 
 interface AuditLog {
   id: string;
@@ -23,40 +23,185 @@ interface EmailSettings {
 }
 
 export default function SettingsPage() {
-  const [tab, setTab] = useState<'email' | 'audit'>('email');
+  const [tab, setTab] = useState<"email" | "devices" | "audit">("email");
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-500 mt-1">Platform configuration & activity logs</p>
+        <p className="text-gray-500 mt-1">
+          Platform configuration & activity logs
+        </p>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit">
-        <button onClick={() => setTab('email')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'email' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-          <span className="flex items-center gap-2"><Mail className="w-4 h-4" /> Email</span>
+        <button
+          onClick={() => setTab("email")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "email" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+        >
+          <span className="flex items-center gap-2">
+            <Mail className="w-4 h-4" /> Email
+          </span>
         </button>
-        <button onClick={() => setTab('audit')} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'audit' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-          <span className="flex items-center gap-2"><FileText className="w-4 h-4" /> Audit Log</span>
+        <button
+          onClick={() => setTab("devices")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "devices" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+        >
+          <span className="flex items-center gap-2">
+            <Shield className="w-4 h-4" /> Device Limits
+          </span>
+        </button>
+        <button
+          onClick={() => setTab("audit")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "audit" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+        >
+          <span className="flex items-center gap-2">
+            <FileText className="w-4 h-4" /> Audit Log
+          </span>
         </button>
       </div>
 
-      {tab === 'email' ? <EmailSettingsTab /> : <AuditLogTab />}
+      {tab === "email" ? (
+        <EmailSettingsTab />
+      ) : tab === "devices" ? (
+        <DeviceLimitSettingsTab />
+      ) : (
+        <AuditLogTab />
+      )}
+    </div>
+  );
+}
+
+interface DeviceLimitSettings {
+  enabled: boolean;
+  defaultMax: number;
+}
+
+function DeviceLimitSettingsTab() {
+  const [form, setForm] = useState<DeviceLimitSettings>({
+    enabled: false,
+    defaultMax: 3,
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    api
+      .get<DeviceLimitSettings>("/admin/device-limits/settings")
+      .then((settings) => setForm(settings))
+      .catch(() => setMsg("Failed to load device limit settings"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    setMsg("");
+    try {
+      const updated = await api.put<DeviceLimitSettings>(
+        "/admin/device-limits/settings",
+        {
+          enabled: form.enabled,
+          defaultMax: Math.min(20, Math.max(1, Number(form.defaultMax) || 3)),
+        },
+      );
+      setForm(updated);
+      setMsg("Device limit settings saved");
+      setTimeout(() => setMsg(""), 3000);
+    } catch (error) {
+      console.error(error);
+      setMsg("Failed to save device limit settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-6 max-w-2xl">
+      <div className="flex items-center gap-2 mb-6">
+        <Shield className="w-5 h-5 text-primary-500" />
+        <h2 className="text-lg font-semibold text-gray-900">
+          Device Login Limits
+        </h2>
+      </div>
+
+      <div className="space-y-5">
+        <label className="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            checked={form.enabled}
+            onChange={(e) => setForm({ ...form, enabled: e.target.checked })}
+            className="h-4 w-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+          />
+          Enable global device limit for users without a custom override
+        </label>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Default Max Devices
+          </label>
+          <input
+            type="number"
+            min={1}
+            max={20}
+            value={form.defaultMax}
+            onChange={(e) =>
+              setForm({ ...form, defaultMax: Number(e.target.value) })
+            }
+            className="w-32 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
+          />
+          <p className="text-xs text-gray-500 mt-2">
+            New logins are allowed. If the account is over its limit, the oldest
+            active device is signed out automatically.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 mt-6">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50 transition-all text-sm font-medium"
+        >
+          {saving ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {saving ? "Saving..." : "Save Settings"}
+        </button>
+        {msg && (
+          <span className="text-sm text-gray-600 font-medium">{msg}</span>
+        )}
+      </div>
     </div>
   );
 }
 
 function EmailSettingsTab() {
   const [form, setForm] = useState<EmailSettings>({
-    smtpHost: '', smtpPort: 587, smtpUser: '', smtpPass: '', fromEmail: '', fromName: '',
+    smtpHost: "",
+    smtpPort: 587,
+    smtpUser: "",
+    smtpPass: "",
+    fromEmail: "",
+    fromName: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    api.get<EmailSettings>('/admin/email-settings')
+    api
+      .get<EmailSettings>("/admin/email-settings")
       .then((s) => setForm(s))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -65,22 +210,37 @@ function EmailSettingsTab() {
   const save = async () => {
     setSaving(true);
     try {
-      await api.put('/admin/email-settings', form);
-      setMsg('Settings saved ✓');
-      setTimeout(() => setMsg(''), 3000);
-    } catch (e) { console.error(e); setMsg('Failed to save'); }
+      await api.put("/admin/email-settings", form);
+      setMsg("Settings saved ✓");
+      setTimeout(() => setMsg(""), 3000);
+    } catch (e) {
+      console.error(e);
+      setMsg("Failed to save");
+    }
     setSaving(false);
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary-500" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
 
-  const field = (label: string, key: keyof EmailSettings, type = 'text') => (
+  const field = (label: string, key: keyof EmailSettings, type = "text") => (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
       <input
         type={type}
         value={form[key]}
-        onChange={(e) => setForm({ ...form, [key]: type === 'number' ? Number(e.target.value) : e.target.value })}
+        onChange={(e) =>
+          setForm({
+            ...form,
+            [key]: type === "number" ? Number(e.target.value) : e.target.value,
+          })
+        }
         className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
       />
     </div>
@@ -90,25 +250,33 @@ function EmailSettingsTab() {
     <div className="bg-white rounded-2xl border border-gray-100 p-6 max-w-2xl">
       <div className="flex items-center gap-2 mb-6">
         <Mail className="w-5 h-5 text-primary-500" />
-        <h2 className="text-lg font-semibold text-gray-900">SMTP / Email Settings</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          SMTP / Email Settings
+        </h2>
       </div>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          {field('SMTP Host', 'smtpHost')}
-          {field('SMTP Port', 'smtpPort', 'number')}
+          {field("SMTP Host", "smtpHost")}
+          {field("SMTP Port", "smtpPort", "number")}
         </div>
-        {field('SMTP User / Email', 'smtpUser')}
-        {field('SMTP Password', 'smtpPass', 'password')}
+        {field("SMTP User / Email", "smtpUser")}
+        {field("SMTP Password", "smtpPass", "password")}
         <div className="grid grid-cols-2 gap-4">
-          {field('From Email', 'fromEmail')}
-          {field('From Name', 'fromName')}
+          {field("From Email", "fromEmail")}
+          {field("From Name", "fromName")}
         </div>
       </div>
       <div className="flex items-center gap-4 mt-6">
-        <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50 transition-all text-sm font-medium">
-          <Save className="w-4 h-4" /> {saving ? 'Saving…' : 'Save Settings'}
+        <button
+          onClick={save}
+          disabled={saving}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50 transition-all text-sm font-medium"
+        >
+          <Save className="w-4 h-4" /> {saving ? "Saving…" : "Save Settings"}
         </button>
-        {msg && <span className="text-sm text-emerald-600 font-medium">{msg}</span>}
+        {msg && (
+          <span className="text-sm text-emerald-600 font-medium">{msg}</span>
+        )}
       </div>
     </div>
   );
@@ -123,15 +291,26 @@ function AuditLogTab() {
 
   useEffect(() => {
     setLoading(true);
-    api.get<{ data: AuditLog[]; total: number }>(`/admin/analytics/audit-logs?page=${page}&limit=${perPage}`)
-      .then((r) => { setLogs(r.data); setTotal(r.total); })
+    api
+      .get<{ data: AuditLog[]; total: number }>(
+        `/admin/analytics/audit-logs?page=${page}&limit=${perPage}`,
+      )
+      .then((r) => {
+        setLogs(r.data);
+        setTotal(r.total);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [page]);
 
   const totalPages = Math.ceil(total / perPage);
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary-500" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6">
@@ -151,23 +330,46 @@ function AuditLogTab() {
                 <div className="w-2 h-2 mt-2 rounded-full bg-primary-300 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900">
-                    <span className="font-medium">{l.adminName || 'Admin'}</span>{' '}
-                    <span className="text-gray-500">{l.action}</span>{' '}
-                    <span className="text-gray-600">{l.entityType}{l.entityId ? ` #${l.entityId}` : ''}</span>
+                    <span className="font-medium">
+                      {l.adminName || "Admin"}
+                    </span>{" "}
+                    <span className="text-gray-500">{l.action}</span>{" "}
+                    <span className="text-gray-600">
+                      {l.entityType}
+                      {l.entityId ? ` #${l.entityId}` : ""}
+                    </span>
                   </p>
                   {l.details && (
-                    <p className="text-xs text-gray-400 mt-0.5 truncate">{JSON.stringify(l.details)}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 truncate">
+                      {JSON.stringify(l.details)}
+                    </p>
                   )}
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap">{new Date(l.createdAt).toLocaleString()}</span>
+                <span className="text-xs text-gray-400 whitespace-nowrap">
+                  {new Date(l.createdAt).toLocaleString()}
+                </span>
               </div>
             ))}
           </div>
           {totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-4 pt-4 border-t border-gray-100">
-              <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1.5 text-sm bg-gray-100 rounded-lg disabled:opacity-40 hover:bg-gray-200 transition-colors">Prev</button>
-              <span className="px-3 py-1.5 text-sm text-gray-500">{page} / {totalPages}</span>
-              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="px-3 py-1.5 text-sm bg-gray-100 rounded-lg disabled:opacity-40 hover:bg-gray-200 transition-colors">Next</button>
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage(page - 1)}
+                className="px-3 py-1.5 text-sm bg-gray-100 rounded-lg disabled:opacity-40 hover:bg-gray-200 transition-colors"
+              >
+                Prev
+              </button>
+              <span className="px-3 py-1.5 text-sm text-gray-500">
+                {page} / {totalPages}
+              </span>
+              <button
+                disabled={page >= totalPages}
+                onClick={() => setPage(page + 1)}
+                className="px-3 py-1.5 text-sm bg-gray-100 rounded-lg disabled:opacity-40 hover:bg-gray-200 transition-colors"
+              >
+                Next
+              </button>
             </div>
           )}
         </>
