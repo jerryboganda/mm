@@ -156,16 +156,26 @@ export function BackgroundGradient({
     }
     return [
       theme.backgroundRoot,
-      isImmersive ? "#EDF0F4" : "#F0F2F5",
-      isImmersive ? "#F5F7FA" : theme.backgroundRoot,
+      isImmersive ? "#F6F8FB" : "#F7F9FC",
+      isImmersive ? "#FFFFFF" : theme.backgroundRoot,
     ] as const;
   }, [isDark, theme, isImmersive]);
 
-  const orbTealColor = isDark ? "rgba(17,164,212,0.08)" : "rgba(0,153,204,0.06)";
-  const orbPurpleColor = isDark ? "rgba(168,85,247,0.05)" : "rgba(147,51,234,0.04)";
+  const orbTealColor = isDark
+    ? "rgba(17,164,212,0.08)"
+    : "rgba(0,153,204,0.018)";
+  const orbPurpleColor = isDark
+    ? "rgba(168,85,247,0.05)"
+    : "rgba(147,51,234,0.012)";
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundRoot }, style]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme.backgroundRoot },
+        style,
+      ]}
+    >
       <View style={StyleSheet.absoluteFill}>
         <LinearGradient
           colors={gradientColors as any}
@@ -177,23 +187,77 @@ export function BackgroundGradient({
           {Platform.OS !== "web" && animated ? (
             <>
               <Animated.View
-                style={[styles.orb, styles.orbTopRight, { backgroundColor: orbTealColor }, animatedOrb1Style]}
+                style={[
+                  styles.orb,
+                  styles.orbTopRight,
+                  { backgroundColor: orbTealColor },
+                  animatedOrb1Style,
+                ]}
               />
               <Animated.View
-                style={[styles.orb, styles.orbBottomLeft, { backgroundColor: orbPurpleColor }, animatedOrb2Style]}
+                style={[
+                  styles.orb,
+                  styles.orbBottomLeft,
+                  { backgroundColor: orbPurpleColor },
+                  animatedOrb2Style,
+                ]}
               />
             </>
           ) : (
             <>
-              <View style={[styles.orb, styles.orbTopRight, { backgroundColor: orbTealColor }]} />
-              <View style={[styles.orb, styles.orbBottomLeft, { backgroundColor: orbPurpleColor }]} />
+              <View
+                style={[
+                  styles.orb,
+                  styles.orbTopRight,
+                  { backgroundColor: orbTealColor },
+                ]}
+              />
+              <View
+                style={[
+                  styles.orb,
+                  styles.orbBottomLeft,
+                  { backgroundColor: orbPurpleColor },
+                ]}
+              />
             </>
           )}
-          {isQuiz ? <View style={[styles.orb, styles.orbQuiz, { backgroundColor: isDark ? "rgba(34,197,94,0.04)" : "rgba(22,163,74,0.03)" }]} /> : null}
+          {isQuiz ? (
+            <View
+              style={[
+                styles.orb,
+                styles.orbQuiz,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(34,197,94,0.04)"
+                    : "rgba(22,163,74,0.03)",
+                },
+              ]}
+            />
+          ) : null}
           {isImmersive ? (
             <>
-              <View style={[styles.orb, styles.orbAccent, { backgroundColor: isDark ? "rgba(17,164,212,0.04)" : "rgba(0,153,204,0.03)" }]} />
-              <View style={[styles.orb, styles.orbPurple, { backgroundColor: isDark ? "rgba(168,85,247,0.03)" : "rgba(147,51,234,0.02)" }]} />
+              <View
+                style={[
+                  styles.orb,
+                  styles.orbAccent,
+                  {
+                    backgroundColor: isDark
+                      ? "rgba(17,164,212,0.04)"
+                      : "rgba(0,153,204,0.03)",
+                  },
+                ]}
+              />
+              <View
+                style={[
+                  styles.orb,
+                  styles.orbPurple,
+                  {
+                    backgroundColor: isDark
+                      ? "rgba(168,85,247,0.03)"
+                      : "rgba(147,51,234,0.02)",
+                  },
+                ]}
+              />
             </>
           ) : null}
         </View>

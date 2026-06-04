@@ -3,7 +3,7 @@ import { z } from "zod";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
 import {
   getMobileAppContent,
-  setMobileAppTextOverrides,
+  setMobileAppContentSettings,
 } from "../lib/mobile-app-content";
 import { logger } from "../lib/logger";
 
@@ -27,6 +27,12 @@ router.put("/", async (req: AuthRequest, res) => {
   try {
     const schema = z.object({
       textOverrides: z.record(z.string()).default({}),
+      readerWatermark: z
+        .object({
+          enabled: z.boolean().optional(),
+          opacity: z.number().min(0).max(0.2).optional(),
+        })
+        .optional(),
     });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
@@ -45,7 +51,10 @@ router.put("/", async (req: AuthRequest, res) => {
         .json({ message: "Too many text overrides (maximum 5000)." });
     }
 
-    const content = await setMobileAppTextOverrides(parsed.data.textOverrides);
+    const content = await setMobileAppContentSettings({
+      textOverrides: parsed.data.textOverrides,
+      readerWatermark: parsed.data.readerWatermark,
+    });
     res.json({
       message: "Mobile app content saved successfully",
       ...content,

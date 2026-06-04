@@ -21,7 +21,7 @@ import { BlurView } from "expo-blur";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/lib/auth";
-import { Spacing, BorderRadius, Typography, Shadows } from "@/constants/theme";
+import { Spacing, BorderRadius, Typography } from "@/constants/theme";
 import { AnimatedListItem } from "@/components/AnimatedListItem";
 import { GlassCard } from "@/components/GlassCard";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
@@ -61,15 +61,26 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
   }[item.variant];
 
   const renderBackground = () => {
-    if (Platform.OS === "web") {
+    if (Platform.OS === "web" || !isDark) {
       return (
-        <View style={styles.bentoBackground}>
-          <LinearGradient
-            colors={[glowColor, theme.glass]}
-            style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          />
+        <View
+          style={[
+            styles.bentoBackground,
+            !isDark && { backgroundColor: theme.backgroundElevated },
+          ]}
+        >
+          {isDark ? (
+            <LinearGradient
+              colors={[glowColor, theme.glass]}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+          ) : (
+            <View
+              style={[StyleSheet.absoluteFill, { backgroundColor: glowColor }]}
+            />
+          )}
         </View>
       );
     }
@@ -93,7 +104,18 @@ function BentoStatCard({ item, index }: { item: StatCardData; index: number }) {
   return (
     <View style={styles.bentoCardContainer}>
       <AnimatedListItem index={index} delay={60} style={{ width: "100%" }}>
-        <View style={[styles.bentoCard, { borderColor: theme.glassBorder }]}>
+        <View
+          style={[
+            styles.bentoCard,
+            {
+              borderColor: isDark ? theme.glassBorder : "rgba(15,23,42,0.08)",
+              backgroundColor: isDark
+                ? "transparent"
+                : theme.backgroundElevated,
+            },
+            !isDark && styles.bentoCardLight,
+          ]}
+        >
           {renderBackground()}
           <View style={styles.bentoContent}>
             <View style={styles.bentoHeader}>
@@ -138,7 +160,7 @@ function ContinueLearningCard({
   onPress: () => void;
   isNarrow: boolean;
 }) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { resolveText } = useMobileContent();
 
   return (
@@ -229,7 +251,7 @@ function RecommendedCard({
   onPress: () => void;
   index: number;
 }) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
 
   return (
     <AnimatedListItem index={index} delay={80}>
@@ -239,24 +261,37 @@ function RecommendedCard({
           styles.recommendedCard,
           pressed && styles.recommendedCardPressed,
           {
-            borderColor: theme.glassBorderLight,
-            backgroundColor: theme.backgroundSecondary,
+            borderColor: isDark
+              ? theme.glassBorderLight
+              : "rgba(15,23,42,0.08)",
+            backgroundColor: isDark
+              ? theme.backgroundSecondary
+              : theme.backgroundElevated,
           },
         ]}
         accessibilityRole="button"
         accessibilityLabel={`${topic.title}, ${topic.chapterTitle}`}
       >
-        <LinearGradient
-          colors={[
-            `${theme.primary}24`,
-            "rgba(255,255,255,0.045)",
-            "rgba(255,255,255,0.015)",
-          ]}
-          locations={[0, 0.46, 1]}
-          style={StyleSheet.absoluteFill}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
+        {isDark ? (
+          <LinearGradient
+            colors={[
+              `${theme.primary}24`,
+              "rgba(255,255,255,0.045)",
+              "rgba(255,255,255,0.015)",
+            ]}
+            locations={[0, 0.46, 1]}
+            style={StyleSheet.absoluteFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        ) : (
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { backgroundColor: "rgba(0,153,204,0.025)" },
+            ]}
+          />
+        )}
         <View
           style={[
             styles.recommendedAccentLine,
@@ -273,11 +308,11 @@ function RecommendedCard({
               },
             ]}
           >
-            <Feather name="book-open" size={17} color={theme.primaryLight} />
+            <Feather name="book-open" size={17} color={theme.primary} />
           </View>
           <View style={styles.recommendedContent}>
             <Text
-              style={[styles.recommendedEyebrow, { color: theme.primaryLight }]}
+              style={[styles.recommendedEyebrow, { color: theme.primary }]}
               numberOfLines={1}
             >
               RECOMMENDED TOPIC
@@ -310,7 +345,7 @@ function RecommendedCard({
               },
             ]}
           >
-            <Feather name="arrow-right" size={16} color={theme.primaryLight} />
+            <Feather name="arrow-right" size={16} color={theme.primary} />
           </View>
         </View>
       </Pressable>
@@ -320,7 +355,7 @@ function RecommendedCard({
 
 export default function HomeScreen() {
   const headerHeight = useHeaderHeight();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { resolveText } = useMobileContent();
   const { width } = useWindowDimensions();
   const t = resolveText;
@@ -513,7 +548,9 @@ export default function HomeScreen() {
                   style={[
                     styles.notificationButton,
                     {
-                      backgroundColor: theme.glass,
+                      backgroundColor: isDark
+                        ? theme.glass
+                        : theme.backgroundElevated,
                       borderColor: theme.glassBorder,
                     },
                   ]}
@@ -662,7 +699,9 @@ export default function HomeScreen() {
                   style={[
                     styles.retryButton,
                     {
-                      backgroundColor: theme.glass,
+                      backgroundColor: isDark
+                        ? theme.glass
+                        : theme.backgroundElevated,
                       borderColor: theme.glassBorder,
                     },
                   ]}
@@ -790,7 +829,7 @@ const styles = StyleSheet.create({
   },
   bentoCard: {
     width: "100%",
-    borderRadius: BorderRadius.xl,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
     overflow: "hidden",
     minHeight: 130,
@@ -909,17 +948,28 @@ const styles = StyleSheet.create({
   recommendedSection: {
     marginBottom: Spacing.xl,
   },
+  bentoCardLight: {
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.055,
+    shadowRadius: 7,
+    elevation: 2,
+  },
   recommendedSectionTitle: {
     marginBottom: Spacing.md,
   },
   recommendedCard: {
     width: "100%",
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
     overflow: "hidden",
     marginBottom: Spacing.sm,
     minHeight: 104,
-    ...Shadows.cardSubtle,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.055,
+    shadowRadius: 7,
+    elevation: 2,
   },
   recommendedCardPressed: {
     transform: [{ scale: 0.985 }],

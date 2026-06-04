@@ -76,10 +76,11 @@ export default function TopicReaderScreen() {
   const { theme, isDark } = useTheme();
   const feedback = useFeedback();
   const { isOffline } = useNetwork();
-  const { resolveText } = useMobileContent();
+  const { readerWatermark, resolveText } = useMobileContent();
   const t = resolveText;
   const { width: windowWidth } = useWindowDimensions();
   const contentWidth = windowWidth - Spacing.lg * 2;
+  const watermarkSize = Math.min(windowWidth * 0.68, 280);
   const bottomLayout = useBottomLayout({
     footerHeight: 56,
     footerSpacing: Spacing["3xl"],
@@ -94,23 +95,35 @@ export default function TopicReaderScreen() {
   const htmlTagsStyles = useMemo(
     () => ({
       body: { color: theme.text, fontSize: 15, lineHeight: 24 },
-      p: { marginBottom: 8, color: theme.text },
+      p: {
+        marginTop: 0,
+        marginBottom: 6,
+        color: theme.text,
+        fontSize: 15,
+        lineHeight: 24,
+      },
       h1: {
         fontSize: 24,
+        lineHeight: 30,
         fontWeight: "700" as const,
         color: theme.text,
-        marginBottom: 8,
+        marginTop: 0,
+        marginBottom: 6,
       },
       h2: {
         fontSize: 20,
+        lineHeight: 26,
         fontWeight: "700" as const,
         color: theme.text,
-        marginBottom: 6,
+        marginTop: 0,
+        marginBottom: 5,
       },
       h3: {
         fontSize: 17,
+        lineHeight: 23,
         fontWeight: "700" as const,
         color: theme.text,
+        marginTop: 0,
         marginBottom: 4,
       },
       strong: { fontWeight: "700" as const, color: theme.text },
@@ -118,17 +131,28 @@ export default function TopicReaderScreen() {
       em: { fontStyle: "italic" as const },
       u: { textDecorationLine: "underline" as const },
       s: { textDecorationLine: "line-through" as const },
-      a: { color: theme.primary, textDecorationLine: "underline" as const },
-      ul: { paddingLeft: 18, marginBottom: 8 },
-      ol: { paddingLeft: 18, marginBottom: 8 },
-      li: { marginBottom: 4, color: theme.text, fontSize: 15 },
+      mark: { backgroundColor: `${theme.warning}26`, color: theme.text },
+      span: { color: theme.text },
+      a: {
+        color: theme.primary,
+        textDecorationLine: "underline" as const,
+      },
+      ul: { paddingLeft: 18, marginTop: 0, marginBottom: 6 },
+      ol: { paddingLeft: 18, marginTop: 0, marginBottom: 6 },
+      li: {
+        marginBottom: 4,
+        color: theme.text,
+        fontSize: 15,
+        lineHeight: 24,
+      },
       blockquote: {
         borderLeftWidth: 3,
         borderLeftColor: theme.primary,
         paddingLeft: 12,
         fontStyle: "italic" as const,
         color: theme.textSecondary,
-        marginVertical: 8,
+        marginTop: 0,
+        marginBottom: 8,
       },
       sup: { fontSize: 10, lineHeight: 14 },
       sub: { fontSize: 10, lineHeight: 14 },
@@ -153,6 +177,7 @@ export default function TopicReaderScreen() {
         fontWeight: "700" as const,
         color: theme.text,
         fontSize: 13,
+        lineHeight: 19,
       },
       td: {
         borderWidth: 1,
@@ -160,6 +185,7 @@ export default function TopicReaderScreen() {
         padding: 8,
         color: theme.text,
         fontSize: 13,
+        lineHeight: 19,
         verticalAlign: "top" as const,
       },
       tr: {},
@@ -171,6 +197,7 @@ export default function TopicReaderScreen() {
         borderRadius: 4,
         paddingHorizontal: 4,
         fontSize: 13,
+        lineHeight: 18,
         fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
         color: theme.primary,
       },
@@ -179,6 +206,7 @@ export default function TopicReaderScreen() {
         borderRadius: 8,
         padding: 12,
         marginVertical: 8,
+        color: theme.text,
         overflow: "hidden" as const,
       },
       img: {
@@ -206,10 +234,15 @@ export default function TopicReaderScreen() {
         padding: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         background-color: transparent;
+        color: ${theme.text};
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: auto;
       }
       table {
         border-collapse: collapse;
         width: 100%;
+        min-width: 100%;
         margin: 0;
         table-layout: auto;
         border: 1.5px solid ${theme.glassBorderLight};
@@ -221,6 +254,7 @@ export default function TopicReaderScreen() {
         padding: 10px 12px;
         font-weight: 700;
         font-size: 14px;
+        line-height: 1.4;
         color: ${isDark ? theme.primaryLight : theme.primaryDark};
         text-align: left;
         border: 1px solid ${theme.glassBorder};
@@ -228,9 +262,16 @@ export default function TopicReaderScreen() {
       td {
         padding: 9px 12px;
         font-size: 13px;
+        line-height: 1.45;
         color: ${theme.text};
         border: 1px solid ${theme.glassBorder};
         vertical-align: top;
+      }
+      td p, th p {
+        margin: 0 0 6px;
+      }
+      td p:last-child, th p:last-child {
+        margin-bottom: 0;
       }
       tbody tr:nth-child(odd) {
         background-color: transparent;
@@ -589,6 +630,29 @@ export default function TopicReaderScreen() {
 
   return (
     <BackgroundGradient>
+      {readerWatermark.enabled ? (
+        <View
+          pointerEvents="none"
+          style={[
+            styles.readerWatermark,
+            {
+              width: watermarkSize,
+              height: watermarkSize,
+              marginLeft: -watermarkSize / 2,
+              marginTop: -watermarkSize / 2,
+              opacity: readerWatermark.opacity,
+            },
+          ]}
+        >
+          <Image
+            source={require("../../assets/images/icon.png")}
+            style={styles.readerWatermarkImage}
+            contentFit="contain"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+        </View>
+      ) : null}
       <ScrollView
         style={styles.container}
         contentContainerStyle={[
@@ -953,6 +1017,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  readerWatermark: {
+    position: "absolute",
+    left: "50%",
+    top: "48%",
+  },
+  readerWatermarkImage: {
+    width: "100%",
+    height: "100%",
+  },
   content: {
     paddingHorizontal: Spacing.lg,
   },
@@ -960,7 +1033,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: Spacing["2xl"],
+    marginBottom: Spacing.lg,
   },
   title: {
     flex: 1,
@@ -970,11 +1043,11 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
   },
   heading: {
-    marginTop: Spacing["2xl"],
+    marginTop: Spacing.lg,
     marginBottom: Spacing.md,
   },
   paragraph: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
     lineHeight: 26,
   },
   imageContainer: {

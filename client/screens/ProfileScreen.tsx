@@ -25,7 +25,7 @@ export default function ProfileScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { user, logout, deactivateAccount, requestAccountDeletion } = useAuth();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
   const [isProcessingProfileAction, setIsProcessingProfileAction] =
     React.useState(false);
@@ -499,7 +499,16 @@ export default function ProfileScreen() {
                   color={theme.textSecondary}
                 />
               }
-              style={{ marginBottom: Spacing.md }}
+              density="compact"
+              style={[
+                styles.settingsCard,
+                {
+                  marginBottom: Spacing.md,
+                  backgroundColor: isDark
+                    ? "transparent"
+                    : theme.backgroundElevated,
+                },
+              ]}
               testID={`card-settings-${item.id}`}
             />
           ))}
@@ -526,7 +535,16 @@ export default function ProfileScreen() {
                     color={theme.textSecondary}
                   />
                 }
-                style={{ marginBottom: Spacing.md }}
+                density="compact"
+                style={[
+                  styles.settingsCard,
+                  {
+                    marginBottom: Spacing.md,
+                    backgroundColor: isDark
+                      ? "transparent"
+                      : theme.backgroundElevated,
+                  },
+                ]}
                 testID={`card-admin-${item.id}`}
               />
             ))}
@@ -552,6 +570,7 @@ export default function ProfileScreen() {
                 />
               }
               style={[
+                styles.settingsCard,
                 styles.dangerCard,
                 {
                   marginBottom: Spacing.md,
@@ -581,6 +600,7 @@ export default function ProfileScreen() {
               />
             }
             style={[
+              styles.settingsCard,
               styles.logoutCard,
               {
                 borderColor: `${theme.warning}40`,
@@ -679,6 +699,9 @@ const styles = StyleSheet.create({
   },
   settingsSection: {
     marginBottom: Spacing["2xl"],
+  },
+  settingsCard: {
+    borderRadius: BorderRadius.md,
   },
   dangerCard: {
     borderWidth: 1,

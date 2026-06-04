@@ -1,13 +1,24 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { api } from '../lib/api';
-import TipTapEditor from '../components/TipTapEditor';
-import MermaidEditor from '../components/MermaidEditor';
+import { useEffect, useState, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import { api } from "../lib/api";
+import TipTapEditor from "../components/TipTapEditor";
+import MermaidEditor from "../components/MermaidEditor";
+import MobileContentPreview from "../components/MobileContentPreview";
 import {
-  Plus, Trash2, Save, ArrowLeft, Loader2, AlertCircle,
-  GripVertical, ChevronUp, ChevronDown, Type, Code, Image,
+  Plus,
+  Trash2,
+  Save,
+  ArrowLeft,
+  Loader2,
+  AlertCircle,
+  GripVertical,
+  ChevronUp,
+  ChevronDown,
+  Type,
+  Code,
+  Image,
   GitBranch,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ContentBlock {
   id: string;
@@ -24,15 +35,15 @@ interface TopicDetail {
   chapterId: string;
 }
 
-type BlockType = 'text' | 'heading' | 'code' | 'image' | 'html' | 'diagram';
+type BlockType = "text" | "heading" | "code" | "image" | "html" | "diagram";
 
 const BLOCK_TYPES: { value: BlockType; label: string; icon: any }[] = [
-  { value: 'text', label: 'Rich Text', icon: Type },
-  { value: 'heading', label: 'Heading', icon: Type },
-  { value: 'code', label: 'Code', icon: Code },
-  { value: 'image', label: 'Image', icon: Image },
-  { value: 'html', label: 'HTML', icon: Code },
-  { value: 'diagram', label: 'Flowchart / Diagram', icon: GitBranch },
+  { value: "text", label: "Rich Text", icon: Type },
+  { value: "heading", label: "Heading", icon: Type },
+  { value: "code", label: "Code", icon: Code },
+  { value: "image", label: "Image", icon: Image },
+  { value: "html", label: "HTML", icon: Code },
+  { value: "diagram", label: "Flowchart / Diagram", icon: GitBranch },
 ];
 
 export default function TopicEditorPage() {
@@ -42,11 +53,12 @@ export default function TopicEditorPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
 
   // Local state for editing
   const [localBlocks, setLocalBlocks] = useState<ContentBlock[]>([]);
-  const [newBlockType, setNewBlockType] = useState<BlockType>('text');
+  const [newBlockType, setNewBlockType] = useState<BlockType>("text");
 
   const load = useCallback(async () => {
     try {
@@ -64,19 +76,23 @@ export default function TopicEditorPage() {
     }
   }, [topicId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const updateBlock = (id: string, content: string) => {
-    setLocalBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, content } : b)));
+    setLocalBlocks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, content } : b)),
+    );
     setSaved(false);
   };
 
   const addBlock = async () => {
     try {
-      const newBlock = await api.post<ContentBlock>('/admin/content/blocks', {
+      const newBlock = await api.post<ContentBlock>("/admin/content/blocks", {
         topicId,
         type: newBlockType,
-        content: '',
+        content: "",
       });
       setLocalBlocks((prev) => [...prev, newBlock]);
       setSaved(false);
@@ -86,7 +102,7 @@ export default function TopicEditorPage() {
   };
 
   const deleteBlock = async (blockId: string) => {
-    if (!confirm('Delete this content block?')) return;
+    if (!confirm("Delete this content block?")) return;
     try {
       await api.delete(`/admin/content/blocks/${blockId}`);
       setLocalBlocks((prev) => prev.filter((b) => b.id !== blockId));
@@ -95,31 +111,38 @@ export default function TopicEditorPage() {
     }
   };
 
-  const moveBlock = (index: number, direction: 'up' | 'down') => {
+  const moveBlock = (index: number, direction: "up" | "down") => {
     const newBlocks = [...localBlocks];
-    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const newIndex = direction === "up" ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= newBlocks.length) return;
-    [newBlocks[index], newBlocks[newIndex]] = [newBlocks[newIndex], newBlocks[index]];
+    [newBlocks[index], newBlocks[newIndex]] = [
+      newBlocks[newIndex],
+      newBlocks[index],
+    ];
     setLocalBlocks(newBlocks);
     setSaved(false);
   };
 
   const saveAll = async () => {
     setSaving(true);
-    setError('');
+    setError("");
     try {
       // Collect only changed blocks
       const changedBlocks = localBlocks
         .filter((block) => {
           const original = blocks.find((b) => b.id === block.id);
-          return !original || original.content !== block.content || original.type !== block.type;
+          return (
+            !original ||
+            original.content !== block.content ||
+            original.type !== block.type
+          );
         })
         .map((b) => ({ id: b.id, content: b.content, type: b.type }));
 
       const orderedIds = localBlocks.map((b) => b.id);
 
       // Single batch request instead of N+1 calls
-      await api.post('/admin/content/blocks/batch-save', {
+      await api.post("/admin/content/blocks/batch-save", {
         blocks: changedBlocks,
         topicId,
         orderedIds,
@@ -135,30 +158,40 @@ export default function TopicEditorPage() {
     }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary-500" /></div>;
+  if (loading)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link to={topic ? `/chapters/${topic.chapterId}/topics` : '/books'} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+        <Link
+          to={topic ? `/chapters/${topic.chapterId}/topics` : "/books"}
+          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+        >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
           <p className="text-sm text-gray-500">Topic Content Editor</p>
-          <h1 className="text-xl font-bold text-gray-900">{topic?.title || 'Loading…'}</h1>
+          <h1 className="text-xl font-bold text-gray-900">
+            {topic?.title || "Loading..."}
+          </h1>
         </div>
         <button
           onClick={saveAll}
           disabled={saving}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
             saved
-              ? 'bg-green-100 text-green-700'
-              : 'bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50'
+              ? "bg-green-100 text-green-700"
+              : "bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
           }`}
         >
           <Save className="w-4 h-4" />
-          {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save All'}
+          {saving ? "Saving..." : saved ? "Saved" : "Save All"}
         </button>
       </div>
 
@@ -168,84 +201,118 @@ export default function TopicEditorPage() {
         </div>
       )}
 
-      {/* Content Blocks */}
-      <div className="space-y-4">
-        {localBlocks.map((block, idx) => (
-          <div key={block.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden group">
-            {/* Block header */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100">
-              <GripVertical className="w-4 h-4 text-gray-300" />
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {block.type}
-              </span>
-              <span className="text-xs text-gray-400">Block {idx + 1}</span>
-              <div className="flex-1" />
-              <button onClick={() => moveBlock(idx, 'up')} disabled={idx === 0} className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30">
-                <ChevronUp className="w-4 h-4" />
-              </button>
-              <button onClick={() => moveBlock(idx, 'down')} disabled={idx === localBlocks.length - 1} className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30">
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <button onClick={() => deleteBlock(block.id)} className="p-1 text-gray-400 hover:text-red-600">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+        {/* Content Blocks */}
+        <div className="space-y-4">
+          {localBlocks.map((block, idx) => (
+            <div
+              key={block.id}
+              className="bg-white rounded-xl border border-gray-200 overflow-hidden group"
+            >
+              {/* Block header */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100">
+                <GripVertical className="w-4 h-4 text-gray-300" />
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {block.type}
+                </span>
+                <span className="text-xs text-gray-400">Block {idx + 1}</span>
+                <div className="flex-1" />
+                <button
+                  onClick={() => moveBlock(idx, "up")}
+                  disabled={idx === 0}
+                  className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => moveBlock(idx, "down")}
+                  disabled={idx === localBlocks.length - 1}
+                  className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => deleteBlock(block.id)}
+                  className="p-1 text-gray-400 hover:text-red-600"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
 
-            {/* Block content */}
-            <div className="p-0">
-              {block.type === 'text' || block.type === 'html' ? (
-                <TipTapEditor
-                  content={block.content}
-                  onChange={(html) => updateBlock(block.id, html)}
-                  placeholder="Write content here…"
-                />
-              ) : block.type === 'diagram' ? (
-                <MermaidEditor
-                  content={block.content}
-                  onChange={(code) => updateBlock(block.id, code)}
-                />
-              ) : block.type === 'image' ? (
-                <div className="p-4 space-y-2">
-                  <input
+              {/* Block content */}
+              <div className="p-0">
+                {block.type === "text" || block.type === "html" ? (
+                  <TipTapEditor
+                    content={block.content}
+                    onChange={(html) => updateBlock(block.id, html)}
+                    placeholder="Write content here..."
+                  />
+                ) : block.type === "diagram" ? (
+                  <MermaidEditor
+                    content={block.content}
+                    onChange={(code) => updateBlock(block.id, code)}
+                  />
+                ) : block.type === "image" ? (
+                  <div className="p-4 space-y-2">
+                    <input
+                      value={block.content}
+                      onChange={(e) => updateBlock(block.id, e.target.value)}
+                      placeholder="Enter image URL..."
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm"
+                    />
+                    {block.content && (
+                      <img
+                        src={block.content}
+                        alt="Preview"
+                        className="max-h-48 rounded-lg object-contain"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <textarea
                     value={block.content}
                     onChange={(e) => updateBlock(block.id, e.target.value)}
-                    placeholder="Enter image URL…"
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm"
+                    rows={block.type === "heading" ? 2 : 6}
+                    placeholder={
+                      block.type === "heading"
+                        ? "Enter heading text..."
+                        : "Enter content..."
+                    }
+                    className="w-full px-4 py-3 outline-none resize-none font-mono text-sm"
                   />
-                  {block.content && (
-                    <img src={block.content} alt="Preview" className="max-h-48 rounded-lg object-contain" />
-                  )}
-                </div>
-              ) : (
-                <textarea
-                  value={block.content}
-                  onChange={(e) => updateBlock(block.id, e.target.value)}
-                  rows={block.type === 'heading' ? 2 : 6}
-                  placeholder={block.type === 'heading' ? 'Enter heading text…' : 'Enter content…'}
-                  className="w-full px-4 py-3 outline-none resize-none font-mono text-sm"
-                />
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* Add new block */}
-        <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-dashed border-gray-300 hover:border-primary-400 transition-colors">
-          <select
-            value={newBlockType}
-            onChange={(e) => setNewBlockType(e.target.value as BlockType)}
-            className="px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
-          >
-            {BLOCK_TYPES.map((bt) => (
-              <option key={bt.value} value={bt.value}>{bt.label}</option>
-            ))}
-          </select>
-          <button
-            onClick={addBlock}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium"
-          >
-            <Plus className="w-4 h-4" /> Add Block
-          </button>
+          {/* Add new block */}
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-dashed border-gray-300 hover:border-primary-400 transition-colors">
+            <select
+              value={newBlockType}
+              onChange={(e) => setNewBlockType(e.target.value as BlockType)}
+              className="px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+            >
+              {BLOCK_TYPES.map((bt) => (
+                <option key={bt.value} value={bt.value}>
+                  {bt.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={addBlock}
+              className="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium"
+            >
+              <Plus className="w-4 h-4" /> Add Block
+            </button>
+          </div>
+        </div>
+        <div className="lg:sticky lg:top-6 lg:self-start">
+          <MobileContentPreview
+            title={topic?.title || "Topic preview"}
+            blocks={localBlocks}
+            theme={previewTheme}
+            onThemeChange={setPreviewTheme}
+          />
         </div>
       </div>
     </div>

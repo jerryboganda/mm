@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { getActiveSession, touchSession } from "./lib/device-sessions";
 
 const JWT_SECRET = process.env.SESSION_SECRET;
 if (!JWT_SECRET) {
@@ -11,6 +12,7 @@ if (!JWT_SECRET) {
 export interface AuthRequest extends Request {
   userId?: string;
   userRole?: string;
+  sessionId?: string;
 }
 
 interface RateLimitEntry {
@@ -23,9 +25,17 @@ interface RateLimiterOptions {
   keyGenerator?: (req: Request) => string;
 }
 
-function verifyToken(token: string): { userId: string } | null {
+function verifyToken(
+  token: string,
+): { userId: string; sessionId: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { userId: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId?: string;
+      sessionId?: string;
+      type?: string;
+    };
+    if (!decoded.userId || !decoded.sessionId || decoded.type) return null;
+    return { userId: decoded.userId, sessionId: decoded.sessionId };
   } catch {
     return null;
   }
@@ -47,7 +57,14 @@ export async function authMiddleware(
     return res.status(401).json({ message: "Invalid token" });
   }
 
+  const session = await getActiveSession(decoded.sessionId);
+  if (!session || session.userId !== decoded.userId) {
+    return res.status(401).json({ message: "Session expired" });
+  }
+
   req.userId = decoded.userId;
+  req.sessionId = decoded.sessionId;
+  void touchSession(decoded.sessionId);
   next();
 }
 

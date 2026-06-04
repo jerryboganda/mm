@@ -6,12 +6,19 @@ import { Alert, AlertButton } from "react-native";
 /** Payload returned from the mobile-content API endpoint. */
 interface MobileAppContentPayload {
   textOverrides: Record<string, string>;
+  readerWatermark: ReaderWatermarkSettings;
   updatedAt: string | null;
+}
+
+interface ReaderWatermarkSettings {
+  enabled: boolean;
+  opacity: number;
 }
 
 /** Context value exposing text overrides and a resolver function. */
 interface MobileContentContextValue {
   textOverrides: Record<string, string>;
+  readerWatermark: ReaderWatermarkSettings;
   resolveText: (value: string) => string;
   isLoading: boolean;
   updatedAt: string | null;
@@ -22,6 +29,10 @@ const nativeAlert: AlertFn = Alert.alert;
 
 const MobileContentContext = createContext<MobileContentContextValue>({
   textOverrides: {},
+  readerWatermark: {
+    enabled: true,
+    opacity: 0.06,
+  },
   resolveText: (value: string) => value,
   isLoading: false,
   updatedAt: null,
@@ -53,6 +64,10 @@ export function MobileContentProvider({
   });
 
   const textOverrides = data?.textOverrides || {};
+  const readerWatermark = data?.readerWatermark || {
+    enabled: true,
+    opacity: 0.06,
+  };
   const updatedAt = data?.updatedAt || null;
 
   const value = useMemo<MobileContentContextValue>(() => {
@@ -80,11 +95,12 @@ export function MobileContentProvider({
 
     return {
       textOverrides,
+      readerWatermark,
       resolveText,
       isLoading,
       updatedAt,
     };
-  }, [isLoading, textOverrides, updatedAt]);
+  }, [isLoading, readerWatermark, textOverrides, updatedAt]);
 
   React.useEffect(() => {
     const patchedAlert: AlertFn = (title, message, buttons, options) => {

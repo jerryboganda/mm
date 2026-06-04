@@ -21,14 +21,8 @@ interface StatCardProps {
   style?: ViewStyle;
 }
 
-export function StatCard({
-  label,
-  value,
-  icon,
-  color,
-  style,
-}: StatCardProps) {
-  const { theme } = useTheme();
+export function StatCard({ label, value, icon, color, style }: StatCardProps) {
+  const { theme, isDark } = useTheme();
   const reduceMotion = useReducedMotion();
   const entrance = useSharedValue(reduceMotion ? 1 : 0);
   const resolvedColor = color ?? theme.primary;
@@ -51,24 +45,37 @@ export function StatCard({
       style={[
         styles.container,
         animatedStyle,
-        { borderColor: theme.glassBorder },
+        {
+          borderColor: theme.glassBorder,
+          backgroundColor: isDark ? "transparent" : theme.backgroundElevated,
+        },
+        !isDark && styles.lightCardShadow,
         style,
       ]}
       accessibilityRole="text"
       accessibilityLabel={`${label}: ${value}`}
     >
       <LinearGradient
-        colors={[
-          `${resolvedColor}18`,
-          theme.glass,
-          "rgba(255,255,255,0.06)",
-        ]}
+        colors={
+          isDark
+            ? [`${resolvedColor}18`, theme.glass, "rgba(255,255,255,0.06)"]
+            : [
+                `${resolvedColor}0D`,
+                "rgba(255,255,255,0)",
+                "rgba(255,255,255,0)",
+              ]
+        }
         locations={[0, 0.62, 1]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
-      <View style={[styles.iconContainer, { backgroundColor: `${resolvedColor}20` }]}>
+      <View
+        style={[
+          styles.iconContainer,
+          { backgroundColor: `${resolvedColor}20` },
+        ]}
+      >
         <Feather name={icon} size={20} color={resolvedColor} />
       </View>
       <ThemedText
@@ -80,7 +87,10 @@ export function StatCard({
       >
         {value}
       </ThemedText>
-      <ThemedText style={[styles.label, { color: theme.textSecondary }]} numberOfLines={2}>
+      <ThemedText
+        style={[styles.label, { color: theme.textSecondary }]}
+        numberOfLines={2}
+      >
         {label}
       </ThemedText>
     </Animated.View>
@@ -91,10 +101,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: Spacing.lg,
-    borderRadius: BorderRadius.xl,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
     alignItems: "center",
     overflow: "hidden",
+  },
+  lightCardShadow: {
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.055,
+    shadowRadius: 7,
+    elevation: 2,
   },
   iconContainer: {
     width: 40,

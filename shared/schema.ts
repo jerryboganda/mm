@@ -39,6 +39,10 @@ export const users = pgTable("users", {
   isPhoneVerified: boolean("is_phone_verified").default(false).notNull(),
   phoneVerificationToken: text("phone_verification_token"),
   phoneTokenExpiresAt: timestamp("phone_token_expires_at"),
+  deviceLimitOverrideEnabled: boolean("device_limit_override_enabled")
+    .default(false)
+    .notNull(),
+  deviceLimitMax: integer("device_limit_max"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -46,6 +50,49 @@ export const usersRelations = relations(users, ({ many }) => ({
   bookmarks: many(bookmarks),
   quizAttempts: many(quizAttempts),
   subscriptions: many(subscriptions),
+  sessions: many(userSessions),
+}));
+
+export const userSessions = pgTable(
+  "user_sessions",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    deviceId: text("device_id").notNull(),
+    deviceLabel: text("device_label"),
+    platform: text("platform"),
+    userAgent: text("user_agent"),
+    ipAddress: text("ip_address"),
+    refreshTokenHash: text("refresh_token_hash").notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    revokedAt: timestamp("revoked_at"),
+    revokedBy: varchar("revoked_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    revokeReason: text("revoke_reason"),
+  },
+  (table) => [
+    index("idx_user_sessions_user_active").on(table.userId, table.isActive),
+    index("idx_user_sessions_device").on(table.userId, table.deviceId),
+  ],
+);
+
+export const userSessionsRelations = relations(userSessions, ({ one }) => ({
+  user: one(users, {
+    fields: [userSessions.userId],
+    references: [users.id],
+  }),
+  revokedByUser: one(users, {
+    fields: [userSessions.revokedBy],
+    references: [users.id],
+  }),
 }));
 
 export const books = pgTable("books", {
@@ -1285,6 +1332,7 @@ export const bulkCouponGenerationSchema = z.object({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type UserSession = typeof userSessions.$inferSelect;
 export type Book = typeof books.$inferSelect;
 export type Chapter = typeof chapters.$inferSelect;
 export type Topic = typeof topics.$inferSelect;

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { storage } from "../storage";
 import {
   sendEmail,
@@ -22,8 +23,38 @@ import {
 } from "../middleware";
 import { sanitizeString } from "../lib/api-response";
 import { logger } from "../lib/logger";
+import {
+  getScanLoginSettings,
+  parseScannedLoginCode,
+  verifyScanLoginCode,
+} from "../lib/scan-login";
+import {
+  createOrReplaceUserSession,
+  getActiveSession,
+  hashRefreshToken,
+  revokeSession,
+  revokeUserSessions,
+  type DeviceIdentity,
+} from "../lib/device-sessions";
 
 const router = Router();
+
+router.get("/scan-login-settings", async (_req, res) => {
+  try {
+    const settings = await getScanLoginSettings();
+    const {
+      codeHash: _codeHash,
+      targetEmail: _targetEmail,
+      ...publicSettings
+    } = settings;
+    res.json(publicSettings);
+  } catch (error) {
+    logger.error("Get public scan login settings error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    res.status(500).json({ message: "Failed to load scan login settings" });
+  }
+});
 
 // ── OTP Attempt Lockout ──────────────────────────────────────
 const OTP_MAX_ATTEMPTS = 5;
@@ -73,14 +104,52 @@ const ACCOUNT_DEACTIVATED_MESSAGE =
 const ACCOUNT_DELETION_PENDING_MESSAGE =
   "Your account deletion request is in progress. Please contact support if you need help.";
 
-function generateToken(userId: string): string {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+function generateToken(userId: string, sessionId: string): string {
+  return jwt.sign({ userId, sessionId }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  });
 }
 
-function generateRefreshToken(userId: string): string {
-  return jwt.sign({ userId, type: "refresh" }, JWT_SECRET, {
+function generateRefreshToken(userId: string, sessionId: string): string {
+  return jwt.sign({ userId, sessionId, type: "refresh" }, JWT_SECRET, {
     expiresIn: REFRESH_EXPIRES_IN,
   });
+}
+
+function parseDeviceIdentity(body: unknown): DeviceIdentity {
+  const input = body && typeof body === "object" ? (body as any) : {};
+  return {
+    deviceId:
+      typeof input.deviceId === "string" ? sanitizeString(input.deviceId) : "",
+    deviceLabel:
+      typeof input.deviceLabel === "string"
+        ? sanitizeString(input.deviceLabel)
+        : "",
+    platform:
+      typeof input.platform === "string" ? sanitizeString(input.platform) : "",
+  };
+}
+
+async function issueSessionTokens(
+  user: NonNullable<Awaited<ReturnType<typeof storage.getUser>>>,
+  req: AuthRequest,
+) {
+  const sessionId = crypto.randomUUID();
+  const refreshToken = generateRefreshToken(user.id, sessionId);
+  const session = await createOrReplaceUserSession({
+    sessionId,
+    user,
+    refreshToken,
+    device: parseDeviceIdentity(req.body),
+    req,
+  });
+  const accessToken = generateToken(user.id, session.id);
+
+  return {
+    accessToken,
+    refreshToken,
+    session,
+  };
 }
 
 function generateOTP(): string {
@@ -243,9 +312,13 @@ router.post(
         emailTokenExpiresAt: null,
       });
 
-      const accessToken = generateToken(user.id);
+      const sessionTokens = await issueSessionTokens(
+        { ...user, isEmailVerified: true },
+        req as AuthRequest,
+      );
       res.json({
-        accessToken,
+        accessToken: sessionTokens.accessToken,
+        refreshToken: sessionTokens.refreshToken,
         user: serializeUser({ ...user, isEmailVerified: true }),
       });
     } catch (error) {
@@ -356,12 +429,11 @@ router.post(
           .json({ code: blockedState.code, message: blockedState.message });
       }
 
-      const accessToken = generateToken(user.id);
-      const refreshToken = generateRefreshToken(user.id);
+      const sessionTokens = await issueSessionTokens(user, req as AuthRequest);
 
       res.json({
-        accessToken,
-        refreshToken,
+        accessToken: sessionTokens.accessToken,
+        refreshToken: sessionTokens.refreshToken,
         user: serializeUser(user),
       });
     } catch (error) {
@@ -372,6 +444,76 @@ router.post(
         error: error instanceof Error ? error.message : String(error),
       });
       res.status(500).json({ message: "Login failed" });
+    }
+  },
+);
+
+router.post(
+  "/scan-login",
+  rateLimiter(10, 15 * 60 * 1000, {
+    keyPrefix: "auth_scan_login",
+    keyGenerator: (req) => getRateLimitClientId(req),
+  }),
+  async (req, res) => {
+    try {
+      const schema = z.object({ code: z.string().min(1) });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Access code is required" });
+      }
+
+      const code = parseScannedLoginCode(sanitizeString(parsed.data.code));
+      const settings = await getScanLoginSettings();
+      if (!settings.enabled || !settings.hasCode || !settings.targetEmail) {
+        return res.status(400).json({
+          code: "SCAN_LOGIN_DISABLED",
+          message: "Scan login is not available right now.",
+        });
+      }
+
+      const validCode = await verifyScanLoginCode(code);
+      if (!validCode) {
+        return res.status(401).json({ message: "Invalid access code" });
+      }
+
+      const user = await storage.getUserByEmail(settings.targetEmail);
+      if (!user) {
+        logger.warn("Scan login target account not found", {
+          targetEmail: settings.targetEmail,
+        });
+        return res.status(400).json({
+          code: "SCAN_LOGIN_NOT_CONFIGURED",
+          message: "Scan login is not configured correctly.",
+        });
+      }
+
+      if (!user.isEmailVerified) {
+        return res.status(403).json({
+          code: "EMAIL_NOT_VERIFIED",
+          message: "Please verify your email address",
+          email: user.email,
+        });
+      }
+
+      const blockedState = getBlockedAccountState(user);
+      if (blockedState) {
+        return res
+          .status(blockedState.status)
+          .json({ code: blockedState.code, message: blockedState.message });
+      }
+
+      const sessionTokens = await issueSessionTokens(user, req as AuthRequest);
+
+      res.json({
+        accessToken: sessionTokens.accessToken,
+        refreshToken: sessionTokens.refreshToken,
+        user: serializeUser(user),
+      });
+    } catch (error) {
+      logger.error("Scan login error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({ message: "Scan login failed" });
     }
   },
 );
@@ -544,9 +686,8 @@ router.post(
   },
 );
 
-router.post("/logout-all", authMiddleware, async (_req: AuthRequest, res) => {
-  // JWT sessions are stateless in this app, so we acknowledge the request.
-  // Client logs out locally right after this endpoint returns success.
+router.post("/logout-all", authMiddleware, async (req: AuthRequest, res) => {
+  await revokeUserSessions(req.userId!, "user_logout_all");
   res.json({ success: true, message: "Logged out from all devices" });
 });
 
@@ -568,7 +709,10 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
   }
 });
 
-router.post("/logout", authMiddleware, async (_req, res) => {
+router.post("/logout", authMiddleware, async (req: AuthRequest, res) => {
+  if (req.sessionId) {
+    await revokeSession(req.sessionId, "user_logout");
+  }
   res.json({ success: true });
 });
 
@@ -582,9 +726,10 @@ router.post("/refresh", rateLimiter(20, 60 * 1000), async (req, res) => {
 
     const decoded = jwt.verify(refreshToken, JWT_SECRET) as {
       userId: string;
+      sessionId?: string;
       type?: string;
     };
-    if (decoded.type !== "refresh") {
+    if (decoded.type !== "refresh" || !decoded.sessionId) {
       return res.status(401).json({ message: "Invalid token type" });
     }
 
@@ -601,7 +746,16 @@ router.post("/refresh", rateLimiter(20, 60 * 1000), async (req, res) => {
         .json({ code: blockedState.code, message: blockedState.message });
     }
 
-    const newAccessToken = generateToken(user.id);
+    const session = await getActiveSession(decoded.sessionId);
+    if (
+      !session ||
+      session.userId !== user.id ||
+      session.refreshTokenHash !== hashRefreshToken(refreshToken)
+    ) {
+      return res.status(401).json({ message: "Invalid or expired session" });
+    }
+
+    const newAccessToken = generateToken(user.id, session.id);
     res.json({ accessToken: newAccessToken });
   } catch (error) {
     if (

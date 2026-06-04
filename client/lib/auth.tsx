@@ -8,6 +8,7 @@ import React, {
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { getApiUrl, queryClient } from "@/lib/query-client";
+import { getDeviceIdentity } from "@/lib/device-identity";
 
 interface User {
   id: string;
@@ -36,6 +37,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isSessionExpired: boolean;
   login: (email: string, password: string) => Promise<void>;
+  scanLogin: (code: string) => Promise<void>;
   register: (
     name: string,
     email: string,
@@ -171,7 +173,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await fetch(new URL("/api/auth/login", baseUrl), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email,
+        password,
+        ...(await getDeviceIdentity()),
+      }),
     });
 
     if (!response.ok) {
@@ -193,6 +199,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       throw error; // Return full error object to handle 403 cases
+    }
+
+    const data = await response.json();
+    await setToken(TOKEN_KEY, data.accessToken);
+    if (data.refreshToken) {
+      await setToken(REFRESH_TOKEN_KEY, data.refreshToken);
+    }
+    setUser(data.user);
+  };
+
+  const scanLogin = async (code: string) => {
+    const baseUrl = getApiUrl();
+    const response = await fetch(new URL("/api/auth/scan-login", baseUrl), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, ...(await getDeviceIdentity()) }),
+    });
+
+    if (!response.ok) {
+      throw await parseErrorResponse(response);
     }
 
     const data = await response.json();
@@ -238,7 +264,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await fetch(new URL("/api/auth/verify-email", baseUrl), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code }),
+      body: JSON.stringify({ email, code, ...(await getDeviceIdentity()) }),
     });
 
     if (!response.ok) {
@@ -248,6 +274,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await response.json();
     await setToken(TOKEN_KEY, data.accessToken);
+    if (data.refreshToken) {
+      await setToken(REFRESH_TOKEN_KEY, data.refreshToken);
+    }
     setUser(data.user);
   };
 
@@ -344,6 +373,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isSessionExpired,
         login,
+        scanLogin,
         register,
         logout,
         refreshUser,

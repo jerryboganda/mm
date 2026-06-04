@@ -18,11 +18,29 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+const ADMIN_DEVICE_ID_KEY = "admin_device_id";
+
+function getAdminDeviceIdentity() {
+  let deviceId = localStorage.getItem(ADMIN_DEVICE_ID_KEY);
+  if (!deviceId) {
+    deviceId =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? `admin-${crypto.randomUUID()}`
+        : `admin-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem(ADMIN_DEVICE_ID_KEY, deviceId);
+  }
+
+  return {
+    deviceId,
+    platform: "web",
+    deviceLabel: "Admin web browser",
+  };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -58,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {
         email,
         password,
+        ...getAdminDeviceIdentity(),
       },
     );
 
@@ -70,10 +89,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data.user);
   };
 
-  const logout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // Local cleanup still needs to run when the server session is already gone.
+    } finally {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+      setUser(null);
+    }
   };
 
   return (
