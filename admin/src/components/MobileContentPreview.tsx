@@ -71,6 +71,18 @@ const previewCss = `
   .mm-mobile-preview p {
     margin-bottom: 6px;
   }
+  .mm-mobile-preview [style*="text-align: left"] {
+    text-align: left;
+  }
+  .mm-mobile-preview [style*="text-align: center"] {
+    text-align: center;
+  }
+  .mm-mobile-preview [style*="text-align: right"] {
+    text-align: right;
+  }
+  .mm-mobile-preview [style*="text-align: justify"] {
+    text-align: justify;
+  }
   .mm-mobile-preview ul,
   .mm-mobile-preview ol {
     padding-left: 18px;

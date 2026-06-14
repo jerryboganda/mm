@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { Extension } from '@tiptap/core';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
+import TiptapImage from '@tiptap/extension-image';
 import { Table } from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
@@ -19,14 +21,37 @@ import {
   Minus, Link as LinkIcon, Superscript as SuperscriptIcon,
   Subscript as SubscriptIcon, AlignLeft, AlignCenter, AlignRight,
   Table as TableIcon,
-  ArrowRightFromLine, ArrowDownFromLine, Trash2,
+  ArrowRightFromLine, ArrowLeftFromLine, ArrowDownFromLine,
+  ArrowUpFromLine, Trash2, Loader2,
 } from 'lucide-react';
 
 interface TipTapEditorProps {
   content: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  uploadImage?: (file: File) => Promise<string>;
+  registerHtmlGetter?: (getter: (() => string) | null) => void;
 }
+
+const TabIndent = Extension.create({
+  name: 'tabIndent',
+  addKeyboardShortcuts() {
+    return {
+      Tab: () => {
+        if (this.editor.isActive('bulletList') || this.editor.isActive('orderedList')) {
+          return this.editor.commands.sinkListItem('listItem');
+        }
+        return this.editor.commands.insertContent('\u00a0\u00a0\u00a0\u00a0');
+      },
+      'Shift-Tab': () => {
+        if (this.editor.isActive('bulletList') || this.editor.isActive('orderedList')) {
+          return this.editor.commands.liftListItem('listItem');
+        }
+        return false;
+      },
+    };
+  },
+});
 
 /* ─── Medical Table Templates ────────────────────────────────── */
 const MEDICAL_TABLE_TEMPLATES: { name: string; description: string; html: string }[] = [
@@ -152,12 +177,25 @@ function TableDropdown({ onInsert, onTemplate }: {
   );
 }
 
-export default function TipTapEditor({ content, onChange, placeholder }: TipTapEditorProps) {
+export default function TipTapEditor({
+  content,
+  onChange,
+  placeholder,
+  uploadImage,
+  registerHtmlGetter,
+}: TipTapEditorProps) {
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const lastAppliedContentRef = useRef(content);
   const editor = useEditor({
     extensions: [
       StarterKit,
+      TabIndent,
       Underline,
       Placeholder.configure({ placeholder: placeholder || 'Write content here…' }),
+      TiptapImage.configure({
+        allowBase64: false,
+        HTMLAttributes: { class: 'mm-inline-image' },
+      }),
       Table.configure({ resizable: true, HTMLAttributes: { class: 'mm-table' } }),
       TableRow,
       TableCell,
@@ -182,11 +220,59 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const html = editor.getHTML();
+      lastAppliedContentRef.current = html;
+      onChange(html);
     },
   });
 
+  useEffect(() => {
+    if (!editor || !registerHtmlGetter) return;
+
+    registerHtmlGetter(() => editor.getHTML());
+    return () => registerHtmlGetter(null);
+  }, [editor, registerHtmlGetter]);
+
+  useEffect(() => {
+    if (!editor || content === lastAppliedContentRef.current) return;
+
+    if (content !== editor.getHTML()) {
+      editor.commands.setContent(content || '', false);
+    }
+    lastAppliedContentRef.current = content;
+  }, [content, editor]);
+
   if (!editor) return null;
+
+  const uploadAndInsertImage = async (file: File) => {
+    if (!uploadImage || !file.type.startsWith('image/')) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadImage(file);
+      editor.chain().focus().setImage({ src: url }).run();
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Image upload failed');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const getImageFromFiles = (files?: FileList | null) =>
+    Array.from(files || []).find((file) => file.type.startsWith('image/'));
+
+  const handlePaste = (event: React.ClipboardEvent) => {
+    const file = getImageFromFiles(event.clipboardData?.files);
+    if (!file) return;
+    event.preventDefault();
+    void uploadAndInsertImage(file);
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    const file = getImageFromFiles(event.dataTransfer?.files);
+    if (!file) return;
+    event.preventDefault();
+    void uploadAndInsertImage(file);
+  };
 
   const addLink = () => {
     const url = window.prompt('URL', editor.getAttributes('link').href || 'https://');
@@ -277,8 +363,14 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
         {/* Table context buttons — only visible when cursor inside a table */}
         {editor.isActive('table') && (
           <>
+            <ToolbarButton onClick={() => editor.chain().focus().addColumnBefore().run()} title="Add Column Before">
+              <ArrowLeftFromLine className="w-4 h-4" />
+            </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().addColumnAfter().run()} title="Add Column After">
               <ArrowRightFromLine className="w-4 h-4" />
+            </ToolbarButton>
+            <ToolbarButton onClick={() => editor.chain().focus().addRowBefore().run()} title="Add Row Before">
+              <ArrowUpFromLine className="w-4 h-4" />
             </ToolbarButton>
             <ToolbarButton onClick={() => editor.chain().focus().addRowAfter().run()} title="Add Row After">
               <ArrowDownFromLine className="w-4 h-4" />
@@ -288,8 +380,22 @@ export default function TipTapEditor({ content, onChange, placeholder }: TipTapE
             </ToolbarButton>
           </>
         )}
+        {uploadingImage && (
+          <span className="inline-flex items-center gap-1 px-2 text-xs text-primary-600">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            Image
+          </span>
+        )}
       </div>
-      <EditorContent editor={editor} />
+      <div
+        onPaste={handlePaste}
+        onDrop={handleDrop}
+        onDragOver={(event) => {
+          if (getImageFromFiles(event.dataTransfer?.files)) event.preventDefault();
+        }}
+      >
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

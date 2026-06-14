@@ -10,8 +10,18 @@ const viteLogger = createLogger();
 
 export async function setupVite(server: Server, app: Express) {
   const serverOptions = {
+    host: "0.0.0.0",
     middlewareMode: true,
-    hmr: { server, path: "/vite-hmr" },
+    hmr: {
+      server,
+      path: "/vite-hmr",
+      host: process.env.VITE_HMR_HOST || "localhost",
+      clientPort: Number(process.env.PORT || "5000"),
+    },
+    watch: {
+      usePolling: process.env.CHOKIDAR_USEPOLLING === "true",
+      interval: Number(process.env.CHOKIDAR_INTERVAL || "100"),
+    },
     allowedHosts: true as const,
   };
 
@@ -49,7 +59,16 @@ export async function setupVite(server: Server, app: Express) {
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      res
+        .status(200)
+        .set({
+          "Content-Type": "text/html",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+          "Surrogate-Control": "no-store",
+        })
+        .end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
