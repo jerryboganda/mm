@@ -14,6 +14,12 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express,
 ): Promise<Server> {
+  if (process.env.NODE_ENV !== "production") {
+    app.get("/api/dev/hot-reload-check", (_req, res) => {
+      res.json({ ok: true, message: "hot-reload-v2" });
+    });
+  }
+
   app.post("/api/waitlist", async (req, res) => {
     try {
       const parsed = insertWaitlistSchema.safeParse(req.body);

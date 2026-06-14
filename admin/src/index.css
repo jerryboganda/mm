@@ -104,8 +104,10 @@
 }
 
 /* Text alignment */
+.ProseMirror [style*="text-align: left"] { text-align: left; }
 .ProseMirror [style*="text-align: center"] { text-align: center; }
 .ProseMirror [style*="text-align: right"] { text-align: right; }
+.ProseMirror [style*="text-align: justify"] { text-align: justify; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

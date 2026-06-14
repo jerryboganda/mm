@@ -352,6 +352,16 @@ function configureExpoAndLanding(app: express.Application) {
     next();
   });
 
+  const uploadsPath = path.resolve(process.cwd(), "uploads", "content-images");
+  fs.mkdirSync(uploadsPath, { recursive: true });
+  app.use(
+    "/uploads/content-images",
+    express.static(uploadsPath, {
+      fallthrough: false,
+      immutable: true,
+      maxAge: "30d",
+    }),
+  );
   app.use("/assets", express.static(path.resolve(process.cwd(), "assets")));
   app.use(express.static(path.resolve(process.cwd(), "static-build")));
 

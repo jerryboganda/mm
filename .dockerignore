@@ -3,6 +3,18 @@ android
 ios
 .expo
 .git
+.cache
+.turbo
+.vite
+coverage
+dist
+build
+web_dist
+admin_dist
+server_dist
+server_dist_check
+*.tsbuildinfo
+*.log
 *.md
 !README.md
 AUDIT_REPORT.md
@@ -14,4 +26,4 @@ Maternal_Mind_Master_Mega_Revised_Plan.md
 .env
 .env.*
 !.env.example
-server_dist
+!.env.development.example

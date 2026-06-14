@@ -5,6 +5,10 @@
  * All routes protected by authMiddleware + requireRole("admin").
  */
 import { Router } from "express";
+import multer from "multer";
+import * as crypto from "crypto";
+import * as fs from "fs";
+import * as path from "path";
 import { z } from "zod";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
 import {
@@ -121,9 +125,95 @@ function validateBody<T>(
 const router = Router();
 const getParamValue = (param: string | string[]) =>
   Array.isArray(param) ? param[0] : param;
+const uploadDir = path.resolve(process.cwd(), "uploads", "content-images");
+const allowedImageTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+const imageExtensionByMime: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+};
+
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const imageUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadDir),
+    filename: (_req, file, cb) => {
+      const ext =
+        imageExtensionByMime[file.mimetype] ||
+        path.extname(file.originalname).toLowerCase();
+      cb(null, `${Date.now()}-${crypto.randomUUID()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (!allowedImageTypes.has(file.mimetype)) {
+      cb(new Error("Only JPEG, PNG, WebP, and GIF images are allowed"));
+      return;
+    }
+    cb(null, true);
+  },
+});
+const uploadSingleImage = imageUpload.single("image");
 
 // All routes require admin
 router.use(authMiddleware, requireRole("admin"));
+
+router.post(
+  "/uploads/images",
+  (req, res, next) => {
+    uploadSingleImage(req, res, (err: unknown) => {
+      if (!err) return next();
+
+      if (err instanceof multer.MulterError) {
+        const message =
+          err.code === "LIMIT_FILE_SIZE"
+            ? "Image must be 10 MB or smaller"
+            : err.message;
+        return res.status(400).json({ message });
+      }
+
+      return res.status(400).json({
+        message: err instanceof Error ? err.message : "Image upload failed",
+      });
+    });
+  },
+  async (req: AuthRequest, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "Image file is required" });
+      }
+
+      await createAuditLog({
+        adminUserId: req.userId!,
+        action: "create",
+        entityType: "content_image",
+        entityId: req.file.filename,
+        details: {
+          filename: req.file.filename,
+          mimeType: req.file.mimetype,
+          size: req.file.size,
+        },
+      });
+
+      res.status(201).json({
+        url: `/uploads/content-images/${req.file.filename}`,
+        filename: req.file.filename,
+      });
+    } catch (err: unknown) {
+      logger.error("Admin image upload error", { error: String(err) });
+      res
+        .status(500)
+        .json({ message: err instanceof Error ? err.message : String(err) });
+    }
+  },
+);
 
 // ═══════════════════════════════════════════════════════════════
 // BOOKS
