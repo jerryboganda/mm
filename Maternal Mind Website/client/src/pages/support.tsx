@@ -124,7 +124,7 @@ export default function Support() {
                 {
                   icon: Mail,
                   title: "Email Support",
-                  desc: "support@maternalmind.app",
+                  desc: "maternalmind.help@gmail.com",
                   sub: "Response within 24 hours",
                 },
                 {

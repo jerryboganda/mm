@@ -49,7 +49,7 @@ const commonIssues = [
   },
 ];
 
-const DEFAULT_SUPPORT_EMAIL = "support@maternalmind.com.pk";
+const DEFAULT_SUPPORT_EMAIL = "maternalmind.help@gmail.com";
 
 export default function PurchaseFailedScreen() {
   const insets = useSafeAreaInsets();

@@ -130,7 +130,7 @@ export function Footer() {
 
             <div className="flex items-center gap-3">
               <a
-                href="mailto:support@maternalmind.app"
+                href="mailto:maternalmind.help@gmail.com"
                 className="w-9 h-9 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-[#11a4d4] hover:border-[#11a4d4]/30 transition-all"
                 data-testid="link-email"
                 aria-label="Email"
