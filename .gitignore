@@ -75,6 +75,10 @@ office_pc_ed25519
 OFFICE_VPS_SSH_COPY_PASTE.txt
 VPS SSH Login Details.md
 
+# Runtime PID files
+*.pid
+.server.pid
+
 # Output and temp directories
 output/
 .tmp_*/
