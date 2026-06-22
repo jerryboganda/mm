@@ -2,8 +2,16 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useAuth } from "@/lib/auth";
+import { usePurchases } from "@/lib/purchases";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { ActivityIndicator, View, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  StyleSheet,
+  Platform,
+  Pressable,
+} from "react-native";
+import { ThemedText } from "@/components/ThemedText";
 
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import WelcomeScreen from "@/screens/WelcomeScreen";
@@ -87,7 +95,8 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { isSubscribed, initialized: purchasesInitialized } = usePurchases();
   const { resolveText } = useMobileContent();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } =
     useOnboarding();
@@ -95,6 +104,18 @@ export default function RootStackNavigator() {
   const t = resolveText;
 
   const requiresEmailVerification = user && !user.isEmailVerified;
+
+  // Hard paywall: a user only reaches the app when they have an active
+  // subscription. RevenueCat is the real-time source of truth on device; the
+  // server status (now expiry-aware) covers web and the brief window before
+  // RevenueCat resolves on native.
+  const serverSubscriptionActive = user?.subscriptionStatus === "active";
+  const hasActiveSubscription =
+    Platform.OS === "web"
+      ? serverSubscriptionActive
+      : purchasesInitialized
+        ? isSubscribed
+        : serverSubscriptionActive;
 
   if (authLoading || onboardingLoading) {
     return (
@@ -122,6 +143,65 @@ export default function RootStackNavigator() {
               headerTransparent: true,
             }}
           />
+        ) : !hasActiveSubscription ? (
+          <>
+            <Stack.Screen
+              name="Paywall"
+              component={PaywallScreen}
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerTitle: "",
+                headerBackVisible: false,
+                gestureEnabled: false,
+                headerRight: () => (
+                  <Pressable
+                    onPress={logout}
+                    hitSlop={8}
+                    style={{ paddingHorizontal: 4 }}
+                  >
+                    <ThemedText
+                      style={{ color: theme.primary, fontWeight: "600" }}
+                    >
+                      Sign Out
+                    </ThemedText>
+                  </Pressable>
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="Subscription"
+              component={SubscriptionScreen}
+              options={{
+                headerTitle: t("Subscription"),
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="RestorePurchases"
+              component={RestorePurchasesScreen}
+              options={{
+                headerTitle: t("Restore Purchases"),
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="PurchaseSuccess"
+              component={PurchaseSuccessScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name="PurchaseFailed"
+              component={PurchaseFailedScreen}
+              options={{
+                headerTitle: t("Purchase Failed"),
+                presentation: "card",
+              }}
+            />
+          </>
         ) : (
           <>
             <Stack.Screen

@@ -74,7 +74,7 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
 
   useEffect(() => {
     initializePurchases();
@@ -84,11 +84,16 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (initialized && user?.id) {
       Purchases.logIn(user.id)
-        .then(({ customerInfo: info }) => {
+        .then(async ({ customerInfo: info }) => {
           setCustomerInfo(info);
           const entitlement =
             info.entitlements.active[REVENUECAT_ENTITLEMENT_ID];
           setIsSubscribed(!!entitlement);
+          // Keep the backend subscription status in lockstep with RevenueCat
+          // so a lapsed or cancelled subscription can no longer report a stale
+          // "active" status to the hard paywall gate.
+          await syncSubscriptionToServer(info);
+          await refreshUser();
         })
         .catch((err) => {
           console.error("RevenueCat logIn error:", err);
@@ -166,6 +171,15 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
           subscriptionStatus: "active",
           subscriptionPlan: entitlement.productIdentifier || "premium",
           expiresAt: entitlement.expirationDate || null,
+          revenueCatId: info.originalAppUserId,
+        });
+      } else {
+        // No active entitlement — report the lapsed/never-subscribed state so
+        // the backend stops reporting a stale "active" status.
+        const everSubscribed =
+          Object.keys(info.entitlements.all ?? {}).length > 0;
+        await apiRequest("POST", "/api/profile/subscription/sync", {
+          subscriptionStatus: everSubscribed ? "expired" : "none",
           revenueCatId: info.originalAppUserId,
         });
       }
