@@ -23,6 +23,7 @@ import {
 } from "../middleware";
 import { sanitizeString } from "../lib/api-response";
 import { logger } from "../lib/logger";
+import { effectiveSubscriptionStatus } from "../lib/subscription-status";
 import {
   getScanLoginSettings,
   parseScannedLoginCode,
@@ -192,7 +193,10 @@ function serializeUser(
     name: user.name,
     avatarUrl: user.avatarUrl,
     role: user.role,
-    subscriptionStatus: user.subscriptionStatus,
+    subscriptionStatus: effectiveSubscriptionStatus(
+      user.subscriptionStatus,
+      user.subscriptionExpiresAt,
+    ),
     subscriptionPlan: user.subscriptionPlan,
     isEmailVerified: user.isEmailVerified,
     isActive: user.isActive,
