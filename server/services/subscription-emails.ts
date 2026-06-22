@@ -15,7 +15,7 @@ import { logger } from "../lib/logger";
 // ── Brand constants ──────────────────────────────────────────────
 const BRAND = {
   appName: "Maternal Mind",
-  supportEmail: "support@maternalmind.com.pk",
+  supportEmail: "maternalmind.help@gmail.com",
   bgColor: "#0c1e2e",
   bgOuter: "#101d22",
   accent: "#11a4d4",

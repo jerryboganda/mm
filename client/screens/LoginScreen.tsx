@@ -52,7 +52,7 @@ export default function LoginScreen() {
   const [supportContact, setSupportContact] = useState({
     whatsappNumber: "",
     phoneNumber: "",
-    supportEmail: "support@maternalmind.com.pk",
+    supportEmail: "maternalmind.help@gmail.com",
     whatsappDefaultMessage: "Hello Support Team, I need help logging in.",
     whatsappEnabled: false,
     phoneEnabled: false,
@@ -188,11 +188,34 @@ export default function LoginScreen() {
       }
     }
 
+    if (supportContact.supportEmail) {
+      const mailtoUrl = `mailto:${supportContact.supportEmail}?subject=${encodeURIComponent(
+        "Trouble logging in",
+      )}&body=${message}`;
+      Alert.alert(
+        "Contact Support",
+        `Please email ${supportContact.supportEmail} for login help.`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Email Support",
+            onPress: () => {
+              Linking.openURL(mailtoUrl).catch(() => {
+                Alert.alert(
+                  "Contact Support",
+                  `Please email ${supportContact.supportEmail} for login help.`,
+                );
+              });
+            },
+          },
+        ],
+      );
+      return;
+    }
+
     Alert.alert(
       "Contact Support",
-      supportContact.supportEmail
-        ? `Please email ${supportContact.supportEmail} for login help.`
-        : "Support contact is not configured yet.",
+      "Support contact is not configured yet.",
     );
   };
 

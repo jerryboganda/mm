@@ -73,7 +73,7 @@ const faqs: FAQ[] = [
 const DEFAULT_SUPPORT_CONTACT_SETTINGS: SupportContactSettings = {
   whatsappNumber: "",
   phoneNumber: "",
-  supportEmail: "support@maternalmind.com.pk",
+  supportEmail: "maternalmind.help@gmail.com",
   whatsappDefaultMessage: "Hello Support Team, I need help.",
   whatsappEnabled: false,
   phoneEnabled: false,

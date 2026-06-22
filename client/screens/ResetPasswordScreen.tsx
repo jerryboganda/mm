@@ -54,8 +54,14 @@ export default function ResetPasswordScreen() {
 
     if (!password) {
       newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = "Password must contain at least one uppercase letter";
+    } else if (!/[a-z]/.test(password)) {
+      newErrors.password = "Password must contain at least one lowercase letter";
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = "Password must contain at least one number";
     }
 
     if (!confirmPassword) {
@@ -191,6 +197,13 @@ export default function ResetPasswordScreen() {
             accessibilityLabel="New Password"
           />
 
+          <ThemedText
+            style={[styles.passwordHint, { color: theme.textSecondary }]}
+          >
+            Password must be at least 8 characters and include an uppercase
+            letter, a lowercase letter, and a number.
+          </ThemedText>
+
           <GlassInput
             label="Confirm Password"
             value={confirmPassword}
@@ -267,6 +280,13 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: Spacing["2xl"],
+  },
+  passwordHint: {
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.xs,
   },
   button: {
     marginTop: Spacing.lg,

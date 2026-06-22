@@ -428,7 +428,7 @@ export default function MobileAppContentPage() {
                 }))
               }
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
-              placeholder="support@maternalmind.com.pk"
+              placeholder="maternalmind.help@gmail.com"
             />
           </div>
 

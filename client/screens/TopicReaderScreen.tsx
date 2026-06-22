@@ -10,9 +10,13 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
-import RenderHtml from "react-native-render-html";
+import RenderHtml, {
+  useInternalRenderer,
+  useContentWidth,
+} from "react-native-render-html";
 import TableRenderer, { tableModel } from "@native-html/table-plugin";
 import WebView from "react-native-webview";
+import { SvgXml } from "react-native-svg";
 import { MermaidDiagram } from "@/components/MermaidDiagram";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -62,6 +66,38 @@ interface TopicDetail {
   blocks: ContentBlock[];
   nextTopicId?: string;
   previousTopicId?: string;
+}
+
+/**
+ * Renders directional arrows (stored as inline-SVG data-URI <img>) with
+ * react-native-svg, and falls back to the default image renderer for every
+ * normal image so uploads keep working unchanged.
+ */
+function ArrowAwareImageRenderer(props: any) {
+  const { Renderer, rendererProps } = useInternalRenderer("img", props);
+  const contentWidth = useContentWidth();
+  const uri: string = rendererProps?.source?.uri ?? "";
+  if (uri.startsWith("data:image/svg+xml")) {
+    const xml = decodeURIComponent(
+      uri.replace(/^data:image\/svg\+xml(;utf8)?,/, ""),
+    );
+    let w = parseFloat((xml.match(/width="([\d.]+)"/) || [])[1] || "0");
+    let h = parseFloat((xml.match(/height="([\d.]+)"/) || [])[1] || "0");
+    if (w > 0 && h > 0 && w > contentWidth) {
+      h = Math.round(h * (contentWidth / w));
+      w = Math.round(contentWidth);
+    }
+    return (
+      <View style={{ alignItems: "center", marginVertical: 10 }}>
+        <SvgXml
+          xml={xml}
+          width={w > 0 ? w : undefined}
+          height={h > 0 ? h : undefined}
+        />
+      </View>
+    );
+  }
+  return <Renderer {...rendererProps} />;
 }
 
 export default function TopicReaderScreen() {
@@ -290,6 +326,7 @@ export default function TopicReaderScreen() {
   const htmlRenderers = useMemo(
     () => ({
       table: TableRenderer,
+      img: ArrowAwareImageRenderer,
     }),
     [],
   );

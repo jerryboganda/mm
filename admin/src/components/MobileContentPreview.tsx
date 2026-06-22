@@ -210,6 +210,11 @@ const previewCss = `
     border-radius: 12px;
     margin: 8px 0;
   }
+  .mm-mobile-preview img.mm-arrow {
+    display: block;
+    margin: 10px auto;
+    border-radius: 0;
+  }
   .mm-mobile-preview .note-block {
     display: flex;
     gap: 10px;

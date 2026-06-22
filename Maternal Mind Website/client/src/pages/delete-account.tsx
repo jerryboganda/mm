@@ -453,7 +453,7 @@ export default function DeleteAccount() {
                   <span>
                     privacy@maternalmind.app
                     <span className="block text-white/40 mt-1">
-                      Support fallback: support@maternalmind.app
+                      Support fallback: maternalmind.help@gmail.com
                     </span>
                   </span>
                 </div>

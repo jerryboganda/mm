@@ -20,7 +20,7 @@ export const SUPPORT_CONTACT_KEYS = {
   emailEnabled: "support_email_enabled",
 } as const;
 
-const DEFAULT_SUPPORT_EMAIL = "support@maternalmind.com.pk";
+const DEFAULT_SUPPORT_EMAIL = "maternalmind.help@gmail.com";
 const DEFAULT_WHATSAPP_MESSAGE = "Hello Support Team, I need help.";
 
 const SUPPORT_CONTACT_KEY_ALIASES = {

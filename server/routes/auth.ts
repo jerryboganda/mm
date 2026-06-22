@@ -621,6 +621,9 @@ router.post("/reset-password", async (req, res) => {
     await storage.markTokenUsed(resetToken.id);
     res.json({ message: "Password reset successfully" });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: error.errors[0].message });
+    }
     logger.error("Reset password error", {
       error: error instanceof Error ? error.message : String(error),
     });
