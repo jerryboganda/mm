@@ -32,7 +32,7 @@ import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { ImageViewer } from "@/components/ImageViewer";
 import { useMobileContent } from "@/lib/mobile-content";
-import { apiRequest, queryClient } from "@/lib/query-client";
+import { apiRequest, getApiUrl, queryClient } from "@/lib/query-client";
 import { enqueueMutationIfOffline } from "@/lib/mutation-queue";
 import { useNetwork } from "@/lib/network";
 import { Spacing, BorderRadius } from "@/constants/theme";
@@ -69,6 +69,18 @@ interface TopicDetail {
 }
 
 /**
+ * Resolves a possibly-relative content asset URL (e.g. admin uploads stored as
+ * "/uploads/content-images/...") into an absolute URL the native image loader
+ * can fetch. Absolute http(s)/data/file/blob URLs are returned unchanged.
+ */
+function resolveAssetUrl(url: string): string {
+  if (!url) return url;
+  if (/^(https?:|data:|file:|blob:)/i.test(url)) return url;
+  const base = getApiUrl().replace(/\/+$/, "");
+  return url.startsWith("/") ? `${base}${url}` : `${base}/${url}`;
+}
+
+/**
  * Renders directional arrows (stored as inline-SVG data-URI <img>) with
  * react-native-svg, and falls back to the default image renderer for every
  * normal image so uploads keep working unchanged.
@@ -95,6 +107,15 @@ function ArrowAwareImageRenderer(props: any) {
           height={h > 0 ? h : undefined}
         />
       </View>
+    );
+  }
+  const resolved = resolveAssetUrl(uri);
+  if (resolved !== uri) {
+    return (
+      <Renderer
+        {...rendererProps}
+        source={{ ...rendererProps.source, uri: resolved }}
+      />
     );
   }
   return <Renderer {...rendererProps} />;
@@ -549,7 +570,7 @@ export default function TopicReaderScreen() {
           <View key={block.id} style={styles.htmlBlock}>
             <RenderHtml
               contentWidth={contentWidth}
-              source={{ html }}
+              source={{ html, baseUrl: getApiUrl() }}
               tagsStyles={htmlTagsStyles}
               classesStyles={htmlClassesStyles}
               renderers={htmlRenderers}
@@ -571,14 +592,14 @@ export default function TopicReaderScreen() {
             style={[styles.imageContainer, { borderColor: theme.glassBorder }]}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setViewerImage(block.content);
+              setViewerImage(resolveAssetUrl(block.content));
             }}
             accessibilityRole="button"
             accessibilityLabel="View image fullscreen"
             accessibilityHint="Opens image in fullscreen viewer"
           >
             <Image
-              source={{ uri: block.content }}
+              source={{ uri: resolveAssetUrl(block.content) }}
               style={styles.image}
               contentFit="cover"
             />
