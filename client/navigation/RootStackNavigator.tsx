@@ -2,13 +2,11 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useAuth } from "@/lib/auth";
-import { usePurchases } from "@/lib/purchases";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import {
   ActivityIndicator,
   View,
   StyleSheet,
-  Platform,
   Pressable,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -35,9 +33,11 @@ import AttemptHistoryScreen from "@/screens/AttemptHistoryScreen";
 import AttemptDetailScreen from "@/screens/AttemptDetailScreen";
 import TopicProgressDetailScreen from "@/screens/TopicProgressDetailScreen";
 import PaywallScreen from "@/screens/PaywallScreen";
+import PurchaseScreen from "@/screens/PurchaseScreen";
+import PaymentProofUploadScreen from "@/screens/PaymentProofUploadScreen";
+import PendingApprovalScreen from "@/screens/PendingApprovalScreen";
 import PurchaseSuccessScreen from "@/screens/PurchaseSuccessScreen";
 import PurchaseFailedScreen from "@/screens/PurchaseFailedScreen";
-import RestorePurchasesScreen from "@/screens/RestorePurchasesScreen";
 import EditProfileScreen from "@/screens/EditProfileScreen";
 import SettingsScreen from "@/screens/SettingsScreen";
 import SecuritySettingsScreen from "@/screens/SecuritySettingsScreen";
@@ -77,9 +77,24 @@ export type RootStackParamList = {
   AttemptDetail: { attemptId: string };
   TopicProgressDetail: { topicId: string; topicTitle: string };
   Paywall: undefined;
+  Purchase: {
+    packageId: string;
+    priceId: string;
+    packageName: string;
+    price: string;
+    currency: string;
+    billingCycle: string;
+  };
+  PaymentProofUpload: {
+    packageId: string;
+    priceId: string;
+    packageName: string;
+    price: string;
+    currency: string;
+  };
+  PendingApproval: undefined;
   PurchaseSuccess: undefined;
   PurchaseFailed: { errorMessage?: string };
-  RestorePurchases: undefined;
   EditProfile: undefined;
   Settings: undefined;
   SecuritySettings: undefined;
@@ -96,7 +111,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
-  const { isSubscribed, initialized: purchasesInitialized } = usePurchases();
   const { resolveText } = useMobileContent();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } =
     useOnboarding();
@@ -106,16 +120,10 @@ export default function RootStackNavigator() {
   const requiresEmailVerification = user && !user.isEmailVerified;
 
   // Hard paywall: a user only reaches the app when they have an active
-  // subscription. RevenueCat is the real-time source of truth on device; the
-  // server status (now expiry-aware) covers web and the brief window before
-  // RevenueCat resolves on native.
-  const serverSubscriptionActive = user?.subscriptionStatus === "active";
-  const hasActiveSubscription =
-    Platform.OS === "web"
-      ? serverSubscriptionActive
-      : purchasesInitialized
-        ? isSubscribed
-        : serverSubscriptionActive;
+  // subscription. The (expiry-aware) server status is the single source of
+  // truth — manual payments are approved by an admin server-side, which flips
+  // the user's subscription status. refreshUser() re-checks after approval.
+  const hasActiveSubscription = user?.subscriptionStatus === "active";
 
   if (authLoading || onboardingLoading) {
     return (
@@ -178,11 +186,27 @@ export default function RootStackNavigator() {
               }}
             />
             <Stack.Screen
-              name="RestorePurchases"
-              component={RestorePurchasesScreen}
+              name="Purchase"
+              component={PurchaseScreen}
               options={{
-                headerTitle: t("Restore Purchases"),
+                headerTitle: t("Payment Details"),
                 presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="PaymentProofUpload"
+              component={PaymentProofUploadScreen}
+              options={{
+                headerTitle: t("Upload Payment Proof"),
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="PendingApproval"
+              component={PendingApprovalScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen
@@ -197,7 +221,7 @@ export default function RootStackNavigator() {
               name="PurchaseFailed"
               component={PurchaseFailedScreen}
               options={{
-                headerTitle: t("Purchase Failed"),
+                headerTitle: t("Payment Failed"),
                 presentation: "card",
               }}
             />
@@ -318,16 +342,32 @@ export default function RootStackNavigator() {
               name="PurchaseFailed"
               component={PurchaseFailedScreen}
               options={{
-                headerTitle: t("Purchase Failed"),
+                headerTitle: t("Payment Failed"),
                 presentation: "card",
               }}
             />
             <Stack.Screen
-              name="RestorePurchases"
-              component={RestorePurchasesScreen}
+              name="Purchase"
+              component={PurchaseScreen}
               options={{
-                headerTitle: t("Restore Purchases"),
+                headerTitle: t("Payment Details"),
                 presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="PaymentProofUpload"
+              component={PaymentProofUploadScreen}
+              options={{
+                headerTitle: t("Upload Payment Proof"),
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="PendingApproval"
+              component={PendingApprovalScreen}
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
               }}
             />
             <Stack.Screen

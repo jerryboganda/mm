@@ -97,7 +97,17 @@ shared/           # Shared code between client/server
 
 ## Recent Changes
 
-### January 28, 2026 (Latest)
+### June 2026 (Latest) — Manual Payment-Proof Subscriptions (RevenueCat removed)
+- RevenueCat was fully removed (SDK, `client/lib/purchases.tsx`, webhook, `/profile/subscription/sync`, RC env vars). Subscriptions are now activated by an admin verifying a manually-uploaded payment proof.
+- New flow:
+  - Mobile shows the three pricing packages (from `GET /api/subscriptions/packages`). Tapping one opens **PurchaseScreen** (admin-configured bank + mobile-wallet details) → **PaymentProofUploadScreen** (image upload) → **PendingApprovalScreen** (polls until approved/rejected).
+  - Backend: `manual_payment_proofs` table; user routes `GET /api/subscriptions/payment-instructions`, `POST /api/subscriptions/proof` (multer → `uploads/payment-proofs/`), `GET /api/subscriptions/my-proofs`.
+  - Admin: `/api/admin/manual-payments` (list/approve/reject/grant) + payment-settings; new **Manual Payments** page and a **Payments** tab under Settings.
+  - Approval calls `subscriptionService.createSubscription(..., { paymentGateway: "manual" })`, which flips `users.subscriptionStatus` and emails the user (approved/rejected/received templates in `subscription-emails.ts`).
+- Hard paywall now relies solely on the (expiry-aware) server subscription status. Self-service provisioning endpoints (`/subscribe`, `/upgrade`, `/downgrade`, `/reactivate`) were removed to prevent paywall bypass.
+- Placeholder packages are seeded via `npm run db:seed:packages` and edited in the admin Packages page.
+
+### January 28, 2026
 - Complete Legal & Safety Screens:
   - TermsPrivacyScreen: Tabbed interface for Terms of Use and Privacy Policy content
   - DisclaimerScreen: Medical disclaimer emphasizing educational purpose, not medical advice

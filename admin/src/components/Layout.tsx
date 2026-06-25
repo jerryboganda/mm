@@ -16,6 +16,7 @@ import {
   ChevronRight,
   ClipboardList,
   CreditCard,
+  ReceiptText,
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { to: "/mcqs", icon: ClipboardList, label: "MCQs" },
   { to: "/users", icon: Users, label: "Users" },
   { to: "/subscriptions", icon: CreditCard, label: "Subscriptions" },
+  { to: "/manual-payments", icon: ReceiptText, label: "Manual Payments" },
   { to: "/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/announcements", icon: Megaphone, label: "Announcements" },
   { to: "/content-reports", icon: AlertTriangle, label: "Reports" },

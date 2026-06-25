@@ -32,7 +32,6 @@ import RootStackNavigator, {
 } from "@/navigation/RootStackNavigator";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth";
-import { PurchasesProvider } from "@/lib/purchases";
 import { NetworkProvider } from "@/lib/network";
 import { MobileContentProvider } from "@/lib/mobile-content";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
@@ -264,23 +263,21 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <PurchasesProvider>
-            <NetworkProvider>
-              <MobileContentProvider>
-                <FeedbackProvider>
-                  <SafeAreaProvider>
-                    <ThemedRoot>
-                      <KeyboardProvider>
-                        <AppContent
-                          initialNavigationState={initialNavigationState}
-                        />
-                      </KeyboardProvider>
-                    </ThemedRoot>
-                  </SafeAreaProvider>
-                </FeedbackProvider>
-              </MobileContentProvider>
-            </NetworkProvider>
-          </PurchasesProvider>
+          <NetworkProvider>
+            <MobileContentProvider>
+              <FeedbackProvider>
+                <SafeAreaProvider>
+                  <ThemedRoot>
+                    <KeyboardProvider>
+                      <AppContent
+                        initialNavigationState={initialNavigationState}
+                      />
+                    </KeyboardProvider>
+                  </ThemedRoot>
+                </SafeAreaProvider>
+              </FeedbackProvider>
+            </MobileContentProvider>
+          </NetworkProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

@@ -491,3 +491,135 @@ export async function sendSubscriptionReactivatedEmail(
     return false;
   }
 }
+
+// ══════════════════════════════════════════════════════════════════
+// ══  9. PAYMENT PROOF RECEIVED (pending review)                 ══
+// ══════════════════════════════════════════════════════════════════
+
+function proofReceivedHtml(userName: string, packageName: string): string {
+  return emailWrapper(`
+    ${heading("Payment Proof Received ⏳")}
+    ${greeting(userName)}
+    ${paragraph(`Thank you! We've received your payment proof for the <strong style="color:${BRAND.accent};">${packageName}</strong> plan. Our team will review it shortly.`)}
+    ${infoCard([
+      { label: "Plan", value: packageName },
+      { label: "Status", value: "⏳ Pending Review" },
+    ])}
+    ${paragraph("You'll receive another email as soon as your payment is verified and your subscription is activated. This usually takes a short while.")}
+    ${signOff()}
+  `);
+}
+
+export async function sendProofReceivedEmail(
+  to: string,
+  userName: string,
+  packageName: string,
+): Promise<boolean> {
+  try {
+    const html = proofReceivedHtml(userName, packageName);
+    await sendEmail({
+      to,
+      subject: "We've received your payment proof — Maternal Mind",
+      html,
+    });
+    return true;
+  } catch (error) {
+    logger.error("subscription-emails: Failed to send proof received email", { error: String(error) });
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ══  10. SUBSCRIPTION APPROVED                                  ══
+// ══════════════════════════════════════════════════════════════════
+
+function subscriptionApprovedHtml(
+  userName: string,
+  packageName: string,
+  expiryDate?: string,
+): string {
+  return emailWrapper(`
+    ${heading("Subscription Approved ✅")}
+    ${greeting(userName)}
+    ${paragraph(`Great news! Your payment for the <strong style="color:${BRAND.accent};">${packageName}</strong> plan has been verified and your subscription is now <strong>active</strong>. You have full access to all premium features.`)}
+    ${infoCard([
+      { label: "Plan", value: packageName },
+      { label: "Status", value: "✅ Active" },
+      ...(expiryDate ? [{ label: "Valid Until", value: expiryDate }] : []),
+    ])}
+    ${paragraph("Open the app to continue your maternal health journey with full access.")}
+    ${ctaButton("Open Maternal Mind")}
+    ${signOff()}
+  `);
+}
+
+export async function sendSubscriptionApprovedEmail(
+  to: string,
+  userName: string,
+  packageName: string,
+  expiryDate?: string,
+): Promise<boolean> {
+  try {
+    const html = subscriptionApprovedHtml(userName, packageName, expiryDate);
+    await sendEmail({
+      to,
+      subject: "Your Maternal Mind subscription is approved! ✅",
+      html,
+    });
+    return true;
+  } catch (error) {
+    logger.error("subscription-emails: Failed to send approved email", { error: String(error) });
+    return false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ══  11. SUBSCRIPTION REJECTED                                  ══
+// ══════════════════════════════════════════════════════════════════
+
+function subscriptionRejectedHtml(
+  userName: string,
+  packageName: string,
+  reason?: string,
+): string {
+  const reasonBlock = reason
+    ? infoCard([
+        { label: "Plan", value: packageName },
+        { label: "Status", value: "❌ Not Approved" },
+        { label: "Reason", value: reason },
+      ])
+    : infoCard([
+        { label: "Plan", value: packageName },
+        { label: "Status", value: "❌ Not Approved" },
+      ]);
+
+  return emailWrapper(`
+    ${heading("Payment Not Approved")}
+    ${greeting(userName)}
+    ${paragraph(`Unfortunately, we were unable to verify your payment for the <strong style="color:${BRAND.accent};">${packageName}</strong> plan, so your subscription has not been activated.`)}
+    ${reasonBlock}
+    ${paragraph("Please double-check your payment details and upload a clear, valid proof of payment again from the app. If you believe this is a mistake, contact our support team and we'll be happy to help.")}
+    ${ctaButton("Try Again")}
+    ${signOff()}
+  `);
+}
+
+export async function sendSubscriptionRejectedEmail(
+  to: string,
+  userName: string,
+  packageName: string,
+  reason?: string,
+): Promise<boolean> {
+  try {
+    const html = subscriptionRejectedHtml(userName, packageName, reason);
+    await sendEmail({
+      to,
+      subject: "Update on your Maternal Mind subscription payment",
+      html,
+    });
+    return true;
+  } catch (error) {
+    logger.error("subscription-emails: Failed to send rejected email", { error: String(error) });
+    return false;
+  }
+}

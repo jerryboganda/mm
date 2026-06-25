@@ -219,6 +219,59 @@ export async function apiRequest(
   }
 }
 
+/**
+ * Upload multipart/form-data (e.g. an image) to the backend with auth.
+ * Does NOT set Content-Type so the platform sets the multipart boundary.
+ * Retries once on 401 via token refresh. Returns the parsed JSON body.
+ *
+ * @param route - The API route path (e.g. "/api/subscriptions/proof")
+ * @param formData - A FormData instance containing the file + fields
+ */
+export async function apiUpload<T = unknown>(
+  route: string,
+  formData: FormData,
+): Promise<T> {
+  const baseUrl = getApiUrl();
+  const url = new URL(route, baseUrl);
+  let token = await getToken();
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
+  try {
+    let res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: formData,
+      credentials: "include",
+      signal: controller.signal,
+    });
+
+    if (res.status === 401 && token) {
+      const newToken = await attemptTokenRefresh();
+      if (newToken) {
+        headers["Authorization"] = `Bearer ${newToken}`;
+        res = await fetch(url, {
+          method: "POST",
+          headers,
+          body: formData,
+          credentials: "include",
+          signal: controller.signal,
+        });
+      }
+    }
+
+    await throwIfResNotOk(res);
+    return (await res.json()) as T;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 type UnauthorizedBehavior = "returnNull" | "throw";
 
 /**

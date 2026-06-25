@@ -101,17 +101,10 @@ test_endpoint GET "/subscriptions/invoices" "" "200"
 test_endpoint GET "/subscriptions/history" "" "200"
 
 echo ""
-echo "=== WEBHOOK ==="
-code=$(curl -s -w "%{http_code}" -o /tmp/resp.json -X POST "$BASE/../api/webhooks/revenuecat" \
-  -H "Content-Type: application/json" \
-  -d '{"api_version":"4.0","event":{"type":"TEST","app_user_id":"test","product_id":"test","period_type":"NORMAL","purchased_at_ms":1234567890000,"expiration_at_ms":null,"environment":"SANDBOX","store":"APP_STORE","original_app_user_id":"test"}}')
-if [ "$code" = "200" ]; then
-  echo "PASS POST /webhooks/revenuecat -> $code"
-  PASS=$((PASS+1))
-else
-  echo "FAIL POST /webhooks/revenuecat -> $code"
-  FAIL=$((FAIL+1))
-fi
+echo "=== MANUAL PAYMENTS ==="
+test_endpoint GET "/subscriptions/payment-instructions" "" "200"
+test_endpoint GET "/subscriptions/my-proofs" "" "200"
+test_endpoint GET "/admin/manual-payments?status=pending" "" "200"
 
 echo ""
 echo "=============================="

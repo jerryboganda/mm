@@ -118,20 +118,24 @@ curl -s -X POST "$BASE/subscriptions/validate-coupon" \
 PASS=$((PASS+1))
 
 echo ""
-echo "=== 4. SUBSCRIBE USER ==="
-echo -n "POST subscribe -> "
-SUB_RESP=$(curl -s -X POST "$BASE/subscriptions/subscribe" \
+echo "=== 4. PROVISION USER (admin manual grant; RevenueCat removed) ==="
+# Self-service /subscribe was removed — subscriptions are provisioned by an
+# admin approving a payment proof or via this manual grant endpoint.
+PRICE_ID=$(curl -s "$BASE/admin/subscriptions/packages" -H "Authorization: Bearer $TOKEN" \
+  | python3 -c "import sys,json; pkgs=json.load(sys.stdin); pr=[pp for p in pkgs if p.get('id')=='$PKG_ID' for pp in p.get('prices',[])]; print(pr[0]['id'] if pr else '')" 2>/dev/null)
+echo -n "POST manual grant -> "
+SUB_RESP=$(curl -s -X POST "$BASE/admin/manual-payments/grant" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"packageId\":\"$PKG_ID\",\"billingCycle\":\"monthly\"}")
+  -d "{\"email\":\"demo@maternalmind.app\",\"packageId\":\"$PKG_ID\",\"priceId\":\"$PRICE_ID\"}")
 SUB_ID=$(echo "$SUB_RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('subscription',{}).get('id','') if isinstance(d.get('subscription'),dict) else d.get('id',''))" 2>/dev/null)
 echo "$SUB_RESP" | head -c 200
 echo ""
 if [ -n "$SUB_ID" ] && [ "$SUB_ID" != "" ]; then
-  echo "PASS Subscription created: $SUB_ID"
+  echo "PASS Subscription granted: $SUB_ID"
   PASS=$((PASS+1))
 else
-  echo "INFO Subscribe returned: $(echo $SUB_RESP | head -c 200)"
+  echo "INFO Grant returned: $(echo $SUB_RESP | head -c 200)"
   PASS=$((PASS+1))
 fi
 

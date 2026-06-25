@@ -17,6 +17,7 @@ import MobileAppContentPage from "./pages/MobileAppContentPage";
 import SubscriptionDashboardPage from "./pages/SubscriptionDashboardPage";
 import SubscriptionPackagesPage from "./pages/SubscriptionPackagesPage";
 import SubscriptionCouponsPage from "./pages/SubscriptionCouponsPage";
+import ManualPaymentsPage from "./pages/ManualPaymentsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -83,6 +84,10 @@ export default function App() {
                 <Route
                   path="/subscription-coupons"
                   element={<SubscriptionCouponsPage />}
+                />
+                <Route
+                  path="/manual-payments"
+                  element={<ManualPaymentsPage />}
                 />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

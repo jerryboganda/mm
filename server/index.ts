@@ -362,6 +362,21 @@ function configureExpoAndLanding(app: express.Application) {
       maxAge: "30d",
     }),
   );
+
+  const paymentProofsPath = path.resolve(
+    process.cwd(),
+    "uploads",
+    "payment-proofs",
+  );
+  fs.mkdirSync(paymentProofsPath, { recursive: true });
+  app.use(
+    "/uploads/payment-proofs",
+    express.static(paymentProofsPath, {
+      fallthrough: false,
+      immutable: true,
+      maxAge: "30d",
+    }),
+  );
   app.use("/assets", express.static(path.resolve(process.cwd(), "assets")));
   app.use(express.static(path.resolve(process.cwd(), "static-build")));
 

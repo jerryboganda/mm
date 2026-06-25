@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -11,13 +11,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "@/lib/haptics-wrapper";
-import { PurchasesPackage, PACKAGE_TYPE } from "react-native-purchases";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
-import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { usePurchases } from "@/lib/purchases";
+import { apiRequest } from "@/lib/query-client";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -25,145 +24,88 @@ import { RootStackParamList } from "@/navigation/RootStackNavigator";
 type SubscriptionScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
-// Map package type to user-friendly details
-function getPackageLabel(pkg: PurchasesPackage): {
-  name: string;
-  period: string;
-  savings?: string;
-  popular?: boolean;
-} {
-  const id = pkg.identifier.toLowerCase();
-  const type = pkg.packageType;
-
-  if (
-    type === PACKAGE_TYPE.ANNUAL ||
-    id.includes("yearly") ||
-    id.includes("annual")
-  ) {
-    return { name: "Yearly", period: "/year", savings: "Save 33%" };
-  }
-  if (
-    type === PACKAGE_TYPE.THREE_MONTH ||
-    id.includes("quarterly") ||
-    id.includes("3month")
-  ) {
-    return {
-      name: "Quarterly",
-      period: "/3 months",
-      savings: "Save 17%",
-      popular: true,
-    };
-  }
-  if (
-    type === PACKAGE_TYPE.SIX_MONTH ||
-    id.includes("6month") ||
-    id.includes("half")
-  ) {
-    return { name: "6 Months", period: "/6 months", savings: "Save 25%" };
-  }
-  if (type === PACKAGE_TYPE.TWO_MONTH || id.includes("2month")) {
-    return { name: "2 Months", period: "/2 months", savings: "Save 10%" };
-  }
-  if (type === PACKAGE_TYPE.WEEKLY || id.includes("weekly")) {
-    return { name: "Weekly", period: "/week" };
-  }
-  // Default: Monthly
-  return { name: "Monthly", period: "/month" };
+interface PackagePrice {
+  id: string;
+  billingCycle: string;
+  price: string;
+  currency: string;
+  originalPrice: string | null;
 }
 
-const allFeatures = [
-  "Access all textbook content",
-  "Unlimited MCQ practice",
-  "Progress tracking",
-  "Bookmarks & notes",
-  "Priority support",
-  "Early access to new content",
-];
+interface PackageFeature {
+  featureKey: string | null;
+  name: string;
+  description: string | null;
+  valueType: string;
+  value: string | null;
+  displayOrder: number;
+}
+
+interface SubscriptionPackage {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  shortDescription: string | null;
+  iconUrl: string | null;
+  displayOrder: number;
+  trialDays: number;
+  prices: PackagePrice[];
+  features: PackageFeature[];
+}
+
+const CYCLE_LABELS: Record<string, string> = {
+  monthly: "per month",
+  quarterly: "per 3 months",
+  semi_annual: "per 6 months",
+  annual: "per year",
+  lifetime: "one-time",
+  custom: "",
+};
+
+function formatPrice(price: string, currency: string): string {
+  const n = Number(price);
+  const amount = Number.isNaN(n)
+    ? price
+    : n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  return `${currency} ${amount}`;
+}
 
 export default function SubscriptionScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<SubscriptionScreenNavigationProp>();
-  const { packages, loading, isSubscribed, purchase, error, initialized } =
-    usePurchases();
   const { theme } = useTheme();
 
-  const [selectedPackage, setSelectedPackage] =
-    useState<PurchasesPackage | null>(null);
-  const [purchasing, setPurchasing] = useState(false);
-  const [restoring, setRestoring] = useState(false);
+  const { data, isLoading, isError, refetch } = useQuery<{
+    packages: SubscriptionPackage[];
+  }>({
+    queryKey: ["/api/subscriptions/packages"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/subscriptions/packages");
+      return res.json();
+    },
+    staleTime: 60_000,
+  });
 
-  // Auto-select the "popular" (quarterly) or first package
-  useEffect(() => {
-    if (packages.length > 0 && !selectedPackage) {
-      const popular = packages.find((pkg) => {
-        const label = getPackageLabel(pkg);
-        return label.popular;
-      });
-      setSelectedPackage(popular || packages[0]);
-    }
-  }, [packages, selectedPackage]);
+  const packages = (data?.packages || [])
+    .filter((p) => p.prices && p.prices.length > 0)
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const handlePurchase = async () => {
+  const handleSelect = (pkg: SubscriptionPackage) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-    if (!selectedPackage) {
-      return;
-    }
-
-    setPurchasing(true);
-    try {
-      const success = await purchase(selectedPackage);
-      setPurchasing(false);
-
-      if (success) {
-        navigation.replace("PurchaseSuccess");
-      }
-    } catch (err: any) {
-      setPurchasing(false);
-      navigation.navigate("PurchaseFailed", {
-        errorMessage: err.message || "Purchase failed. Please try again.",
-      });
-    }
+    const price = pkg.prices[0];
+    navigation.navigate("Purchase", {
+      packageId: pkg.id,
+      priceId: price.id,
+      packageName: pkg.name,
+      price: price.price,
+      currency: price.currency,
+      billingCycle: price.billingCycle,
+    });
   };
 
-  const handleRestore = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate("RestorePurchases");
-  };
-
-  if (isSubscribed) {
-    return (
-      <BackgroundGradient>
-        <View
-          style={[
-            styles.subscribedContainer,
-            {
-              paddingTop: headerHeight + Spacing["2xl"],
-              paddingBottom: insets.bottom + Spacing["3xl"],
-            },
-          ]}
-        >
-          <View style={styles.successIcon}>
-            <Feather name="check-circle" size={64} color={theme.success} />
-          </View>
-          <ThemedText type="h2" style={styles.successTitle}>
-            You&apos;re Subscribed!
-          </ThemedText>
-          <ThemedText style={styles.successSubtitle}>
-            Enjoy full access to all Maternal Mind content and features.
-          </ThemedText>
-          <PrimaryButton
-            title="Continue Learning"
-            onPress={() => navigation.goBack()}
-            style={styles.continueButton}
-          />
-        </View>
-      </BackgroundGradient>
-    );
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <BackgroundGradient>
         <View style={styles.loadingContainer}>
@@ -171,46 +113,41 @@ export default function SubscriptionScreen() {
           <ThemedText
             style={[styles.loadingText, { color: theme.textSecondary }]}
           >
-            Loading subscription options...
+            Loading plans...
           </ThemedText>
         </View>
       </BackgroundGradient>
     );
   }
 
-  // Show error state if RevenueCat failed to initialize or no packages available
-  if (!initialized || (error && packages.length === 0)) {
+  if (isError || packages.length === 0) {
     return (
       <BackgroundGradient>
         <View
           style={[
-            styles.subscribedContainer,
+            styles.centerContainer,
             {
               paddingTop: headerHeight + Spacing["2xl"],
               paddingBottom: insets.bottom + Spacing["3xl"],
             },
           ]}
         >
-          <View style={styles.errorIconContainer}>
-            <Feather name="alert-circle" size={56} color={theme.warning} />
-          </View>
-          <ThemedText type="h3" style={styles.successTitle}>
-            Subscription Unavailable
+          <Feather name="alert-circle" size={56} color={theme.warning} />
+          <ThemedText type="h3" style={styles.centerTitle}>
+            Plans Unavailable
           </ThemedText>
           <ThemedText
-            style={[styles.successSubtitle, { color: theme.textSecondary }]}
+            style={[styles.centerSubtitle, { color: theme.textSecondary }]}
           >
-            {error ||
-              "Unable to load subscription plans. Please check your internet connection and try again."}
+            We couldn&apos;t load the subscription plans. Please check your
+            connection and try again.
           </ThemedText>
-          <PrimaryButton
-            title="Try Again"
-            onPress={() => navigation.replace("Subscription")}
-            style={styles.continueButton}
-          />
-          <Pressable style={styles.restoreButton} onPress={handleRestore}>
-            <ThemedText style={[styles.restoreText, { color: theme.primary }]}>
-              Restore Purchases
+          <Pressable
+            style={[styles.retryButton, { borderColor: theme.primary }]}
+            onPress={() => refetch()}
+          >
+            <ThemedText style={{ color: theme.primary, fontWeight: "600" }}>
+              Try Again
             </ThemedText>
           </Pressable>
         </View>
@@ -229,6 +166,7 @@ export default function SubscriptionScreen() {
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
           <ThemedText type="h2" style={styles.title}>
@@ -241,153 +179,108 @@ export default function SubscriptionScreen() {
 
         <View style={styles.plansContainer}>
           {packages.map((pkg) => {
-            const isSelected = selectedPackage?.identifier === pkg.identifier;
-            const label = getPackageLabel(pkg);
+            const price = pkg.prices[0];
+            const cycleLabel = CYCLE_LABELS[price.billingCycle] ?? "";
+            const includedFeatures = pkg.features
+              .filter((f) => f.valueType !== "cross")
+              .sort((a, b) => a.displayOrder - b.displayOrder);
 
             return (
               <Pressable
-                key={pkg.identifier}
-                onPress={() => {
-                  setSelectedPackage(pkg);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
+                key={pkg.id}
+                onPress={() => handleSelect(pkg)}
                 style={[
                   styles.planCard,
                   {
                     backgroundColor: theme.glass,
                     borderColor: theme.glassBorder,
                   },
-                  isSelected && {
-                    borderColor: theme.primary,
-                    backgroundColor: `${theme.primary}15`,
-                  },
-                  label.popular && {
-                    borderColor: theme.primary,
-                  },
                 ]}
-                accessibilityRole="radio"
-                accessibilityLabel={`${label.name} plan, ${pkg.product.priceString}${label.period}${label.savings ? `, ${label.savings}` : ""}${label.popular ? ", best value" : ""}`}
-                accessibilityState={{ selected: isSelected }}
+                accessibilityRole="button"
+                accessibilityLabel={`${pkg.name} plan, ${formatPrice(price.price, price.currency)} ${cycleLabel}`}
               >
-                {label.popular ? (
-                  <View
-                    style={[
-                      styles.popularBadge,
-                      { backgroundColor: theme.primary },
-                    ]}
-                  >
-                    <ThemedText style={styles.popularText}>
-                      BEST VALUE
-                    </ThemedText>
-                  </View>
-                ) : null}
-
-                <View style={styles.planHeader}>
-                  <View
-                    style={[
-                      styles.radioOuter,
-                      { borderColor: theme.glassBorder },
-                      isSelected && { borderColor: theme.primary },
-                    ]}
-                  >
-                    {isSelected ? (
-                      <View
-                        style={[
-                          styles.radioInner,
-                          { backgroundColor: theme.primary },
-                        ]}
-                      />
-                    ) : null}
-                  </View>
+                <View style={styles.planTop}>
                   <View style={styles.planInfo}>
                     <ThemedText type="h4" style={styles.planName}>
-                      {label.name}
+                      {pkg.name}
                     </ThemedText>
-                    {label.savings ? (
-                      <View
+                    {pkg.shortDescription ? (
+                      <ThemedText
                         style={[
-                          styles.savingsBadge,
-                          { backgroundColor: `${theme.success}33` },
+                          styles.planDesc,
+                          { color: theme.textSecondary },
                         ]}
                       >
-                        <ThemedText
-                          style={[styles.savingsText, { color: theme.success }]}
-                        >
-                          {label.savings}
-                        </ThemedText>
-                      </View>
+                        {pkg.shortDescription}
+                      </ThemedText>
                     ) : null}
                   </View>
                   <View style={styles.priceContainer}>
+                    {price.originalPrice ? (
+                      <ThemedText
+                        style={[
+                          styles.originalPrice,
+                          { color: theme.textMuted },
+                        ]}
+                      >
+                        {formatPrice(price.originalPrice, price.currency)}
+                      </ThemedText>
+                    ) : null}
                     <ThemedText
                       type="h3"
                       style={[styles.price, { color: theme.primary }]}
                     >
-                      {pkg.product.priceString}
+                      {formatPrice(price.price, price.currency)}
                     </ThemedText>
                     <ThemedText
                       style={[styles.period, { color: theme.textSecondary }]}
                     >
-                      {label.period}
+                      {cycleLabel}
                     </ThemedText>
                   </View>
+                </View>
+
+                {includedFeatures.length > 0 ? (
+                  <View style={styles.featuresList}>
+                    {includedFeatures.map((f, i) => (
+                      <View key={i} style={styles.featureRow}>
+                        <Feather
+                          name="check"
+                          size={15}
+                          color={theme.success}
+                        />
+                        <ThemedText
+                          style={[styles.featureText, { color: theme.text }]}
+                        >
+                          {f.value ? `${f.name}: ${f.value}` : f.name}
+                        </ThemedText>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+
+                <View
+                  style={[
+                    styles.selectRow,
+                    { borderTopColor: theme.glassBorder },
+                  ]}
+                >
+                  <ThemedText
+                    style={[styles.selectText, { color: theme.primary }]}
+                  >
+                    Select &amp; Continue
+                  </ThemedText>
+                  <Feather name="arrow-right" size={18} color={theme.primary} />
                 </View>
               </Pressable>
             );
           })}
         </View>
 
-        <View style={styles.featuresSection}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
-            INCLUDED FEATURES
-          </ThemedText>
-          {allFeatures.map((feature, index) => (
-            <View key={index} style={styles.featureRow}>
-              <View
-                style={[
-                  styles.featureIcon,
-                  { backgroundColor: `${theme.success}26` },
-                ]}
-              >
-                <Feather name="check" size={16} color={theme.success} />
-              </View>
-              <ThemedText style={styles.featureText}>{feature}</ThemedText>
-            </View>
-          ))}
-        </View>
-
-        <PrimaryButton
-          title={
-            selectedPackage
-              ? `Subscribe for ${selectedPackage.product.priceString}`
-              : "Select a Plan"
-          }
-          onPress={handlePurchase}
-          loading={purchasing}
-          disabled={!selectedPackage}
-          style={styles.subscribeButton}
-          testID="button-subscribe"
-        />
-
-        <Pressable
-          style={styles.restoreButton}
-          onPress={handleRestore}
-          accessibilityRole="button"
-          accessibilityLabel="Restore purchases"
-        >
-          {restoring ? (
-            <ActivityIndicator size="small" color={theme.primary} />
-          ) : (
-            <ThemedText style={[styles.restoreText, { color: theme.primary }]}>
-              Restore Purchases
-            </ThemedText>
-          )}
-        </Pressable>
-
         <ThemedText style={[styles.legalText, { color: theme.textMuted }]}>
-          Subscription will auto-renew unless cancelled at least 24 hours before
-          the end of the current period. By subscribing, you agree to our Terms
-          of Service and Privacy Policy.
+          After selecting a plan you&apos;ll see payment instructions and can
+          upload your payment proof. Your subscription activates once an admin
+          verifies your payment.
         </ThemedText>
       </ScrollView>
     </BackgroundGradient>
@@ -395,132 +288,52 @@ export default function SubscriptionScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: Spacing.lg,
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: Spacing["2xl"],
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: Spacing.sm,
-  },
-  subtitle: {
-    textAlign: "center",
-  },
-  plansContainer: {
-    marginBottom: Spacing.xl,
-  },
+  container: { flex: 1 },
+  content: { paddingHorizontal: Spacing.lg },
+  header: { alignItems: "center", marginBottom: Spacing["2xl"] },
+  title: { textAlign: "center", marginBottom: Spacing.sm },
+  subtitle: { textAlign: "center" },
+  plansContainer: { marginBottom: Spacing.xl },
   planCard: {
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
-    position: "relative",
     overflow: "hidden",
   },
-  popularBadge: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderBottomLeftRadius: BorderRadius.md,
-  },
-  popularText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.5,
-  },
-  planHeader: {
+  planTop: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
   },
-  radioOuter: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: Spacing.md,
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  planInfo: {
-    flex: 1,
-  },
-  planName: {
-    marginBottom: 0,
-  },
-  savingsBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
-    borderRadius: BorderRadius.xs,
-    marginTop: Spacing.xs,
-  },
-  savingsText: {
-    fontSize: 11,
-    fontWeight: "600",
-  },
-  priceContainer: {
-    alignItems: "flex-end",
+  planInfo: { flex: 1, paddingRight: Spacing.md },
+  planName: { marginBottom: Spacing.xs },
+  planDesc: { fontSize: 13, lineHeight: 18 },
+  priceContainer: { alignItems: "flex-end" },
+  originalPrice: {
+    fontSize: 12,
+    textDecorationLine: "line-through",
   },
   price: {},
-  period: {
-    fontSize: 12,
-  },
-  errorIconContainer: {
-    marginBottom: Spacing.xl,
-  },
-  featuresSection: {
-    marginBottom: Spacing["2xl"],
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    letterSpacing: 2,
-    textTransform: "uppercase",
-    marginBottom: Spacing.lg,
-  },
+  period: { fontSize: 12 },
+  featuresList: { marginTop: Spacing.lg },
   featureRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
+    gap: Spacing.sm,
   },
-  featureIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: BorderRadius.full,
+  featureText: { flex: 1, fontSize: 14 },
+  selectRow: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: Spacing.md,
+    gap: Spacing.sm,
+    marginTop: Spacing.lg,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
   },
-  featureText: {
-    flex: 1,
-    fontSize: 15,
-  },
-  subscribeButton: {
-    marginBottom: Spacing.lg,
-  },
-  restoreButton: {
-    alignItems: "center",
-    marginBottom: Spacing["2xl"],
-    height: 24,
-    justifyContent: "center",
-  },
-  restoreText: {
-    fontSize: 14,
-  },
+  selectText: { fontSize: 15, fontWeight: "600" },
   legalText: {
     fontSize: 11,
     textAlign: "center",
@@ -531,27 +344,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  loadingText: {
-    marginTop: Spacing.lg,
-  },
-  subscribedContainer: {
+  loadingText: { marginTop: Spacing.lg },
+  centerContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: Spacing.xl,
   },
-  successIcon: {
-    marginBottom: Spacing.xl,
-  },
-  successTitle: {
-    textAlign: "center",
-    marginBottom: Spacing.md,
-  },
-  successSubtitle: {
-    textAlign: "center",
-    marginBottom: Spacing["2xl"],
-  },
-  continueButton: {
-    width: "100%",
+  centerTitle: { textAlign: "center", marginTop: Spacing.lg, marginBottom: Spacing.md },
+  centerSubtitle: { textAlign: "center", marginBottom: Spacing["2xl"] },
+  retryButton: {
+    borderWidth: 1,
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing["2xl"],
   },
 });
