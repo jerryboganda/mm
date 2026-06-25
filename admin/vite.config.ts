@@ -53,6 +53,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': process.env.ADMIN_API_PROXY_TARGET || 'http://localhost:5000',
+      '/uploads': process.env.ADMIN_API_PROXY_TARGET || 'http://localhost:5000',
     },
   },
 });

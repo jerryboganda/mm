@@ -1,11 +1,67 @@
 import { Router } from "express";
+import multer from "multer";
+import * as crypto from "crypto";
+import * as fs from "fs";
+import * as path from "path";
+import { eq, and, desc } from "drizzle-orm";
 import { authMiddleware, type AuthRequest } from "../middleware";
 import { subscriptionService } from "../services/subscription-service";
 import { couponService } from "../services/coupon-service";
-import { validateCouponSchema } from "../../shared/schema";
+import {
+  validateCouponSchema,
+  submitPaymentProofSchema,
+  manualPaymentProofs,
+  subscriptionPackages,
+  users,
+} from "../../shared/schema";
+import { db } from "../db";
+import { getPaymentInstructions } from "../services/payment-settings";
+import { sendProofReceivedEmail } from "../services/subscription-emails";
 import { logger } from "../lib/logger";
 
 const router = Router();
+
+// ── Payment-proof image upload (multer → local disk) ──────────────
+const proofUploadDir = path.resolve(
+  process.cwd(),
+  "uploads",
+  "payment-proofs",
+);
+const allowedProofTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+const proofExtensionByMime: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+};
+
+fs.mkdirSync(proofUploadDir, { recursive: true });
+
+const proofUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, proofUploadDir),
+    filename: (_req, file, cb) => {
+      const ext =
+        proofExtensionByMime[file.mimetype] ||
+        path.extname(file.originalname).toLowerCase();
+      cb(null, `${Date.now()}-${crypto.randomUUID()}${ext}`);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (!allowedProofTypes.has(file.mimetype)) {
+      cb(new Error("Only JPEG, PNG, WebP, and GIF images are allowed"));
+      return;
+    }
+    cb(null, true);
+  },
+});
+const uploadSingleProof = proofUpload.single("proof");
 
 // ══════════════════════════════════════════════════════════════
 // Public routes (no auth required)
@@ -119,6 +175,21 @@ router.get("/packages/compare", async (_req, res) => {
   } catch (error) {
     logger.error("GET /packages/compare error", { error: String(error) });
     res.status(500).json({ message: "Failed to load package comparison" });
+  }
+});
+
+/**
+ * GET /payment-instructions
+ * Admin-configured manual payment details (bank + mobile wallets +
+ * instructions) shown on the purchase screen.
+ */
+router.get("/payment-instructions", async (_req, res) => {
+  try {
+    const instructions = await getPaymentInstructions();
+    res.json({ instructions });
+  } catch (error) {
+    logger.error("GET /payment-instructions error", { error: String(error) });
+    res.status(500).json({ message: "Failed to load payment instructions" });
   }
 });
 
@@ -266,95 +337,11 @@ router.post(
   },
 );
 
-/**
- * POST /subscribe
- * Create a new subscription.
- * For RevenueCat, the actual payment happens client-side; this records
- * the subscription server-side.
- * Body: { packageId, priceId, couponCode?, paymentGateway? }
- */
-router.post("/subscribe", authMiddleware, async (req: AuthRequest, res) => {
-  try {
-    const { packageId, priceId, couponCode, paymentGateway } = req.body;
-
-    if (!packageId || !priceId) {
-      return res
-        .status(400)
-        .json({ message: "packageId and priceId are required" });
-    }
-
-    const userId = req.userId!;
-
-    // Check if user already has an active subscription
-    const existing =
-      await subscriptionService.getUserActiveSubscription(userId);
-    if (existing) {
-      return res.status(409).json({
-        message:
-          "You already have an active subscription. Please cancel or upgrade instead.",
-      });
-    }
-
-    // Validate and apply coupon if provided
-    let couponId: string | undefined;
-    let discountAmount: string | undefined;
-
-    if (couponCode) {
-      const couponResult = await couponService.validateCoupon(
-        couponCode,
-        userId,
-        packageId,
-      );
-
-      if (!couponResult.valid) {
-        return res.status(400).json({
-          message: couponResult.error || "Invalid coupon code",
-        });
-      }
-
-      couponId = couponResult.coupon?.id;
-      discountAmount =
-        couponResult.discountAmount != null
-          ? String(couponResult.discountAmount)
-          : undefined;
-    }
-
-    const subscription = await subscriptionService.createSubscription(
-      userId,
-      packageId,
-      priceId,
-      {
-        couponId,
-        discountAmount,
-        paymentGateway: paymentGateway || "revenuecat",
-        performedBy: userId,
-        source: "api",
-      },
-    );
-
-    // Redeem coupon after successful subscription creation
-    if (couponId && discountAmount) {
-      await couponService.redeemCoupon(
-        couponId,
-        userId,
-        subscription.id,
-        parseFloat(discountAmount),
-      );
-    }
-
-    res.status(201).json({ subscription });
-  } catch (error: unknown) {
-    logger.error("POST /subscribe error", { error: String(error) });
-    const message =
-      error instanceof Error ? error.message : "Failed to create subscription";
-    const status = message.includes("not found")
-      ? 404
-      : message.includes("limit")
-        ? 409
-        : 500;
-    res.status(status).json({ message });
-  }
-});
+// NOTE: Self-service provisioning endpoints (/subscribe, /upgrade, /downgrade,
+// /reactivate) were intentionally removed. Subscriptions are now provisioned
+// exclusively by an admin approving an uploaded payment proof (or via an admin
+// manual grant). Allowing a user to create/extend their own subscription would
+// bypass the manual-payment paywall.
 
 /**
  * POST /cancel
@@ -450,93 +437,6 @@ router.post("/resume", authMiddleware, async (req: AuthRequest, res) => {
 });
 
 /**
- * POST /upgrade
- * Upgrade to a different package.
- * Body: { packageId, priceId }
- */
-router.post("/upgrade", authMiddleware, async (req: AuthRequest, res) => {
-  try {
-    const { packageId, priceId } = req.body;
-
-    if (!packageId || !priceId) {
-      return res
-        .status(400)
-        .json({ message: "packageId and priceId are required" });
-    }
-
-    const userId = req.userId!;
-
-    const subscription =
-      await subscriptionService.getUserActiveSubscription(userId);
-    if (!subscription) {
-      return res.status(404).json({ message: "No active subscription found" });
-    }
-
-    const result = await subscriptionService.upgradeSubscription(
-      subscription.id,
-      packageId,
-      priceId,
-    );
-
-    res.json({
-      subscription: result.subscription,
-      prorationAmount: result.prorationAmount,
-    });
-  } catch (error: unknown) {
-    logger.error("POST /upgrade error", { error: String(error) });
-    const message =
-      error instanceof Error ? error.message : "Failed to upgrade subscription";
-    const status = message.includes("not found") ? 404 : 500;
-    res.status(status).json({ message });
-  }
-});
-
-/**
- * POST /downgrade
- * Downgrade to a different package (takes effect at period end).
- * Body: { packageId, priceId }
- */
-router.post("/downgrade", authMiddleware, async (req: AuthRequest, res) => {
-  try {
-    const { packageId, priceId } = req.body;
-
-    if (!packageId || !priceId) {
-      return res
-        .status(400)
-        .json({ message: "packageId and priceId are required" });
-    }
-
-    const userId = req.userId!;
-
-    const subscription =
-      await subscriptionService.getUserActiveSubscription(userId);
-    if (!subscription) {
-      return res.status(404).json({ message: "No active subscription found" });
-    }
-
-    const updated = await subscriptionService.downgradeSubscription(
-      subscription.id,
-      packageId,
-      priceId,
-    );
-
-    res.json({
-      subscription: updated,
-      message:
-        "Downgrade scheduled. Changes will take effect at the end of your current billing period.",
-    });
-  } catch (error: unknown) {
-    logger.error("POST /downgrade error", { error: String(error) });
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to downgrade subscription";
-    const status = message.includes("not found") ? 404 : 500;
-    res.status(status).json({ message });
-  }
-});
-
-/**
  * GET /history
  * Full subscription history for the current user.
  */
@@ -553,38 +453,161 @@ router.get("/history", authMiddleware, async (req: AuthRequest, res) => {
   }
 });
 
+// ══════════════════════════════════════════════════════════════
+// Manual payment-proof flow
+// ══════════════════════════════════════════════════════════════
+
 /**
- * POST /reactivate
- * Reactivate an expired or canceled subscription.
+ * POST /proof
+ * Submit a payment-proof image for a package. Multipart form-data:
+ * field `proof` (image) + packageId, priceId, amountClaimed?,
+ * paymentMethod?, senderReference?, userNote?.
+ * Creates a `pending` manual_payment_proofs row for admin review.
  */
-router.post("/reactivate", authMiddleware, async (req: AuthRequest, res) => {
-  try {
-    const userId = req.userId!;
-
-    // Find the most recent expired or canceled subscription
-    const allSubs = await subscriptionService.getUserSubscriptions(userId);
-    const reactivatable = allSubs.find(
-      (s) => s.status === "expired" || s.status === "canceled",
-    );
-
-    if (!reactivatable) {
-      return res.status(404).json({
-        message: "No expired or canceled subscription found to reactivate",
+router.post(
+  "/proof",
+  authMiddleware,
+  (req, res, next) => {
+    uploadSingleProof(req, res, (err: unknown) => {
+      if (!err) return next();
+      if (err instanceof multer.MulterError) {
+        const message =
+          err.code === "LIMIT_FILE_SIZE"
+            ? "Image must be 10 MB or smaller"
+            : err.message;
+        return res.status(400).json({ message });
+      }
+      return res.status(400).json({
+        message: err instanceof Error ? err.message : "Proof upload failed",
       });
+    });
+  },
+  async (req: AuthRequest, res) => {
+    try {
+      const userId = req.userId!;
+
+      if (!req.file) {
+        return res.status(400).json({ message: "Proof image is required" });
+      }
+
+      const parsed = submitPaymentProofSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          message:
+            parsed.error.errors[0]?.message || "Invalid request body",
+        });
+      }
+      const {
+        packageId,
+        priceId,
+        amountClaimed,
+        paymentMethod,
+        senderReference,
+        userNote,
+      } = parsed.data;
+
+      // Block if the user already has an active subscription
+      const existingSub =
+        await subscriptionService.getUserActiveSubscription(userId);
+      if (existingSub) {
+        return res.status(409).json({
+          message: "You already have an active subscription.",
+        });
+      }
+
+      // Block if the user already has a pending proof under review
+      const [pending] = await db
+        .select()
+        .from(manualPaymentProofs)
+        .where(
+          and(
+            eq(manualPaymentProofs.userId, userId),
+            eq(manualPaymentProofs.status, "pending"),
+          ),
+        );
+      if (pending) {
+        return res.status(409).json({
+          message:
+            "You already have a payment proof awaiting review. Please wait for it to be processed.",
+        });
+      }
+
+      // Validate the package exists
+      const [pkg] = await db
+        .select()
+        .from(subscriptionPackages)
+        .where(eq(subscriptionPackages.id, packageId));
+      if (!pkg) {
+        return res.status(404).json({ message: "Package not found" });
+      }
+
+      const [proof] = await db
+        .insert(manualPaymentProofs)
+        .values({
+          userId,
+          packageId,
+          priceId,
+          status: "pending",
+          amountClaimed: amountClaimed ?? null,
+          currency: null,
+          paymentMethod: paymentMethod ?? null,
+          senderReference: senderReference ?? null,
+          userNote: userNote ?? null,
+          proofImageUrl: `/uploads/payment-proofs/${req.file.filename}`,
+          proofFilename: req.file.filename,
+        })
+        .returning();
+
+      // Notify the user their proof was received (best-effort)
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+      if (user?.email) {
+        void sendProofReceivedEmail(user.email, user.name || "there", pkg.name);
+      }
+
+      res.status(201).json({ proof });
+    } catch (error) {
+      logger.error("POST /proof error", { error: String(error) });
+      res.status(500).json({ message: "Failed to submit payment proof" });
     }
+  },
+);
 
-    const updated = await subscriptionService.reactivateSubscription(
-      reactivatable.id,
-    );
+/**
+ * GET /my-proofs
+ * The current user's payment-proof submissions (most recent first), so the
+ * mobile pending screen can reflect approval/rejection.
+ */
+router.get("/my-proofs", authMiddleware, async (req: AuthRequest, res) => {
+  try {
+    const proofs = await db
+      .select({
+        id: manualPaymentProofs.id,
+        packageId: manualPaymentProofs.packageId,
+        priceId: manualPaymentProofs.priceId,
+        status: manualPaymentProofs.status,
+        amountClaimed: manualPaymentProofs.amountClaimed,
+        paymentMethod: manualPaymentProofs.paymentMethod,
+        rejectionReason: manualPaymentProofs.rejectionReason,
+        proofImageUrl: manualPaymentProofs.proofImageUrl,
+        createdAt: manualPaymentProofs.createdAt,
+        reviewedAt: manualPaymentProofs.reviewedAt,
+        packageName: subscriptionPackages.name,
+      })
+      .from(manualPaymentProofs)
+      .leftJoin(
+        subscriptionPackages,
+        eq(manualPaymentProofs.packageId, subscriptionPackages.id),
+      )
+      .where(eq(manualPaymentProofs.userId, req.userId!))
+      .orderBy(desc(manualPaymentProofs.createdAt));
 
-    res.json({ subscription: updated });
-  } catch (error: unknown) {
-    logger.error("POST /reactivate error", { error: String(error) });
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to reactivate subscription";
-    res.status(500).json({ message });
+    res.json({ proofs });
+  } catch (error) {
+    logger.error("GET /my-proofs error", { error: String(error) });
+    res.status(500).json({ message: "Failed to load proofs" });
   }
 });
 

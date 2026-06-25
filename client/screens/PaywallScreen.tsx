@@ -11,7 +11,6 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { usePurchases } from "@/lib/purchases";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -61,43 +60,12 @@ const premiumBenefits = [
 export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<PaywallScreenNavigationProp>();
-  const { isSubscribed } = usePurchases();
   const { theme } = useTheme();
 
   const handleContinue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     navigation.navigate("Subscription");
   };
-
-  const handleRestore = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.navigate("RestorePurchases");
-  };
-
-  if (isSubscribed) {
-    return (
-      <BackgroundGradient>
-        <View
-          style={[styles.subscribedContainer, { paddingTop: insets.top + 60 }]}
-        >
-          <View style={styles.successIcon}>
-            <Feather name="check-circle" size={64} color={theme.success} />
-          </View>
-          <ThemedText type="h2" style={styles.successTitle}>
-            You&apos;re Premium!
-          </ThemedText>
-          <ThemedText style={styles.successSubtitle}>
-            Enjoy unlimited access to all Maternal Mind features.
-          </ThemedText>
-          <PrimaryButton
-            title="Continue Learning"
-            onPress={() => navigation.goBack()}
-            style={styles.continueButton}
-          />
-        </View>
-      </BackgroundGradient>
-    );
-  }
 
   return (
     <BackgroundGradient>
@@ -183,20 +151,6 @@ export default function PaywallScreen() {
             style={styles.ctaButton}
             testID="button-view-plans"
           />
-
-          <View style={styles.restoreRow}>
-            <ThemedText
-              style={[styles.restoreLabel, { color: theme.textSecondary }]}
-            >
-              Already a subscriber?
-            </ThemedText>
-            <ThemedText
-              style={[styles.restoreLink, { color: theme.primary }]}
-              onPress={handleRestore}
-            >
-              Restore Purchases
-            </ThemedText>
-          </View>
         </View>
       </ScrollView>
     </BackgroundGradient>

@@ -18,9 +18,9 @@ import adminUserRoutes from "./admin-users";
 import adminAnalyticsRoutes from "./admin-analytics";
 import adminAnnouncementsRoutes from "./admin-announcements";
 import adminSubscriptionRoutes from "./admin-subscriptions";
+import adminManualPaymentRoutes from "./admin-manual-payments";
 import adminDeviceLimitRoutes from "./admin-device-limits";
 import subscriptionRoutes from "./subscription";
-import webhookRoutes from "./webhook";
 
 // General API rate limits (per IP)
 const generalLimiter = rateLimiter(120, 60_000); // 120 requests/min for content browsing
@@ -51,8 +51,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/admin/analytics", adminLimiter, adminAnalyticsRoutes);
   app.use("/api/admin/announcements", adminLimiter, adminAnnouncementsRoutes);
   app.use("/api/admin/subscriptions", adminLimiter, adminSubscriptionRoutes);
+  app.use(
+    "/api/admin/manual-payments",
+    adminLimiter,
+    adminManualPaymentRoutes,
+  );
   app.use("/api/admin/device-limits", adminLimiter, adminDeviceLimitRoutes);
-  app.use("/api/webhooks", webhookRoutes);
 
   const httpServer = createServer(app);
   return httpServer;

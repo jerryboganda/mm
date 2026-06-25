@@ -97,12 +97,18 @@ curl -s -w "%{http_code}" -o /tmp/resp.json "$BASE/subscriptions/history" -H "Au
 echo " $(cat /tmp/resp.json | head -c 200)"
 echo ""
 
-# 5. Webhook test
-echo "--- Webhook ---"
-echo -n "POST /webhooks/revenuecat (test event) -> "
-curl -s -w "%{http_code}" -o /tmp/resp.json -X POST "$BASE/../api/webhooks/revenuecat" \
-  -H "Content-Type: application/json" \
-  -d '{"api_version":"4.0","event":{"type":"TEST","app_user_id":"test","product_id":"test","period_type":"NORMAL","purchased_at_ms":1234567890000,"expiration_at_ms":null,"environment":"SANDBOX","store":"APP_STORE","original_app_user_id":"test"}}'
+# 5. Manual payment flow
+echo "--- Manual Payments ---"
+echo -n "GET /subscriptions/payment-instructions -> "
+curl -s -w "%{http_code}" -o /tmp/resp.json "$BASE/subscriptions/payment-instructions"
+echo " $(cat /tmp/resp.json | head -c 200)"
+echo ""
+echo -n "GET /subscriptions/my-proofs (auth) -> "
+curl -s -w "%{http_code}" -o /tmp/resp.json "$BASE/subscriptions/my-proofs" -H "Authorization: Bearer $TOKEN"
+echo " $(cat /tmp/resp.json | head -c 200)"
+echo ""
+echo -n "GET /admin/manual-payments?status=pending -> "
+curl -s -w "%{http_code}" -o /tmp/resp.json "$BASE/admin/manual-payments?status=pending" -H "Authorization: Bearer $TOKEN"
 echo " $(cat /tmp/resp.json | head -c 200)"
 echo ""
 

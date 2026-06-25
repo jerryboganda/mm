@@ -13,16 +13,12 @@
                 "buildType": "apk"
             },
             "env": {
-                "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
-                "EXPO_PUBLIC_RC_API_KEY_TEST": "test_EcWYjytvXOiUkiWRxDcWlYjnyNU",
-                "EXPO_PUBLIC_RC_ENTITLEMENT_ID": "maternalmind Premium"
+                "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
             }
         },
         "production": {
             "env": {
-                "NPM_CONFIG_LEGACY_PEER_DEPS": "true",
-                "EXPO_PUBLIC_RC_API_KEY_TEST": "test_EcWYjytvXOiUkiWRxDcWlYjnyNU",
-                "EXPO_PUBLIC_RC_ENTITLEMENT_ID": "maternalmind Premium"
+                "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
             }
         }
     },

@@ -1148,6 +1148,75 @@ export const subscriptionAuditLogsRelations = relations(
   }),
 );
 
+// ── 14. Manual Payment Proofs ─────────────────────────────────
+// User-submitted proof of a manual (offline) payment for a subscription
+// package. An admin reviews the proof and approves (which provisions a
+// subscription via subscriptionService.createSubscription with
+// paymentGateway="manual") or rejects it.
+export const manualPaymentProofs = pgTable(
+  "manual_payment_proofs",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    packageId: varchar("package_id")
+      .notNull()
+      .references(() => subscriptionPackages.id),
+    priceId: varchar("price_id").references(() => packagePrices.id),
+    // Review state: pending → approved | rejected
+    status: text("status").notNull().default("pending"),
+    // What the user claims they paid (informational; admin verifies the image)
+    amountClaimed: numeric("amount_claimed", { precision: 12, scale: 2 }),
+    currency: text("currency"),
+    // e.g. "Bank Transfer", "JazzCash", "Easypaisa"
+    paymentMethod: text("payment_method"),
+    // Sender name / transaction id the user provides
+    senderReference: text("sender_reference"),
+    userNote: text("user_note"),
+    // Uploaded proof image (served from /uploads/payment-proofs)
+    proofImageUrl: text("proof_image_url").notNull(),
+    proofFilename: text("proof_filename"),
+    // Admin review
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    rejectionReason: text("rejection_reason"),
+    // Subscription created on approval
+    createdSubscriptionId: varchar("created_subscription_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_manual_proof_user").on(table.userId),
+    index("idx_manual_proof_status").on(table.status),
+    index("idx_manual_proof_created").on(table.createdAt),
+  ],
+);
+
+export const manualPaymentProofsRelations = relations(
+  manualPaymentProofs,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [manualPaymentProofs.userId],
+      references: [users.id],
+    }),
+    package: one(subscriptionPackages, {
+      fields: [manualPaymentProofs.packageId],
+      references: [subscriptionPackages.id],
+    }),
+    price: one(packagePrices, {
+      fields: [manualPaymentProofs.priceId],
+      references: [packagePrices.id],
+    }),
+    reviewer: one(users, {
+      fields: [manualPaymentProofs.reviewedBy],
+      references: [users.id],
+    }),
+  }),
+);
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -1313,6 +1382,66 @@ export const validateCouponSchema = z.object({
   addOnId: z.string().optional(),
 });
 
+// ── Manual Payment Proof Zod Schemas ──────────────────────────
+
+export const submitPaymentProofSchema = z.object({
+  packageId: z.string().min(1, "packageId is required"),
+  priceId: z.string().min(1, "priceId is required"),
+  amountClaimed: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  paymentMethod: z.string().max(100).optional(),
+  senderReference: z.string().max(200).optional(),
+  userNote: z.string().max(1000).optional(),
+});
+
+export const reviewPaymentProofSchema = z.object({
+  rejectionReason: z.string().max(1000).optional(),
+});
+
+export const manualGrantSchema = z
+  .object({
+    userId: z.string().optional(),
+    email: z.string().email().optional(),
+    packageId: z.string().min(1, "packageId is required"),
+    priceId: z.string().min(1, "priceId is required"),
+  })
+  .refine((d) => !!d.userId || !!d.email, {
+    message: "Either userId or email is required",
+    path: ["email"],
+  });
+
+// Admin-configurable payment instructions stored in app_settings under
+// the key "payment_instructions".
+export const paymentInstructionsSchema = z.object({
+  currency: z.string().default("PKR"),
+  instructions: z.string().default(""),
+  bank: z
+    .object({
+      bankName: z.string().default(""),
+      accountTitle: z.string().default(""),
+      accountNumber: z.string().default(""),
+      iban: z.string().default(""),
+    })
+    .default({
+      bankName: "",
+      accountTitle: "",
+      accountNumber: "",
+      iban: "",
+    }),
+  wallets: z
+    .array(
+      z.object({
+        name: z.string().default(""),
+        accountTitle: z.string().default(""),
+        number: z.string().default(""),
+      }),
+    )
+    .default([]),
+});
+export type PaymentInstructions = z.infer<typeof paymentInstructionsSchema>;
+
 export const bulkCouponGenerationSchema = z.object({
   count: z.number().int().min(1).max(10000),
   prefix: z.string().min(1).max(20),
@@ -1363,3 +1492,6 @@ export type Invoice = typeof invoices.$inferSelect;
 export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
 export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
 export type SubscriptionAuditLog = typeof subscriptionAuditLogs.$inferSelect;
+export type ManualPaymentProof = typeof manualPaymentProofs.$inferSelect;
+export type InsertManualPaymentProof =
+  typeof manualPaymentProofs.$inferInsert;

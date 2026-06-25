@@ -36,11 +36,11 @@ if [ -z "$PRICE_ID" ] || [ "$PRICE_ID" = "" ]; then
 fi
 
 echo ""
-echo "--- Subscribe with priceId ---"
-SUB_RESP=$(curl -s -X POST "$BASE/subscriptions/subscribe" \
+echo "--- Provision via admin manual grant (RevenueCat removed; /subscribe no longer exists) ---"
+SUB_RESP=$(curl -s -X POST "$BASE/admin/manual-payments/grant" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"packageId\":\"$PKG_ID\",\"priceId\":\"$PRICE_ID\"}")
+  -d "{\"email\":\"demo@maternalmind.app\",\"packageId\":\"$PKG_ID\",\"priceId\":\"$PRICE_ID\"}")
 echo "$SUB_RESP" | python3 -m json.tool 2>/dev/null | head -30
 echo ""
 
