@@ -63,12 +63,12 @@ const CYCLE_LABELS: Record<string, string> = {
   custom: "",
 };
 
-function formatPrice(price: string, currency: string): string {
+function formatPrice(price: string): string {
   const n = Number(price);
   const amount = Number.isNaN(n)
     ? price
     : n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return `${currency} ${amount}`;
+  return `PKR ${amount}`;
 }
 
 export default function SubscriptionScreen() {
@@ -197,7 +197,7 @@ export default function SubscriptionScreen() {
                   },
                 ]}
                 accessibilityRole="button"
-                accessibilityLabel={`${pkg.name} plan, ${formatPrice(price.price, price.currency)} ${cycleLabel}`}
+                accessibilityLabel={`${pkg.name} plan, ${formatPrice(price.price)} ${cycleLabel}`}
               >
                 <View style={styles.planTop}>
                   <View style={styles.planInfo}>
@@ -223,14 +223,14 @@ export default function SubscriptionScreen() {
                           { color: theme.textMuted },
                         ]}
                       >
-                        {formatPrice(price.originalPrice, price.currency)}
+                        {formatPrice(price.originalPrice)}
                       </ThemedText>
                     ) : null}
                     <ThemedText
                       type="h3"
                       style={[styles.price, { color: theme.primary }]}
                     >
-                      {formatPrice(price.price, price.currency)}
+                      {formatPrice(price.price)}
                     </ThemedText>
                     <ThemedText
                       style={[styles.period, { color: theme.textSecondary }]}

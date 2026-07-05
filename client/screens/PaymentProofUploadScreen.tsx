@@ -46,7 +46,7 @@ export default function PaymentProofUploadScreen() {
   const route = useRoute<RouteProps>();
   const { theme } = useTheme();
 
-  const { packageId, priceId, packageName, price, currency } = route.params;
+  const { packageId, priceId, packageName, price } = route.params;
 
   const [image, setImage] = useState<PickedImage | null>(null);
   const [amount, setAmount] = useState(price || "");
@@ -152,7 +152,7 @@ export default function PaymentProofUploadScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedText style={[styles.summary, { color: theme.textSecondary }]}>
-          {packageName} — {currency} {price}
+          {packageName} — PKR {price}
         </ThemedText>
 
         <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>

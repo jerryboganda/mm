@@ -57,12 +57,12 @@ const CYCLE_LABELS: Record<string, string> = {
   custom: "",
 };
 
-function formatPrice(price: string, currency: string): string {
+function formatPrice(price: string): string {
   const n = Number(price);
   const amount = Number.isNaN(n)
     ? price
     : n.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return `${currency} ${amount}`;
+  return `PKR ${amount}`;
 }
 
 export default function PurchaseScreen() {
@@ -135,7 +135,7 @@ export default function PurchaseScreen() {
               {packageName}
             </ThemedText>
             <ThemedText type="h4" style={{ color: theme.primary }}>
-              {formatPrice(price, currency)}
+              {formatPrice(price)}
             </ThemedText>
           </View>
           <ThemedText style={[styles.summaryCycle, { color: theme.textMuted }]}>

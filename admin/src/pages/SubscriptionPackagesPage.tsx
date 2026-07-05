@@ -90,7 +90,7 @@ const emptyFeature = (): PackageFeature => ({
 const emptyPrice = (): PackagePrice => ({
   billingCycle: "monthly",
   price: 0,
-  currency: "USD",
+  currency: "PKR",
   stripePriceId: "",
   isActive: true,
 });
@@ -733,7 +733,7 @@ export default function SubscriptionPackagesPage() {
                               currency: e.target.value.toUpperCase(),
                             })
                           }
-                          placeholder="USD"
+                          placeholder="PKR"
                           maxLength={3}
                           className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none font-mono uppercase"
                         />
