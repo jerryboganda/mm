@@ -592,7 +592,7 @@ export const packagePrices = pgTable(
     customDurationDays: integer("custom_duration_days"),
     // Price in smallest currency unit (e.g., cents). Use numeric for precision.
     price: numeric("price", { precision: 12, scale: 2 }).notNull(),
-    currency: text("currency").notNull().default("USD"),
+    currency: text("currency").notNull().default("PKR"),
     // Original price for strike-through display
     originalPrice: numeric("original_price", { precision: 12, scale: 2 }),
     isActive: boolean("is_active").default(true).notNull(),
@@ -663,7 +663,7 @@ export const addOns = pgTable(
     // Pricing: one_time or recurring
     pricingType: text("pricing_type").notNull().default("one_time"),
     price: numeric("price", { precision: 12, scale: 2 }).notNull(),
-    currency: text("currency").notNull().default("USD"),
+    currency: text("currency").notNull().default("PKR"),
     // If recurring, how often
     billingCycle: text("billing_cycle"),
     // Quantity limits per user (0 = unlimited)
@@ -689,7 +689,7 @@ export const addOnBundles = pgTable("add_on_bundles", {
   description: text("description"),
   // Discounted bundle price
   price: numeric("price", { precision: 12, scale: 2 }).notNull(),
-  currency: text("currency").notNull().default("USD"),
+  currency: text("currency").notNull().default("PKR"),
   // JSON array of add-on IDs in this bundle
   addOnIds: jsonb("add_on_ids").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
@@ -840,7 +840,7 @@ export const subscriptions = pgTable(
       precision: 12,
       scale: 2,
     }).notNull(),
-    currency: text("currency").notNull().default("USD"),
+    currency: text("currency").notNull().default("PKR"),
     // Applied coupon
     couponId: varchar("coupon_id").references(() => coupons.id),
     discountAmount: numeric("discount_amount", { precision: 12, scale: 2 }),
@@ -956,7 +956,7 @@ export const invoices = pgTable(
     }).default("0"),
     taxTotal: numeric("tax_total", { precision: 12, scale: 2 }).default("0"),
     total: numeric("total", { precision: 12, scale: 2 }).notNull(),
-    currency: text("currency").notNull().default("USD"),
+    currency: text("currency").notNull().default("PKR"),
     // Payment tracking
     paidAt: timestamp("paid_at"),
     dueAt: timestamp("due_at"),
@@ -1055,7 +1055,7 @@ export const paymentTransactions = pgTable(
     status: text("status").notNull().default("pending"),
     // Amount and currency
     amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
-    currency: text("currency").notNull().default("USD"),
+    currency: text("currency").notNull().default("PKR"),
     // Gateway details
     paymentGateway: text("payment_gateway").notNull(), // revenuecat, stripe, paypal, manual
     gatewayTransactionId: text("gateway_transaction_id"),
@@ -1311,7 +1311,7 @@ export const createPackagePriceSchema = z.object({
   billingCycle: billingCycleEnum,
   customDurationDays: z.number().int().min(1).optional(),
   price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
-  currency: z.string().default("USD"),
+  currency: z.string().default("PKR"),
   originalPrice: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
@@ -1337,7 +1337,7 @@ export const createAddOnSchema = z.object({
   description: z.string().optional(),
   pricingType: z.enum(["one_time", "recurring"]).default("one_time"),
   price: z.string().regex(/^\d+(\.\d{1,2})?$/),
-  currency: z.string().default("USD"),
+  currency: z.string().default("PKR"),
   billingCycle: billingCycleEnum.optional(),
   maxQuantityPerUser: z.number().int().min(1).default(1),
   compatiblePackageIds: z.array(z.string()).optional(),

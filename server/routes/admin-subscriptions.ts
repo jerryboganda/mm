@@ -378,7 +378,7 @@ router.get("/coupons", async (req: AuthRequest, res: Response) => {
       code: c.code,
       discountType: c.discountType,
       discountValue: parseFloat(c.discountValue) || 0,
-      currency: "USD",
+      currency: "PKR",
       maxUses: c.maxTotalUses,
       currentUses: c.currentUseCount ?? 0,
       validFrom: c.validFrom,
@@ -887,7 +887,7 @@ router.get("/analytics/kpis", async (_req: AuthRequest, res: Response) => {
     res.json({
       activeSubscribers: stats.totalActive ?? 0,
       mrr: stats.mrr ?? 0,
-      mrrCurrency: "USD",
+      mrrCurrency: "PKR",
       churnRate: stats.churnRate ?? 0,
       newThisMonth: stats.newSubscriptionsThisMonth ?? 0,
       trialUsers: stats.totalTrialing ?? 0,
@@ -923,7 +923,7 @@ router.get(
           packageName: r.packageName,
           subscriberCount: r.activeSubscribers ?? 0,
           revenue: r.totalRevenue ?? 0,
-          currency: "USD",
+          currency: "PKR",
           percentOfTotal:
             totalRev > 0
               ? Math.round(((r.totalRevenue ?? 0) / totalRev) * 100)
@@ -1100,7 +1100,7 @@ router.get("/packages", async (req: AuthRequest, res: Response) => {
                   id: p.id,
                   billingCycle: p.billingCycle,
                   price: parseFloat(p.price) || 0,
-                  currency: p.currency || "USD",
+                  currency: p.currency || "PKR",
                   stripePriceId: p.revenuecatOfferingId || "",
                   isActive: p.isActive ?? true,
                 })),

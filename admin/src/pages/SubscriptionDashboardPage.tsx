@@ -335,7 +335,7 @@ export default function SubscriptionDashboardPage() {
                   Total
                 </span>
                 <span className="text-sm font-bold text-gray-900">
-                  {revenueByPackage[0]?.currency || "USD"}{" "}
+                  {revenueByPackage[0]?.currency || "PKR"}{" "}
                   {totalRevenue.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                   })}
