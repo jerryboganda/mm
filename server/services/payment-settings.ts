@@ -26,6 +26,7 @@ const DEFAULT_INSTRUCTIONS: PaymentInstructions = {
     accountTitle: "",
     accountNumber: "",
     iban: "",
+    branch: "",
   },
   wallets: [],
 };

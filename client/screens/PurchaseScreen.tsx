@@ -44,6 +44,7 @@ interface PaymentInstructions {
     accountTitle: string;
     accountNumber: string;
     iban: string;
+    branch: string;
   };
   wallets: Wallet[];
 }
@@ -179,6 +180,9 @@ export default function PurchaseScreen() {
                   <DetailRow label="Account #" value={bank.accountNumber} />
                 ) : null}
                 {bank?.iban ? <DetailRow label="IBAN" value={bank.iban} /> : null}
+                {bank?.branch ? (
+                  <DetailRow label="Branch" value={bank.branch} />
+                ) : null}
               </GlassCard>
             ) : null}
 
