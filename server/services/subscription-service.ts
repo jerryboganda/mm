@@ -1,4 +1,5 @@
 import { logger } from "../lib/logger";
+import { isSubscriptionActive } from "../lib/subscription-status";
 import {
   subscriptionPackages,
   packagePrices,
@@ -1041,7 +1042,35 @@ class SubscriptionService {
         )
         .orderBy(desc(subscriptions.createdAt))
         .limit(1);
-      return sub || undefined;
+      if (!sub) return undefined;
+
+      // Manual (bank transfer / JazzCash) payments have no gateway webhook,
+      // and there is no periodic job that flips a lapsed subscription's
+      // status to "expired". That means a row can sit here as "active"/
+      // "trialing" long after its real billing period has ended. Self-heal
+      // that here: if the period has genuinely lapsed, transition it for
+      // real (this also syncs the denormalized users.subscriptionStatus
+      // fields) and report "no active subscription" instead of treating a
+      // stale row as if it still grants access or blocks a new purchase.
+      if (
+        (sub.status === "active" || sub.status === "trialing") &&
+        !isSubscriptionActive(sub.status, sub.currentPeriodEnd)
+      ) {
+        await this.expireSubscription(sub.id);
+        return undefined;
+      }
+
+      // A past_due subscription past its grace period no longer grants
+      // access. We don't force a status transition here — dunning
+      // status changes are owned by the payment-retry/reactivation flow —
+      // we just stop reporting it as the user's active subscription.
+      if (sub.status === "past_due") {
+        const inGracePeriod =
+          sub.gracePeriodEndAt != null && new Date() <= sub.gracePeriodEndAt;
+        if (!inGracePeriod) return undefined;
+      }
+
+      return sub;
     } catch (error) {
       logger.error("SubscriptionService getUserActiveSubscription error", { error: String(error) });
       throw error;
