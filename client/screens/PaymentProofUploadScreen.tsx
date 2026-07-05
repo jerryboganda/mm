@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -26,6 +26,7 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { apiUpload } from "@/lib/query-client";
+import { useAuth } from "@/lib/auth";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -39,12 +40,37 @@ interface PickedImage {
   fileName: string;
 }
 
+/**
+ * apiUpload/apiRequest throw `Error("<status>: <raw body>")`. Extract the
+ * HTTP status and a clean message (parsing JSON bodies like
+ * `{"message": "..."}`) instead of surfacing the raw response text to users.
+ */
+function parseApiError(err: unknown): {
+  status: number | null;
+  message: string;
+} {
+  const raw = err instanceof Error ? err.message : String(err ?? "");
+  const match = raw.match(/^(\d+):\s*([\s\S]*)$/);
+  const status = match ? Number(match[1]) : null;
+  const body = match ? match[2] : raw;
+  try {
+    const parsed = JSON.parse(body);
+    if (parsed && typeof parsed.message === "string") {
+      return { status, message: parsed.message };
+    }
+  } catch {
+    // Not JSON — fall through to the raw text below.
+  }
+  return { status, message: body };
+}
+
 export default function PaymentProofUploadScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<NavProp>();
   const route = useRoute<RouteProps>();
   const { theme } = useTheme();
+  const { user, refreshUser } = useAuth();
 
   const { packageId, priceId, packageName, price } = route.params;
 
@@ -54,6 +80,15 @@ export default function PaymentProofUploadScreen() {
   const [reference, setReference] = useState("");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // If our subscription turns out to already be active (e.g. the server
+  // rejected this submission because one already exists), jump straight into
+  // the app instead of leaving the user stuck on this upload form.
+  useEffect(() => {
+    if (user?.subscriptionStatus === "active") {
+      navigation.reset({ index: 0, routes: [{ name: "Main" }] });
+    }
+  }, [user?.subscriptionStatus, navigation]);
 
   const handlePickImage = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -122,7 +157,25 @@ export default function PaymentProofUploadScreen() {
       navigation.replace("PendingApproval");
     } catch (err: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      const message = (err?.message || "").replace(/^\d+:\s*/, "");
+      const { status, message } = parseApiError(err);
+
+      // Don't leave the user stuck on a dead-end alert — route them to
+      // where they actually belong instead of just re-showing this form.
+      if (status === 409 && /payment proof awaiting review/i.test(message)) {
+        navigation.replace("PendingApproval");
+        return;
+      }
+      if (status === 409 && /active subscription/i.test(message)) {
+        // Our local state was stale. Refresh it — the effect above will
+        // navigate into the app once the server confirms it's active.
+        await refreshUser();
+        Alert.alert(
+          "Already Subscribed",
+          "You already have an active subscription. Taking you into the app.",
+        );
+        return;
+      }
+
       Alert.alert(
         "Upload Failed",
         message || "We couldn't submit your payment proof. Please try again.",
