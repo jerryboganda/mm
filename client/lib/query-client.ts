@@ -112,7 +112,7 @@ export function getApiUrl(): string {
 // Refresh lock to prevent concurrent refresh requests
 let refreshPromise: Promise<string | null> | null = null;
 
-async function attemptTokenRefresh(): Promise<string | null> {
+export async function attemptTokenRefresh(): Promise<string | null> {
   // Deduplicate concurrent refresh attempts
   if (refreshPromise) return refreshPromise;
 

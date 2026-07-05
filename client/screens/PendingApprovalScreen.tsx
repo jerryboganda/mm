@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, ActivityIndicator, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -42,18 +42,21 @@ export default function PendingApprovalScreen() {
     staleTime: 0,
   });
 
+  const [isChecking, setIsChecking] = useState(false);
+  const [checkError, setCheckError] = useState<string | null>(null);
+
   const latest = data?.proofs?.[0];
   const isRejected = latest?.status === "rejected";
 
-  // Poll the auth status so the hard paywall opens automatically once an
-  // admin approves the payment.
+  // Poll auth status so the hard paywall opens automatically once an admin
+  // approves the payment. The proofs list already polls itself via
+  // `refetchInterval` above, so this only needs to refresh the user.
   useEffect(() => {
     const interval = setInterval(() => {
       refreshUser();
-      refetch();
     }, 8000);
     return () => clearInterval(interval);
-  }, [refreshUser, refetch]);
+  }, [refreshUser]);
 
   // When the subscription becomes active, jump to the app.
   useEffect(() => {
@@ -64,6 +67,20 @@ export default function PendingApprovalScreen() {
 
   const handleTryAgain = () => {
     navigation.reset({ index: 0, routes: [{ name: "Subscription" }] });
+  };
+
+  const handleCheckAgain = async () => {
+    if (isChecking) return;
+    setIsChecking(true);
+    setCheckError(null);
+    try {
+      await Promise.all([refreshUser(), refetch({ throwOnError: true })]);
+    } catch (error) {
+      console.error("Check again failed:", error);
+      setCheckError("Couldn't check right now. Please try again.");
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   return (
@@ -126,17 +143,24 @@ export default function PendingApprovalScreen() {
               </ThemedText>
             </GlassCard>
             <Pressable
-              onPress={() => {
-                refreshUser();
-                refetch();
-              }}
-              style={styles.refreshButton}
+              onPress={handleCheckAgain}
+              disabled={isChecking}
+              style={[styles.refreshButton, isChecking && styles.refreshButtonDisabled]}
             >
-              <Feather name="refresh-cw" size={16} color={theme.primary} />
+              {isChecking ? (
+                <ActivityIndicator size="small" color={theme.primary} />
+              ) : (
+                <Feather name="refresh-cw" size={16} color={theme.primary} />
+              )}
               <ThemedText style={{ color: theme.primary, fontSize: 14 }}>
-                Check again
+                {isChecking ? "Checking..." : "Check again"}
               </ThemedText>
             </Pressable>
+            {checkError ? (
+              <ThemedText style={[styles.checkErrorText, { color: theme.error }]}>
+                {checkError}
+              </ThemedText>
+            ) : null}
           </>
         )}
 
@@ -192,6 +216,14 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     marginTop: Spacing.xl,
     padding: Spacing.md,
+  },
+  refreshButtonDisabled: {
+    opacity: 0.6,
+  },
+  checkErrorText: {
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: -Spacing.sm,
   },
   signOut: { marginTop: "auto", padding: Spacing.md },
   signOutText: { fontSize: 14 },

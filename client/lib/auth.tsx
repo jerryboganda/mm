@@ -3,11 +3,12 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import { getApiUrl, queryClient } from "@/lib/query-client";
+import { getApiUrl, queryClient, attemptTokenRefresh } from "@/lib/query-client";
 import { getDeviceIdentity } from "@/lib/device-identity";
 
 interface User {
@@ -128,34 +129,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const token = await getToken(TOKEN_KEY);
       if (token) {
         const baseUrl = getApiUrl();
-        const response = await fetch(new URL("/api/auth/me", baseUrl), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const fetchMe = (bearerToken: string) =>
+          fetch(new URL("/api/auth/me", baseUrl), {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+            },
+          });
+
+        let response = await fetchMe(token);
+
+        if (response.status === 401) {
+          // Access token expired — attempt a silent refresh before giving
+          // up, mirroring the retry behavior apiRequest/getQueryFn already
+          // use. Without this, a routine expired-token 401 (e.g. after
+          // waiting a while on the Pending Approval screen) would
+          // immediately wipe a still-valid refresh token below.
+          const newToken = await attemptTokenRefresh();
+          if (newToken) {
+            response = await fetchMe(newToken);
+          }
+        }
+
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
-        } else {
+        } else if (response.status === 401) {
+          // Genuine auth failure even after attempting a refresh (or no
+          // refresh was possible) — the session really is over. Clear it
+          // and reflect that in state so the UI (e.g. navigation) responds
+          // instead of silently doing nothing.
           await removeToken(TOKEN_KEY);
           await removeToken(REFRESH_TOKEN_KEY);
+          setUser(null);
         }
+        // Other non-ok statuses (5xx, transient network/server errors)
+        // intentionally leave tokens and user state untouched so a
+        // temporary hiccup doesn't log the user out.
       }
     } catch (error) {
       console.error("Auth check failed:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const parseErrorResponse = async (response: Response) => {
     const contentType = response.headers.get("content-type") || "";
@@ -357,9 +382,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     await checkAuth();
-  };
+  }, [checkAuth]);
 
   const dismissSessionExpired = () => {
     setIsSessionExpired(false);
