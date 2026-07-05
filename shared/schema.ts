@@ -1423,12 +1423,14 @@ export const paymentInstructionsSchema = z.object({
       accountTitle: z.string().default(""),
       accountNumber: z.string().default(""),
       iban: z.string().default(""),
+      branch: z.string().default(""),
     })
     .default({
       bankName: "",
       accountTitle: "",
       accountNumber: "",
       iban: "",
+      branch: "",
     }),
   wallets: z
     .array(

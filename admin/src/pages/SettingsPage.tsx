@@ -109,6 +109,7 @@ interface PaymentInstructions {
     accountTitle: string;
     accountNumber: string;
     iban: string;
+    branch: string;
   };
   wallets: Wallet[];
 }
@@ -116,7 +117,7 @@ interface PaymentInstructions {
 const EMPTY_PAYMENT: PaymentInstructions = {
   currency: "PKR",
   instructions: "",
-  bank: { bankName: "", accountTitle: "", accountNumber: "", iban: "" },
+  bank: { bankName: "", accountTitle: "", accountNumber: "", iban: "", branch: "" },
   wallets: [],
 };
 
@@ -260,6 +261,14 @@ function PaymentSettingsTab() {
               className={inputCls}
               value={form.bank.iban}
               onChange={(e) => setBank("iban", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Branch</label>
+            <input
+              className={inputCls}
+              value={form.bank.branch}
+              onChange={(e) => setBank("branch", e.target.value)}
             />
           </div>
         </div>
