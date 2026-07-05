@@ -3,6 +3,7 @@ import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useHeaderHeight } from "@react-navigation/elements";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "@/lib/haptics-wrapper";
@@ -59,6 +60,7 @@ const premiumBenefits = [
 
 export default function PaywallScreen() {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const navigation = useNavigation<PaywallScreenNavigationProp>();
   const { theme } = useTheme();
 
@@ -74,7 +76,7 @@ export default function PaywallScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing.xl,
+            paddingTop: Math.max(insets.top, headerHeight) + Spacing.xl,
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
