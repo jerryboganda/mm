@@ -13,6 +13,10 @@ web_dist
 admin_dist
 server_dist
 server_dist_check
+# OTA: never bake the signing private key or published bundles into the image —
+# both are provided at runtime via docker-compose bind mounts.
+secrets
+updates
 *.tsbuildinfo
 *.log
 *.md

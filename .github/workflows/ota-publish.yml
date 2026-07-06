@@ -1,0 +1,124 @@
+name: OTA Publish
+
+# Builds the JS/asset bundle with `expo export` and publishes it to the
+# self-hosted update server on the VPS (rsync over SSH). The installed app then
+# picks it up on next foreground and shows the mandatory "Update Required" popup.
+#
+# Native code is NOT updated by this — only JS, assets and content. Native
+# changes require a new store build (see android-release.yml / one-time EAS iOS).
+#
+# Publishing stays DORMANT until you set the repository variable OTA_ENABLED=true
+# (do this only AFTER the one-time store build that embeds the OTA engine has
+# shipped to users). Until then this workflow runs but is a no-op.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: "Message shown in the in-app update popup"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths:
+      - "client/**"
+      - "shared/**"
+      - "assets/**"
+      - "app.json"
+      - "package.json"
+      - "package-lock.json"
+
+concurrency:
+  group: ota-publish
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.g.outputs.enabled }}
+    steps:
+      - id: g
+        run: |
+          if [ "${{ vars.OTA_ENABLED }}" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::OTA publishing is disabled. Set repository variable OTA_ENABLED=true (after the one-time store build) to enable."
+          fi
+
+  publish:
+    needs: gate
+    if: needs.gate.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # needed for `git log` release-notes fallback
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Resolve runtime versions and export bundle
+        id: build
+        env:
+          EXPO_NO_TELEMETRY: "1"
+        run: |
+          set -euo pipefail
+          IOS_RTV=$(npx expo-updates runtimeversion:resolve --platform ios | jq -r .runtimeVersion)
+          ANDROID_RTV=$(npx expo-updates runtimeversion:resolve --platform android | jq -r .runtimeVersion)
+          TS=$(date +%s%3N)
+          echo "ios_rtv=$IOS_RTV" >> "$GITHUB_OUTPUT"
+          echo "android_rtv=$ANDROID_RTV" >> "$GITHUB_OUTPUT"
+          echo "ts=$TS" >> "$GITHUB_OUTPUT"
+          echo "iOS runtime version:     $IOS_RTV"
+          echo "Android runtime version: $ANDROID_RTV"
+
+          npx expo export --platform ios --platform android --output-dir dist
+
+          # Publish-time extras, surfaced by the update server as manifest.extra
+          # (the app reads extra.releaseNotes for the popup body).
+          NOTES="${{ github.event.inputs.release_notes }}"
+          if [ -z "$NOTES" ]; then NOTES="$(git log -1 --pretty=%s)"; fi
+          jq -n --arg notes "$NOTES" --arg commit "${{ github.sha }}" \
+            '{releaseNotes: $notes, commit: $commit}' > dist/expo-updates-extra.json
+
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Publish bundle to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          UPDATES_DIR: ${{ vars.VPS_UPDATES_DIR }}
+          IOS_RTV: ${{ steps.build.outputs.ios_rtv }}
+          ANDROID_RTV: ${{ steps.build.outputs.android_rtv }}
+          TS: ${{ steps.build.outputs.ts }}
+        run: |
+          set -euo pipefail
+          BASE="${UPDATES_DIR:-/root/maternal-mind/updates}"
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          publish_one () {
+            local rtv="$1"
+            ssh "$VPS_USER@$VPS_HOST" "mkdir -p '$BASE/$rtv/$TS'"
+            rsync -az dist/ "$VPS_USER@$VPS_HOST:$BASE/$rtv/$TS/"
+            # Keep the last 5 updates per runtime version; drop older ones.
+            ssh "$VPS_USER@$VPS_HOST" "cd '$BASE/$rtv' && ls -1dt */ | tail -n +6 | xargs -r rm -rf || true"
+          }
+
+          publish_one "$IOS_RTV"
+          if [ "$ANDROID_RTV" != "$IOS_RTV" ]; then
+            publish_one "$ANDROID_RTV"
+          fi
+          echo "Published update $TS to runtime version(s): $IOS_RTV${ANDROID_RTV:+, $ANDROID_RTV}"
