@@ -78,7 +78,10 @@ jobs:
           if-no-files-found: error
 
       - name: Submit to Google Play (internal)
-        if: ${{ inputs.submit_to_play && secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        # NB: the `secrets` context cannot be used in `if:`; the action below
+        # receives the service account via `with:`. Ensure PLAY_SERVICE_ACCOUNT_JSON
+        # is set before enabling submit_to_play.
+        if: ${{ inputs.submit_to_play }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
