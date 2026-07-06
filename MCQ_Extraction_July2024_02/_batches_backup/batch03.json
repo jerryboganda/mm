@@ -1,0 +1,350 @@
+[
+{
+"source_pages": [
+17
+],
+"printed_number": "21",
+"question": "A long scenario describing a 65 kg patient requiring thromboprophylaxis. Options given were various doses of LMWH.",
+"options": [
+[
+"a",
+"5000u dalteparin twice daily",
+false
+],
+[
+"b",
+"2500u dalteparin once daily",
+false
+],
+[
+"c",
+"40 mg enoxaparin once daily",
+true
+],
+[
+"d",
+"60 mg enoxaparin twice daily",
+false
+],
+[
+"e",
+"7500u dalteparin once daily",
+false
+]
+],
+"explanation": "Thromboprophylactic LMWH dose is based on booking/early-pregnancy weight (Table 3). For a woman weighing 50–90 kg, the dose is enoxaparin 40 mg daily (or dalteparin 5000 units daily). VTE risk assessment (Appendix III): if total score ≥ 4 antenatally consider thromboprophylaxis from the first trimester; if score 3, from 28 weeks; if score ≥ 2 postnatally, for at least 10 days.",
+"figs": [
+"p017_f1.png",
+"p017_f2.png"
+]
+},
+{
+"source_pages": [
+17,
+18
+],
+"printed_number": "22",
+"question": "Antenatal patient presented with hyperemesis gravidarum. Her PUQE score was 10. She continued vomiting despite a combination of first line medications. What action is to be taken?",
+"options": [
+[
+"a",
+"Ondansetron",
+false
+],
+[
+"b",
+"Ondansetron and domperidone",
+false
+],
+[
+"c",
+"Cyclizine and ondansetron",
+false
+],
+[
+"d",
+"Add Metoclopramide",
+true
+],
+[
+"e",
+"Prochlorperazine",
+false
+]
+],
+"explanation": "Be careful: if one drug is used you can use a combination of up to 3 medications. When up-titrating antiemetics, add drugs from different classes rather than replacing them, as they may have synergistic effects; some women require a combination of 3+ antiemetics. First line: doxylamine/pyridoxine, cyclizine, prochlorperazine, promethazine, chlorpromazine. Second line: metoclopramide, domperidone, ondansetron. Third line: prednisolone. As the patient failed first-line combination, add a second-line agent (metoclopramide).",
+"figs": [
+"p018_f1.png"
+]
+},
+{
+"source_pages": [
+18,
+19
+],
+"printed_number": "23",
+"question": "What is the recommended management of recurrent genital herpes in a woman at 20 weeks of gestation?",
+"options": [
+[
+"a",
+"Daily suppressive dose from now",
+false
+],
+[
+"b",
+"Daily suppressive dose from 36 weeks",
+true
+],
+[
+"c",
+"Saline bath",
+false
+],
+[
+"d",
+"Analgesia",
+false
+]
+],
+"explanation": "Recurrences usually resolve within 7–10 days without antiviral treatment. Supportive treatment measures usually suffice (e.g. saline bathing, paracetamol). Vaginal delivery should be anticipated. Consider daily suppressive aciclovir 400 mg TDS from 36 weeks (increased dose compared with standard suppression in non-pregnant patients). Discuss risks, benefits and alternatives with women. Sequential PCR culture during late pregnancy or delivery is not indicated.",
+"figs": []
+},
+{
+"source_pages": [
+19
+],
+"printed_number": "24",
+"question": "Woman was on combined oral contraceptive pills. She missed the pill on day 10 and had UPSI after 16 hours. She visited the contraceptive clinic the next day. What is the further course recommended for her?",
+"options": [
+[
+"a",
+"Reassure her, take the missed pill as soon as possible",
+true
+],
+[
+"b",
+"Consider EC, take the missed pill as soon as possible",
+false
+],
+[
+"c",
+"Consider EC, take the missed pill as soon as possible; condoms should be used or sex avoided until pills have been taken for 7 consecutive days",
+false
+],
+[
+"d",
+"Consider EC, take the missed pill as soon as possible; condoms should be used or sex avoided until pills have been taken for 7 consecutive days; UPT from 3 wks of last UPSI",
+false
+]
+],
+"explanation": "A COC pill is missed if it is not taken within 24 hours after it should have been taken. For 1 missed pill (48 to <72 hours since the last pill in the current pack was taken), whether in week 1, 2 or 3: take the missed pill as soon as possible, continue the remaining pills at the usual time, EC is not required and no additional contraceptive precaution is required (provided consistent, correct use previously). Reassure and advise to take the missed pill as soon as possible.",
+"figs": [
+"p019_f1.png"
+]
+},
+{
+"source_pages": [
+19,
+20
+],
+"printed_number": "25",
+"question": "Antenatal mother who is a school teacher presented with a lacy rash associated with fever. Which of the following is the most probable infection?",
+"options": [
+[
+"a",
+"Parvovirus infection",
+true
+],
+[
+"b",
+"CMV",
+false
+],
+[
+"c",
+"Toxoplasmosis",
+false
+],
+[
+"d",
+"Measles",
+false
+],
+[
+"e",
+"Rubella",
+false
+]
+],
+"explanation": "Parvovirus B19 infection has a wide range of consequences, from minor febrile illness to erythema infectiosum (fifth disease, slapped cheek syndrome) — a generalised lacy rash illness clinically indistinguishable from rubella — aplastic crises, arthropathy, and persistent infection in the immunocompromised. Recent infection can be confirmed by parvovirus B19-specific IgM on the first serum from the day after rash onset. Management of proven infection includes specialist advice, serial ultrasound scanning and Doppler assessment (fetal anaemia/hydrops), with intrauterine transfusion improving outcome.",
+"figs": []
+},
+{
+"source_pages": [
+20
+],
+"printed_number": "26",
+"question": "A woman in her 60s was newly diagnosed with lichen sclerosus. What action is to be taken as part of further investigations?",
+"options": [
+[
+"a",
+"Thyroid profile",
+true
+],
+[
+"b",
+"Fasting blood sugar",
+false
+],
+[
+"c",
+"OGTT",
+false
+],
+[
+"d",
+"Wedge biopsy",
+false
+]
+],
+"explanation": "Investigation for autoimmune disease if clinically indicated, especially thyroid dysfunction (i.e. thyroid autoantibodies and TSH), as it can commonly be present together with lichen sclerosus.",
+"figs": []
+},
+{
+"source_pages": [
+20,
+21
+],
+"printed_number": "27",
+"question": "HPE of the LLETZ specimen measuring 3x3 cm showed an invasive carcinoma of the cervix with stromal invasion of 1 mm depth, and 6 mm of surrounding tissue showed CIN3. The specimen had a clear margin of >5 mm. What is the stage of cancer cervix?",
+"options": [
+[
+"a",
+"Stage IA1",
+true
+],
+[
+"b",
+"Stage IA2",
+false
+],
+[
+"c",
+"Stage IB1",
+false
+],
+[
+"d",
+"Stage IB2",
+false
+]
+],
+"explanation": "FIGO staging of cervical cancer: Stage IA is invasive carcinoma diagnosed only by microscopy, with maximum depth of invasion ≤5 mm. IA1 = measured stromal invasion ≤3 mm in depth; IA2 = >3 and ≤5 mm. With 1 mm stromal invasion, this is Stage IA1.",
+"figs": [
+"p021_f1.png"
+]
+},
+{
+"source_pages": [
+21
+],
+"printed_number": "28",
+"question": "Staging laparotomy for cancer confined to the right ovary was done. The peritoneal washings show malignant cells. What is the stage of the tumour?",
+"options": [
+[
+"a",
+"IA",
+false
+],
+[
+"b",
+"IIB",
+false
+],
+[
+"c",
+"IC1",
+false
+],
+[
+"d",
+"IC2",
+false
+],
+[
+"e",
+"IC3",
+true
+]
+],
+"explanation": "FIGO staging of ovarian cancer, Stage I (tumour confined to ovaries/fallopian tubes): IA = limited to 1 ovary, capsule intact, no malignant cells in washings; IC = limited to 1 or both ovaries with any of: IC1 surgical spill, IC2 capsule ruptured before surgery or tumour on surface, IC3 malignant cells in the ascites or peritoneal washings. Malignant cells in peritoneal washings with tumour confined to one ovary = Stage IC3.",
+"figs": [
+"p021_f2.png"
+]
+},
+{
+"source_pages": [
+21,
+22
+],
+"printed_number": "29",
+"question": "Patient came to gyne clinic with a pigmented vulval lesion measuring 8 mm. What action would you take?",
+"options": [
+[
+"a",
+"Incisional biopsy",
+true
+],
+[
+"b",
+"Excisional biopsy",
+false
+],
+[
+"c",
+"Punch biopsy",
+false
+]
+],
+"explanation": "Diagnosis: incisional biopsy (punch or wedge biopsy) ideally including the edge of a lesion, where there is a transition from normal to abnormal tissue. Biopsies should avoid a central ulcer, since this may not be diagnostic, and should be of adequate depth to allow differentiation between superficially invasive lesions and those with invasion >1 mm, since this informs subsequent management.",
+"figs": [
+"p022_f1.png"
+]
+},
+{
+"source_pages": [
+22
+],
+"printed_number": "30",
+"question": "What is the recommended management to prevent recurrence of Bartholin's abscess in a patient who was treated before?",
+"options": [
+[
+"a",
+"Word catheter method",
+false
+],
+[
+"b",
+"Marsupialization",
+true
+],
+[
+"c",
+"Sclerotherapy",
+false
+],
+[
+"d",
+"Needle aspiration",
+false
+],
+[
+"e",
+"Jacobi ring catheter",
+false
+]
+],
+"explanation": "Marsupialization is recommended to prevent recurrence of Bartholin's abscess/cyst. Comparative recurrence rates: balloon Word catheter 12% at 12 months (23% premature expulsion, painful, latex allergy contraindication); Jacobi ring catheter 4% at 12 months (needs two incisions, painful); alcohol sclerotherapy 8–10% within 6–7 months (risk of necrosis, haematoma, dyspareunia); silver nitrate sclerotherapy 3.8% at 2 months (scarring, chemical burns); needle aspiration 13% recurrence (not recommended).",
+"figs": []
+}
+]

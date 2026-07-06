@@ -1,0 +1,102 @@
+[
+{
+"source_pages": [
+73
+],
+"printed_number": "123",
+"question": "Multiparous patient in labour with a diagnosed delay in delivery. Examination now shows vertex at +1 OA position.",
+"options": [
+[
+"a",
+"Midcavity delivery in labour room",
+false
+],
+[
+"b",
+"Trial of instrumental delivery in theatre",
+true
+],
+[
+"c",
+"Ventouse delivery in labour room",
+false
+]
+],
+"explanation": "A vertex at +1 station is at the mid-cavity level. With delay in the second stage and the vertex at +1 in the OA position, a trial of instrumental (non-rotational) delivery should be conducted in theatre, where there is immediate recourse to caesarean section if the trial fails, rather than in the labour room, because mid-cavity deliveries carry a higher risk of failure.",
+"figs": []
+},
+{
+"source_pages": [
+73
+],
+"printed_number": "124",
+"question": "Patient presented with ataxia, irregular menses and learning disability. Examination also showed cataract. What is the probable cause?",
+"options": [
+[
+"a",
+"Galactosemia",
+true
+],
+[
+"b",
+"Turner syndrome",
+false
+]
+],
+"explanation": "This is classic galactosemia. Affected adolescents and adults often have focal neurologic findings such as tremor, ataxia and dysmetria (impaired ability to control actions). Together with cataracts, primary/premature ovarian insufficiency (irregular menses) and learning disability, the picture points to galactosemia rather than Turner syndrome.",
+"figs": []
+},
+{
+"source_pages": [
+73
+],
+"printed_number": "125",
+"question": "Pregnant mother presented with absent fetal movements. Diagnosed with IUFD at 22 weeks. She chose conservative management and delivered at 24 weeks. How would you define this delivery?",
+"options": [
+[
+"a",
+"Miscarriage",
+false
+],
+[
+"b",
+"Stillbirth",
+true
+]
+],
+"explanation": "Stillbirth is defined by the gestation at birth, irrespective of when the death occurred. Deaths eligible for reporting to MBRRACE-UK: Late fetal losses - a baby born at 22 or 23 completed weeks' gestation showing no signs of life, irrespective of when death occurred. Stillbirths - a baby born from 24 completed weeks' gestation (or from 400 g where an accurate gestation is not available) showing no signs of life, irrespective of when death occurred. Neonatal deaths - the death of a live-born baby, born from 20 completed weeks' gestation, occurring before 28 completed days after birth. Here the intrauterine death occurred at 22 weeks but the baby was delivered at 24 weeks, so by gestation at birth it is classified as a stillbirth.",
+"figs": [
+"p073_f1.png"
+]
+},
+{
+"source_pages": [
+73,
+74,
+75
+],
+"printed_number": "126",
+"question": "Patient on methadone collapsed with pinpoint pupils. What is the management?",
+"options": [
+[
+"a",
+"Iv naloxone",
+true
+],
+[
+"b",
+"Im naloxone",
+false
+],
+[
+"c",
+"Intranasal naloxone",
+false
+]
+],
+"explanation": "Give intravenous naloxone. The British National Formulary (BNF) recommends reversing acute opioid/opiate overdose in adults by intravenous injection of naloxone 400 micrograms to 2 mg; if there is no response, repeat at intervals of two to three minutes to a maximum of 10 mg. Doses used in acute overdose may not be appropriate for opioid-induced respiratory depression and sedation in palliative care or chronic opioid use, where the recommended IV dose is 100 to 200 micrograms (1.5 to 3 micrograms/kg), with subsequent 100 microgram doses every two minutes if the response is inadequate. Careful monitoring of vital observations and maintenance of pain relief are still required.",
+"figs": [
+"p075_f1.png"
+]
+}
+]

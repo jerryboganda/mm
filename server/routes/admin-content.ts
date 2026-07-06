@@ -91,13 +91,22 @@ const mcqSchema = z.object({
   options: z
     .array(mcqOptionSchema)
     .min(2, "At least 2 options required")
-    .max(6),
+    .max(10),
   correctAnswer: z.string().min(1, "Correct answer is required"),
   explanation: z.string().max(10000).optional().nullable(),
   optionExplanations: z.record(z.string()).optional().nullable(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
   references: z.string().max(5000).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
+  images: z
+    .array(
+      z.object({
+        url: z.string().min(1),
+        caption: z.string().optional().nullable(),
+      }),
+    )
+    .optional()
+    .nullable(),
   isPublished: z.boolean().optional(),
 });
 

@@ -1,0 +1,129 @@
+[
+{
+"source_pages": [
+62,
+63
+],
+"printed_number": "107",
+"question": "How will you confirm a case of diabetes insipidus in pregnancy?",
+"options": [
+[
+"a",
+"LDH",
+false
+],
+[
+"b",
+"Serum electrolytes",
+false
+],
+[
+"c",
+"Full blood count",
+false
+],
+[
+"d",
+"Blood osmolality",
+true
+]
+],
+"explanation": "Diabetes insipidus (DI) classically presents with polydipsia and dilute polyuria. Diagnosis is made after excluding other causes of polyuria (diuretics, hyperglycaemia, hypercalcaemia, hypokalaemia and renal tubular acidosis). Gestational DI should be considered when blood osmolality is consistent with nonpregnant levels (i.e. >285 mOsmol/kg) with urinary osmolality <300 mOsmol/kg. Women may have borderline high serum sodium (within normal limits but elevated for pregnancy). Serum ADH can be assayed with a vasopressinase inhibitor to distinguish a central lack of production from degradation by placental vasopressinase; chromatography can measure vasopressinase activity. Vasopressin treatment differentiates DI types, as central and gestational DI result from a lack of circulating ADH. Pituitary function tests (TFTs, prolactin) may be performed to look for panhypopituitarism. Table 2 summary: presenting symptoms polyuria (>3 L/day), polydipsia (>3 L/day) and hypernatraemia (weakness, confusion, seizures); investigations urea and electrolytes, Ca2+, glucose; serum and urine osmolality; urine specific gravity low, usually <1.005.",
+"figs": [
+"p063_f1.png"
+]
+},
+{
+"source_pages": [
+63
+],
+"printed_number": "108",
+"question": "A couple was evaluated for subfertility and diagnosed to be due to anovulation. The female was started on clomifene citrate. On day 21 of the cycle, the patient presented with acute pelvic pain which was relieved with paracetamol. What is the probable cause?",
+"options": [
+[
+"a",
+"PID",
+false
+],
+[
+"b",
+"Subacute torsion",
+false
+],
+[
+"c",
+"Mittelschmerz",
+false
+],
+[
+"d",
+"Ohss",
+true
+],
+[
+"e",
+"Tubal Hydrocele",
+false
+]
+],
+"explanation": "This is OHSS. The timing of presentation following the trigger injection divides patients into early and late OHSS. Early OHSS usually presents within 7 days of the hCG injection and is associated with an excessive ovarian response. Late OHSS typically presents 10 or more days after the hCG injection and usually results from endogenous hCG derived from an early pregnancy; the preceding ovarian response may be unremarkable, and late OHSS tends to be more prolonged and severe than the early form. Clomifene-induced ovulation with day-21 pelvic pain relieved by simple analgesia is consistent with OHSS rather than PID, torsion, mittelschmerz or hydrocele.",
+"figs": []
+},
+{
+"source_pages": [
+63,
+64
+],
+"printed_number": "109",
+"question": "What is the most common reason for transfer from homebirth to an obstetric unit?",
+"options": [
+[
+"a",
+"Delay during first or second stage of labour",
+true
+],
+[
+"b",
+"Fetal distress",
+false
+],
+[
+"c",
+"Meconium stained liquor",
+false
+]
+],
+"explanation": "Delay during the first or second stage of labour is the most common reason for transfer to an obstetric unit from all birth settings. Table 1 shows the primary reasons for transfer: delay in the first or second stage of labour accounts for 1,144 (32.4%) transfers from home, 912 (37.1%) from freestanding midwifery units and 1,548 (35.2%) from alongside midwifery units, making it the leading reason in each setting, ahead of meconium staining, repair of perineal trauma and abnormal fetal heart rate.",
+"figs": [
+"p064_f1.png"
+]
+},
+{
+"source_pages": [
+64
+],
+"printed_number": "110",
+"question": "Patient suffered myocardial infarction at 35 weeks of gestation. What is your advice regarding delivery?",
+"options": [
+[
+"a",
+"Delay delivery for 2 wks",
+true
+],
+[
+"b",
+"4 weeks",
+false
+],
+[
+"c",
+"Instrumental delivery with epidural analgesia",
+false
+]
+],
+"explanation": "Timing and mode of delivery after acute myocardial infarction (AMI): there are no standardised guidelines because of the lack of prospective data and the variation in individual patient characteristics. Collaborative management involving a cardiologist, obstetric physician, obstetrician, obstetric anaesthetist and neonatologist guides care, individualised to maternal cardiac status and gestational age. If there is a risk of preterm delivery, maternal steroid injections should be administered at the earliest opportunity. If possible, delivery should be delayed by 2 to 3 weeks following AMI because of the increased risk of maternal mortality during this time.",
+"figs": [
+"p064_f2.png"
+]
+}
+]

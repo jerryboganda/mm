@@ -212,6 +212,9 @@ export const mcqs = pgTable("mcqs", {
   difficulty: text("difficulty").notNull().default("medium"),
   references: text("references"),
   tags: jsonb("tags"),
+  // Optional explanation figures: [{ url: string, caption?: string }]
+  // Additive/nullable so existing rows and callers are unaffected.
+  images: jsonb("images"),
   isPublished: boolean("is_published").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

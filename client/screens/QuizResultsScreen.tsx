@@ -12,6 +12,10 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { StatCard } from "@/components/StatCard";
 import { ThemedText } from "@/components/ThemedText";
+import {
+  ExplanationFigures,
+  ExplanationImage,
+} from "@/components/ExplanationFigures";
 import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -29,6 +33,7 @@ interface QuestionResult {
   correctAnswer: string;
   isCorrect: boolean;
   explanation: string;
+  images?: ExplanationImage[];
 }
 
 interface QuizResult {
@@ -239,6 +244,7 @@ export default function QuizResultsScreen() {
                   {q.explanation}
                 </ThemedText>
               </View>
+              <ExplanationFigures images={q.images} />
             </GlassCard>
           ))}
         </View>

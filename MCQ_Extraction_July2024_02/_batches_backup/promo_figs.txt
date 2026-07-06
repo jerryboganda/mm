@@ -1,0 +1,6 @@
+PROMO figures to discard: p010_f1.png, p016_f1.png
+p018_f2.png
+p033_f1.png
+p069_f1.png
+p074_f1.png
+p083_f1.png

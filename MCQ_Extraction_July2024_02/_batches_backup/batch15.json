@@ -1,0 +1,110 @@
+[
+{
+"source_pages": [
+71
+],
+"printed_number": "120",
+"question": "Labouring woman was on continuous fetal monitoring with CTG. The trace showed variable deceleration with shouldering for 30 minutes at 7 cm dilatation. What is the next step?",
+"options": [
+[
+"a",
+"Fetal blood sampling",
+false
+],
+[
+"b",
+"Expedite birth",
+false
+],
+[
+"c",
+"Start conservative measures",
+false
+],
+[
+"d",
+"Continue ctg",
+true
+]
+],
+"explanation": "Regard the following as concerning characteristics of variable decelerations: lasting more than 60 seconds; reduced variability within the deceleration; failure or slow return to the baseline fetal heart rate; and loss of previously present shouldering. Variable decelerations WITH shouldering that persist for 30 minutes but have none of these concerning characteristics are not pathological, so the appropriate step is to continue the CTG.",
+"figs": []
+},
+{
+"source_pages": [
+71,
+72
+],
+"printed_number": "121",
+"question": "Patient in labour with good descent and progression. CTG shows a baseline at 160, variability 2-4 for 45 minutes. What is the management?",
+"options": [
+[
+"a",
+"Cs",
+false
+],
+[
+"b",
+"Fetal scalp stimulation",
+false
+],
+[
+"c",
+"Continue ctg",
+false
+],
+[
+"d",
+"Fetal scalp stimulation",
+false
+],
+[
+"e",
+"Conservative measures",
+true
+]
+],
+"explanation": "A baseline of 160 with reduced variability (2-4) for 45 minutes represents a suspicious CTG. If the CTG is suspicious and there are no other concerning risk factors: perform a full risk assessment (a full set of maternal observations and the whole clinical picture) and document; note that if accelerations are present fetal acidosis is unlikely; if the trace was previously normal, consider underlying reasons for the change; and undertake conservative measures. If suspicious with additional intrapartum risk factors (slow progress, sepsis or meconium): full risk assessment, conservative measures, obtain an urgent review by an obstetrician or senior midwife, and consider fetal scalp stimulation or expediting birth. With good descent and progression and no additional risk factors, conservative measures are appropriate.",
+"note": "Source lists options b and d identically as 'Fetal scalp stimulation' (duplication in the original).",
+"figs": [
+"p072_f1.png"
+]
+},
+{
+"source_pages": [
+72,
+73
+],
+"printed_number": "122",
+"question": "A primigravida is in spontaneous preterm labour at 35 + 1 weeks of gestation. She has progressed satisfactorily and has been pushing for 15 minutes. Fifteen minutes prior to pushing, a suspicious CTG was noted. Baby passed meconium. You are not able to feel the fetal head abdominally and the vertex is at +1 station. Conservative measures failed to improve the fetal heart rate. What is the most appropriate course of action?",
+"options": [
+[
+"a",
+"Expedite delivery by performing a caesarean section",
+false
+],
+[
+"b",
+"Expedite delivery with mid-cavity forceps",
+true
+],
+[
+"c",
+"Expedite delivery with rotational forceps",
+false
+],
+[
+"d",
+"Expedite delivery with Ventouse",
+false
+],
+[
+"e",
+"perform fetal blood sampling",
+false
+]
+],
+"explanation": "At preterm gestations, operators should be aware of a higher risk of subgaleal haemorrhage and scalp trauma with vacuum extraction compared with forceps. Vacuum birth should be avoided below 32 weeks of gestation and should be used with caution between 32+0 and 36+0 weeks. At 35+1 weeks with a suspicious CTG unresponsive to conservative measures, the head not palpable abdominally and the vertex at +1 station (mid-cavity), expediting delivery with mid-cavity forceps is most appropriate; ventouse is cautioned at this gestation because of the higher risk of scalp trauma and subgaleal haemorrhage.",
+"figs": []
+}
+]

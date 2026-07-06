@@ -11,6 +11,10 @@ import { GlassCard } from "@/components/GlassCard";
 import { StatCard } from "@/components/StatCard";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
+import {
+  ExplanationFigures,
+  ExplanationImage,
+} from "@/components/ExplanationFigures";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -26,6 +30,7 @@ interface QuestionDetail {
   correctAnswer: string;
   isCorrect: boolean;
   explanation: string;
+  images?: ExplanationImage[];
 }
 
 interface AttemptDetail {
@@ -325,6 +330,7 @@ export default function AttemptDetailScreen() {
                   </ThemedText>
                 </View>
               ) : null}
+              <ExplanationFigures images={q.images} />
             </GlassCard>
           ))}
         </View>
