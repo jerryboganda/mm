@@ -1,0 +1,227 @@
+[
+{
+"source_pages": [
+58
+],
+"printed_number": "100",
+"question": "Which of the following is associated with recurrent miscarriage?",
+"options": [
+[
+"a",
+"Factor V Leiden",
+true
+],
+[
+"b",
+"Protein S",
+false
+],
+[
+"c",
+"Prothrombin gene mutation",
+false
+],
+[
+"d",
+"Protein C",
+false
+]
+],
+"explanation": "Factor V Leiden appears to be associated with first and particularly second trimester recurrent miscarriages. Prothrombin gene mutation is associated with recurrent miscarriage. Protein S deficiency has not demonstrated a consistent association with recurrent first trimester miscarriage, but has shown an association with second trimester. Protein C deficiency has not shown a consistent association with recurrent miscarriage. MTHFR mutation (heterozygous and homozygous) has been found to have a significant association with recurrent miscarriage in one meta-analysis from China; however other meta-analyses did not find an association and advise against testing for it. Antithrombin deficiency is the rarer yet most thrombogenic mutation; the EPCOT study found only a possible association with sporadic miscarriage while a subsequent meta-analysis did not.",
+"figs": [
+"p058_f1.png"
+]
+},
+{
+"source_pages": [
+58,
+59
+],
+"printed_number": "101",
+"question": "What is the next step in managing a patient with recurrent postmenopausal bleeding on combined hormonal replacement therapy? Patient continued to have recurrent bleed despite alteration in progesterone dose.",
+"options": [
+[
+"a",
+"Tvs",
+true
+],
+[
+"b",
+"Pipelle biopsy",
+false
+],
+[
+"c",
+"Hysteroscopy",
+false
+],
+[
+"d",
+"Stop HRT",
+false
+],
+[
+"e",
+"Give COC",
+false
+]
+],
+"explanation": "For unscheduled bleeding on HRT: assess cancer risk factors and bleeding pattern, identify HRT regimen/duration/compliance, and offer examination/investigations. Arrange urgent transvaginal ultrasound (within 6 weeks) if there is 1 major or 3 minor risk factors for endometrial cancer, or heavy/persistent bleeding, 2 minor risk factors, more than 6 months since starting HRT, or more than 3 months after a change in dose or preparation. Ultrasound thresholds prompting endometrial assessment: sHRT ET > 7 mm, ccHRT ET > 4 mm, or endometrium incompletely visualised. Management options for persistent unscheduled bleeding include changing to an oral preparation, offering the 52 mg LNG-IUD, increasing the progestogen dose or switching to a synthetic progestogen, a 3-month trial of an additional progestogen, and reducing the estrogen dose.",
+"figs": [
+"p059_f1.png"
+]
+},
+{
+"source_pages": [
+59,
+60
+],
+"printed_number": "102",
+"question": "Test to diagnose hyperandrogenism in PCOS.",
+"options": [
+[
+"a",
+"Free Testosterone",
+true
+],
+[
+"b",
+"Free androgen index",
+false
+],
+[
+"c",
+"17 OHP",
+false
+],
+[
+"d",
+"LH and FSH",
+false
+]
+],
+"explanation": "Use total testosterone and free testosterone for diagnosis of hyperandrogenism in PCOS. If not elevated, then androstenedione and dehydroepiandrosterone sulfate (DHEA-S) could be measured, but are less specific with a limited role in PCOS diagnosis.",
+"figs": [
+"p060_f1.png"
+]
+},
+{
+"source_pages": [
+60
+],
+"printed_number": "103",
+"question": "How will you manage a woman with PCOS presenting with 18 months amenorrhea?",
+"options": [
+[
+"a",
+"Cyclical progesterone",
+true
+],
+[
+"b",
+"Coc",
+false
+],
+[
+"c",
+"Laparoscopic ovarian drilling",
+false
+],
+[
+"d",
+"Hysteroscopy and Endometrial biopsy",
+false
+]
+],
+"explanation": "Oligo- or amenorrhoea in women with PCOS may predispose to endometrial hyperplasia and later carcinoma. It is good practice to recommend treatment with gestogens to induce a withdrawal bleed at least every 3 to 4 months. Transvaginal ultrasound should be considered in the absence of withdrawal bleeds or abnormal uterine bleeding. In PCOS, an endometrial thickness of less than 7 mm is unlikely to be hyperplasia. A thickened endometrium or an endometrial polyp should prompt consideration of endometrial biopsy and/or hysteroscopy.",
+"figs": []
+},
+{
+"source_pages": [
+60,
+61
+],
+"printed_number": "104",
+"question": "How will you manage a woman with PCOS presenting with 18 months amenorrhea with an endometrial thickness of 7mm?",
+"options": [
+[
+"a",
+"Cyclical progesterone",
+true
+],
+[
+"b",
+"Coc",
+false
+],
+[
+"c",
+"Laparoscopic ovarian drilling",
+false
+],
+[
+"d",
+"Hysteroscopy and Endometrial biopsy",
+false
+]
+],
+"explanation": "Cyclical progesterone (gestogens) is recommended to induce a withdrawal bleed. In PCOS an endometrial thickness below 7 mm is unlikely to be hyperplasia, so at 7 mm cyclical progesterone remains appropriate; a clearly thickened endometrium or a polyp would prompt endometrial biopsy and/or hysteroscopy. Progestin-only oral contraceptives may be considered for endometrial protection, based on general population guidelines, acknowledging that evidence in women with PCOS is limited. COCP is first-line pharmacological therapy for hyperandrogenism and irregular cycles.",
+"figs": [
+"p061_f1.png"
+]
+},
+{
+"source_pages": [
+61
+],
+"printed_number": "105",
+"question": "38 year old, P2, presented with amenorrhoea for 18 months after the delivery of her second child. During her delivery she had PPH, retained placenta was removed under GA and 1 unit of blood was transfused. Postpartum period was uneventful and she breastfed her baby. Her hormonal evaluation showed: Prolactin high, estradiol 2430. What is the probable cause?",
+"options": [
+[
+"a",
+"Sheehan's syndrome",
+false
+],
+[
+"b",
+"Pregnancy",
+true
+],
+[
+"c",
+"Ovarian tumour",
+false
+]
+],
+"explanation": "A markedly high estradiol (2430) together with high prolactin in a woman with amenorrhoea points to pregnancy. Sheehan's syndrome (postpartum pituitary necrosis after PPH) causes hypopituitarism with low estradiol and failure of lactation, not a high estradiol, so the elevated estradiol here is consistent with pregnancy rather than Sheehan's syndrome.",
+"figs": []
+},
+{
+"source_pages": [
+61
+],
+"printed_number": "106",
+"question": "GARDASIL 9 protects against what types of HPV?",
+"options": [
+[
+"a",
+"6, 11",
+false
+],
+[
+"b",
+"6, 11, 16, 18",
+false
+],
+[
+"c",
+"6, 11, 16, 18, 31, 33, 45, 52, 58",
+true
+]
+],
+"explanation": "Cervarix (protecting against HPV types 16 and 18) was offered from September 2008 until September 2012, when Gardasil (protecting against HPV 16 and 18 plus 6 and 11, which cause genital warts) replaced it. In summer 2022, Gardasil 9 was introduced to replace Gardasil. The 9-valent vaccine protects against 5 additional cancer-causing HPV types (31, 33, 45, 52, 58), giving protection against 9 HPV types in total: 6, 11, 16, 18, 31, 33, 45, 52, 58. Gardasil 9 is currently supplied for those eligible (adolescents aged 12-13 and those eligible until age 25, and GBMSM up to and including 45 years).",
+"figs": [
+"p062_f1.png"
+]
+}
+]

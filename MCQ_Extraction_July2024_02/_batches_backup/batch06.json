@@ -1,0 +1,485 @@
+[
+{
+"source_pages": [
+36,
+37
+],
+"printed_number": "56",
+"question": "A postmenopausal woman was referred for a 4.5 cm simple ovarian cyst on CT scan, found during investigation for a surgical cause. CA125 is 17. What is the most appropriate management?",
+"options": [
+[
+"a",
+"Laparotomy",
+false
+],
+[
+"b",
+"No further management",
+false
+],
+[
+"c",
+"Ultrasound and CA125 after 4 months",
+true
+],
+[
+"d",
+"Ultrasound and CA125 after 12 months",
+false
+],
+[
+"e",
+"Ultrasound after 4-6 months",
+false
+],
+[
+"f",
+"Bilateral salpingo-oophorectomy",
+false
+]
+],
+"explanation": "Asymptomatic, simple, unilateral, unilocular ovarian cysts <5 cm with normal CA125 have a low risk of malignancy in postmenopausal women and can be managed conservatively with repeat assessment (ultrasound and CA125) in 4–6 months. Discharge after 1 year if unchanged/reduced with normal CA125.",
+"figs": [
+"p036_f1.png"
+]
+},
+{
+"source_pages": [
+37
+],
+"printed_number": "57",
+"question": "What is the management of a simple ovarian cyst in a 23-year-old woman? The cyst measures 4.5 cm and is an incidental finding. She has no complaints so far.",
+"options": [
+[
+"a",
+"Laparotomy",
+false
+],
+[
+"b",
+"Reassure, no further management",
+true
+],
+[
+"c",
+"Ultrasound and CA125 after 4 months",
+false
+],
+[
+"d",
+"Ultrasound and CA125 after 12 months",
+false
+],
+[
+"e",
+"Bilateral salpingo-oophorectomy",
+false
+],
+[
+"f",
+"Yearly assessment",
+false
+]
+],
+"explanation": "Women with small (less than 50 mm diameter) simple ovarian cysts generally do not require follow-up, as these cysts are very likely to be physiological and almost always resolve within 3 menstrual cycles. Cysts of 50–70 mm should have yearly ultrasound follow-up; larger simple cysts should be considered for further imaging (MRI) or surgical intervention.",
+"figs": [
+"p037_f1.png"
+]
+},
+{
+"source_pages": [
+37,
+38
+],
+"printed_number": "58",
+"question": "Patient presents with a history of reduced fetal movements. Her CTG shows a baseline of 140 bpm, normal variability, showing repetitive variable decelerations with concerning characteristics. Categorize the CTG.",
+"options": [
+[
+"a",
+"Normal",
+false
+],
+[
+"b",
+"Pathological",
+true
+],
+[
+"c",
+"Suspicious",
+false
+],
+[
+"d",
+"Reassuring",
+false
+],
+[
+"e",
+"Non-reassuring",
+false
+]
+],
+"explanation": "Repetitive variable decelerations with concerning characteristics represent a pathological feature; a CTG with a pathological feature is classified as pathological.",
+"figs": []
+},
+{
+"source_pages": [
+37,
+38
+],
+"printed_number": "59",
+"question": "Patient presented with spontaneous rupture of membranes and regular contractions at term. Her examination revealed 4 cm cervical dilatation. 4 hours later, vaginal examination showed 5 cm cervical dilatation. Her CTG is normal. How to manage?",
+"options": [
+[
+"a",
+"Reassess in 2 hours",
+true
+],
+[
+"b",
+"Reassess in 4 hrs",
+false
+],
+[
+"c",
+"Start oxytocin",
+false
+],
+[
+"d",
+"Perform cat 2 CS",
+false
+],
+[
+"e",
+"Perform cat 1 CS",
+false
+]
+],
+"explanation": "Advise all women with suspected delay in the established first stage of labour to have a vaginal examination 2 hours later, and diagnose delay if progress is less than 1 cm. Here progress was 1 cm over 4 hours, so reassess in 2 hours.",
+"figs": []
+},
+{
+"source_pages": [
+38
+],
+"printed_number": "60",
+"question": "Patient presents in labour at term gestation. She has been diagnosed with cardiac disease in the past — valvular heart disease with functional classification NYHA class 2. How to manage her?",
+"options": [
+[
+"a",
+"Allow normal vaginal delivery",
+true
+],
+[
+"b",
+"Cut short second stage by vacuum delivery",
+false
+],
+[
+"c",
+"Cut short second stage by forceps delivery",
+false
+],
+[
+"d",
+"CS under GA",
+false
+],
+[
+"e",
+"CS under spinal",
+false
+],
+[
+"f",
+"CS under epidural",
+false
+]
+],
+"explanation": "Most women with well-compensated valvular heart disease (NYHA class 1–2) can be allowed a normal vaginal delivery; caesarean section is reserved for obstetric indications.",
+"figs": []
+},
+{
+"source_pages": [
+38
+],
+"printed_number": "61",
+"question": "Epileptic patient on topiramate came for contraceptive advice. What is the best option for her?",
+"options": [
+[
+"a",
+"DMPA",
+true
+],
+[
+"b",
+"Implant",
+false
+],
+[
+"c",
+"Progesterone-only pills",
+false
+],
+[
+"d",
+"Barrier method",
+false
+]
+],
+"explanation": "Topiramate has enzyme-inducing activity at higher doses; as it is also a teratogen and there is wide inter-individual variability, FSRH advises treating topiramate as a potential enzyme inducer regardless of dose. Recommended contraceptive options are Cu-IUD, LNG-IUS or DMPA (plus condoms). Among the options given, DMPA is the best choice.",
+"figs": [
+"p038_f1.png"
+]
+},
+{
+"source_pages": [
+38,
+39
+],
+"printed_number": "62",
+"question": "What is the contraceptive option with the least failure rate?",
+"options": [
+[
+"a",
+"Tubal ligation",
+false
+],
+[
+"b",
+"Vasectomy",
+false
+],
+[
+"c",
+"Implant",
+true
+],
+[
+"d",
+"DMPA",
+false
+],
+[
+"e",
+"LNG IUS",
+false
+]
+],
+"explanation": "The progestogen-only implant has the lowest failure rate of the listed methods, at approximately 0.05% with both typical and perfect use.",
+"figs": [
+"p039_f1.png"
+]
+},
+{
+"source_pages": [
+39,
+40
+],
+"printed_number": "63",
+"question": "Woman who was on the combined contraceptive ring came with a history of the ring missing for the past 48 hours in the second week following the hormone-free interval. She has a history of UPSI 1 day back. How to counsel her?",
+"options": [
+[
+"a",
+"EC is not required",
+false
+],
+[
+"b",
+"Consider EC",
+false
+],
+[
+"c",
+"Consider EC if correct use in the past 1 week",
+false
+],
+[
+"d",
+"Skip HFI, no need of EC",
+false
+],
+[
+"e",
+"EC is not required, insert ring ASAP, avoid intercourse for 7 days",
+true
+]
+],
+"explanation": "For unscheduled ring removal of ≥48 hours in week 2 or 3 after the HFI, if there was correct consistent use in the previous 7 days, emergency contraception is not required. Insert the ring as soon as possible, keep it in until the scheduled removal day, and use condoms or avoid sex until the new ring has been used for 7 consecutive days.",
+"figs": [
+"p039_f2.png",
+"p040_f1.png",
+"p040_f2.png"
+]
+},
+{
+"source_pages": [
+40,
+41
+],
+"printed_number": "64",
+"question": "Epileptic patient on carbamazepine needs emergency contraception. She has a past history of PID. What to offer her?",
+"options": [
+[
+"a",
+"Copper T",
+true
+],
+[
+"b",
+"LNG EC",
+false
+],
+[
+"c",
+"UPA EC",
+false
+],
+[
+"d",
+"Double dose LNG EC",
+false
+],
+[
+"e",
+"Double dose UPA EC",
+false
+]
+],
+"explanation": "Carbamazepine is an enzyme inducer that reduces the effectiveness of oral emergency contraception, so the copper IUD (Copper T) is the most effective option. Past PID (with no current STI risk factor) is UKMEC category 1 for the Cu-IUD, so it is not contraindicated.",
+"figs": [
+"p041_f1.png"
+]
+},
+{
+"source_pages": [
+41
+],
+"printed_number": "65",
+"question": "Patient presents with loin pain and haematuria on the 13th postoperative day following TAH. Her urine output was normal.",
+"options": [
+[
+"a",
+"Ureteric injury",
+true
+],
+[
+"b",
+"Bladder injury",
+false
+],
+[
+"c",
+"Urinary tract infection",
+false
+]
+],
+"explanation": "Delayed loin pain and haematuria after hysterectomy with preserved urine output suggests a ureteric injury.",
+"figs": []
+},
+{
+"source_pages": [
+41,
+42
+],
+"printed_number": "66",
+"question": "Following a laparoscopic surgery, a superficial burn was noticed on the patient's thigh. The surgical instrument included a hybrid cannula. What is the possible cause?",
+"options": [
+[
+"a",
+"Direct injury",
+false
+],
+[
+"b",
+"Insulation failure",
+false
+],
+[
+"c",
+"Capacitative coupling",
+true
+]
+],
+"explanation": "With a hybrid cannula (mixed metal and plastic), even with intact insulation, if an open circuit is formed capacitive coupling increases and a trocar-site burn can occur. Other electrosurgical injuries include direct application (lateral thermal spread — the commonest), antenna coupling (a form of capacitive coupling), and direct coupling (active electrode touching another metal instrument).",
+"figs": []
+},
+{
+"source_pages": [
+42
+],
+"printed_number": "67",
+"question": "Patient presents with paraesthesia and pain in the anterior and posterolateral thigh following TAH. Select the nerve involved.",
+"options": [
+[
+"a",
+"Obturator nerve",
+false
+],
+[
+"b",
+"Femoral nerve",
+false
+],
+[
+"c",
+"Sciatic nerve",
+false
+],
+[
+"d",
+"Lateral cutaneous nerve of the thigh",
+true
+],
+[
+"e",
+"Iliohypogastric nerve",
+false
+]
+],
+"explanation": "The lateral cutaneous nerve of the thigh (L2–L3) emerges from the lateral border of psoas, crosses the iliac fossa anterior to iliacus and enters the thigh posterior to the lateral end of the inguinal ligament. Injury during pelvic surgery causes paraesthesia and pain in the anterior and posterolateral thigh (meralgia paraesthetica).",
+"figs": [
+"p043_f1.png"
+]
+},
+{
+"source_pages": [
+42
+],
+"printed_number": "68",
+"question": "Patient presents with foot drop and inability to dorsiflex her foot following TAH. Name the nerve involved.",
+"options": [
+[
+"a",
+"Sciatic",
+false
+],
+[
+"b",
+"Common peroneal",
+true
+],
+[
+"c",
+"Tibial",
+false
+],
+[
+"d",
+"Lateral cutaneous nerve",
+false
+],
+[
+"e",
+"Genitofemoral",
+false
+]
+],
+"explanation": "Foot drop with inability to dorsiflex the foot indicates a common peroneal (fibular) nerve injury.",
+"figs": [
+"p043_f1.png"
+]
+}
+]

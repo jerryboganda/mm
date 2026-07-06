@@ -1,0 +1,142 @@
+[
+{
+"source_pages": [
+69
+],
+"printed_number": "115",
+"question": "Patient presented with primary amenorrhea. Examination showed a blind-ending vagina, Tanner 2/5 breast development, scanty pubic hair and axillary hair.",
+"options": [
+[
+"a",
+"MRKH",
+false
+],
+[
+"b",
+"AIS",
+true
+],
+[
+"c",
+"Turner syndrome",
+false
+]
+],
+"explanation": "This is androgen insensitivity syndrome (AIS). Disorders of androgen action are a common form of 46,XY differences of sex development (DSD); loss-of-function mutations in the androgen receptor (AR) lead to variable loss of virilization. In complete AIS the external genitalia are completely female with a short/blind-ending vagina, gonads are mostly abdominal or inguinal, puberty brings feminization with sparse-to-absent secondary sexual hair, and post-pubertal gonadectomy is favoured. In partial AIS there is clitoromegaly, a narrow vagina and variable labial fusion, mostly inguinal gonads, breast development with slight virilization, and pre-pubertal gonadectomy is favoured. A blind-ending vagina with breast development but scanty pubic and axillary hair fits AIS rather than MRKH (which has normal pubic/axillary hair) or Turner syndrome.",
+"figs": [
+"p069_f2.png"
+]
+},
+{
+"source_pages": [
+69,
+70
+],
+"printed_number": "116",
+"question": "65 year old patient presented with moderate rectocele and urge incontinence. What is the initial management?",
+"options": [
+[
+"a",
+"Supervised pelvic floor exercise + bladder retraining",
+false
+],
+[
+"b",
+"Bladder diary",
+true
+],
+[
+"c",
+"Bladder retraining",
+false
+],
+[
+"d",
+"Supervised pelvic floor exercise",
+false
+]
+],
+"explanation": "Use bladder diaries in the initial assessment of women with urinary incontinence or overactive bladder. Encourage women to complete a minimum of 3 days of the diary covering variations in their usual activities, such as both working and leisure days.",
+"figs": []
+},
+{
+"source_pages": [
+70
+],
+"printed_number": "117",
+"question": "Patient with a history of failed mid-urethral sling surgery for SUI. What is the best investigation?",
+"options": [
+[
+"a",
+"Urodynamic",
+true
+],
+[
+"b",
+"Cystoscopy",
+false
+]
+],
+"explanation": "After failed continence surgery, urodynamic studies are recommended before considering further surgical treatment, to characterise the underlying bladder dysfunction (stress incontinence, detrusor overactivity or voiding difficulty).",
+"figs": []
+},
+{
+"source_pages": [
+70
+],
+"printed_number": "118",
+"question": "Pregnant patient presented with a painful swollen left leg. She was commenced on LMWH. How to evaluate her further?",
+"options": [
+[
+"a",
+"Duplex scanning of Left leg",
+true
+],
+[
+"b",
+"Duplex scanning of both legs",
+false
+]
+],
+"explanation": "Compression duplex ultrasound of the symptomatic (left) leg is the initial investigation for suspected DVT in pregnancy. If the initial scan is negative but clinical suspicion of DVT remains, anticoagulation is continued and the scan is repeated.",
+"figs": []
+},
+{
+"source_pages": [
+70
+],
+"printed_number": "119",
+"question": "Patient in labour with continuous fetal heart rate monitoring. At 4 cm dilatation, the CTG showed a baseline above 180 bpm. What is the best management?",
+"options": [
+[
+"a",
+"fetal scalp stimulation",
+false
+],
+[
+"b",
+"perform fetal blood sampling",
+false
+],
+[
+"c",
+"administer tocolysis",
+false
+],
+[
+"d",
+"undertake conservative measures",
+false
+],
+[
+"e",
+"evaluate the whole clinical picture and consider expediting birth",
+true
+]
+],
+"explanation": "A fetal heart rate baseline above 180 bpm is an abnormal (pathological) feature. Management is not a single isolated action; the whole clinical picture should be evaluated. If the CTG trace is categorised as pathological: obtain an urgent review by an obstetrician and a senior midwife; exclude acute events (e.g. cord prolapse, suspected placental abruption or suspected uterine rupture) that need immediate intervention; perform a full risk assessment including a full set of maternal observations, taking into account the whole clinical picture, and document the findings; and consider possible underlying causes and undertake conservative measures. If the trace is still pathological after conservative measures: obtain a further urgent review, evaluate the whole clinical picture and consider expediting birth; if there are evolving intrapartum risk factors for fetal compromise, have a very low threshold for expediting birth.",
+"figs": [
+"p071_f1.png"
+]
+}
+]

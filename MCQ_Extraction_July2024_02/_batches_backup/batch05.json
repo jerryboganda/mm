@@ -1,0 +1,324 @@
+[
+{
+"source_pages": [
+30,
+31
+],
+"printed_number": "47",
+"question": "How many more women would need to undergo peripartum hysterectomy if caesarean section was done compared to a vaginal delivery?",
+"options": [
+[
+"a",
+"65 more women / 100000",
+true
+],
+[
+"b",
+"200 more women / 100000",
+false
+],
+[
+"c",
+"24 more women / 100000",
+false
+],
+[
+"d",
+"80 more women / 100000",
+false
+],
+[
+"e",
+"150 more women / 100000",
+false
+]
+],
+"explanation": "RCOG consent data (Table 1, outcomes more likely with caesarean birth): about 65 more women per 100,000 who had a caesarean birth would be expected to have a peripartum hysterectomy (about 200 per 100,000 with caesarean vs about 100 per 100,000 with vaginal birth), so for about 99,935 women per 100,000 the outcome was the same irrespective of mode of birth.",
+"figs": [
+"p030_f1.png",
+"p031_f1.png"
+]
+},
+{
+"source_pages": [
+31
+],
+"printed_number": "48",
+"question": "Patient was on warfarin for AF. Her INR is maintained at 2.5. She is planned for polypectomy. Preoperatively, the INR is 1.6. How to proceed in this situation?",
+"options": [
+[
+"a",
+"Give Phytomenadione",
+true
+],
+[
+"b",
+"Repeat INR and review",
+false
+],
+[
+"c",
+"Defer operation until proper bridging",
+false
+],
+[
+"d",
+"Proceed for surgery",
+false
+]
+],
+"explanation": "Warfarin should be stopped 5 days before elective surgery with an INR check ideally the day before surgery: if the INR is >1.5 the day before surgery, phytomenadione (vitamin K) should be given. Here the INR is 1.6 (>1.5), so give phytomenadione. LMWH bridging is considered in those with high VTE risk. Restart warfarin when haemostasis is achieved (low bleeding risk ~12–24 h; high bleeding risk LMWH not until 48 h after surgery).",
+"figs": [
+"p031_f2.png"
+]
+},
+{
+"source_pages": [
+32
+],
+"printed_number": "49",
+"question": "Antenatal haemoglobinopathy screening: the woman is of UK origin. Her partner's family of origin is not known. What is the appropriate action?",
+"options": [
+[
+"a",
+"No further tests",
+false
+],
+[
+"b",
+"NIPT",
+false
+],
+[
+"c",
+"CVS/amnio",
+false
+],
+[
+"d",
+"Newborn screening",
+false
+],
+[
+"e",
+"Paternal screening",
+false
+],
+[
+"f",
+"Parental karyotyping",
+false
+],
+[
+"g",
+"Maternal screening",
+true
+]
+],
+"explanation": "When the father's origin is unknown (or from a high-prevalence area), this is considered high risk. Offer a blood test for the mother (maternal screening) to identify whether she is a carrier. Sickle cell screening: Family Origin Questionnaire → if high risk, HPLC → if carrier, test father → if both carriers, offer prenatal invasive testing (CVS/amniocentesis). Thalassaemia screening is offered to all pregnant women in the UK (MCH <27 pg → HPLC → test father → invasive testing if both carriers).",
+"figs": [
+"p032_f1.png"
+]
+},
+{
+"source_pages": [
+33
+],
+"printed_number": "50",
+"question": "Parents are carriers for CAH (congenital adrenal hyperplasia). What is the risk of offspring inheriting the disease?",
+"options": [
+[
+"a",
+"1 in 2",
+false
+],
+[
+"b",
+"1 in 4",
+true
+],
+[
+"c",
+"3 in 4",
+false
+],
+[
+"d",
+"No risk of offspring inheriting the disease",
+false
+]
+],
+"explanation": "CAH is autosomal recessive. When both parents are carriers (Aa × Aa), the Punnett square gives AA (1/4 unaffected), Aa and Aa (1/2 carriers) and aa (1/4 affected). The risk of an affected child is 1 in 4.",
+"figs": []
+},
+{
+"source_pages": [
+33,
+34
+],
+"printed_number": "51",
+"question": "Woman presented with features of overactive bladder. Her urodynamic findings confirmed her symptoms. Which of the following is representative of detrusor overactivity (DO)?",
+"options": [
+[
+"a",
+"Evidence of leak with provocation, with no rise in Pdet",
+false
+],
+[
+"b",
+"Provoked or unprovoked rise in detrusor pressure that is abnormal and correlates with leak: positive flow during filling / Pabd stable / Pdet increase 2–27 / leakage +/− / normal flow",
+true
+],
+[
+"c",
+"Rise in detrusor pressure during filling, but the pressure falls to normal when filling is stopped",
+false
+]
+],
+"explanation": "Detrusor overactivity (DO) is characterised by involuntary detrusor contractions during the filling phase (spontaneous or provoked, amplitudes >15 cm H2O) that are abnormal and correlate with leak. Phasic DO = waves of contraction that may or may not be associated with incontinence; terminal DO = a single involuntary contraction at cystometric capacity; cough-associated DO = onset immediately following a cough pressure peak. (Option c describes poor detrusor accommodation; option a describes urodynamic stress incontinence.)",
+"figs": [
+"p034_f1.png"
+]
+},
+{
+"source_pages": [
+34
+],
+"printed_number": "52",
+"question": "Patient underwent mid-urethral tape in the past for SUI. Following her surgery she was symptom free for some time, and now presents again with SUI. No residual urine on investigations. What is the next step in her management?",
+"options": [
+[
+"a",
+"Urodynamics",
+true
+],
+[
+"b",
+"Colposuspension",
+false
+],
+[
+"c",
+"TVT again",
+false
+],
+[
+"d",
+"Bulking agents",
+false
+],
+[
+"e",
+"Cystoscopy",
+false
+]
+],
+"explanation": "For recurrent stress urinary incontinence after a previous continence procedure, the best investigation is urodynamics; subsequent management is often with urethral bulking agents.",
+"figs": []
+},
+{
+"source_pages": [
+34,
+35
+],
+"printed_number": "53",
+"question": "A pregnant woman at 7 weeks amenorrhoea came with complaint of spotting. USG shows a thickened endometrium with no intrauterine/extrauterine gestational sac (pregnancy of unknown location). On hCG follow up, the rise was 360 iu from 340 iu in 48 hours. How to proceed now?",
+"options": [
+[
+"a",
+"hCG after 1 week",
+false
+],
+[
+"b",
+"US after 2 weeks",
+false
+],
+[
+"c",
+"TVS after 1 week",
+false
+],
+[
+"d",
+"TVS after 2 weeks",
+false
+],
+[
+"e",
+"Urgent review in early pregnancy unit within 24 hr",
+true
+]
+],
+"explanation": "For a woman with a pregnancy of unknown location and a decrease in serum hCG of less than 50%, or an increase of less than 63% over 48 hours, refer her for clinical review in the early pregnancy assessment service within 24 hours. A rise from 340 to 360 iu is a sub-optimal rise (<63%), so urgent EPU review within 24 hours is required (risk of ectopic).",
+"figs": [
+"p034_f2.png",
+"p035_f1.png"
+]
+},
+{
+"source_pages": [
+35
+],
+"printed_number": "54",
+"question": "What is the initial management in a patient with a large cystocele and complaint of SUI?",
+"options": [
+[
+"a",
+"PMFT (pelvic floor muscle training)",
+true
+],
+[
+"b",
+"Urodynamic test",
+false
+],
+[
+"c",
+"Pessary",
+false
+]
+],
+"explanation": "Initial (first-line) management is pelvic floor muscle training (PMFT).",
+"figs": []
+},
+{
+"source_pages": [
+35,
+36
+],
+"printed_number": "55",
+"question": "What is the management of a persistent simple ovarian cyst in a postmenopausal woman? Her RMI is <200 and CA125 is normal.",
+"options": [
+[
+"a",
+"Bilateral salpingo-oophorectomy",
+false
+],
+[
+"b",
+"Laparoscopic BSO",
+false
+],
+[
+"c",
+"TAH with BSO",
+false
+],
+[
+"d",
+"Discharge from follow up",
+false
+],
+[
+"e",
+"Repeat assessment in four months",
+true
+]
+],
+"explanation": "Asymptomatic, simple, unilateral, unilocular ovarian cysts less than 5 cm in diameter have a low risk of malignancy. With normal serum CA125 (RMI <200), they can be managed conservatively with a repeat evaluation in 4–6 months (CA125, TVS ± TAS). It is reasonable to discharge after 1 year if the cyst remains unchanged or reduces in size with normal CA125, considering the woman's wishes and surgical fitness.",
+"figs": [
+"p036_f1.png"
+]
+}
+]

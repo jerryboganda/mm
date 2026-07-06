@@ -1,0 +1,493 @@
+[
+{
+"source_pages": [
+43
+],
+"printed_number": "69",
+"question": "Patient came back to the UK following oocyte retrieval. 25 oocytes were retrieved. The next morning, she wakes with severe right-sided abdominal pain associated with nausea and vomiting. She also complains of lightheadedness. What is the probable cause?",
+"options": [
+[
+"a",
+"OHSS",
+true
+],
+[
+"b",
+"Ovarian torsion",
+false
+],
+[
+"c",
+"Ovarian rupture",
+false
+],
+[
+"d",
+"Appendicitis",
+false
+],
+[
+"e",
+"PID",
+false
+]
+],
+"explanation": "A high oocyte yield (25 retrieved) is a major risk factor for ovarian hyperstimulation syndrome (OHSS). Severe abdominal pain, nausea, vomiting and lightheadedness (from fluid shifts/hypovolaemia) shortly after retrieval indicate OHSS.",
+"figs": []
+},
+{
+"source_pages": [
+43,
+44
+],
+"printed_number": "70",
+"question": "According to the latest MBRRACE, what is the most common cause of direct maternal death?",
+"options": [
+[
+"a",
+"Suicide",
+false
+],
+[
+"b",
+"VTE",
+true
+],
+[
+"c",
+"Cardiac cause",
+false
+],
+[
+"d",
+"Preeclampsia",
+false
+],
+[
+"e",
+"Bleeding",
+false
+]
+],
+"explanation": "Thrombosis and thromboembolism (blood clots, ~16% of deaths) remains the leading cause of direct maternal death during or up to six weeks after the end of pregnancy. (Maternal suicide is the leading cause of direct death between 6 weeks and a year postpartum, and mental-health causes account for nearly 40% of deaths in that later period.)",
+"figs": [
+"p044_f1.png"
+]
+},
+{
+"source_pages": [
+44,
+45
+],
+"printed_number": "71",
+"question": "A couple was evaluated for subfertility. The male partner's evaluation showed azoospermia and low FSH. What is the possible cause?",
+"options": [
+[
+"a",
+"Kallmann syndrome",
+true
+],
+[
+"b",
+"Anabolic steroid",
+false
+],
+[
+"c",
+"Klinefelter syndrome",
+false
+],
+[
+"d",
+"CBAVD",
+false
+]
+],
+"explanation": "Azoospermia with a LOW FSH indicates secondary (hypogonadotropic) hypogonadism. Kallmann syndrome is a congenital isolated gonadotropin (GnRH) deficiency causing low FSH/LH and impaired spermatogenesis. (Klinefelter and anabolic steroid abuse cause different hormonal pictures; CBAVD causes obstructive azoospermia with normal FSH.)",
+"figs": [
+"p045_f1.png"
+]
+},
+{
+"source_pages": [
+45,
+46
+],
+"printed_number": "72",
+"question": "Couple was evaluated for infertility and planned for IVF. Male partner evaluation showed a severe deficit in sperm quantity: 4–5 million sperm per millilitre. Female partner evaluation was normal. What is the best option recommended for the couple?",
+"options": [
+[
+"a",
+"IUI with partner sperm",
+false
+],
+[
+"b",
+"IUI with donor sperm",
+false
+],
+[
+"c",
+"IVF",
+false
+],
+[
+"d",
+"IVF-ICSI",
+true
+],
+[
+"e",
+"IVF with donor sperm",
+false
+]
+],
+"explanation": "The recognised indications for ICSI include severe deficits in semen quality and obstructive or non-obstructive azoospermia. With severe oligospermia, IVF with ICSI is recommended. Before ICSI, appropriate investigations and consideration of relevant genetic issues should be undertaken.",
+"figs": []
+},
+{
+"source_pages": [
+46
+],
+"printed_number": "73",
+"question": "What is the antihypertensive of choice in a postnatal patient? She is a known asthmatic with no history of recent exacerbations. She had stopped nifedipine due to drug allergy.",
+"options": [
+[
+"a",
+"Enalapril",
+true
+],
+[
+"b",
+"Thiazide",
+false
+],
+[
+"c",
+"Amlodipine",
+false
+]
+],
+"explanation": "Enalapril (an ACE inhibitor) is a suitable postnatal antihypertensive and is compatible with breastfeeding. Bronchospasm with enalapril is uncommon (≥1/1,000 to <1/100); cough is common. Contraindications include the 2nd and 3rd trimesters of pregnancy, hypersensitivity/angioedema with ACE inhibitors, and co-administration with aliskiren in diabetes or renal impairment (GFR <60).",
+"figs": []
+},
+{
+"source_pages": [
+46
+],
+"printed_number": "74",
+"question": "Scenario describing bladder pain syndrome impacting on the patient's quality of life. What is the first-line management of bladder pain syndrome?",
+"options": [
+[
+"a",
+"Amitriptyline",
+true
+],
+[
+"b",
+"Analgesics",
+false
+],
+[
+"c",
+"Cimetidine",
+false
+],
+[
+"d",
+"Oral cyclosporin",
+false
+],
+[
+"e",
+"Botox",
+false
+]
+],
+"explanation": "Oral amitriptyline (or cimetidine) may be considered when first-line conservative treatments have failed; amitriptyline is the first-line oral pharmacological option for bladder pain syndrome.",
+"figs": []
+},
+{
+"source_pages": [
+47
+],
+"printed_number": "75",
+"question": "Genital examination of a patient showed the presence of genital piercing. Identify the type of FGM.",
+"options": [
+[
+"a",
+"FGM Type 1",
+false
+],
+[
+"b",
+"FGM Type 2",
+false
+],
+[
+"c",
+"FGM Type 3",
+false
+],
+[
+"d",
+"FGM Type 4",
+true
+],
+[
+"e",
+"Not an FGM",
+false
+]
+],
+"explanation": "WHO classification of FGM — Type 1: partial/total removal of the clitoris and/or prepuce (clitoridectomy). Type 2: removal of the clitoris and labia minora ± labia majora (excision). Type 3: narrowing of the vaginal orifice with a covering seal (infibulation). Type 4: all other harmful procedures for non-medical purposes, e.g. pricking, piercing, incising, scraping and cauterization. Genital piercing is Type 4.",
+"figs": []
+},
+{
+"source_pages": [
+47
+],
+"printed_number": "76",
+"question": "An antenatal woman with Anti-K (Kell) antibodies was on follow up. Her evaluation showed no fetal anaemia, MCA PSV normal, no hydrops, delivered vaginally at term. She should be counselled that the newborn baby is at risk of:",
+"options": [
+[
+"a",
+"Early anaemia",
+true
+],
+[
+"b",
+"Early jaundice within 24 hours of delivery",
+false
+],
+[
+"c",
+"Late anaemia",
+false
+],
+[
+"d",
+"Late jaundice",
+false
+]
+],
+"explanation": "Kell (anti-K) antibodies suppress fetal/neonatal erythropoiesis rather than causing marked haemolysis, so the newborn is at risk of early neonatal anaemia (with relatively little jaundice).",
+"figs": []
+},
+{
+"source_pages": [
+47,
+48
+],
+"printed_number": "77",
+"question": "You are teaching the midwife about normal labour and episiotomy. She wanted to know the maximum dose of 1% lignocaine without vasopressor for episiotomy for a woman weighing 80 kg.",
+"options": [
+[
+"a",
+"1 mg/kg",
+false
+],
+[
+"b",
+"2 mg/kg",
+false
+],
+[
+"c",
+"3 mg/kg",
+true
+],
+[
+"d",
+"5 mg/kg",
+false
+],
+[
+"e",
+"7 mg/kg",
+false
+]
+],
+"explanation": "Maximum dose of lidocaine (lignocaine) without adrenaline is 3 mg/kg (6 mg/kg with adrenaline). 1% = 10 mg/ml. For an 80 kg woman this is a maximum of 240 mg (24 ml of 1%).",
+"figs": [
+"p048_f1.png"
+]
+},
+{
+"source_pages": [
+48
+],
+"printed_number": "78",
+"question": "What is the most common vessel injured in primary port insertion during laparoscopy?",
+"options": [
+[
+"a",
+"Inferior epigastric artery",
+false
+],
+[
+"b",
+"Right common iliac artery",
+false
+],
+[
+"c",
+"Left common iliac artery",
+false
+],
+[
+"d",
+"Aorta",
+true
+],
+[
+"e",
+"Superficial epigastric artery",
+false
+]
+],
+"explanation": "With midline (umbilical) primary port entry, the major retroperitoneal vessels — the aorta and iliac vessels — are at risk. As the aortic bifurcation occurs just to the left of the midline, the right common iliac artery is at higher risk than the left during instrumentation at the umbilicus; keeping the Veress needle and trocar in the midline minimises this risk.",
+"figs": [
+"p048_f2.png"
+]
+},
+{
+"source_pages": [
+48
+],
+"printed_number": "79",
+"question": "What is the most common vessel injured in port insertion during laparoscopy (secondary/accessory ports)?",
+"options": [
+[
+"a",
+"Inferior epigastric artery",
+true
+],
+[
+"b",
+"Right common iliac artery",
+false
+],
+[
+"c",
+"Left common iliac artery",
+false
+],
+[
+"d",
+"Aorta",
+false
+],
+[
+"e",
+"Superficial epigastric artery",
+false
+]
+],
+"explanation": "The most common trocar-induced abdominal wall injury is haemorrhage of the epigastric (inferior epigastric) vessels — a serious and potentially preventable complication of accessory port insertion.",
+"figs": []
+},
+{
+"source_pages": [
+48,
+49
+],
+"printed_number": "80",
+"question": "What is the most common injury in gynaecological laparoscopy?",
+"options": [
+[
+"a",
+"Bladder",
+true
+],
+[
+"b",
+"Bowel",
+false
+],
+[
+"c",
+"Blood vessels",
+false
+],
+[
+"d",
+"Ureter",
+false
+]
+],
+"explanation": "Urinary tract injuries pooled together are the most common major complication of laparoscopic pelvic surgery, with bladder injury at the top of the list of visceral damage (reported rates 0.02%–8.3%). The overall rate of major complications is about 1.4/1000 procedures (intestinal 0.6/1000, urological 0.3/1000, vascular 0.1/1000).",
+"figs": []
+},
+{
+"source_pages": [
+49
+],
+"printed_number": "81",
+"question": "What is the risk of bladder injury in diagnostic laparoscopy planned for chronic pelvic pain?",
+"options": [
+[
+"a",
+"1 in 100",
+false
+],
+[
+"b",
+"2 in 1000",
+true
+],
+[
+"c",
+"3-8 / 10000",
+false
+],
+[
+"d",
+"14 in 100",
+false
+],
+[
+"e",
+"4 in 100",
+false
+]
+],
+"explanation": "The overall risk of serious complications from diagnostic laparoscopy is approximately 2 in 1000 women (uncommon). This includes damage to the bowel, bladder, ureters, uterus or major blood vessels that would require immediate repair by laparoscopy or laparotomy.",
+"figs": [
+"p049_f1.png"
+]
+},
+{
+"source_pages": [
+49
+],
+"printed_number": "82",
+"question": "What is the management of a patient presenting with PPROM at 29 weeks? Her examination showed normal fetal heart sounds and an uneffaced cervix.",
+"options": [
+[
+"a",
+"MgSO4",
+false
+],
+[
+"b",
+"IV antibiotic + steroids",
+false
+],
+[
+"c",
+"Steroid + erythromycin",
+true
+],
+[
+"d",
+"Steroid + IOL with prostaglandin",
+false
+]
+],
+"explanation": "For preterm prelabour rupture of membranes (PPROM) without labour, give antenatal corticosteroids (for fetal lung maturity) plus oral erythromycin 250 mg four times a day for 10 days or until the woman is in established labour (whichever is sooner). Expectant management is appropriate at 29 weeks with a reassuring fetus and closed cervix.",
+"figs": [],
+"answer_inferred": true,
+"answer_note": "Source did not highlight an option for this question; the correct answer (steroid + erythromycin) is taken from the explanation, which specifies erythromycin 250 mg four times daily for 10 days (standard PPROM management with antenatal corticosteroids). Please verify before import."
+}
+]

@@ -191,6 +191,7 @@ router.get(
             String(answer?.correct || ""),
           isCorrect: Boolean(answer?.isCorrect),
           explanation: answer.explanation || mcq?.explanation || "",
+          images: (mcq?.images as unknown[] | null) ?? [],
         };
       });
 

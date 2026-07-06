@@ -168,6 +168,7 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
         correctAnswer,
         isCorrect: Boolean(answerInfo.isCorrect),
         explanation: mcq?.explanation || "",
+        images: (mcq?.images as unknown[] | null) ?? [],
       };
     });
 

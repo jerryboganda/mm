@@ -1,0 +1,302 @@
+[
+{
+"source_pages": [
+49,
+50
+],
+"printed_number": "83",
+"question": "What is the most probable cause of virilization in a 42-year-old woman presenting with baldness and progressive hirsutism over the past 6 months? Her evaluation showed a testosterone of 7-8 and a normal DHEAS.",
+"options": [
+[
+"a",
+"Sertoli-Leydig cell tumour",
+true
+],
+[
+"b",
+"Hyperthecosis",
+false
+],
+[
+"c",
+"Adrenal tumour",
+false
+],
+[
+"d",
+"PCOS",
+false
+],
+[
+"e",
+"Non-classical CAH",
+false
+]
+],
+"explanation": "Rapid-onset virilization with a markedly raised testosterone but NORMAL DHEAS points to an ovarian (androgen-secreting) source rather than an adrenal one. A Sertoli-Leydig cell tumour is a testosterone-secreting ovarian tumour causing defeminization and progressive masculinization (amenorrhoea, deepening voice, hirsutism, male-pattern hair growth, clitoromegaly). Adrenal adenomas tend to secrete DHEA-S.",
+"figs": []
+},
+{
+"source_pages": [
+50
+],
+"printed_number": "84",
+"question": "How will you diagnose a case of hyperandrogenism in a teenage girl presenting with hirsutism and acne? She has not attained menarche. Her evaluation showed testosterone: 9.",
+"options": [
+[
+"a",
+"17-hydroxyprogesterone",
+true
+],
+[
+"b",
+"DHEAS",
+false
+],
+[
+"c",
+"USG pelvis",
+false
+],
+[
+"d",
+"CT abdomen",
+false
+]
+],
+"explanation": "In a teenager with hyperandrogenism, primary amenorrhoea and a high testosterone, measure 17-hydroxyprogesterone to diagnose non-classical (late-onset) congenital adrenal hyperplasia (21-hydroxylase deficiency).",
+"figs": []
+},
+{
+"source_pages": [
+50,
+51
+],
+"printed_number": "85",
+"question": "How will you manage a 17-year-old patient with hirsutism and irregular cycles? She is not sexually active.",
+"options": [
+[
+"a",
+"Cyproterone with ethinyl estradiol",
+false
+],
+[
+"b",
+"COCP for 3 months",
+false
+],
+[
+"c",
+"COCP for 6 months",
+true
+]
+],
+"explanation": "Cosmetic measures and the combined oral contraceptive pill (COCP) are first-line treatments for hirsutism (including in PCOS). A trial of at least 6 months of COCP is recommended before assessing response. Anti-androgens (e.g. spironolactone) may be added, with effective contraception, if the response is suboptimal after ≥6 months of COCP/cosmetic therapy; ethinylestradiol 35 mcg plus cyproterone acetate is not first-line due to increased adverse effects.",
+"figs": [
+"p051_f1.png"
+]
+},
+{
+"source_pages": [
+51
+],
+"printed_number": "86",
+"question": "A patient diagnosed with multiple sclerosis presents with bladder complaints. What is the management?",
+"options": [
+[
+"a",
+"Oxybutynin",
+false
+],
+[
+"b",
+"Clean intermittent self catheterization",
+true
+],
+[
+"c",
+"Botox",
+false
+]
+],
+"explanation": "In multiple sclerosis with bladder dysfunction (incomplete emptying/retention with a significant post-void residual), clean intermittent self catheterization is the appropriate management.",
+"figs": []
+},
+{
+"source_pages": [
+51
+],
+"printed_number": "87",
+"question": "What is accepting the null hypothesis when it is actually false?",
+"options": [
+[
+"a",
+"Type 1 error",
+false
+],
+[
+"b",
+"Type 2 error",
+true
+],
+[
+"c",
+"True positive",
+false
+],
+[
+"d",
+"True negative",
+false
+]
+],
+"explanation": "Failing to reject (accepting) the null hypothesis when it is actually false is a Type II error (false negative, probability = β). Rejecting the null hypothesis when it is actually true is a Type I error (false positive, probability = α).",
+"figs": [
+"p051_f2.png"
+]
+},
+{
+"source_pages": [
+52
+],
+"printed_number": "88",
+"question": "What is the likelihood of the test to be positive in a diseased person?",
+"options": [
+[
+"a",
+"Sensitivity",
+false
+],
+[
+"b",
+"Specificity",
+false
+],
+[
+"c",
+"Negative predictive value",
+false
+],
+[
+"d",
+"Positive predictive value",
+true
+],
+[
+"e",
+"Positive LR",
+false
+]
+],
+"explanation": "Definitions — Sensitivity: the proportion of true positives detected by a test (how well it classifies subjects who truly have the outcome). Specificity: the proportion of true negatives detected. PPV: the probability of true disease when the result is positive. NPV: the probability of no disease when the result is negative.",
+"answer_note": "Source highlighted 'Positive predictive value', but the likelihood of a positive test in a diseased person is the definition of SENSITIVITY (option a). The parallel question #89 (Q91 here) is marked 'sensitivity' for the same concept. Likely a source error — please verify before import.",
+"figs": []
+},
+{
+"source_pages": [
+52
+],
+"printed_number": "89",
+"question": "Patient was diagnosed as Covid positive. What is described as the likelihood of testing positive in persons who are diseased?",
+"options": [
+[
+"a",
+"PPV",
+false
+],
+[
+"b",
+"NPV",
+false
+],
+[
+"c",
+"Sensitivity",
+true
+],
+[
+"d",
+"Specificity",
+false
+],
+[
+"e",
+"True positive rate",
+false
+]
+],
+"explanation": "Sensitivity quantifies a test's ability to correctly identify subjects with the disease — the proportion of true positives that are correctly identified by the test (also called the true positive rate). PPV and NPV are related to sensitivity and specificity through disease prevalence.",
+"figs": []
+},
+{
+"source_pages": [
+52,
+53
+],
+"printed_number": "90",
+"question": "Which of the following drugs is to be avoided in a patient with significant aortopathy in Marfan syndrome with an aortic dilatation >40 mm?",
+"options": [
+[
+"a",
+"IV oxytocin bolus",
+false
+],
+[
+"b",
+"Ergometrine",
+true
+],
+[
+"c",
+"Carbetocin",
+false
+],
+[
+"d",
+"Misoprostol",
+false
+],
+[
+"e",
+"Carboprost",
+false
+]
+],
+"explanation": "In significant aortopathy (Marfan/Loeys–Dietz with aortic dilatation >40 mm, bicuspid aortopathy with dilatation >45 mm, previous aortic dissection, Turner syndrome with aortic size index >25 cm/m2), ergometrine should be avoided because of the risk of hypertension-induced aortic dissection or rupture. First-line uterotonic is oxytocin; second-line options are misoprostol and carboprost.",
+"figs": [
+"p053_f1.png"
+]
+},
+{
+"source_pages": [
+53,
+54
+],
+"printed_number": "91",
+"question": "Antenatal patient was lost to follow up from 36 weeks. She presented with severe headache a few weeks later. Her evaluation showed elevated liver enzymes and normal platelets. She was taken for caesarean section owing to maternal indications; however, she collapsed on the table and could not be revived. Post-mortem examination showed haemorrhage in the intraventricular, cerebellar and brainstem regions, with death due to coning (herniation) of the cerebellum. What is the probable cause?",
+"options": [
+[
+"a",
+"Meningitis",
+false
+],
+[
+"b",
+"Subarachnoid haemorrhage",
+false
+],
+[
+"c",
+"Severe pre-eclampsia",
+true
+],
+[
+"d",
+"Intracerebral haemorrhage",
+false
+]
+],
+"explanation": "Pregnancy-associated intracranial haemorrhage (ICH) is an uncommon but life-threatening event contributing to maternal mortality. Pre-eclampsia (and HELLP — haemolysis, elevated liver enzymes, low platelets) is a major risk factor and is associated with poor outcomes in pregnancy-associated ICH. Early symptoms (e.g. vomiting) can be mistaken for morning sickness and missed. The elevated liver enzymes and severe headache point to severe pre-eclampsia as the underlying cause.",
+"figs": []
+}
+]

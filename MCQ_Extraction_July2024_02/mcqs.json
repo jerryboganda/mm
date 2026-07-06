@@ -1,0 +1,5356 @@
+[
+  {
+    "id": 1,
+    "printed_number": "1",
+    "source_pages": [
+      1
+    ],
+    "question": "48 yr old on tamoxifen presented due to pain in loin, accidentally discovered to have an endometrial thickness of 22mm. How to evaluate?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Hysteroscopy with biopsy",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Pipelle biopsy",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Reassure",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Stop tamoxifen",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Evaluate if symptomatic.",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Evaluate if symptomatic.",
+    "explanation": "For women on tamoxifen and symptoms of bleeding, urgent assessment is required, especially hysteroscopy and biopsy. Evidence does not support screening asymptomatic women with TVS and/or endometrial sampling; abnormal vaginal bleeding should prompt urgent investigation by TVS, hysteroscopy and endometrial sampling.",
+    "explanation_images": [
+      "figures/q001_fig1.png"
+    ]
+  },
+  {
+    "id": 2,
+    "printed_number": "2",
+    "source_pages": [
+      1
+    ],
+    "question": "Question describes a scenario of endometrial hyperplasia with atypia. Patient refuses surgery. What is the recommended follow up?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Endometrial biopsy at 3 months",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Endometrial biopsy at 6 months",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Endometrial biopsy at 3 monthly intervals, discharge after negative biopsy",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "≥ 2 consecutive negative EBs at 3-month intervals, thereafter 6–12-monthly EB and review",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "≥ 2 consecutive negative EBs at 3-month intervals",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "≥ two consecutive negative EBs at 6-month intervals, thereafter annual EB and review.",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "≥ 2 consecutive negative EBs at 3-month intervals, thereafter 6–12-monthly EB and review",
+    "explanation": "Management of endometrial hyperplasia. For atypical hyperplasia (AH) managed non-surgically: ≥ two consecutive negative endometrial biopsies at 3-month intervals, thereafter 6–12-monthly EB and review.",
+    "explanation_images": [
+      "figures/q002_fig1.png"
+    ]
+  },
+  {
+    "id": 3,
+    "printed_number": "3",
+    "source_pages": [
+      1
+    ],
+    "question": "Question describes a scenario of endometrial hyperplasia with no atypia in an obese patient. How will you follow up?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Endometrial biopsy at 3 months",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Endometrial biopsy at 6 months",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Endometrial biopsy at 3 monthly intervals, discharge after negative biopsy",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "≥ 2 consecutive negative EBs at 3-month intervals, thereafter 6–12-monthly EB and review",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "≥ 2 consecutive negative EBs at 3-month intervals",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "≥ two consecutive negative EBs at 6-month intervals, thereafter annual EB and review",
+        "correct": true
+      }
+    ],
+    "correct_letter": "f",
+    "correct_answer": "≥ two consecutive negative EBs at 6-month intervals, thereafter annual EB and review",
+    "explanation": "Endometrial hyperplasia without atypia (EH) with BMI ≥ 35 or treated with oral progestogens: ≥ two consecutive negative EBs at 6-month intervals, thereafter annual EB and review.",
+    "explanation_images": [
+      "figures/q003_fig1.png"
+    ]
+  },
+  {
+    "id": 4,
+    "printed_number": "4",
+    "source_pages": [
+      2
+    ],
+    "question": "Post-menopausal woman was started on combined HRT 6 months ago. She presents with persistent bleeding for the past 2 months, despite dose adjustments and increase in progesterone component. What is the next step?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "TVS",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Pipelle biopsy",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Hysteroscopy guided biopsy",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Change to sequential HRT",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Stop HRT",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "TVS",
+    "explanation": "Unscheduled bleeding on HRT: assess cancer risk factors and bleeding pattern, identify HRT regimen/duration/compliance, offer examination and investigations. With heavy/persistent bleeding, more than 6 months since starting HRT, or 1 major / 3 minor risk factors for endometrial cancer, arrange urgent TVS (within 6 weeks).",
+    "explanation_images": [
+      "figures/q004_fig1.png"
+    ]
+  },
+  {
+    "id": 5,
+    "printed_number": "5",
+    "source_pages": [
+      3
+    ],
+    "question": "What is the risk of VTE in a postmenopausal woman on combined HRT for 5 years?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Additional 5 / 1000 women using HRT",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Additional 7 / 1000 women using HRT",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Additional 13 / 1000 women using HRT",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Additional 8 / 1000 women using HRT",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Additional 12 / 1000 women using HRT",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Additional 7 / 1000 women using HRT",
+    "explanation": "Risks associated with combined estrogen-progestogen HRT: venous thromboembolism (VTE) over 5 years use adds approximately 7 extra cases per 1000 women using HRT.",
+    "explanation_images": [
+      "figures/q005_fig1.png"
+    ]
+  },
+  {
+    "id": 6,
+    "printed_number": "6",
+    "source_pages": [
+      4
+    ],
+    "question": "How will you manage unscheduled bleeding in a patient on estrogel 1.5 mg and micronized progesterone 100 mg? She presented with bleeding within 6 months of starting the regimen.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Increase estrogen dose",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Change to sequential HRT regimen",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Change progesterone",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Increase progesterone dose to 200mg",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Reduce progesterone dose",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Increase progesterone dose to 200mg",
+    "explanation": "Unscheduled bleeding with sHRT/ccHRT within the first 6 months: options include increasing the micronised progesterone (MP) dose or changing to a synthetic progestogen, a 3-month trial of an additional progestogen on top of the current preparation, offering the 52 mg LNG-IUD, or changing to an oral preparation. Here, increase the progesterone dose to 200 mg.",
+    "explanation_images": [
+      "figures/q006_fig1.png"
+    ]
+  },
+  {
+    "id": 7,
+    "printed_number": "7",
+    "source_pages": [
+      4
+    ],
+    "question": "What is the most effective contraceptive for a patient on efavirenz?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Barrier contraceptive",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Progesterone only pills",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Desogestrel",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Combined hormonal contraceptive pills",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Copper T",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Copper T",
+    "explanation": "Efavirenz (EFV) is an enzyme-inducing NNRTI. Contraceptive effectiveness of CHC, POP and ENG-IMP could be reduced (use not advised). DMPA, LNG-IUD and Cu-IUD have no expected effect and need no extra precautions; the Cu-IUD (Copper T) is the most effective option.",
+    "explanation_images": [
+      "figures/q007_fig1.png"
+    ]
+  },
+  {
+    "id": 8,
+    "printed_number": "8",
+    "source_pages": [
+      5
+    ],
+    "question": "What is the most effective contraceptive for a patient on enzyme inducing anti-epileptic?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Barrier contraceptive",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Progesterone only pills",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Desogestrel",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Combined hormonal contraceptive pills",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Copper T",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Copper T",
+    "explanation": "DMPA and IUCD are both correct, but DMPA has an extra benefit in the epileptic patient. For enzyme inducers, DMPA, LNG-IUS and Cu-IUD have no expected effect on contraceptive effectiveness and need no extra precautions; the Cu-IUD is the most effective method of emergency contraception.",
+    "explanation_images": [
+      "figures/q008_fig1.png"
+    ]
+  },
+  {
+    "id": 9,
+    "printed_number": "9",
+    "source_pages": [
+      6
+    ],
+    "question": "How would you evaluate a structurally normal severe SGA fetus with normal uterine Doppler, anomaly scan showing ventricular dilatation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Serological screening for CMV: CMV IgM and IgG with avidity",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "B19V DNA or IgG seroconversion using an antenatal booking blood for parvovirus",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Screen for Toxoplasmosis + CMV",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Arrange for fetal echo",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Perform fetal echo + brain MRI",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Screen for toxoplasmosis.",
+        "correct": false
+      },
+      {
+        "letter": "g",
+        "text": "Consider invasive diagnostic testing including a Microarray to detect microdeletions.",
+        "correct": true
+      }
+    ],
+    "correct_letter": "g",
+    "correct_answer": "Consider invasive diagnostic testing including a Microarray to detect microdeletions.",
+    "explanation": "Invasive diagnostic testing should be offered in severely SGA fetuses with structural anomalies and considered in non-anomalous fetuses detected before 23 weeks of gestation, especially if uterine artery Doppler is normal. Analysis should include a microarray to detect microdeletions and microinsertions.",
+    "explanation_images": [
+      "figures/q009_fig1.png"
+    ]
+  },
+  {
+    "id": 10,
+    "printed_number": "10",
+    "source_pages": [
+      7
+    ],
+    "question": "How would you evaluate a structurally normal SGA fetus with normal uterine Doppler, normal karyotyping, USG showing mild ventricular dilatation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Serological screening for CMV: CMV IgM and IgG with avidity",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "B19V DNA or IgG seroconversion using an antenatal booking blood for parvovirus",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Screen for Toxoplasmosis + CMV",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Arrange for fetal echo",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Perform fetal echo + brain MRI",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Screen for toxoplasmosis",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Serological screening for CMV: CMV IgM and IgG with avidity",
+    "explanation": "Karyotyping normal. Serological screening for congenital CMV (and toxoplasmosis) should be offered in severe SGA, as fetal infections are responsible for up to 5% of SGA fetuses.",
+    "explanation_images": []
+  },
+  {
+    "id": 11,
+    "printed_number": "11",
+    "source_pages": [
+      7
+    ],
+    "question": "Postpartum patient on antiepileptic (lamotrigine). The dose was increased in pregnancy. What is the advice regarding her dose modification?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Within 10 days",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Review in 4 weeks",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Review in 8 weeks",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Continue medications",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Continue pre-pregnancy antiepileptic dose",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Within 10 days",
+    "explanation": "If the AED dose was increased in pregnancy, it should be reviewed within 10 days of delivery to avoid postpartum toxicity. The increase should be clearly documented, with a plan to liaise with the neurological team to taper the dose in the first 10 days after delivery. If symptoms of AED toxicity develop in the puerperium (e.g. drowsiness, diplopia or unsteadiness), urgent neurological review is needed.",
+    "explanation_images": []
+  },
+  {
+    "id": 12,
+    "printed_number": "10 (etanercept)",
+    "source_pages": [
+      7,
+      8
+    ],
+    "question": "What is the suggested time to discontinue etanercept during pregnancy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "30-32 wks",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "21-22 wks",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "26-28 wks",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "28-32 wk",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "30-32 wks",
+    "explanation": "Accumulation of anti-TNF agents in the neonate (Table 2). Etanercept has a half-life of ~4 days and a low cord blood to maternal serum concentration (3.6–7.4%); suggested gestation to discontinue is 30–32 weeks.",
+    "explanation_images": [
+      "figures/q012_fig1.png"
+    ]
+  },
+  {
+    "id": 13,
+    "printed_number": "11 (IUFD)",
+    "source_pages": [
+      8
+    ],
+    "question": "Patient had IUFD at 4 days after her EDD. Baby weighed 2.6 kg. She denied postmortem examination. External features of the baby appeared normal on examination. What could be the most probable cause of IUFD?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Congenital anomaly",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Cord accident",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Placental dysfunction",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Karyotype anomalies",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Placental dysfunction",
+    "explanation": "Parents should be advised that no specific cause is found in almost half of stillbirths. An abnormal result might not be linked to the IUFD but rather be simply an incidental finding. Tests should be directed to identify scientifically proven causes of late IUFD. Commonly associated antepartum conditions include congenital malformation, congenital fetal infection, antepartum haemorrhage, pre-eclampsia and maternal disease such as diabetes mellitus. Common causes of intrapartum death include placental abruption, maternal and fetal infection, cord prolapse, idiopathic hypoxia–acidosis and uterine rupture.",
+    "explanation_images": []
+  },
+  {
+    "id": 14,
+    "printed_number": "12",
+    "source_pages": [
+      8,
+      9
+    ],
+    "question": "Asthmatic patient presented in labour. In view of poor control, she was started on prednisolone 5mg since 3 weeks back. What is recommended steroid cover for her during labour?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Give IV hydrocortisone during labour",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Increase prednisolone till respiratory medicine specialist consultation",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Give IV hydrocortisone only if she is planned for CS",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Continue prednisolone 5mg oral and offer hydrocortisone IV during labour",
+        "correct": true
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Continue prednisolone 5mg oral and offer hydrocortisone IV during labour",
+    "explanation": "For adrenal insufficiency or those taking long-term oral steroids (equivalent to 5 mg or more prednisolone daily for more than 3 weeks): for women planning a vaginal birth, continue their regular oral steroids and give IV hydrocortisone; for women having a planned or emergency caesarean section, continue their regular oral steroids and give IV hydrocortisone when starting anaesthesia.",
+    "explanation_images": []
+  },
+  {
+    "id": 15,
+    "printed_number": "13",
+    "source_pages": [
+      9
+    ],
+    "question": "What is the recommended fluid management in a patient with pulse 120/min, BP 90/60 mmHg presenting with diabetic ketoacidosis?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "1 l normal saline in 1hr",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "5 litre NS in 1 hr",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "1 l dextrose normal saline in 1 hr",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "0.9% normal saline 50 ml/kg/hr",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Several options mentioning various combinations",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "1 l normal saline in 1hr",
+    "explanation": "Fluid replacement should be commenced by infusing isotonic saline (0.9%), as most patients have a negative fluid balance of about 100 ml/kg of body weight. This represents a total fluid deficit of approximately 6–10 l. The IV infusion should be started at 10–15 ml/kg/h in the first hour, after which the rate should be adjusted according to the haemodynamic status of the patient, guided by monitoring of blood pressure, urine output and central venous pressure in selected cases. When blood glucose falls below 14 mmol/l (250 mg/dL), add dextrose 10% 125 ml/hour to the ongoing saline IV fluid therapy.",
+    "explanation_images": [
+      "figures/q015_fig1.png"
+    ]
+  },
+  {
+    "id": 16,
+    "printed_number": "14",
+    "source_pages": [
+      10,
+      11
+    ],
+    "question": "In an ongoing CPR on a collapsed type 1 diabetic patient, results of blood work show blood glucose at 4 mmol. She was at 23 wk GA and felt cold and clammy before the collapse. What is the next management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "IM adrenaline",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Glucose infusion",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "IV adrenaline",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "IM glucagon",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Glucose infusion",
+    "explanation": "Advise pregnant women with diabetes who are taking insulin to maintain their capillary plasma glucose level above 4 mmol/litre. Common, reversible causes of maternal cardiopulmonary arrest (the 4 H's and 4 T's) should be considered throughout the resuscitation process. Emergency treatment of hypoglycaemia is chosen according to the condition of the patient: if conscious and able to swallow give oral fast-acting carbohydrate (Step A); if unconscious/fitting/unable to swallow, stop any IV insulin and give 10% glucose infusion 200 ml over 10 mins (or 20% glucose 100 ml stat) and/or IM glucagon 1 mg.",
+    "explanation_images": [
+      "figures/q016_fig1.png",
+      "figures/q016_fig2.png"
+    ]
+  },
+  {
+    "id": 17,
+    "printed_number": "15",
+    "source_pages": [
+      11
+    ],
+    "question": "What is the risk in a patient with corrected tetralogy of Fallot according to the modified WHO classification of maternal cardiovascular risk?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Class I",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Class II",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Class III",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Class IV",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Class V",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Class II",
+    "explanation": "According to the modified WHO classification of maternal cardiovascular risk, repaired tetralogy of Fallot is Class II (small increased risk of maternal mortality or moderate increase in morbidity). Class II also includes unoperated atrial or ventricular septal defect and most arrhythmias.",
+    "explanation_images": [
+      "figures/q017_fig1.png"
+    ]
+  },
+  {
+    "id": 18,
+    "printed_number": "16",
+    "source_pages": [
+      12,
+      13
+    ],
+    "question": "What is the fluid deficit cut off to prevent fluid overload when using an isotonic solution in operative hysteroscopy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "2500 ml",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "1000 ml",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "1500 ml",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "750 ml",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "2500 ml",
+    "explanation": "Definition of fluid overload: a fluid deficit of more than 1000 ml should be used as the threshold when using hypotonic solutions in healthy women of reproductive age [C]; a fluid deficit of 2500 ml should be used as the threshold when using isotonic solutions in healthy women of reproductive age [GPP]. A maximum fluid deficit of 1000 ml (hypotonic) or 2500 ml (isotonic) should be set in a healthy woman and surgery stopped on reaching this limit. Lower thresholds apply in the elderly and women with cardiovascular, renal or other co-morbidities (suggested upper limits 750 ml hypotonic and 1500 ml isotonic).",
+    "explanation_images": [
+      "figures/q018_fig1.png",
+      "figures/q018_fig2.png"
+    ]
+  },
+  {
+    "id": 19,
+    "printed_number": "17",
+    "source_pages": [
+      13,
+      14
+    ],
+    "question": "Patient is planned to undergo laparoscopic hysterectomy for benign disease. She is hypertensive and has a history of atrial fibrillation. She is on warfarin which was stopped 5 days before operation. What is the recommendation for bridging thromboprophylaxis for her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "No need for bridging therapy",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Bridge with prophylactic LMWH and stop 24 hours before operation",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Bridge with prophylactic LMWH and stop 48 hours before operation",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Bridge with therapeutic LMWH and stop 24 hours before operation",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Bridge with therapeutic LMWH and stop 48 hours before operation",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Bridge with therapeutic LMWH and stop 24 hours before operation",
+    "explanation": "All patients taking warfarin should stop treatment 5 days before surgery, irrespective of their risk of intraoperative bleeding. Bridge with therapeutic-dose LMWH, with the therapeutic dose stopped 24 hours before surgery; bridging with LMWH should be continued until the INR is in therapeutic range. Warfarin can be resumed at the normal maintenance dose the evening of surgery or the next day if haemostasis is adequate. For procedures with a high bleeding risk, the British Society of Haematology recommends that bridging (full-dose anticoagulation) should not be restarted until at least 48 hours after the procedure.",
+    "explanation_images": [
+      "figures/q019_fig1.png"
+    ]
+  },
+  {
+    "id": 20,
+    "printed_number": "18",
+    "source_pages": [
+      14,
+      15
+    ],
+    "question": "What is the recommended imaging technique for levator ani muscle avulsion injury?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "MRI",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Transperineal USG",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Transvaginal USG",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Endoanal USG",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Tomographic imaging",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Tomographic imaging",
+    "explanation": "Maternal birth trauma in the form of levator ani muscle (LAM) avulsion occurs in 10–36% of women during vaginal childbirth. Forceps is the primary modifiable risk factor (odds ratios 4–5 for avulsion relative to Ventouse); rotational forceps appear particularly traumatic. In equivocal cases, a levator–urethra gap of greater than 25 mm can clarify findings. Since diagnosis by palpation has poor agreement with both transperineal and endovaginal ultrasound, diagnosis using tomographic imaging is currently the gold standard. (Note: the correct option was not highlighted in the source document; it is inferred from the explanation.)",
+    "explanation_images": [
+      "figures/q020_fig1.png"
+    ],
+    "answer_inferred": true
+  },
+  {
+    "id": 21,
+    "printed_number": "19",
+    "source_pages": [
+      15
+    ],
+    "question": "What is the recommended venous thromboprophylaxis for a 35 yr old patient who underwent elective CS? Her BMI was 24.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "No need of thromboprophylaxis",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Consider thromboprophylaxis for at least 10 days",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "At least 6 weeks' postnatal prophylactic LMWH",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Consider extending thromboprophylaxis with LMWH",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Early mobilisation and avoidance of dehydration",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Early mobilisation and avoidance of dehydration",
+    "explanation": "A woman undergoing elective caesarean section with no additional risk factors (age 35, BMI 24) does not require pharmacological thromboprophylaxis; early mobilisation and avoidance of dehydration are recommended.",
+    "explanation_images": []
+  },
+  {
+    "id": 22,
+    "printed_number": "20",
+    "source_pages": [
+      16
+    ],
+    "question": "What is the venous thromboprophylaxis recommendation for a G3, 36 years old patient with heterozygous prothrombin gene mutation? Her weight is 98 kg.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "5000u dalteparin twice daily",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "2500u dalteparin once daily",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "40 mg enoxaparin once daily",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "60 mg enoxaparin twice daily",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "7500u dalteparin once daily",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "7500u dalteparin once daily",
+    "explanation": "Heterozygosity for factor V Leiden or prothrombin gene mutation or antiphospholipid antibodies are risk factors for thrombosis in asymptomatic women; parity ≥ 3 and age > 35 years are additional risk factors. Suggested thromboprophylactic LMWH dose by weight (Table 3): for 91–130 kg, dalteparin 7500 units daily (or enoxaparin 60 mg daily).",
+    "explanation_images": [
+      "figures/q022_fig1.png"
+    ]
+  },
+  {
+    "id": 23,
+    "printed_number": "21",
+    "source_pages": [
+      17
+    ],
+    "question": "A long scenario describing a 65 kg patient requiring thromboprophylaxis. Options given were various doses of LMWH.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "5000u dalteparin twice daily",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "2500u dalteparin once daily",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "40 mg enoxaparin once daily",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "60 mg enoxaparin twice daily",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "7500u dalteparin once daily",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "40 mg enoxaparin once daily",
+    "explanation": "Thromboprophylactic LMWH dose is based on booking/early-pregnancy weight (Table 3). For a woman weighing 50–90 kg, the dose is enoxaparin 40 mg daily (or dalteparin 5000 units daily). VTE risk assessment (Appendix III): if total score ≥ 4 antenatally consider thromboprophylaxis from the first trimester; if score 3, from 28 weeks; if score ≥ 2 postnatally, for at least 10 days.",
+    "explanation_images": [
+      "figures/q023_fig1.png",
+      "figures/q023_fig2.png"
+    ]
+  },
+  {
+    "id": 24,
+    "printed_number": "22",
+    "source_pages": [
+      17,
+      18
+    ],
+    "question": "Antenatal patient presented with hyperemesis gravidarum. Her PUQE score was 10. She continued vomiting despite a combination of first line medications. What action is to be taken?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Ondansetron",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Ondansetron and domperidone",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Cyclizine and ondansetron",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Add Metoclopramide",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Prochlorperazine",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Add Metoclopramide",
+    "explanation": "Be careful: if one drug is used you can use a combination of up to 3 medications. When up-titrating antiemetics, add drugs from different classes rather than replacing them, as they may have synergistic effects; some women require a combination of 3+ antiemetics. First line: doxylamine/pyridoxine, cyclizine, prochlorperazine, promethazine, chlorpromazine. Second line: metoclopramide, domperidone, ondansetron. Third line: prednisolone. As the patient failed first-line combination, add a second-line agent (metoclopramide).",
+    "explanation_images": [
+      "figures/q024_fig1.png"
+    ]
+  },
+  {
+    "id": 25,
+    "printed_number": "23",
+    "source_pages": [
+      18,
+      19
+    ],
+    "question": "What is the recommended management of recurrent genital herpes in a woman at 20 weeks of gestation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Daily suppressive dose from now",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Daily suppressive dose from 36 weeks",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Saline bath",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Analgesia",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Daily suppressive dose from 36 weeks",
+    "explanation": "Recurrences usually resolve within 7–10 days without antiviral treatment. Supportive treatment measures usually suffice (e.g. saline bathing, paracetamol). Vaginal delivery should be anticipated. Consider daily suppressive aciclovir 400 mg TDS from 36 weeks (increased dose compared with standard suppression in non-pregnant patients). Discuss risks, benefits and alternatives with women. Sequential PCR culture during late pregnancy or delivery is not indicated.",
+    "explanation_images": []
+  },
+  {
+    "id": 26,
+    "printed_number": "24",
+    "source_pages": [
+      19
+    ],
+    "question": "Woman was on combined oral contraceptive pills. She missed the pill on day 10 and had UPSI after 16 hours. She visited the contraceptive clinic the next day. What is the further course recommended for her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Reassure her, take the missed pill as soon as possible",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Consider EC, take the missed pill as soon as possible",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Consider EC, take the missed pill as soon as possible; condoms should be used or sex avoided until pills have been taken for 7 consecutive days",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Consider EC, take the missed pill as soon as possible; condoms should be used or sex avoided until pills have been taken for 7 consecutive days; UPT from 3 wks of last UPSI",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Reassure her, take the missed pill as soon as possible",
+    "explanation": "A COC pill is missed if it is not taken within 24 hours after it should have been taken. For 1 missed pill (48 to <72 hours since the last pill in the current pack was taken), whether in week 1, 2 or 3: take the missed pill as soon as possible, continue the remaining pills at the usual time, EC is not required and no additional contraceptive precaution is required (provided consistent, correct use previously). Reassure and advise to take the missed pill as soon as possible.",
+    "explanation_images": [
+      "figures/q026_fig1.png"
+    ]
+  },
+  {
+    "id": 27,
+    "printed_number": "25",
+    "source_pages": [
+      19,
+      20
+    ],
+    "question": "Antenatal mother who is a school teacher presented with a lacy rash associated with fever. Which of the following is the most probable infection?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Parvovirus infection",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "CMV",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Toxoplasmosis",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Measles",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Rubella",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Parvovirus infection",
+    "explanation": "Parvovirus B19 infection has a wide range of consequences, from minor febrile illness to erythema infectiosum (fifth disease, slapped cheek syndrome) — a generalised lacy rash illness clinically indistinguishable from rubella — aplastic crises, arthropathy, and persistent infection in the immunocompromised. Recent infection can be confirmed by parvovirus B19-specific IgM on the first serum from the day after rash onset. Management of proven infection includes specialist advice, serial ultrasound scanning and Doppler assessment (fetal anaemia/hydrops), with intrauterine transfusion improving outcome.",
+    "explanation_images": []
+  },
+  {
+    "id": 28,
+    "printed_number": "26",
+    "source_pages": [
+      20
+    ],
+    "question": "A woman in her 60s was newly diagnosed with lichen sclerosus. What action is to be taken as part of further investigations?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Thyroid profile",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Fasting blood sugar",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "OGTT",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Wedge biopsy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Thyroid profile",
+    "explanation": "Investigation for autoimmune disease if clinically indicated, especially thyroid dysfunction (i.e. thyroid autoantibodies and TSH), as it can commonly be present together with lichen sclerosus.",
+    "explanation_images": []
+  },
+  {
+    "id": 29,
+    "printed_number": "27",
+    "source_pages": [
+      20,
+      21
+    ],
+    "question": "HPE of the LLETZ specimen measuring 3x3 cm showed an invasive carcinoma of the cervix with stromal invasion of 1 mm depth, and 6 mm of surrounding tissue showed CIN3. The specimen had a clear margin of >5 mm. What is the stage of cancer cervix?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Stage IA1",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Stage IA2",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Stage IB1",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Stage IB2",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Stage IA1",
+    "explanation": "FIGO staging of cervical cancer: Stage IA is invasive carcinoma diagnosed only by microscopy, with maximum depth of invasion ≤5 mm. IA1 = measured stromal invasion ≤3 mm in depth; IA2 = >3 and ≤5 mm. With 1 mm stromal invasion, this is Stage IA1.",
+    "explanation_images": [
+      "figures/q029_fig1.png"
+    ]
+  },
+  {
+    "id": 30,
+    "printed_number": "28",
+    "source_pages": [
+      21
+    ],
+    "question": "Staging laparotomy for cancer confined to the right ovary was done. The peritoneal washings show malignant cells. What is the stage of the tumour?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "IA",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "IIB",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "IC1",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "IC2",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "IC3",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "IC3",
+    "explanation": "FIGO staging of ovarian cancer, Stage I (tumour confined to ovaries/fallopian tubes): IA = limited to 1 ovary, capsule intact, no malignant cells in washings; IC = limited to 1 or both ovaries with any of: IC1 surgical spill, IC2 capsule ruptured before surgery or tumour on surface, IC3 malignant cells in the ascites or peritoneal washings. Malignant cells in peritoneal washings with tumour confined to one ovary = Stage IC3.",
+    "explanation_images": [
+      "figures/q030_fig1.png"
+    ]
+  },
+  {
+    "id": 31,
+    "printed_number": "29",
+    "source_pages": [
+      21,
+      22
+    ],
+    "question": "Patient came to gyne clinic with a pigmented vulval lesion measuring 8 mm. What action would you take?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Incisional biopsy",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Excisional biopsy",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Punch biopsy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Incisional biopsy",
+    "explanation": "Diagnosis: incisional biopsy (punch or wedge biopsy) ideally including the edge of a lesion, where there is a transition from normal to abnormal tissue. Biopsies should avoid a central ulcer, since this may not be diagnostic, and should be of adequate depth to allow differentiation between superficially invasive lesions and those with invasion >1 mm, since this informs subsequent management.",
+    "explanation_images": [
+      "figures/q031_fig1.png"
+    ]
+  },
+  {
+    "id": 32,
+    "printed_number": "30",
+    "source_pages": [
+      22
+    ],
+    "question": "What is the recommended management to prevent recurrence of Bartholin's abscess in a patient who was treated before?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Word catheter method",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Marsupialization",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Sclerotherapy",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Needle aspiration",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Jacobi ring catheter",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Marsupialization",
+    "explanation": "Marsupialization is recommended to prevent recurrence of Bartholin's abscess/cyst. Comparative recurrence rates: balloon Word catheter 12% at 12 months (23% premature expulsion, painful, latex allergy contraindication); Jacobi ring catheter 4% at 12 months (needs two incisions, painful); alcohol sclerotherapy 8–10% within 6–7 months (risk of necrosis, haematoma, dyspareunia); silver nitrate sclerotherapy 3.8% at 2 months (scarring, chemical burns); needle aspiration 13% recurrence (not recommended).",
+    "explanation_images": []
+  },
+  {
+    "id": 33,
+    "printed_number": "31",
+    "source_pages": [
+      23
+    ],
+    "question": "During a difficult gynaecology surgery a bladder injury was diagnosed intra-operatively and primary repair was done. Postoperative cystoscopy was done and an adequate repair was ascertained. Now the patient presented with urine leak through the vagina. How to investigate her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Cystoscopy",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Cystogram",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "MRI",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "CT urogram",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Intravenous pyelogram",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Cystoscopy",
+    "explanation": "In late presentations where a fistula is suspected, diagnosis is supported by filling the bladder with dye (e.g. methylene blue) and demonstrating vaginal leakage; MRI provides good tissue contrast and can be diagnostic for a vesico-vaginal fistula. Bladder repairs should be watertight and tested (methylene blue or indigo carmine); a catheter is inserted with continuous drainage for 2 weeks. Before catheter removal, complete repair without leakage should be confirmed by retrograde cystography; if contrast escapes, leave the catheter and repeat in 1 week. Cystoscopic examination can assist in the decision.",
+    "explanation_images": []
+  },
+  {
+    "id": 34,
+    "printed_number": "32",
+    "source_pages": [
+      23,
+      24
+    ],
+    "question": "Following a laparoscopic gyne surgery for endometriosis, the patient presented with left-sided flank pain, haematuria and fever. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Ureteric injury",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Bladder injury",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Bowel injury",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Urinary tract infection",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Ureteric injury",
+    "explanation": "Any failure to recover as anticipated following major laparoscopic pelvic surgery must raise suspicion of a ureteric injury. Flank pain and tenderness, haematuria, oliguria or watery vaginal loss may be present within the first 48 hours of an acute injury (uroperitoneum).",
+    "explanation_images": []
+  },
+  {
+    "id": 35,
+    "printed_number": "33",
+    "source_pages": [
+      24,
+      25
+    ],
+    "question": "Patient from Zambia had no antenatal care. The newborn is noticed to have nasal stuffiness, sabre shin, rashes on palms and soles and hepatosplenomegaly. What is the diagnosis?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Early congenital syphilis",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Late congenital syphilis",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Zika infection",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "CMV",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Parvovirus",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Fetal varicella syndrome",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Early congenital syphilis",
+    "explanation": "Early congenital syphilis (within two years): approximately half of neonates are normal on initial examination. Common manifestations (40–60% have at least one) include rash, haemorrhagic rhinitis (bloody snuffles), generalised lymphadenopathy, hepatosplenomegaly and skeletal abnormalities. Other signs: condylomata lata, vesiculobullous lesions, osteochondritis, periostitis, pseudoparalysis, mucous patches, perioral fissures, non-immune hydrops, glomerulonephritis, neurological/ocular involvement, haemolysis, thrombocytopenia. Late congenital syphilis shows stigmata such as interstitial keratitis, Clutton's joints, Hutchinson's incisors, mulberry molars, saddlenose deformity and sabre shins.",
+    "explanation_images": [
+      "figures/q035_fig1.png",
+      "figures/q035_fig2.png"
+    ]
+  },
+  {
+    "id": 36,
+    "printed_number": "34",
+    "source_pages": [
+      25
+    ],
+    "question": "What is the major cause of mortality in women with epilepsy during pregnancy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "SUDEP",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Usage of lamotrigine",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Drowning",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Status epilepticus",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Change of medications",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "SUDEP",
+    "explanation": "SUDEP (sudden unexpected death in epilepsy): poorly controlled seizures is the main contributory factor. The higher risk in pregnancy is explained partly by the relatively common use of lamotrigine and reduced serum drug levels with advancing gestation, potentially increasing seizure frequency.",
+    "explanation_images": []
+  },
+  {
+    "id": 37,
+    "printed_number": "35",
+    "source_pages": [
+      25,
+      26
+    ],
+    "question": "A prepubescent girl presents with vulvovaginal discharge. Her smear shows gram-negative diplococci. What is the possible cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Group A beta-haemolytic streptococci",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Staphylococci",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Candida",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Neisseria",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Mixed bacterial flora",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Neisseria",
+    "explanation": "Gram-negative diplococci indicate Neisseria gonorrhoeae. Causes of childhood vulvovaginitis: most common is non-specific with mixed bacterial flora; infective causes include Group A beta-haemolytic streptococcus, Haemophilus influenzae, and Candida (unusual); systemic infections include varicella, measles, rubella, diphtheria, shigella; vulval dermatitis (soap, bubble bath, sandpit, urine/faeces contact, irritants) and foreign bodies are non-infective causes.",
+    "explanation_images": [
+      "figures/q037_fig1.png"
+    ]
+  },
+  {
+    "id": 38,
+    "printed_number": "36",
+    "source_pages": [
+      26
+    ],
+    "question": "A labouring woman was exhausted. During vacuum delivery, the cup popped off twice with good descent after each application. Vertex is now at +2. How to proceed further, since she has consented only for vacuum delivery?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Low vacuum application",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Midcavity in labour ward",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Instrumental delivery trial",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Cat 1 CS",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Cat 2 CS",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Cat 1 CS",
+    "explanation": "After 2 pop-offs of the vacuum, discontinue vacuum delivery. Although the station is low (+2) and forceps could technically be applied, the patient gave consent only for vacuum, so proceed to caesarean section. Discontinue vacuum-assisted birth if two 'pop-offs' of the instrument occur; consider the consequences of a failed attempt at operative vaginal birth (increased trauma/OASI with sequential instruments, increased maternal morbidity and fetal head impaction at caesarean in second stage).",
+    "explanation_images": [
+      "figures/q038_fig1.png"
+    ]
+  },
+  {
+    "id": 39,
+    "printed_number": "37",
+    "source_pages": [
+      27
+    ],
+    "question": "An antenatal woman presented with retro-orbital headache on and off since her 20th week. Her BMI is 40. Examination showed no focal neurological deficit. Her headache increased with cough. Examination showed features suggestive of 6th nerve palsy. What is the best investigation to confirm the diagnosis?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Fundoscopy",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Lumbar puncture",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "MR angiogram",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "CT",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "MRI brain",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Lumbar puncture",
+    "explanation": "Idiopathic intracranial hypertension (IIH) — Modified Dandy criteria: signs/symptoms of raised ICP (headache, nausea, vomiting, transient visual obscurations, papilloedema); no localising neurological signs except unilateral/bilateral sixth-nerve paresis; CSF shows increased pressure but no cytological/chemical abnormality; normal to small symmetric ventricles. The lumbar CSF opening pressure should be >250 mmH2O in the lateral decubitus position to diagnose IIH — CSF opening pressure is vital to confirm the diagnosis. Neuroimaging (CT adequate) is used to exclude other causes such as hydrocephalus.",
+    "explanation_images": [
+      "figures/q039_fig1.png"
+    ]
+  },
+  {
+    "id": 40,
+    "printed_number": "38",
+    "source_pages": [
+      27
+    ],
+    "question": "An antenatal patient came with a history of headache which started in week 20. Her BMI is 37. Examination showed no focal neurological symptoms. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Benign intracranial hypertension",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Migraine",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Tension headache",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "SAH",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Benign intracranial hypertension",
+    "explanation": "There is not enough information in the question, but with a raised BMI and headache the probable cause is benign intracranial hypertension (idiopathic intracranial hypertension), especially if there is papilloedema and all imaging is normal. (Note: the correct option was not highlighted in the source; it is inferred from the accompanying note.)",
+    "explanation_images": [],
+    "answer_inferred": true
+  },
+  {
+    "id": 41,
+    "printed_number": "39",
+    "source_pages": [
+      27,
+      28
+    ],
+    "question": "Patient presented with acute RIF pain. An ultrasound showed a right-sided ovarian mass. Consent was obtained for laparoscopy + open and biopsy if needed. During laparoscopy, on visualising the peritoneal cavity, this was found to be a pedunculated tortuous hyperaemic fibroid approaching the right ovary. How to proceed with the management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Do as consented",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Remove the fibroid",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Detorsion, abandon the procedure",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Remove the ovary",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Follow up in gyne clinic",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Detorsion, abandon the procedure",
+    "explanation": "Unexpected pathology: if unexpected disease is found at operation for which additional procedures are indicated, treatment may only be performed if the woman was made aware and consented to it beforehand; if such a preoperative discussion has not occurred, additional treatment should not take place. Where a complication that is itself life-threatening occurs, corrective surgery must proceed. Otherwise it is unwise to proceed with additional procedures without discussing with the woman. Here, detorse and abandon the procedure.",
+    "explanation_images": [
+      "figures/q041_fig1.png"
+    ]
+  },
+  {
+    "id": 42,
+    "printed_number": "40",
+    "source_pages": [
+      28
+    ],
+    "question": "A pregnant patient is brought to the ER with multiple trauma owing to a road traffic accident. How to investigate?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "MRI",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Full body X-ray",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Full body CT",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "MRI with IV contrast",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Full body CT",
+    "explanation": "",
+    "explanation_images": []
+  },
+  {
+    "id": 43,
+    "printed_number": "41",
+    "source_pages": [
+      28
+    ],
+    "question": "A surgeon was doing an elective laparoscopic cholecystectomy. During surgery, a complex 10 cm ovarian mass was visualised on the left ovary. How to proceed in this situation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Do as consented",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Abandon procedure",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Remove",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Seek another opinion",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Take a biopsy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Do as consented",
+    "explanation": "Generally, it is unwise to proceed with any additional surgical procedures without discussing them with the woman, even if this means a second operation, unless clear boundaries about additional procedures were documented and consented before the procedure. Complete the operation as consented (cholecystectomy) and plan the ovarian mass separately.",
+    "explanation_images": []
+  },
+  {
+    "id": 44,
+    "printed_number": "42",
+    "source_pages": [
+      28
+    ],
+    "question": "You are doing endometriosis surgery for a patient with severe adhesions. She consented for laparotomy if needed. During removal of the (x) ovary from (y) endometriosis, there was brisk bleeding and the patient gets worse. Ovarian artery injury was suspected.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Wait for your colleague",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Wait for second opinion",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Try to separate x from y",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Laparotomy and pan to remove y",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Removal of x to stop bleeding",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Removal of x to stop bleeding",
+    "explanation": "",
+    "explanation_images": []
+  },
+  {
+    "id": 45,
+    "printed_number": "43",
+    "source_pages": [
+      29
+    ],
+    "question": "A patient who is a Jehovah's Witness is prepped for laparoscopic ovarian cystectomy. She signed an advance directive mentioning no blood transfusion. Following the surgery, the patient collapsed in the ward. Her examination showed signs of intra-abdominal collection. The patient is drowsy. How to proceed?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Perform a laparotomy in best-interest principle",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Adhere to advanced directive",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Need written consent from patient",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Patient consent is valid",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Verbal consent from patient",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Written consent from husband",
+        "correct": false
+      },
+      {
+        "letter": "g",
+        "text": "Wait for legal board for further treatment",
+        "correct": false
+      },
+      {
+        "letter": "h",
+        "text": "Patient consent is not valid",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Perform a laparotomy in best-interest principle",
+    "explanation": "Attempt to stop the bleeding and manage the acute intra-abdominal haemorrhage (laparotomy) under the best-interest principle, while respecting the valid advance directive refusing blood — so NO blood transfusion is given.",
+    "explanation_images": []
+  },
+  {
+    "id": 46,
+    "printed_number": "44",
+    "source_pages": [
+      29
+    ],
+    "question": "A 15 year old girl and her 18 year old partner came for termination of an unwanted pregnancy. The girl lives with her father and occasionally visits her mother. She doesn't wish to tell her parents. How to proceed?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Proceed termination with the girl's consent if she is deemed to have capacity",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Encourage her to tell the parents",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Consent from partner",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Consent from parents",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Legal consent",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Proceed termination with the girl's consent if she is deemed to have capacity",
+    "explanation": "If the young person is deemed to have capacity (Gillick competent), proceed with termination using her own consent. Parental involvement should be encouraged but cannot be required if she is competent and refuses.",
+    "explanation_images": []
+  },
+  {
+    "id": 47,
+    "printed_number": "45",
+    "source_pages": [
+      29
+    ],
+    "question": "What is the risk of offspring being affected when both parents are carriers of cystic fibrosis?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "All the offspring",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "½",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "¼",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "All are carriers",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "¼",
+    "explanation": "Cystic fibrosis is autosomal recessive. When both parents are carriers (Cc × Cc), the Punnett square gives CC (1/4 unaffected), Cc and Cc (1/2 carriers) and cc (1/4 affected). Therefore the risk of an affected child is 1/4.",
+    "explanation_images": []
+  },
+  {
+    "id": 48,
+    "printed_number": "46",
+    "source_pages": [
+      29
+    ],
+    "question": "A premenopausal patient comes to the gyne emergency with abdominal pain and USG revealed an ovarian cyst with mixed echogenicity measuring 8x7x8 cm. What is the best management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Antibiotics",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Conservative management",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Lap cystectomy",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Laparotomy",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Ovarian cystectomy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Lap cystectomy",
+    "explanation": "A persistent large (8 cm) complex/mixed-echogenicity ovarian cyst in a premenopausal woman presenting with pain is best managed by laparoscopic cystectomy.",
+    "explanation_images": []
+  },
+  {
+    "id": 49,
+    "printed_number": "47",
+    "source_pages": [
+      30,
+      31
+    ],
+    "question": "How many more women would need to undergo peripartum hysterectomy if caesarean section was done compared to a vaginal delivery?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "65 more women / 100000",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "200 more women / 100000",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "24 more women / 100000",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "80 more women / 100000",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "150 more women / 100000",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "65 more women / 100000",
+    "explanation": "RCOG consent data (Table 1, outcomes more likely with caesarean birth): about 65 more women per 100,000 who had a caesarean birth would be expected to have a peripartum hysterectomy (about 200 per 100,000 with caesarean vs about 100 per 100,000 with vaginal birth), so for about 99,935 women per 100,000 the outcome was the same irrespective of mode of birth.",
+    "explanation_images": [
+      "figures/q049_fig1.png",
+      "figures/q049_fig2.png"
+    ]
+  },
+  {
+    "id": 50,
+    "printed_number": "48",
+    "source_pages": [
+      31
+    ],
+    "question": "Patient was on warfarin for AF. Her INR is maintained at 2.5. She is planned for polypectomy. Preoperatively, the INR is 1.6. How to proceed in this situation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Give Phytomenadione",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Repeat INR and review",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Defer operation until proper bridging",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Proceed for surgery",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Give Phytomenadione",
+    "explanation": "Warfarin should be stopped 5 days before elective surgery with an INR check ideally the day before surgery: if the INR is >1.5 the day before surgery, phytomenadione (vitamin K) should be given. Here the INR is 1.6 (>1.5), so give phytomenadione. LMWH bridging is considered in those with high VTE risk. Restart warfarin when haemostasis is achieved (low bleeding risk ~12–24 h; high bleeding risk LMWH not until 48 h after surgery).",
+    "explanation_images": [
+      "figures/q050_fig1.png"
+    ]
+  },
+  {
+    "id": 51,
+    "printed_number": "49",
+    "source_pages": [
+      32
+    ],
+    "question": "Antenatal haemoglobinopathy screening: the woman is of UK origin. Her partner's family of origin is not known. What is the appropriate action?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "No further tests",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "NIPT",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "CVS/amnio",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Newborn screening",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Paternal screening",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Parental karyotyping",
+        "correct": false
+      },
+      {
+        "letter": "g",
+        "text": "Maternal screening",
+        "correct": true
+      }
+    ],
+    "correct_letter": "g",
+    "correct_answer": "Maternal screening",
+    "explanation": "When the father's origin is unknown (or from a high-prevalence area), this is considered high risk. Offer a blood test for the mother (maternal screening) to identify whether she is a carrier. Sickle cell screening: Family Origin Questionnaire → if high risk, HPLC → if carrier, test father → if both carriers, offer prenatal invasive testing (CVS/amniocentesis). Thalassaemia screening is offered to all pregnant women in the UK (MCH <27 pg → HPLC → test father → invasive testing if both carriers).",
+    "explanation_images": [
+      "figures/q051_fig1.png"
+    ]
+  },
+  {
+    "id": 52,
+    "printed_number": "50",
+    "source_pages": [
+      33
+    ],
+    "question": "Parents are carriers for CAH (congenital adrenal hyperplasia). What is the risk of offspring inheriting the disease?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "1 in 2",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "1 in 4",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "3 in 4",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "No risk of offspring inheriting the disease",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "1 in 4",
+    "explanation": "CAH is autosomal recessive. When both parents are carriers (Aa × Aa), the Punnett square gives AA (1/4 unaffected), Aa and Aa (1/2 carriers) and aa (1/4 affected). The risk of an affected child is 1 in 4.",
+    "explanation_images": []
+  },
+  {
+    "id": 53,
+    "printed_number": "51",
+    "source_pages": [
+      33,
+      34
+    ],
+    "question": "Woman presented with features of overactive bladder. Her urodynamic findings confirmed her symptoms. Which of the following is representative of detrusor overactivity (DO)?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Evidence of leak with provocation, with no rise in Pdet",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Provoked or unprovoked rise in detrusor pressure that is abnormal and correlates with leak: positive flow during filling / Pabd stable / Pdet increase 2–27 / leakage +/− / normal flow",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Rise in detrusor pressure during filling, but the pressure falls to normal when filling is stopped",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Provoked or unprovoked rise in detrusor pressure that is abnormal and correlates with leak: positive flow during filling / Pabd stable / Pdet increase 2–27 / leakage +/− / normal flow",
+    "explanation": "Detrusor overactivity (DO) is characterised by involuntary detrusor contractions during the filling phase (spontaneous or provoked, amplitudes >15 cm H2O) that are abnormal and correlate with leak. Phasic DO = waves of contraction that may or may not be associated with incontinence; terminal DO = a single involuntary contraction at cystometric capacity; cough-associated DO = onset immediately following a cough pressure peak. (Option c describes poor detrusor accommodation; option a describes urodynamic stress incontinence.)",
+    "explanation_images": [
+      "figures/q053_fig1.png"
+    ]
+  },
+  {
+    "id": 54,
+    "printed_number": "52",
+    "source_pages": [
+      34
+    ],
+    "question": "Patient underwent mid-urethral tape in the past for SUI. Following her surgery she was symptom free for some time, and now presents again with SUI. No residual urine on investigations. What is the next step in her management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Urodynamics",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Colposuspension",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "TVT again",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Bulking agents",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Cystoscopy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Urodynamics",
+    "explanation": "For recurrent stress urinary incontinence after a previous continence procedure, the best investigation is urodynamics; subsequent management is often with urethral bulking agents.",
+    "explanation_images": []
+  },
+  {
+    "id": 55,
+    "printed_number": "53",
+    "source_pages": [
+      34,
+      35
+    ],
+    "question": "A pregnant woman at 7 weeks amenorrhoea came with complaint of spotting. USG shows a thickened endometrium with no intrauterine/extrauterine gestational sac (pregnancy of unknown location). On hCG follow up, the rise was 360 iu from 340 iu in 48 hours. How to proceed now?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "hCG after 1 week",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "US after 2 weeks",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "TVS after 1 week",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "TVS after 2 weeks",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Urgent review in early pregnancy unit within 24 hr",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Urgent review in early pregnancy unit within 24 hr",
+    "explanation": "For a woman with a pregnancy of unknown location and a decrease in serum hCG of less than 50%, or an increase of less than 63% over 48 hours, refer her for clinical review in the early pregnancy assessment service within 24 hours. A rise from 340 to 360 iu is a sub-optimal rise (<63%), so urgent EPU review within 24 hours is required (risk of ectopic).",
+    "explanation_images": [
+      "figures/q055_fig1.png",
+      "figures/q055_fig2.png"
+    ]
+  },
+  {
+    "id": 56,
+    "printed_number": "54",
+    "source_pages": [
+      35
+    ],
+    "question": "What is the initial management in a patient with a large cystocele and complaint of SUI?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "PMFT (pelvic floor muscle training)",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Urodynamic test",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Pessary",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "PMFT (pelvic floor muscle training)",
+    "explanation": "Initial (first-line) management is pelvic floor muscle training (PMFT).",
+    "explanation_images": []
+  },
+  {
+    "id": 57,
+    "printed_number": "55",
+    "source_pages": [
+      35,
+      36
+    ],
+    "question": "What is the management of a persistent simple ovarian cyst in a postmenopausal woman? Her RMI is <200 and CA125 is normal.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Bilateral salpingo-oophorectomy",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Laparoscopic BSO",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "TAH with BSO",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Discharge from follow up",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Repeat assessment in four months",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Repeat assessment in four months",
+    "explanation": "Asymptomatic, simple, unilateral, unilocular ovarian cysts less than 5 cm in diameter have a low risk of malignancy. With normal serum CA125 (RMI <200), they can be managed conservatively with a repeat evaluation in 4–6 months (CA125, TVS ± TAS). It is reasonable to discharge after 1 year if the cyst remains unchanged or reduces in size with normal CA125, considering the woman's wishes and surgical fitness.",
+    "explanation_images": [
+      "figures/q057_fig1.png"
+    ]
+  },
+  {
+    "id": 58,
+    "printed_number": "56",
+    "source_pages": [
+      36,
+      37
+    ],
+    "question": "A postmenopausal woman was referred for a 4.5 cm simple ovarian cyst on CT scan, found during investigation for a surgical cause. CA125 is 17. What is the most appropriate management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Laparotomy",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "No further management",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Ultrasound and CA125 after 4 months",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Ultrasound and CA125 after 12 months",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Ultrasound after 4-6 months",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Bilateral salpingo-oophorectomy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Ultrasound and CA125 after 4 months",
+    "explanation": "Asymptomatic, simple, unilateral, unilocular ovarian cysts <5 cm with normal CA125 have a low risk of malignancy in postmenopausal women and can be managed conservatively with repeat assessment (ultrasound and CA125) in 4–6 months. Discharge after 1 year if unchanged/reduced with normal CA125.",
+    "explanation_images": [
+      "figures/q058_fig1.png"
+    ]
+  },
+  {
+    "id": 59,
+    "printed_number": "57",
+    "source_pages": [
+      37
+    ],
+    "question": "What is the management of a simple ovarian cyst in a 23-year-old woman? The cyst measures 4.5 cm and is an incidental finding. She has no complaints so far.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Laparotomy",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Reassure, no further management",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Ultrasound and CA125 after 4 months",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Ultrasound and CA125 after 12 months",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Bilateral salpingo-oophorectomy",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Yearly assessment",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Reassure, no further management",
+    "explanation": "Women with small (less than 50 mm diameter) simple ovarian cysts generally do not require follow-up, as these cysts are very likely to be physiological and almost always resolve within 3 menstrual cycles. Cysts of 50–70 mm should have yearly ultrasound follow-up; larger simple cysts should be considered for further imaging (MRI) or surgical intervention.",
+    "explanation_images": [
+      "figures/q059_fig1.png"
+    ]
+  },
+  {
+    "id": 60,
+    "printed_number": "58",
+    "source_pages": [
+      37,
+      38
+    ],
+    "question": "Patient presents with a history of reduced fetal movements. Her CTG shows a baseline of 140 bpm, normal variability, showing repetitive variable decelerations with concerning characteristics. Categorize the CTG.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Normal",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Pathological",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Suspicious",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Reassuring",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Non-reassuring",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Pathological",
+    "explanation": "Repetitive variable decelerations with concerning characteristics represent a pathological feature; a CTG with a pathological feature is classified as pathological.",
+    "explanation_images": []
+  },
+  {
+    "id": 61,
+    "printed_number": "59",
+    "source_pages": [
+      37,
+      38
+    ],
+    "question": "Patient presented with spontaneous rupture of membranes and regular contractions at term. Her examination revealed 4 cm cervical dilatation. 4 hours later, vaginal examination showed 5 cm cervical dilatation. Her CTG is normal. How to manage?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Reassess in 2 hours",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Reassess in 4 hrs",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Start oxytocin",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Perform cat 2 CS",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Perform cat 1 CS",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Reassess in 2 hours",
+    "explanation": "Advise all women with suspected delay in the established first stage of labour to have a vaginal examination 2 hours later, and diagnose delay if progress is less than 1 cm. Here progress was 1 cm over 4 hours, so reassess in 2 hours.",
+    "explanation_images": []
+  },
+  {
+    "id": 62,
+    "printed_number": "60",
+    "source_pages": [
+      38
+    ],
+    "question": "Patient presents in labour at term gestation. She has been diagnosed with cardiac disease in the past — valvular heart disease with functional classification NYHA class 2. How to manage her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Allow normal vaginal delivery",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Cut short second stage by vacuum delivery",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Cut short second stage by forceps delivery",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "CS under GA",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "CS under spinal",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "CS under epidural",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Allow normal vaginal delivery",
+    "explanation": "Most women with well-compensated valvular heart disease (NYHA class 1–2) can be allowed a normal vaginal delivery; caesarean section is reserved for obstetric indications.",
+    "explanation_images": []
+  },
+  {
+    "id": 63,
+    "printed_number": "61",
+    "source_pages": [
+      38
+    ],
+    "question": "Epileptic patient on topiramate came for contraceptive advice. What is the best option for her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "DMPA",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Implant",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Progesterone-only pills",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Barrier method",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "DMPA",
+    "explanation": "Topiramate has enzyme-inducing activity at higher doses; as it is also a teratogen and there is wide inter-individual variability, FSRH advises treating topiramate as a potential enzyme inducer regardless of dose. Recommended contraceptive options are Cu-IUD, LNG-IUS or DMPA (plus condoms). Among the options given, DMPA is the best choice.",
+    "explanation_images": [
+      "figures/q063_fig1.png"
+    ]
+  },
+  {
+    "id": 64,
+    "printed_number": "62",
+    "source_pages": [
+      38,
+      39
+    ],
+    "question": "What is the contraceptive option with the least failure rate?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Tubal ligation",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Vasectomy",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Implant",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "DMPA",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "LNG IUS",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Implant",
+    "explanation": "The progestogen-only implant has the lowest failure rate of the listed methods, at approximately 0.05% with both typical and perfect use.",
+    "explanation_images": [
+      "figures/q064_fig1.png"
+    ]
+  },
+  {
+    "id": 65,
+    "printed_number": "63",
+    "source_pages": [
+      39,
+      40
+    ],
+    "question": "Woman who was on the combined contraceptive ring came with a history of the ring missing for the past 48 hours in the second week following the hormone-free interval. She has a history of UPSI 1 day back. How to counsel her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "EC is not required",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Consider EC",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Consider EC if correct use in the past 1 week",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Skip HFI, no need of EC",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "EC is not required, insert ring ASAP, avoid intercourse for 7 days",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "EC is not required, insert ring ASAP, avoid intercourse for 7 days",
+    "explanation": "For unscheduled ring removal of ≥48 hours in week 2 or 3 after the HFI, if there was correct consistent use in the previous 7 days, emergency contraception is not required. Insert the ring as soon as possible, keep it in until the scheduled removal day, and use condoms or avoid sex until the new ring has been used for 7 consecutive days.",
+    "explanation_images": [
+      "figures/q065_fig1.png",
+      "figures/q065_fig2.png",
+      "figures/q065_fig3.png"
+    ]
+  },
+  {
+    "id": 66,
+    "printed_number": "64",
+    "source_pages": [
+      40,
+      41
+    ],
+    "question": "Epileptic patient on carbamazepine needs emergency contraception. She has a past history of PID. What to offer her?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Copper T",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "LNG EC",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "UPA EC",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Double dose LNG EC",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Double dose UPA EC",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Copper T",
+    "explanation": "Carbamazepine is an enzyme inducer that reduces the effectiveness of oral emergency contraception, so the copper IUD (Copper T) is the most effective option. Past PID (with no current STI risk factor) is UKMEC category 1 for the Cu-IUD, so it is not contraindicated.",
+    "explanation_images": [
+      "figures/q066_fig1.png"
+    ]
+  },
+  {
+    "id": 67,
+    "printed_number": "65",
+    "source_pages": [
+      41
+    ],
+    "question": "Patient presents with loin pain and haematuria on the 13th postoperative day following TAH. Her urine output was normal.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Ureteric injury",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Bladder injury",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Urinary tract infection",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Ureteric injury",
+    "explanation": "Delayed loin pain and haematuria after hysterectomy with preserved urine output suggests a ureteric injury.",
+    "explanation_images": []
+  },
+  {
+    "id": 68,
+    "printed_number": "66",
+    "source_pages": [
+      41,
+      42
+    ],
+    "question": "Following a laparoscopic surgery, a superficial burn was noticed on the patient's thigh. The surgical instrument included a hybrid cannula. What is the possible cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Direct injury",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Insulation failure",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Capacitative coupling",
+        "correct": true
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Capacitative coupling",
+    "explanation": "With a hybrid cannula (mixed metal and plastic), even with intact insulation, if an open circuit is formed capacitive coupling increases and a trocar-site burn can occur. Other electrosurgical injuries include direct application (lateral thermal spread — the commonest), antenna coupling (a form of capacitive coupling), and direct coupling (active electrode touching another metal instrument).",
+    "explanation_images": []
+  },
+  {
+    "id": 69,
+    "printed_number": "67",
+    "source_pages": [
+      42
+    ],
+    "question": "Patient presents with paraesthesia and pain in the anterior and posterolateral thigh following TAH. Select the nerve involved.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Obturator nerve",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Femoral nerve",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Sciatic nerve",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Lateral cutaneous nerve of the thigh",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Iliohypogastric nerve",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Lateral cutaneous nerve of the thigh",
+    "explanation": "The lateral cutaneous nerve of the thigh (L2–L3) emerges from the lateral border of psoas, crosses the iliac fossa anterior to iliacus and enters the thigh posterior to the lateral end of the inguinal ligament. Injury during pelvic surgery causes paraesthesia and pain in the anterior and posterolateral thigh (meralgia paraesthetica).",
+    "explanation_images": [
+      "figures/q069_fig1.png"
+    ]
+  },
+  {
+    "id": 70,
+    "printed_number": "68",
+    "source_pages": [
+      42
+    ],
+    "question": "Patient presents with foot drop and inability to dorsiflex her foot following TAH. Name the nerve involved.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Sciatic",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Common peroneal",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Tibial",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Lateral cutaneous nerve",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Genitofemoral",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Common peroneal",
+    "explanation": "Foot drop with inability to dorsiflex the foot indicates a common peroneal (fibular) nerve injury.",
+    "explanation_images": [
+      "figures/q070_fig1.png"
+    ]
+  },
+  {
+    "id": 71,
+    "printed_number": "69",
+    "source_pages": [
+      43
+    ],
+    "question": "Patient came back to the UK following oocyte retrieval. 25 oocytes were retrieved. The next morning, she wakes with severe right-sided abdominal pain associated with nausea and vomiting. She also complains of lightheadedness. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "OHSS",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Ovarian torsion",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Ovarian rupture",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Appendicitis",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "PID",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "OHSS",
+    "explanation": "A high oocyte yield (25 retrieved) is a major risk factor for ovarian hyperstimulation syndrome (OHSS). Severe abdominal pain, nausea, vomiting and lightheadedness (from fluid shifts/hypovolaemia) shortly after retrieval indicate OHSS.",
+    "explanation_images": []
+  },
+  {
+    "id": 72,
+    "printed_number": "70",
+    "source_pages": [
+      43,
+      44
+    ],
+    "question": "According to the latest MBRRACE, what is the most common cause of direct maternal death?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Suicide",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "VTE",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Cardiac cause",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Preeclampsia",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Bleeding",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "VTE",
+    "explanation": "Thrombosis and thromboembolism (blood clots, ~16% of deaths) remains the leading cause of direct maternal death during or up to six weeks after the end of pregnancy. (Maternal suicide is the leading cause of direct death between 6 weeks and a year postpartum, and mental-health causes account for nearly 40% of deaths in that later period.)",
+    "explanation_images": [
+      "figures/q072_fig1.png"
+    ]
+  },
+  {
+    "id": 73,
+    "printed_number": "71",
+    "source_pages": [
+      44,
+      45
+    ],
+    "question": "A couple was evaluated for subfertility. The male partner's evaluation showed azoospermia and low FSH. What is the possible cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Kallmann syndrome",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Anabolic steroid",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Klinefelter syndrome",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "CBAVD",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Kallmann syndrome",
+    "explanation": "Azoospermia with a LOW FSH indicates secondary (hypogonadotropic) hypogonadism. Kallmann syndrome is a congenital isolated gonadotropin (GnRH) deficiency causing low FSH/LH and impaired spermatogenesis. (Klinefelter and anabolic steroid abuse cause different hormonal pictures; CBAVD causes obstructive azoospermia with normal FSH.)",
+    "explanation_images": [
+      "figures/q073_fig1.png"
+    ]
+  },
+  {
+    "id": 74,
+    "printed_number": "72",
+    "source_pages": [
+      45,
+      46
+    ],
+    "question": "Couple was evaluated for infertility and planned for IVF. Male partner evaluation showed a severe deficit in sperm quantity: 4–5 million sperm per millilitre. Female partner evaluation was normal. What is the best option recommended for the couple?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "IUI with partner sperm",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "IUI with donor sperm",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "IVF",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "IVF-ICSI",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "IVF with donor sperm",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "IVF-ICSI",
+    "explanation": "The recognised indications for ICSI include severe deficits in semen quality and obstructive or non-obstructive azoospermia. With severe oligospermia, IVF with ICSI is recommended. Before ICSI, appropriate investigations and consideration of relevant genetic issues should be undertaken.",
+    "explanation_images": []
+  },
+  {
+    "id": 75,
+    "printed_number": "73",
+    "source_pages": [
+      46
+    ],
+    "question": "What is the antihypertensive of choice in a postnatal patient? She is a known asthmatic with no history of recent exacerbations. She had stopped nifedipine due to drug allergy.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Enalapril",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Thiazide",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Amlodipine",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Enalapril",
+    "explanation": "Enalapril (an ACE inhibitor) is a suitable postnatal antihypertensive and is compatible with breastfeeding. Bronchospasm with enalapril is uncommon (≥1/1,000 to <1/100); cough is common. Contraindications include the 2nd and 3rd trimesters of pregnancy, hypersensitivity/angioedema with ACE inhibitors, and co-administration with aliskiren in diabetes or renal impairment (GFR <60).",
+    "explanation_images": []
+  },
+  {
+    "id": 76,
+    "printed_number": "74",
+    "source_pages": [
+      46
+    ],
+    "question": "Scenario describing bladder pain syndrome impacting on the patient's quality of life. What is the first-line management of bladder pain syndrome?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Amitriptyline",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Analgesics",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Cimetidine",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Oral cyclosporin",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Botox",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Amitriptyline",
+    "explanation": "Oral amitriptyline (or cimetidine) may be considered when first-line conservative treatments have failed; amitriptyline is the first-line oral pharmacological option for bladder pain syndrome.",
+    "explanation_images": []
+  },
+  {
+    "id": 77,
+    "printed_number": "75",
+    "source_pages": [
+      47
+    ],
+    "question": "Genital examination of a patient showed the presence of genital piercing. Identify the type of FGM.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "FGM Type 1",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "FGM Type 2",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "FGM Type 3",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "FGM Type 4",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Not an FGM",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "FGM Type 4",
+    "explanation": "WHO classification of FGM — Type 1: partial/total removal of the clitoris and/or prepuce (clitoridectomy). Type 2: removal of the clitoris and labia minora ± labia majora (excision). Type 3: narrowing of the vaginal orifice with a covering seal (infibulation). Type 4: all other harmful procedures for non-medical purposes, e.g. pricking, piercing, incising, scraping and cauterization. Genital piercing is Type 4.",
+    "explanation_images": []
+  },
+  {
+    "id": 78,
+    "printed_number": "76",
+    "source_pages": [
+      47
+    ],
+    "question": "An antenatal woman with Anti-K (Kell) antibodies was on follow up. Her evaluation showed no fetal anaemia, MCA PSV normal, no hydrops, delivered vaginally at term. She should be counselled that the newborn baby is at risk of:",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Early anaemia",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Early jaundice within 24 hours of delivery",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Late anaemia",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Late jaundice",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Early anaemia",
+    "explanation": "Kell (anti-K) antibodies suppress fetal/neonatal erythropoiesis rather than causing marked haemolysis, so the newborn is at risk of early neonatal anaemia (with relatively little jaundice).",
+    "explanation_images": []
+  },
+  {
+    "id": 79,
+    "printed_number": "77",
+    "source_pages": [
+      47,
+      48
+    ],
+    "question": "You are teaching the midwife about normal labour and episiotomy. She wanted to know the maximum dose of 1% lignocaine without vasopressor for episiotomy for a woman weighing 80 kg.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "1 mg/kg",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "2 mg/kg",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "3 mg/kg",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "5 mg/kg",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "7 mg/kg",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "3 mg/kg",
+    "explanation": "Maximum dose of lidocaine (lignocaine) without adrenaline is 3 mg/kg (6 mg/kg with adrenaline). 1% = 10 mg/ml. For an 80 kg woman this is a maximum of 240 mg (24 ml of 1%).",
+    "explanation_images": [
+      "figures/q079_fig1.png"
+    ]
+  },
+  {
+    "id": 80,
+    "printed_number": "78",
+    "source_pages": [
+      48
+    ],
+    "question": "What is the most common vessel injured in primary port insertion during laparoscopy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Inferior epigastric artery",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Right common iliac artery",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Left common iliac artery",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Aorta",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Superficial epigastric artery",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Aorta",
+    "explanation": "With midline (umbilical) primary port entry, the major retroperitoneal vessels — the aorta and iliac vessels — are at risk. As the aortic bifurcation occurs just to the left of the midline, the right common iliac artery is at higher risk than the left during instrumentation at the umbilicus; keeping the Veress needle and trocar in the midline minimises this risk.",
+    "explanation_images": [
+      "figures/q080_fig1.png"
+    ]
+  },
+  {
+    "id": 81,
+    "printed_number": "79",
+    "source_pages": [
+      48
+    ],
+    "question": "What is the most common vessel injured in port insertion during laparoscopy (secondary/accessory ports)?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Inferior epigastric artery",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Right common iliac artery",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Left common iliac artery",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Aorta",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Superficial epigastric artery",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Inferior epigastric artery",
+    "explanation": "The most common trocar-induced abdominal wall injury is haemorrhage of the epigastric (inferior epigastric) vessels — a serious and potentially preventable complication of accessory port insertion.",
+    "explanation_images": []
+  },
+  {
+    "id": 82,
+    "printed_number": "80",
+    "source_pages": [
+      48,
+      49
+    ],
+    "question": "What is the most common injury in gynaecological laparoscopy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Bladder",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Bowel",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Blood vessels",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Ureter",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Bladder",
+    "explanation": "Urinary tract injuries pooled together are the most common major complication of laparoscopic pelvic surgery, with bladder injury at the top of the list of visceral damage (reported rates 0.02%–8.3%). The overall rate of major complications is about 1.4/1000 procedures (intestinal 0.6/1000, urological 0.3/1000, vascular 0.1/1000).",
+    "explanation_images": []
+  },
+  {
+    "id": 83,
+    "printed_number": "81",
+    "source_pages": [
+      49
+    ],
+    "question": "What is the risk of bladder injury in diagnostic laparoscopy planned for chronic pelvic pain?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "1 in 100",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "2 in 1000",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "3-8 / 10000",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "14 in 100",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "4 in 100",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "2 in 1000",
+    "explanation": "The overall risk of serious complications from diagnostic laparoscopy is approximately 2 in 1000 women (uncommon). This includes damage to the bowel, bladder, ureters, uterus or major blood vessels that would require immediate repair by laparoscopy or laparotomy.",
+    "explanation_images": [
+      "figures/q083_fig1.png"
+    ]
+  },
+  {
+    "id": 84,
+    "printed_number": "82",
+    "source_pages": [
+      49
+    ],
+    "question": "What is the management of a patient presenting with PPROM at 29 weeks? Her examination showed normal fetal heart sounds and an uneffaced cervix.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "MgSO4",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "IV antibiotic + steroids",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Steroid + erythromycin",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Steroid + IOL with prostaglandin",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Steroid + erythromycin",
+    "explanation": "For preterm prelabour rupture of membranes (PPROM) without labour, give antenatal corticosteroids (for fetal lung maturity) plus oral erythromycin 250 mg four times a day for 10 days or until the woman is in established labour (whichever is sooner). Expectant management is appropriate at 29 weeks with a reassuring fetus and closed cervix.",
+    "explanation_images": [],
+    "answer_inferred": true,
+    "answer_note": "Source did not highlight an option for this question; the correct answer (steroid + erythromycin) is taken from the explanation, which specifies erythromycin 250 mg four times daily for 10 days (standard PPROM management with antenatal corticosteroids). Please verify before import."
+  },
+  {
+    "id": 85,
+    "printed_number": "83",
+    "source_pages": [
+      49,
+      50
+    ],
+    "question": "What is the most probable cause of virilization in a 42-year-old woman presenting with baldness and progressive hirsutism over the past 6 months? Her evaluation showed a testosterone of 7-8 and a normal DHEAS.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Sertoli-Leydig cell tumour",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Hyperthecosis",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Adrenal tumour",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "PCOS",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Non-classical CAH",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Sertoli-Leydig cell tumour",
+    "explanation": "Rapid-onset virilization with a markedly raised testosterone but NORMAL DHEAS points to an ovarian (androgen-secreting) source rather than an adrenal one. A Sertoli-Leydig cell tumour is a testosterone-secreting ovarian tumour causing defeminization and progressive masculinization (amenorrhoea, deepening voice, hirsutism, male-pattern hair growth, clitoromegaly). Adrenal adenomas tend to secrete DHEA-S.",
+    "explanation_images": []
+  },
+  {
+    "id": 86,
+    "printed_number": "84",
+    "source_pages": [
+      50
+    ],
+    "question": "How will you diagnose a case of hyperandrogenism in a teenage girl presenting with hirsutism and acne? She has not attained menarche. Her evaluation showed testosterone: 9.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "17-hydroxyprogesterone",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "DHEAS",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "USG pelvis",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "CT abdomen",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "17-hydroxyprogesterone",
+    "explanation": "In a teenager with hyperandrogenism, primary amenorrhoea and a high testosterone, measure 17-hydroxyprogesterone to diagnose non-classical (late-onset) congenital adrenal hyperplasia (21-hydroxylase deficiency).",
+    "explanation_images": []
+  },
+  {
+    "id": 87,
+    "printed_number": "85",
+    "source_pages": [
+      50,
+      51
+    ],
+    "question": "How will you manage a 17-year-old patient with hirsutism and irregular cycles? She is not sexually active.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Cyproterone with ethinyl estradiol",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "COCP for 3 months",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "COCP for 6 months",
+        "correct": true
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "COCP for 6 months",
+    "explanation": "Cosmetic measures and the combined oral contraceptive pill (COCP) are first-line treatments for hirsutism (including in PCOS). A trial of at least 6 months of COCP is recommended before assessing response. Anti-androgens (e.g. spironolactone) may be added, with effective contraception, if the response is suboptimal after ≥6 months of COCP/cosmetic therapy; ethinylestradiol 35 mcg plus cyproterone acetate is not first-line due to increased adverse effects.",
+    "explanation_images": [
+      "figures/q087_fig1.png"
+    ]
+  },
+  {
+    "id": 88,
+    "printed_number": "86",
+    "source_pages": [
+      51
+    ],
+    "question": "A patient diagnosed with multiple sclerosis presents with bladder complaints. What is the management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Oxybutynin",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Clean intermittent self catheterization",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Botox",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Clean intermittent self catheterization",
+    "explanation": "In multiple sclerosis with bladder dysfunction (incomplete emptying/retention with a significant post-void residual), clean intermittent self catheterization is the appropriate management.",
+    "explanation_images": []
+  },
+  {
+    "id": 89,
+    "printed_number": "87",
+    "source_pages": [
+      51
+    ],
+    "question": "What is accepting the null hypothesis when it is actually false?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Type 1 error",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Type 2 error",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "True positive",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "True negative",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Type 2 error",
+    "explanation": "Failing to reject (accepting) the null hypothesis when it is actually false is a Type II error (false negative, probability = β). Rejecting the null hypothesis when it is actually true is a Type I error (false positive, probability = α).",
+    "explanation_images": [
+      "figures/q089_fig1.png"
+    ]
+  },
+  {
+    "id": 90,
+    "printed_number": "88",
+    "source_pages": [
+      52
+    ],
+    "question": "What is the likelihood of the test to be positive in a diseased person?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Sensitivity",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Specificity",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Negative predictive value",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Positive predictive value",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Positive LR",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Positive predictive value",
+    "explanation": "Definitions — Sensitivity: the proportion of true positives detected by a test (how well it classifies subjects who truly have the outcome). Specificity: the proportion of true negatives detected. PPV: the probability of true disease when the result is positive. NPV: the probability of no disease when the result is negative.",
+    "explanation_images": [],
+    "answer_note": "Source highlighted 'Positive predictive value', but the likelihood of a positive test in a diseased person is the definition of SENSITIVITY (option a). The parallel question #89 (Q91 here) is marked 'sensitivity' for the same concept. Likely a source error — please verify before import."
+  },
+  {
+    "id": 91,
+    "printed_number": "89",
+    "source_pages": [
+      52
+    ],
+    "question": "Patient was diagnosed as Covid positive. What is described as the likelihood of testing positive in persons who are diseased?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "PPV",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "NPV",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Sensitivity",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Specificity",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "True positive rate",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Sensitivity",
+    "explanation": "Sensitivity quantifies a test's ability to correctly identify subjects with the disease — the proportion of true positives that are correctly identified by the test (also called the true positive rate). PPV and NPV are related to sensitivity and specificity through disease prevalence.",
+    "explanation_images": []
+  },
+  {
+    "id": 92,
+    "printed_number": "90",
+    "source_pages": [
+      52,
+      53
+    ],
+    "question": "Which of the following drugs is to be avoided in a patient with significant aortopathy in Marfan syndrome with an aortic dilatation >40 mm?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "IV oxytocin bolus",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Ergometrine",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Carbetocin",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Misoprostol",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Carboprost",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Ergometrine",
+    "explanation": "In significant aortopathy (Marfan/Loeys–Dietz with aortic dilatation >40 mm, bicuspid aortopathy with dilatation >45 mm, previous aortic dissection, Turner syndrome with aortic size index >25 cm/m2), ergometrine should be avoided because of the risk of hypertension-induced aortic dissection or rupture. First-line uterotonic is oxytocin; second-line options are misoprostol and carboprost.",
+    "explanation_images": [
+      "figures/q092_fig1.png"
+    ]
+  },
+  {
+    "id": 93,
+    "printed_number": "91",
+    "source_pages": [
+      53,
+      54
+    ],
+    "question": "Antenatal patient was lost to follow up from 36 weeks. She presented with severe headache a few weeks later. Her evaluation showed elevated liver enzymes and normal platelets. She was taken for caesarean section owing to maternal indications; however, she collapsed on the table and could not be revived. Post-mortem examination showed haemorrhage in the intraventricular, cerebellar and brainstem regions, with death due to coning (herniation) of the cerebellum. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Meningitis",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Subarachnoid haemorrhage",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Severe pre-eclampsia",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "Intracerebral haemorrhage",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Severe pre-eclampsia",
+    "explanation": "Pregnancy-associated intracranial haemorrhage (ICH) is an uncommon but life-threatening event contributing to maternal mortality. Pre-eclampsia (and HELLP — haemolysis, elevated liver enzymes, low platelets) is a major risk factor and is associated with poor outcomes in pregnancy-associated ICH. Early symptoms (e.g. vomiting) can be mistaken for morning sickness and missed. The elevated liver enzymes and severe headache point to severe pre-eclampsia as the underlying cause.",
+    "explanation_images": []
+  },
+  {
+    "id": 94,
+    "printed_number": "92",
+    "source_pages": [
+      54
+    ],
+    "question": "What is the specimen of choice for the diagnosis of chlamydia?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Vulvo-vaginal swab (VVS)",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Endocervical swab",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Urethral swab",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "First-catch urine",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "High vaginal swab",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Vulvo-vaginal swab (VVS)",
+    "explanation": "A vulvo-vaginal swab (VVS) is the specimen of choice in women. It is collected by inserting a dry swab about 2–3 inches into the vagina and rotating for 10–30 seconds, has a sensitivity of 96–98%, and can be taken by the patient or a healthcare worker. VVS sensitivities are higher than cervical swabs and are more acceptable to women than urine or cervical specimens.",
+    "explanation_images": []
+  },
+  {
+    "id": 95,
+    "printed_number": "93",
+    "source_pages": [
+      54,
+      55
+    ],
+    "question": "Following a surgery for a benign gynaecological procedure, patient complained of cough with greenish sputum, chest pain and dyspnoea. Examination showed high-grade fever, crepitations and features of lung consolidation. What is the most probable causative organism?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Streptococcus pneumoniae",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Influenza virus",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Respiratory syncytial virus",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Streptococcus pneumoniae",
+    "explanation": "Post-operative bacterial pneumonia with fever, consolidation and productive cough is most commonly caused by Streptococcus pneumoniae. Sputum colour may suggest the pathogen: S. pneumoniae classically rust-coloured (pneumococcal species may also produce green sputum), Klebsiella red currant-jelly, Pseudomonas/Haemophilus green, anaerobes foul-smelling.",
+    "explanation_images": [
+      "figures/q095_fig1.png"
+    ]
+  },
+  {
+    "id": 96,
+    "printed_number": "94",
+    "source_pages": [
+      55
+    ],
+    "question": "Following a surgery for a benign gynaecological procedure, patient complained of cough with greenish sputum, chest pain, dyspnoea and fever. ABG shows a picture of hypoxia and hypercapnia with respiratory acidosis. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Respiratory failure",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Pneumonia",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Opiate toxicity",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Pneumonia",
+    "explanation": "Fever, productive cough, consolidation and an ABG showing hypoxia with hypercapnia/respiratory acidosis in this post-operative patient indicate pneumonia (with type 2 respiratory failure secondary to it).",
+    "explanation_images": [
+      "figures/q096_fig1.png"
+    ]
+  },
+  {
+    "id": 97,
+    "printed_number": "95",
+    "source_pages": [
+      55,
+      56
+    ],
+    "question": "What is the detection rate of the combined test for trisomy 21?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "90%",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "95%",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "85%",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "99%",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "90%",
+    "explanation": "The first-trimester combined test detects about 90% of trisomy 21 with a false-positive rate of about 5%. For comparison: double test 60–65%, triple test 65–70%, quadruple test 70–75%, and cell-free DNA (NIPT) about 99% (false positive 0.1%).",
+    "explanation_images": [
+      "figures/q097_fig1.png"
+    ]
+  },
+  {
+    "id": 98,
+    "printed_number": "96",
+    "source_pages": [
+      56
+    ],
+    "question": "What is the success rate of the McRoberts' manoeuvre in managing shoulder dystocia?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "85%",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "90%",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "95%",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "100%",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "90%",
+    "explanation": "The McRoberts' manoeuvre is an effective intervention with reported success rates as high as 90%. It has a low complication rate and is one of the least invasive manoeuvres, so should be employed first. (The 'all-fours' position has an ~83% success rate in one case series.)",
+    "explanation_images": []
+  },
+  {
+    "id": 99,
+    "printed_number": "97",
+    "source_pages": [
+      56,
+      57
+    ],
+    "question": "Recurrent vulvovaginal candidiasis (VVC) in pregnancy: management. (Short-answer / learning point — no MCQ options in source.)",
+    "options": [],
+    "correct_letter": null,
+    "correct_answer": "Clotrimazole pessary 500 mg per vagina: induction once a night for 10–14 nights according to response, then maintenance once a week.",
+    "explanation": "Treatment of VVC in pregnancy is topical: Acute VVC — clotrimazole pessary 500 mg per vagina once a night for up to 7 consecutive nights. Recurrent VVC — induction with clotrimazole pessary 500 mg per vagina once a night for 10–14 nights according to response, then maintenance clotrimazole pessary 500 mg per vagina once a week. (Oral fluconazole regimens used in non-pregnant recurrent VVC are avoided in pregnancy.)",
+    "explanation_images": [
+      "figures/q099_fig1.png",
+      "figures/q099_fig2.png"
+    ],
+    "note": "No multiple-choice options in the source; presented as a short-answer/learning point with the answer given as a treatment table."
+  },
+  {
+    "id": 100,
+    "printed_number": "98",
+    "source_pages": [
+      57
+    ],
+    "question": "What is the recommended maximum insufflation pressure for the placement of the primary port in laparoscopy in a pregnant patient at 22 weeks of gestation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "20 mmHg",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "25 mmHg",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "12 mmHg",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "10 mmHg",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "8 mmHg",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "25 mmHg",
+    "explanation": "Pneumoperitoneum in pregnancy: an intra-abdominal pressure of 20–25 mmHg should be used for gas insufflation before inserting the primary trocar (so the maximum is 25 mmHg). Current evidence supports operating pressures of 12 mmHg. As these higher pressures are only maintained briefly until the primary port is placed, they are unlikely to harm the fetus.",
+    "explanation_images": [
+      "figures/q100_fig1.png"
+    ]
+  },
+  {
+    "id": 101,
+    "printed_number": "99",
+    "source_pages": [
+      57
+    ],
+    "question": "Evaluation of a patient with recurrent first-trimester loss shows a normal 3D USG of the uterus. Blood report ruled out APLA. She has a positive family history of thrombophilia. What is the appropriate investigation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "OGTT",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "TORCH",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Anti-thyroid antibodies",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Genetic screening",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Factor V Leiden",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Factor V Leiden",
+    "explanation": "With a positive family history of thrombophilia and antiphospholipid antibodies excluded, test for inherited thrombophilia — Factor V Leiden (and prothrombin gene mutation and protein S deficiency), ideally within a research context.",
+    "explanation_images": []
+  },
+  {
+    "id": 102,
+    "printed_number": "100",
+    "source_pages": [
+      58
+    ],
+    "question": "Which of the following is associated with recurrent miscarriage?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Factor V Leiden",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Protein S",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Prothrombin gene mutation",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Protein C",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Factor V Leiden",
+    "explanation": "Factor V Leiden appears to be associated with first and particularly second trimester recurrent miscarriages. Prothrombin gene mutation is associated with recurrent miscarriage. Protein S deficiency has not demonstrated a consistent association with recurrent first trimester miscarriage, but has shown an association with second trimester. Protein C deficiency has not shown a consistent association with recurrent miscarriage. MTHFR mutation (heterozygous and homozygous) has been found to have a significant association with recurrent miscarriage in one meta-analysis from China; however other meta-analyses did not find an association and advise against testing for it. Antithrombin deficiency is the rarer yet most thrombogenic mutation; the EPCOT study found only a possible association with sporadic miscarriage while a subsequent meta-analysis did not.",
+    "explanation_images": [
+      "figures/q102_fig1.png"
+    ]
+  },
+  {
+    "id": 103,
+    "printed_number": "101",
+    "source_pages": [
+      58,
+      59
+    ],
+    "question": "What is the next step in managing a patient with recurrent postmenopausal bleeding on combined hormonal replacement therapy? Patient continued to have recurrent bleed despite alteration in progesterone dose.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Tvs",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Pipelle biopsy",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Hysteroscopy",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Stop HRT",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Give COC",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Tvs",
+    "explanation": "For unscheduled bleeding on HRT: assess cancer risk factors and bleeding pattern, identify HRT regimen/duration/compliance, and offer examination/investigations. Arrange urgent transvaginal ultrasound (within 6 weeks) if there is 1 major or 3 minor risk factors for endometrial cancer, or heavy/persistent bleeding, 2 minor risk factors, more than 6 months since starting HRT, or more than 3 months after a change in dose or preparation. Ultrasound thresholds prompting endometrial assessment: sHRT ET > 7 mm, ccHRT ET > 4 mm, or endometrium incompletely visualised. Management options for persistent unscheduled bleeding include changing to an oral preparation, offering the 52 mg LNG-IUD, increasing the progestogen dose or switching to a synthetic progestogen, a 3-month trial of an additional progestogen, and reducing the estrogen dose.",
+    "explanation_images": [
+      "figures/q103_fig1.png"
+    ]
+  },
+  {
+    "id": 104,
+    "printed_number": "102",
+    "source_pages": [
+      59,
+      60
+    ],
+    "question": "Test to diagnose hyperandrogenism in PCOS.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Free Testosterone",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Free androgen index",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "17 OHP",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "LH and FSH",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Free Testosterone",
+    "explanation": "Use total testosterone and free testosterone for diagnosis of hyperandrogenism in PCOS. If not elevated, then androstenedione and dehydroepiandrosterone sulfate (DHEA-S) could be measured, but are less specific with a limited role in PCOS diagnosis.",
+    "explanation_images": [
+      "figures/q104_fig1.png"
+    ]
+  },
+  {
+    "id": 105,
+    "printed_number": "103",
+    "source_pages": [
+      60
+    ],
+    "question": "How will you manage a woman with PCOS presenting with 18 months amenorrhea?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Cyclical progesterone",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Coc",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Laparoscopic ovarian drilling",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Hysteroscopy and Endometrial biopsy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Cyclical progesterone",
+    "explanation": "Oligo- or amenorrhoea in women with PCOS may predispose to endometrial hyperplasia and later carcinoma. It is good practice to recommend treatment with gestogens to induce a withdrawal bleed at least every 3 to 4 months. Transvaginal ultrasound should be considered in the absence of withdrawal bleeds or abnormal uterine bleeding. In PCOS, an endometrial thickness of less than 7 mm is unlikely to be hyperplasia. A thickened endometrium or an endometrial polyp should prompt consideration of endometrial biopsy and/or hysteroscopy.",
+    "explanation_images": []
+  },
+  {
+    "id": 106,
+    "printed_number": "104",
+    "source_pages": [
+      60,
+      61
+    ],
+    "question": "How will you manage a woman with PCOS presenting with 18 months amenorrhea with an endometrial thickness of 7mm?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Cyclical progesterone",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Coc",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Laparoscopic ovarian drilling",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Hysteroscopy and Endometrial biopsy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Cyclical progesterone",
+    "explanation": "Cyclical progesterone (gestogens) is recommended to induce a withdrawal bleed. In PCOS an endometrial thickness below 7 mm is unlikely to be hyperplasia, so at 7 mm cyclical progesterone remains appropriate; a clearly thickened endometrium or a polyp would prompt endometrial biopsy and/or hysteroscopy. Progestin-only oral contraceptives may be considered for endometrial protection, based on general population guidelines, acknowledging that evidence in women with PCOS is limited. COCP is first-line pharmacological therapy for hyperandrogenism and irregular cycles.",
+    "explanation_images": [
+      "figures/q106_fig1.png"
+    ]
+  },
+  {
+    "id": 107,
+    "printed_number": "105",
+    "source_pages": [
+      61
+    ],
+    "question": "38 year old, P2, presented with amenorrhoea for 18 months after the delivery of her second child. During her delivery she had PPH, retained placenta was removed under GA and 1 unit of blood was transfused. Postpartum period was uneventful and she breastfed her baby. Her hormonal evaluation showed: Prolactin high, estradiol 2430. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Sheehan's syndrome",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Pregnancy",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Ovarian tumour",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Pregnancy",
+    "explanation": "A markedly high estradiol (2430) together with high prolactin in a woman with amenorrhoea points to pregnancy. Sheehan's syndrome (postpartum pituitary necrosis after PPH) causes hypopituitarism with low estradiol and failure of lactation, not a high estradiol, so the elevated estradiol here is consistent with pregnancy rather than Sheehan's syndrome.",
+    "explanation_images": []
+  },
+  {
+    "id": 108,
+    "printed_number": "106",
+    "source_pages": [
+      61
+    ],
+    "question": "GARDASIL 9 protects against what types of HPV?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "6, 11",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "6, 11, 16, 18",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "6, 11, 16, 18, 31, 33, 45, 52, 58",
+        "correct": true
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "6, 11, 16, 18, 31, 33, 45, 52, 58",
+    "explanation": "Cervarix (protecting against HPV types 16 and 18) was offered from September 2008 until September 2012, when Gardasil (protecting against HPV 16 and 18 plus 6 and 11, which cause genital warts) replaced it. In summer 2022, Gardasil 9 was introduced to replace Gardasil. The 9-valent vaccine protects against 5 additional cancer-causing HPV types (31, 33, 45, 52, 58), giving protection against 9 HPV types in total: 6, 11, 16, 18, 31, 33, 45, 52, 58. Gardasil 9 is currently supplied for those eligible (adolescents aged 12-13 and those eligible until age 25, and GBMSM up to and including 45 years).",
+    "explanation_images": [
+      "figures/q108_fig1.png"
+    ]
+  },
+  {
+    "id": 109,
+    "printed_number": "107",
+    "source_pages": [
+      62,
+      63
+    ],
+    "question": "How will you confirm a case of diabetes insipidus in pregnancy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "LDH",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Serum electrolytes",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Full blood count",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Blood osmolality",
+        "correct": true
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Blood osmolality",
+    "explanation": "Diabetes insipidus (DI) classically presents with polydipsia and dilute polyuria. Diagnosis is made after excluding other causes of polyuria (diuretics, hyperglycaemia, hypercalcaemia, hypokalaemia and renal tubular acidosis). Gestational DI should be considered when blood osmolality is consistent with nonpregnant levels (i.e. >285 mOsmol/kg) with urinary osmolality <300 mOsmol/kg. Women may have borderline high serum sodium (within normal limits but elevated for pregnancy). Serum ADH can be assayed with a vasopressinase inhibitor to distinguish a central lack of production from degradation by placental vasopressinase; chromatography can measure vasopressinase activity. Vasopressin treatment differentiates DI types, as central and gestational DI result from a lack of circulating ADH. Pituitary function tests (TFTs, prolactin) may be performed to look for panhypopituitarism. Table 2 summary: presenting symptoms polyuria (>3 L/day), polydipsia (>3 L/day) and hypernatraemia (weakness, confusion, seizures); investigations urea and electrolytes, Ca2+, glucose; serum and urine osmolality; urine specific gravity low, usually <1.005.",
+    "explanation_images": [
+      "figures/q109_fig1.png"
+    ]
+  },
+  {
+    "id": 110,
+    "printed_number": "108",
+    "source_pages": [
+      63
+    ],
+    "question": "A couple was evaluated for subfertility and diagnosed to be due to anovulation. The female was started on clomifene citrate. On day 21 of the cycle, the patient presented with acute pelvic pain which was relieved with paracetamol. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "PID",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Subacute torsion",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Mittelschmerz",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Ohss",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Tubal Hydrocele",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Ohss",
+    "explanation": "This is OHSS. The timing of presentation following the trigger injection divides patients into early and late OHSS. Early OHSS usually presents within 7 days of the hCG injection and is associated with an excessive ovarian response. Late OHSS typically presents 10 or more days after the hCG injection and usually results from endogenous hCG derived from an early pregnancy; the preceding ovarian response may be unremarkable, and late OHSS tends to be more prolonged and severe than the early form. Clomifene-induced ovulation with day-21 pelvic pain relieved by simple analgesia is consistent with OHSS rather than PID, torsion, mittelschmerz or hydrocele.",
+    "explanation_images": []
+  },
+  {
+    "id": 111,
+    "printed_number": "109",
+    "source_pages": [
+      63,
+      64
+    ],
+    "question": "What is the most common reason for transfer from homebirth to an obstetric unit?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Delay during first or second stage of labour",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Fetal distress",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Meconium stained liquor",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Delay during first or second stage of labour",
+    "explanation": "Delay during the first or second stage of labour is the most common reason for transfer to an obstetric unit from all birth settings. Table 1 shows the primary reasons for transfer: delay in the first or second stage of labour accounts for 1,144 (32.4%) transfers from home, 912 (37.1%) from freestanding midwifery units and 1,548 (35.2%) from alongside midwifery units, making it the leading reason in each setting, ahead of meconium staining, repair of perineal trauma and abnormal fetal heart rate.",
+    "explanation_images": [
+      "figures/q111_fig1.png"
+    ]
+  },
+  {
+    "id": 112,
+    "printed_number": "110",
+    "source_pages": [
+      64
+    ],
+    "question": "Patient suffered myocardial infarction at 35 weeks of gestation. What is your advice regarding delivery?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Delay delivery for 2 wks",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "4 weeks",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Instrumental delivery with epidural analgesia",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Delay delivery for 2 wks",
+    "explanation": "Timing and mode of delivery after acute myocardial infarction (AMI): there are no standardised guidelines because of the lack of prospective data and the variation in individual patient characteristics. Collaborative management involving a cardiologist, obstetric physician, obstetrician, obstetric anaesthetist and neonatologist guides care, individualised to maternal cardiac status and gestational age. If there is a risk of preterm delivery, maternal steroid injections should be administered at the earliest opportunity. If possible, delivery should be delayed by 2 to 3 weeks following AMI because of the increased risk of maternal mortality during this time.",
+    "explanation_images": [
+      "figures/q112_fig1.png"
+    ]
+  },
+  {
+    "id": 113,
+    "printed_number": "111",
+    "source_pages": [
+      65
+    ],
+    "question": "DIC marker: scenario of a patient who presented with IUFD with normal fibrinogen 1.9, prolonged APTT 37 (ref 35) and low platelets (130000). Which among the following is a pointer for DIC?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Fibrinogen",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "APTT",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Low Platelets",
+        "correct": true
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "Low Platelets",
+    "explanation": "After a late intrauterine fetal death there is a moderate risk of maternal disseminated intravascular coagulation (DIC): about 10% within 4 weeks of the IUFD, rising to 30% thereafter. It is tested for by clotting studies, blood platelet count and fibrinogen measurement. A down-trending platelet count is often the first laboratory abnormality to be noted; a trend toward decreasing platelets or a grossly reduced absolute platelet count is a sensitive (though not specific) indicator of DIC. Other tests include prothrombin time (PT-INR), activated partial thromboplastin time (aPTT), D-dimer and fibrinogen level; the D-dimer test is the most sensitive single laboratory test for diagnosing DIC. In this scenario the fibrinogen (1.9) is normal and the APTT (37, ref 35) is only marginally raised, so the low platelet count (130000) is the pointer to DIC.",
+    "explanation_images": [
+      "figures/q113_fig1.png"
+    ]
+  },
+  {
+    "id": 114,
+    "printed_number": "112",
+    "source_pages": [
+      65,
+      66
+    ],
+    "question": "What is the possible etiology in a pregnancy showing hydrocephalus, holoprosencephaly, FGR and placental cysts on the anomaly scan?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Edward syndrome",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Triploidy",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Turner syndrome",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Patau syndrome",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Down syndrome",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Triploidy",
+    "explanation": "Triploid syndrome (triploidy) is a chromosomal disorder in which the fetus has three copies of every chromosome instead of the normal two. CNS features include holoprosencephaly, hydrocephalus (increased cerebrospinal fluid within the brain), ventriculomegaly, Arnold-Chiari malformation, agenesis of the corpus callosum and neural tube defects. Triploid fetuses have intrauterine growth restriction beginning early in pregnancy, as early as 12 weeks, which does not affect the head as severely as the body. Oligohydramnios is common in triploid pregnancies. Placental abnormalities are common in triploidy; most frequently the placenta is enlarged and may contain cysts.",
+    "explanation_images": []
+  },
+  {
+    "id": 115,
+    "printed_number": "113",
+    "source_pages": [
+      66
+    ],
+    "question": "What is the rate of persistent trophoblastic disease in ectopic pregnancy managed by salpingotomy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "1%",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "10%",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "7%",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "15%",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "20%",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "7%",
+    "explanation": "Persistent trophoblast occurred more frequently in the salpingotomy group (14 [7%] versus 1 [less than 1%]; relative risk [RR] 15.0, 95% CI 2.0-113.4). Studies have reported persistent trophoblast rates of 3.9-11.0% after salpingotomy. Factors suggested as increasing the risk of persistent trophoblast include higher preoperative serum beta-hCG levels, a rapid preoperative rise in serum beta-hCG and larger tubal masses. Inform women having a salpingotomy that up to 1 in 5 women may need further treatment.",
+    "explanation_images": []
+  },
+  {
+    "id": 116,
+    "printed_number": "114",
+    "source_pages": [
+      67,
+      68
+    ],
+    "question": "Patient is taken up for CS at full dilatation. During the procedure, the surgeon encountered difficulty in delivering the deeply impacted fetal head. What is the best method employed in such situations?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Breech extraction",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Push method",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Employing fetal pillow",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Abdominal cephalic disimpaction",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Reverse breech extraction",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "Administer nitroglycerine",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Abdominal cephalic disimpaction",
+    "explanation": "Impaction of the fetal head can leave a lack of space for the operator to insert their hand anteriorly between the fetal head and pubic symphysis, hindering the standard approach to deliver the head at caesarean birth (CB). Abdominal cephalic disimpaction (using the dominant or non-dominant hand to flex and lift the baby's head upwards into the maternal abdomen) is likely to be effective in the majority of cases of impacted fetal head (IFH) at CB. If the obstetrician is unable to disimpact the head with these standard manoeuvres, several strategies can be employed, including tocolysis, vaginal disimpaction (push-up), reverse breech extraction and the Patwardhan method. There is a lack of consensus regarding which technique is safest or most effective. Non-recommended techniques: a single forceps blade or ventouse used abdominally, or bladder filling, are not supported by evidence; use of a vacuum at CB can cause significant fetal injury (intracranial and subgaleal haemorrhage) and should be avoided. The algorithm for IFH at caesarean section summarises anticipate and prepare, diagnose IFH, declare the emergency, call for help, pause, consider tocolysis, abdominal cephalic disimpaction (A), consider changing hands, then vaginal disimpaction (B) or reverse breech extraction (C), and repeating the above or considering the Patwardhan manoeuvre.",
+    "explanation_images": [
+      "figures/q116_fig1.png",
+      "figures/q116_fig2.png"
+    ]
+  },
+  {
+    "id": 117,
+    "printed_number": "115",
+    "source_pages": [
+      69
+    ],
+    "question": "Patient presented with primary amenorrhea. Examination showed a blind-ending vagina, Tanner 2/5 breast development, scanty pubic hair and axillary hair.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "MRKH",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "AIS",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Turner syndrome",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "AIS",
+    "explanation": "This is androgen insensitivity syndrome (AIS). Disorders of androgen action are a common form of 46,XY differences of sex development (DSD); loss-of-function mutations in the androgen receptor (AR) lead to variable loss of virilization. In complete AIS the external genitalia are completely female with a short/blind-ending vagina, gonads are mostly abdominal or inguinal, puberty brings feminization with sparse-to-absent secondary sexual hair, and post-pubertal gonadectomy is favoured. In partial AIS there is clitoromegaly, a narrow vagina and variable labial fusion, mostly inguinal gonads, breast development with slight virilization, and pre-pubertal gonadectomy is favoured. A blind-ending vagina with breast development but scanty pubic and axillary hair fits AIS rather than MRKH (which has normal pubic/axillary hair) or Turner syndrome.",
+    "explanation_images": [
+      "figures/q117_fig1.png"
+    ]
+  },
+  {
+    "id": 118,
+    "printed_number": "116",
+    "source_pages": [
+      69,
+      70
+    ],
+    "question": "65 year old patient presented with moderate rectocele and urge incontinence. What is the initial management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Supervised pelvic floor exercise + bladder retraining",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Bladder diary",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Bladder retraining",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Supervised pelvic floor exercise",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Bladder diary",
+    "explanation": "Use bladder diaries in the initial assessment of women with urinary incontinence or overactive bladder. Encourage women to complete a minimum of 3 days of the diary covering variations in their usual activities, such as both working and leisure days.",
+    "explanation_images": []
+  },
+  {
+    "id": 119,
+    "printed_number": "117",
+    "source_pages": [
+      70
+    ],
+    "question": "Patient with a history of failed mid-urethral sling surgery for SUI. What is the best investigation?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Urodynamic",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Cystoscopy",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Urodynamic",
+    "explanation": "After failed continence surgery, urodynamic studies are recommended before considering further surgical treatment, to characterise the underlying bladder dysfunction (stress incontinence, detrusor overactivity or voiding difficulty).",
+    "explanation_images": []
+  },
+  {
+    "id": 120,
+    "printed_number": "118",
+    "source_pages": [
+      70
+    ],
+    "question": "Pregnant patient presented with a painful swollen left leg. She was commenced on LMWH. How to evaluate her further?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Duplex scanning of Left leg",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Duplex scanning of both legs",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Duplex scanning of Left leg",
+    "explanation": "Compression duplex ultrasound of the symptomatic (left) leg is the initial investigation for suspected DVT in pregnancy. If the initial scan is negative but clinical suspicion of DVT remains, anticoagulation is continued and the scan is repeated.",
+    "explanation_images": []
+  },
+  {
+    "id": 121,
+    "printed_number": "119",
+    "source_pages": [
+      70
+    ],
+    "question": "Patient in labour with continuous fetal heart rate monitoring. At 4 cm dilatation, the CTG showed a baseline above 180 bpm. What is the best management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "fetal scalp stimulation",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "perform fetal blood sampling",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "administer tocolysis",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "undertake conservative measures",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "evaluate the whole clinical picture and consider expediting birth",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "evaluate the whole clinical picture and consider expediting birth",
+    "explanation": "A fetal heart rate baseline above 180 bpm is an abnormal (pathological) feature. Management is not a single isolated action; the whole clinical picture should be evaluated. If the CTG trace is categorised as pathological: obtain an urgent review by an obstetrician and a senior midwife; exclude acute events (e.g. cord prolapse, suspected placental abruption or suspected uterine rupture) that need immediate intervention; perform a full risk assessment including a full set of maternal observations, taking into account the whole clinical picture, and document the findings; and consider possible underlying causes and undertake conservative measures. If the trace is still pathological after conservative measures: obtain a further urgent review, evaluate the whole clinical picture and consider expediting birth; if there are evolving intrapartum risk factors for fetal compromise, have a very low threshold for expediting birth.",
+    "explanation_images": [
+      "figures/q121_fig1.png"
+    ]
+  },
+  {
+    "id": 122,
+    "printed_number": "120",
+    "source_pages": [
+      71
+    ],
+    "question": "Labouring woman was on continuous fetal monitoring with CTG. The trace showed variable deceleration with shouldering for 30 minutes at 7 cm dilatation. What is the next step?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Fetal blood sampling",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Expedite birth",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Start conservative measures",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Continue ctg",
+        "correct": true
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Continue ctg",
+    "explanation": "Regard the following as concerning characteristics of variable decelerations: lasting more than 60 seconds; reduced variability within the deceleration; failure or slow return to the baseline fetal heart rate; and loss of previously present shouldering. Variable decelerations WITH shouldering that persist for 30 minutes but have none of these concerning characteristics are not pathological, so the appropriate step is to continue the CTG.",
+    "explanation_images": []
+  },
+  {
+    "id": 123,
+    "printed_number": "121",
+    "source_pages": [
+      71,
+      72
+    ],
+    "question": "Patient in labour with good descent and progression. CTG shows a baseline at 160, variability 2-4 for 45 minutes. What is the management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Cs",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Fetal scalp stimulation",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Continue ctg",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Fetal scalp stimulation",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "Conservative measures",
+        "correct": true
+      }
+    ],
+    "correct_letter": "e",
+    "correct_answer": "Conservative measures",
+    "explanation": "A baseline of 160 with reduced variability (2-4) for 45 minutes represents a suspicious CTG. If the CTG is suspicious and there are no other concerning risk factors: perform a full risk assessment (a full set of maternal observations and the whole clinical picture) and document; note that if accelerations are present fetal acidosis is unlikely; if the trace was previously normal, consider underlying reasons for the change; and undertake conservative measures. If suspicious with additional intrapartum risk factors (slow progress, sepsis or meconium): full risk assessment, conservative measures, obtain an urgent review by an obstetrician or senior midwife, and consider fetal scalp stimulation or expediting birth. With good descent and progression and no additional risk factors, conservative measures are appropriate.",
+    "explanation_images": [
+      "figures/q123_fig1.png"
+    ],
+    "note": "Source lists options b and d identically as 'Fetal scalp stimulation' (duplication in the original)."
+  },
+  {
+    "id": 124,
+    "printed_number": "122",
+    "source_pages": [
+      72,
+      73
+    ],
+    "question": "A primigravida is in spontaneous preterm labour at 35 + 1 weeks of gestation. She has progressed satisfactorily and has been pushing for 15 minutes. Fifteen minutes prior to pushing, a suspicious CTG was noted. Baby passed meconium. You are not able to feel the fetal head abdominally and the vertex is at +1 station. Conservative measures failed to improve the fetal heart rate. What is the most appropriate course of action?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Expedite delivery by performing a caesarean section",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Expedite delivery with mid-cavity forceps",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Expedite delivery with rotational forceps",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Expedite delivery with Ventouse",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "perform fetal blood sampling",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Expedite delivery with mid-cavity forceps",
+    "explanation": "At preterm gestations, operators should be aware of a higher risk of subgaleal haemorrhage and scalp trauma with vacuum extraction compared with forceps. Vacuum birth should be avoided below 32 weeks of gestation and should be used with caution between 32+0 and 36+0 weeks. At 35+1 weeks with a suspicious CTG unresponsive to conservative measures, the head not palpable abdominally and the vertex at +1 station (mid-cavity), expediting delivery with mid-cavity forceps is most appropriate; ventouse is cautioned at this gestation because of the higher risk of scalp trauma and subgaleal haemorrhage.",
+    "explanation_images": []
+  },
+  {
+    "id": 125,
+    "printed_number": "123",
+    "source_pages": [
+      73
+    ],
+    "question": "Multiparous patient in labour with a diagnosed delay in delivery. Examination now shows vertex at +1 OA position.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Midcavity delivery in labour room",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Trial of instrumental delivery in theatre",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Ventouse delivery in labour room",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Trial of instrumental delivery in theatre",
+    "explanation": "A vertex at +1 station is at the mid-cavity level. With delay in the second stage and the vertex at +1 in the OA position, a trial of instrumental (non-rotational) delivery should be conducted in theatre, where there is immediate recourse to caesarean section if the trial fails, rather than in the labour room, because mid-cavity deliveries carry a higher risk of failure.",
+    "explanation_images": []
+  },
+  {
+    "id": 126,
+    "printed_number": "124",
+    "source_pages": [
+      73
+    ],
+    "question": "Patient presented with ataxia, irregular menses and learning disability. Examination also showed cataract. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Galactosemia",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Turner syndrome",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Galactosemia",
+    "explanation": "This is classic galactosemia. Affected adolescents and adults often have focal neurologic findings such as tremor, ataxia and dysmetria (impaired ability to control actions). Together with cataracts, primary/premature ovarian insufficiency (irregular menses) and learning disability, the picture points to galactosemia rather than Turner syndrome.",
+    "explanation_images": []
+  },
+  {
+    "id": 127,
+    "printed_number": "125",
+    "source_pages": [
+      73
+    ],
+    "question": "Pregnant mother presented with absent fetal movements. Diagnosed with IUFD at 22 weeks. She chose conservative management and delivered at 24 weeks. How would you define this delivery?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Miscarriage",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Stillbirth",
+        "correct": true
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Stillbirth",
+    "explanation": "Stillbirth is defined by the gestation at birth, irrespective of when the death occurred. Deaths eligible for reporting to MBRRACE-UK: Late fetal losses - a baby born at 22 or 23 completed weeks' gestation showing no signs of life, irrespective of when death occurred. Stillbirths - a baby born from 24 completed weeks' gestation (or from 400 g where an accurate gestation is not available) showing no signs of life, irrespective of when death occurred. Neonatal deaths - the death of a live-born baby, born from 20 completed weeks' gestation, occurring before 28 completed days after birth. Here the intrauterine death occurred at 22 weeks but the baby was delivered at 24 weeks, so by gestation at birth it is classified as a stillbirth.",
+    "explanation_images": [
+      "figures/q127_fig1.png"
+    ]
+  },
+  {
+    "id": 128,
+    "printed_number": "126",
+    "source_pages": [
+      73,
+      74,
+      75
+    ],
+    "question": "Patient on methadone collapsed with pinpoint pupils. What is the management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Iv naloxone",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Im naloxone",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Intranasal naloxone",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Iv naloxone",
+    "explanation": "Give intravenous naloxone. The British National Formulary (BNF) recommends reversing acute opioid/opiate overdose in adults by intravenous injection of naloxone 400 micrograms to 2 mg; if there is no response, repeat at intervals of two to three minutes to a maximum of 10 mg. Doses used in acute overdose may not be appropriate for opioid-induced respiratory depression and sedation in palliative care or chronic opioid use, where the recommended IV dose is 100 to 200 micrograms (1.5 to 3 micrograms/kg), with subsequent 100 microgram doses every two minutes if the response is inadequate. Careful monitoring of vital observations and maintenance of pain relief are still required.",
+    "explanation_images": [
+      "figures/q128_fig1.png"
+    ]
+  },
+  {
+    "id": 129,
+    "printed_number": "127",
+    "source_pages": [
+      75
+    ],
+    "question": "Patient on 70 ml of methadone was observed to be lost from the ward and found unconscious near the toilet. Examination showed a weak and thready pulse. How to manage?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "IV adrenalin",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "IM adrenalin",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "IV Naloxone",
+        "correct": true
+      },
+      {
+        "letter": "d",
+        "text": "IM Naloxone",
+        "correct": false
+      }
+    ],
+    "correct_letter": "c",
+    "correct_answer": "IV Naloxone",
+    "explanation": "This is opioid (methadone) overdose causing reduced consciousness and cardiovascular compromise (weak, thready pulse). The management is intravenous naloxone, an opioid antagonist; adrenaline is not the treatment for opioid overdose. Naloxone is given by the intravenous route (preferred) for its quicker onset of action and is titrated to response. Emergency treatment of opioid overdose: initial dose 400 micrograms IV; if no response after 1 minute give 800 micrograms; repeat 800 micrograms after a further minute if still no response; if still no response give 2 mg (up to 4 mg in a seriously poisoned patient), then review the diagnosis.",
+    "explanation_images": []
+  },
+  {
+    "id": 130,
+    "printed_number": "128",
+    "source_pages": [
+      75,
+      76
+    ],
+    "question": "How will you monitor an early-onset FGR fetus growing at the 3rd centile with an absent umbilical artery Doppler?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Daily cCTG",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Daily DV doppler",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Alternate every 2-3 days: DV doppler",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Alternate days: umbilical artery doppler - DV and cCTG",
+        "correct": true
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Alternate days: umbilical artery doppler - DV and cCTG",
+    "explanation": "In early-onset FGR the intensity of surveillance is guided by the severity of the Doppler abnormality. Absent end-diastolic flow (EDF) in the umbilical artery is a pre-critical finding. Borderline (UA PI >95th centile, DV PIV raised >95th centile): repeat umbilical artery Doppler, DV Doppler and CTG every week. Pre-critical (absent EDF in the UA, absent DV a-wave): alternate daily umbilical artery Doppler and DV Doppler and CTG. Critical (reversed EDF, reversed DV a-wave): daily cCTG and/or DV Doppler. For an early FGR fetus at the 3rd centile with absent umbilical artery EDF (pre-critical), monitoring is on alternate days with umbilical artery Doppler, DV Doppler and cCTG. Timing of delivery in early FGR (gestational age up to 32 weeks): with AEDF or REDF in the UA, monitor every 2-3 days with cCTG and/or DV unless delivery is indicated; deliver if the DV a-wave is at or below baseline, or if short-term variation (STV) is below threshold (<2.6 ms at 26+0 to 28+6 weeks; <3.0 ms at 29+0 to 31+6 weeks).",
+    "explanation_images": [
+      "figures/q130_fig1.png",
+      "figures/q130_fig2.png"
+    ]
+  },
+  {
+    "id": 131,
+    "printed_number": "129",
+    "source_pages": [
+      77
+    ],
+    "question": "Early-onset FGR with reversed EDF. How will you monitor?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Daily cCTG",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Daily DV doppler",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Alternate every 2-3 days: DV doppler",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Alternate every 2-3 days: umbilical artery doppler",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Daily cCTG",
+    "explanation": "Umbilical artery Doppler changes are defined as: PI above the 95th centile (borderline), absent end-diastolic flow (EDF) (pre-critical) and reversed EDF (critical). Ductus venosus Doppler changes are defined as: PIV raised above the 95th centile (borderline), absent 'a' wave to baseline (pre-critical) or reversed 'a' wave (critical). Depending on severity, repeat ultrasound (umbilical and ductus venosus Doppler) and CTG monitoring is normally undertaken every week where umbilical Doppler changes are borderline, alternating daily in early-onset FGR with pre-critical umbilical Doppler changes. Where the umbilical Doppler changes are critical (reversed EDF), daily cCTG and/or ductus venosus Doppler are indicated, as sudden deterioration of the fetal condition may occur.",
+    "explanation_images": [
+      "figures/q131_fig1.png"
+    ]
+  },
+  {
+    "id": 132,
+    "printed_number": "130",
+    "source_pages": [
+      77
+    ],
+    "question": "Patient comes for booking. Her TPPA is positive, RPR negative, with a past history of syphilis. How will you manage this patient?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Treat for syphilis since RPR is false negative",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Reassure her as this is previously treated syphilis",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Retest again since this is early syphilis",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Reassure her as this is previously treated syphilis",
+    "explanation": "A positive TPPA (treponemal test) with a negative RPR (non-treponemal test) in a patient with a past history of syphilis indicates previously treated (or resolved) syphilis, so reassure. Treponemal tests (EIA, TP-PA/TPPA) detect syphilis-specific antibodies, are reported as reactive/non-reactive and remain positive over time in most cases (used for new diagnosis and screening). Non-treponemal tests (RPR, VDRL) detect antibodies released due to infection, are reported as a quantitative titre (higher titres indicate a stronger positive) and decline over time (faster with treatment), and are used to monitor treatment response and distinguish re-infection from resolved infection. On serology interpretation, a reactive treponemal test with a non-reactive RPR is consistent with previously treated syphilis (or early syphilis where RPR is not yet positive); with a documented history of treated syphilis, reassurance is appropriate.",
+    "explanation_images": [
+      "figures/q132_fig1.png"
+    ]
+  },
+  {
+    "id": 133,
+    "printed_number": "131",
+    "source_pages": [
+      78
+    ],
+    "question": "How will you manage a case of early syphilis diagnosed at 33 weeks of pregnancy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Benzathine penicillin 2.4 mu im single dose",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Benzathine penicillin 2.4 mu im 2 doses",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Benzathine penicillin 2.4 mu im 3 doses",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Benzathine penicillin 2.4 mu im weekly for 2 doses",
+        "correct": true
+      },
+      {
+        "letter": "e",
+        "text": "Benzathine penicillin 2.4 mu im weekly for 3 doses",
+        "correct": false
+      }
+    ],
+    "correct_letter": "d",
+    "correct_answer": "Benzathine penicillin 2.4 mu im weekly for 2 doses",
+    "explanation": "Benzathine penicillin is the treatment for syphilis in pregnancy, with the regimen depending on trimester and stage. First/second trimester: early disease (primary/secondary or latent <2 years) is 2.4 MU IM as a single dose, and late disease (latent/unknown duration) is 2.4 MU IM weekly for 3 weeks/doses. Third trimester: early disease is 2.4 MU IM weekly for 2 weeks/doses, and the weekly regimen is used for late disease at all stages of pregnancy. Early syphilis diagnosed at 33 weeks (third trimester) is therefore treated with benzathine penicillin 2.4 MU IM weekly for 2 doses.",
+    "explanation_images": [
+      "figures/q133_fig1.png"
+    ]
+  },
+  {
+    "id": 134,
+    "printed_number": "132",
+    "source_pages": [
+      78
+    ],
+    "question": "What is the diagnostic marker for myocardial infarction in pregnancy?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Troponin",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "CKMB",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Myoglobin",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "creatinine kinase",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Troponin",
+    "explanation": "Cardiac-specific troponin I and troponin T are the biomarkers of choice for diagnosing myocardial infarction. Recommended sampling times vary by assay, so local guidelines should be checked; a negative troponin at presentation does not exclude cardiac damage as it can take up to 12 hours for the level to peak. Troponin is not raised above the upper limit of normal in healthy pregnant women and is not affected by anaesthesia, prolonged labour or caesarean section, and is therefore the investigation of choice. In contrast, myoglobin, creatinine kinase and CK-MB can be increased significantly in labour. Troponin can be mildly raised in pre-eclampsia, gestational hypertension and pulmonary embolism in the absence of significant coronary disease, but in pre-eclampsia the troponin level is never above the standard threshold set for MI.",
+    "explanation_images": [
+      "figures/q134_fig1.png"
+    ]
+  },
+  {
+    "id": 135,
+    "printed_number": "133",
+    "source_pages": [
+      79
+    ],
+    "question": "What is the diagnostic marker of choice in anaphylaxis?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Mast cell tryptase levels",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Eosinophil count",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Skin prick tests",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "IgE estimation",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Mast cell tryptase levels",
+    "explanation": "Mast cell tryptase levels are the diagnostic marker of choice in anaphylaxis. Anaphylaxis is a clinical diagnosis suggested by sudden onset and rapid progression of symptoms, life-threatening airway and/or breathing and/or circulation problems, and skin and/or mucosal changes (flushing, urticaria, angioedema). Exposure to a known allergen supports the diagnosis, but many cases occur with no previous history. Mast cell tryptase can help confirm the diagnosis: as a minimum, one sample should be taken 1-2 hours after the start of symptoms; ideally three timed samples are taken - as soon as possible after resuscitation has started (without delaying resuscitation), 1-2 hours after symptom onset, and 24 hours later.",
+    "explanation_images": [
+      "figures/q135_fig1.png"
+    ]
+  },
+  {
+    "id": 136,
+    "printed_number": "134",
+    "source_pages": [
+      79,
+      80
+    ],
+    "question": "Antenatal woman with a BMI of 34, at 40 weeks of gestation, came for ANC with mild dyspnoea. Examination showed SFH 46 cm. USG showed high-normal liquor and EFW 3.6 kg. What to do?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "cs",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "amniocentesis",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "admit",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "wait for spontaneous onset of labour",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "induce",
+        "correct": false
+      },
+      {
+        "letter": "f",
+        "text": "measure fasting glucose/ OGTT",
+        "correct": false
+      },
+      {
+        "letter": "g",
+        "text": "measure oral glucose tolerance before deciding on the mode of delivery",
+        "correct": true
+      }
+    ],
+    "correct_letter": "g",
+    "correct_answer": "measure oral glucose tolerance before deciding on the mode of delivery",
+    "explanation": "The large symphysis-fundal height (46 cm at 40 weeks), high-normal liquor and estimated fetal weight of 3.6 kg in a woman with a raised BMI raise suspicion of macrosomia/LGA and gestational diabetes, so an oral glucose tolerance test should be arranged before deciding on the mode of delivery. Polyhydramnios can be defined with gestational-age-specific thresholds, but generally a constant value of AFI >=25 cm or DVP >=8 cm is used across all gestational ages; by AFI it is classified as mild (25.0-29.9 cm), moderate (30-34.9 cm) or severe (>35 cm). Pathway for suspected LGA/macrosomia: SFH >90th centile leads to considering USS; if LGA/macrosomia is diagnosed, offer OGTT (refer to the diabetic team if positive), explain the limitations of USS in predicting LGA, discuss the potential risks of LGA for mother and baby, then discuss management options (expectant management, induction of labour, or caesarean section).",
+    "explanation_images": [
+      "figures/q136_fig1.png"
+    ]
+  },
+  {
+    "id": 137,
+    "printed_number": "135",
+    "source_pages": [
+      80,
+      81
+    ],
+    "question": "A woman in her postpartum, who returned from a tropical country, brought in a baby with multiple skin pigments, microcephaly and hypoplasia of a limb. She had a fever with a vesicular rash in the earlier part of her pregnancy. What is the probable cause?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Herpes simplex virus",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Chicken pox",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Parvo virus",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Syphilis",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "CMV",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Chicken pox",
+    "explanation": "Maternal varicella (chickenpox) or serological conversion in the first 28 weeks of pregnancy carries a small risk of fetal varicella syndrome (FVS), and the woman should be informed of the implications. FVS is characterised by one or more of: skin scarring in a dermatomal distribution; eye defects (microphthalmia, chorioretinitis or cataracts); hypoplasia of the limbs; and neurological abnormalities (microcephaly, cortical atrophy, mental retardation, or dysfunction of the bowel and bladder sphincters). FVS does not occur at the time of the initial fetal infection but results from a subsequent herpes zoster reactivation in utero, and occurs in only a minority of infected fetuses. A vesicular rash in early pregnancy with a baby showing skin scarring/pigmentation, microcephaly and limb hypoplasia is therefore due to varicella (chickenpox) rather than HSV, parvovirus, syphilis or CMV.",
+    "explanation_images": []
+  },
+  {
+    "id": 138,
+    "printed_number": "136",
+    "source_pages": [
+      81
+    ],
+    "question": "Postmenopausal woman came with a complaint of bleeding per vagina for two weeks. Hysteroscopy and endometrial biopsy was done. Biopsy revealed hyperplasia without atypia in a polyp and the endometrium was normal (no hyperplasia). What is the management?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "No further treatment",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Follow up with endometrial sampling 3 months",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Follow up with endometrial sampling 6 months",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "No further treatment",
+    "explanation": "Endometrial hyperplasia confined to an endometrial polyp: complete removal of the uterine polyp(s) is recommended and an endometrial biopsy should be obtained to sample the background endometrium; subsequent management is according to the histological classification of the endometrial hyperplasia. Here the hyperplasia without atypia was confined to the polyp, which has been removed, and the background endometrium was normal (no hyperplasia), so no further treatment is required.",
+    "explanation_images": [
+      "figures/q138_fig1.png"
+    ]
+  },
+  {
+    "id": 139,
+    "printed_number": "137",
+    "source_pages": [
+      81
+    ],
+    "question": "How will you follow up a complete molar pregnancy following evacuation? Her hCG has reverted to normal within 56 days.",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Follow up 6 months from the day of evacuation",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "Follow up 6 months from the day of normal beta hCG",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "Discharge after two samples normal 4 weeks apart",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "Follow up 6 months from the day of evacuation",
+    "explanation": "For a complete molar pregnancy, if hCG has reverted to normal within 56 days of the pregnancy event, follow-up is for 6 months from the date of uterine evacuation. If hCG has not reverted to normal within 56 days of the pregnancy event, follow-up is for 6 months from normalisation of the hCG level. Follow-up for a partial molar pregnancy is concluded once hCG has returned to normal on two samples at least 4 weeks apart. As this complete mole normalised within 56 days, follow-up is 6 months from the day of evacuation.",
+    "explanation_images": [
+      "figures/q139_fig1.png"
+    ]
+  },
+  {
+    "id": 140,
+    "printed_number": "138",
+    "source_pages": [
+      81,
+      82
+    ],
+    "question": "Bicornuate uterus is associated with which of the following?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Pregnancy loss",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Malpresentation",
+        "correct": true
+      },
+      {
+        "letter": "c",
+        "text": "Ectopic pregnancy",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "Labour dystocia",
+        "correct": false
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Malpresentation",
+    "explanation": "Unification defects such as bicornuate, unicornuate and didelphic uteri do not appear to reduce fertility but are associated with increased risks of adverse pregnancy outcomes, depending on the type of defect. Women with bicornuate and unicornuate uteri have an increased risk of first-trimester miscarriage (OR 3.4 and OR 2.15), preterm birth (OR 2.55 and OR 3.47) and fetal malpresentation (OR 5.38 and OR 2.74); women with uterus didelphys have an increased risk of preterm labour (OR 3.58) and fetal malpresentation (OR 3.7). The strongest association for a bicornuate uterus is with fetal malpresentation (OR 5.38).",
+    "explanation_images": [
+      "figures/q140_fig1.png"
+    ]
+  },
+  {
+    "id": 141,
+    "printed_number": "139",
+    "source_pages": [
+      82
+    ],
+    "question": "Woman is counselled regarding endometrial hyperplasia without atypia. What is the risk of progression to cancer?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "1-5 % over 20 years",
+        "correct": true
+      },
+      {
+        "letter": "b",
+        "text": "10% over 20 years",
+        "correct": false
+      },
+      {
+        "letter": "c",
+        "text": "15% over 20 years",
+        "correct": false
+      },
+      {
+        "letter": "d",
+        "text": "25% over 20 years",
+        "correct": false
+      },
+      {
+        "letter": "e",
+        "text": "30% over 20 years",
+        "correct": false
+      }
+    ],
+    "correct_letter": "a",
+    "correct_answer": "1-5 % over 20 years",
+    "explanation": "A 20-year follow-up study found that among women with hyperplasia without atypia (previously described as simple or complex hyperplasia), the cumulative long-term risk of progression to endometrial cancer is less than 5% over 20 years.",
+    "explanation_images": []
+  },
+  {
+    "id": 142,
+    "printed_number": "140",
+    "source_pages": [
+      82
+    ],
+    "question": "What is the risk of CTPA over V/Q scan?",
+    "options": [
+      {
+        "letter": "a",
+        "text": "Higher risk of childhood cancer",
+        "correct": false
+      },
+      {
+        "letter": "b",
+        "text": "Higher risk of maternal breast cancer",
+        "correct": true
+      }
+    ],
+    "correct_letter": "b",
+    "correct_answer": "Higher risk of maternal breast cancer",
+    "explanation": "While CTPA is associated with a low radiation risk to the fetus, it delivers a relatively high radiation dose (up to 20 mGy) to the mother's breast tissue, which is associated with an increased risk of breast cancer; the dose estimate for CTPA is 20 to 100 times greater than for V/Q scanning. The dose depends on breast size, the technique used and the woman's age (the risk being greater in younger women). Breast doses from CTPA can be reduced by 20-40% using bismuth shields placed over the breasts. Lung perfusion (V/Q) scanning should be considered the investigation of first choice for young women, especially if there is a family history of breast cancer or a previous chest CT scan.",
+    "explanation_images": []
+  }
+]

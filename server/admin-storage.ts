@@ -351,6 +351,7 @@ export async function adminCreateMcq(data: {
   difficulty?: string;
   references?: string | null;
   tags?: unknown | null;
+  images?: unknown | null;
   isPublished?: boolean;
 }): Promise<MCQ> {
   const [m] = await db.insert(mcqs).values(data).returning();
@@ -368,6 +369,7 @@ export async function adminUpdateMcq(
     difficulty: string;
     references: string | null;
     tags: unknown | null;
+    images: unknown | null;
     isPublished: boolean;
     topicId: string;
   }>,
@@ -395,6 +397,7 @@ export async function adminBulkCreateMcqs(
     difficulty?: string;
     references?: string | null;
     tags?: unknown | null;
+    images?: unknown | null;
     isPublished?: boolean;
   }[],
 ): Promise<number> {
