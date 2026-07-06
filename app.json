@@ -8,6 +8,23 @@
     "scheme": "maternalmind",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://admin.maternalmind.com.pk/updates/manifest",
+      "enabled": true,
+      "checkAutomatically": "NEVER",
+      "fallbackToCacheTimeout": 0,
+      "codeSigningCertificate": "./client/certs/certificate.pem",
+      "codeSigningMetadata": {
+        "keyid": "main",
+        "alg": "rsa-v1_5-sha256"
+      },
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.maternalmind.app",

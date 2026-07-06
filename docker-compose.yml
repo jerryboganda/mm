@@ -17,11 +17,20 @@ services:
       - BREVO_SMTP_PASS=${BREVO_SMTP_PASS:-}
       - BREVO_FROM_EMAIL=${BREVO_FROM_EMAIL:-}
       - BREVO_FROM_NAME=${BREVO_FROM_NAME:-}
+      # Self-hosted Expo OTA: where the server reads the code-signing private key.
+      - CODE_SIGNING_PRIVATE_KEY_PATH=/app/secrets/code-signing-private-key.pem
+      - CODE_SIGNING_KEY_ID=${CODE_SIGNING_KEY_ID:-main}
     volumes:
       # Persist user/admin uploads (content images, payment proofs) across
       # container rebuilds & restarts. Without this they live on the container's
       # ephemeral layer and are wiped on every `docker compose down && up`.
       - uploads_data:/app/uploads
+      # Published OTA update bundles, dropped here by the GitHub Actions publish
+      # pipeline (rsync). A host bind-mount so CI can write to it directly.
+      - ./updates:/app/updates
+      # Code-signing private key (read-only). Lives only on the host, never baked
+      # into the image. Create ./secrets/code-signing-private-key.pem on the VPS.
+      - ./secrets:/app/secrets:ro
     depends_on:
       db:
         condition: service_healthy

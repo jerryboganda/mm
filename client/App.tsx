@@ -35,6 +35,8 @@ import { AuthProvider } from "@/lib/auth";
 import { NetworkProvider } from "@/lib/network";
 import { MobileContentProvider } from "@/lib/mobile-content";
 import { AppNetworkWrapper } from "@/components/AppNetworkWrapper";
+import { OtaUpdatesProvider } from "@/lib/updates";
+import { UpdateRequiredModal } from "@/components/UpdateRequiredModal";
 import { useTheme } from "@/hooks/useTheme";
 import {
   persistQueryCache,
@@ -290,7 +292,11 @@ function ThemedRoot({ children }: { children: React.ReactNode }) {
     <GestureHandlerRootView
       style={{ flex: 1, backgroundColor: theme.backgroundRoot }}
     >
-      {children}
+      <OtaUpdatesProvider>
+        {children}
+        {/* Mandatory OTA update popup — inert on web & in dev, blocks in native prod */}
+        <UpdateRequiredModal />
+      </OtaUpdatesProvider>
       <StatusBar style={isDark ? "light" : "dark"} />
     </GestureHandlerRootView>
   );

@@ -87,3 +87,11 @@ screenshots/
 # Misc generated files
 subscription-dashboard.png
 web_dist/
+
+# Self-hosted OTA: published update bundles + code-signing private key material
+/updates/
+/secrets/
+# ...but the PUBLIC code-signing certificate MUST be committed (app bundles it to
+# verify OTA manifests). This negation overrides the global `*.pem` ignore above.
+!client/certs/
+!client/certs/certificate.pem

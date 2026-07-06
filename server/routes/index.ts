@@ -21,6 +21,7 @@ import adminSubscriptionRoutes from "./admin-subscriptions";
 import adminManualPaymentRoutes from "./admin-manual-payments";
 import adminDeviceLimitRoutes from "./admin-device-limits";
 import subscriptionRoutes from "./subscription";
+import updatesRoutes from "./updates";
 
 // General API rate limits (per IP)
 const generalLimiter = rateLimiter(120, 60_000); // 120 requests/min for content browsing
@@ -28,6 +29,11 @@ const quizLimiter = rateLimiter(30, 60_000); // 30 requests/min for quiz operati
 const adminLimiter = rateLimiter(600, 60_000); // 600 requests/min for admin operations (bulk saves need headroom)
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Self-hosted Expo OTA updates. Mounted outside /api (no `no-store` header,
+  // no /api 404 handler) and intentionally un-rate-limited: one OTA download
+  // bursts through a JS bundle + many content-addressed assets.
+  app.use("/updates", updatesRoutes);
+
   app.use("/api/auth", authRoutes);
   app.use("/api/mobile-content", generalLimiter, mobileContentRoutes);
   app.use("/api/profile", generalLimiter, userRoutes);
@@ -51,11 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/admin/analytics", adminLimiter, adminAnalyticsRoutes);
   app.use("/api/admin/announcements", adminLimiter, adminAnnouncementsRoutes);
   app.use("/api/admin/subscriptions", adminLimiter, adminSubscriptionRoutes);
-  app.use(
-    "/api/admin/manual-payments",
-    adminLimiter,
-    adminManualPaymentRoutes,
-  );
+  app.use("/api/admin/manual-payments", adminLimiter, adminManualPaymentRoutes);
   app.use("/api/admin/device-limits", adminLimiter, adminDeviceLimitRoutes);
 
   const httpServer = createServer(app);
