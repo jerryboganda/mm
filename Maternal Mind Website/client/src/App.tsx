@@ -23,11 +23,14 @@ import DeleteAccount from "@/pages/delete-account";
 import { ResourcesHub, ResourcePage } from "@/pages/resources";
 import Media from "@/pages/media";
 
+import DownloadPage from "@/pages/download";
+
 function Router() {
   return (
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/download" component={DownloadPage} />
         <Route path="/features" component={Features} />
         <Route path="/how-it-works" component={HowItWorks} />
         <Route path="/pricing" component={Pricing} />
