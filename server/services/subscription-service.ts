@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { logger } from "../lib/logger";
 import { isSubscriptionActive } from "../lib/subscription-status";
 import {
@@ -152,7 +153,7 @@ class SubscriptionService {
       const [pkg] = await db
         .insert(subscriptionPackages)
         .values({ ...data, version: 1 })
-        .returning();
+        ;
       return pkg;
     } catch (error) {
       logger.error("SubscriptionService createPackage error", { error: String(error) });
@@ -188,7 +189,7 @@ class SubscriptionService {
         .update(subscriptionPackages)
         .set(updateData)
         .where(eq(subscriptionPackages.id, id))
-        .returning();
+        ;
 
       return updated || undefined;
     } catch (error) {
@@ -203,7 +204,7 @@ class SubscriptionService {
         .update(subscriptionPackages)
         .set({ status: "archived", updatedAt: new Date() })
         .where(eq(subscriptionPackages.id, id))
-        .returning();
+        ;
       return updated || undefined;
     } catch (error) {
       logger.error("SubscriptionService deletePackage error", { error: String(error) });
@@ -275,7 +276,7 @@ class SubscriptionService {
           ...data,
           packageVersion: pkg ? pkg.version : 1,
         })
-        .returning();
+        ;
 
       // Bump package version since pricing changed
       if (pkg) {
@@ -301,7 +302,7 @@ class SubscriptionService {
         .update(packagePrices)
         .set({ ...data, updatedAt: new Date() })
         .where(eq(packagePrices.id, id))
-        .returning();
+        ;
       return updated || undefined;
     } catch (error) {
       logger.error("SubscriptionService updatePrice error", { error: String(error) });
@@ -329,7 +330,7 @@ class SubscriptionService {
       const [feature] = await db
         .insert(packageFeatures)
         .values(data)
-        .returning();
+        ;
       return feature;
     } catch (error) {
       logger.error("SubscriptionService createFeature error", { error: String(error) });
@@ -346,7 +347,7 @@ class SubscriptionService {
         .update(packageFeatures)
         .set(data)
         .where(eq(packageFeatures.id, id))
-        .returning();
+        ;
       return updated || undefined;
     } catch (error) {
       logger.error("SubscriptionService updateFeature error", { error: String(error) });
@@ -463,7 +464,7 @@ class SubscriptionService {
           paymentGateway: options?.paymentGateway || "revenuecat",
           packageVersionAtPurchase: pkg.version,
         })
-        .returning();
+        ;
 
       // Audit log
       await this.logSubscriptionEvent({
@@ -515,7 +516,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -569,7 +570,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -645,7 +646,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -717,7 +718,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -761,7 +762,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -813,7 +814,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -860,7 +861,7 @@ class SubscriptionService {
             updatedAt: now,
           })
           .where(eq(subscriptions.id, subscriptionId))
-          .returning();
+          ;
 
         await this.logSubscriptionEvent({
           subscriptionId,
@@ -885,7 +886,7 @@ class SubscriptionService {
             updatedAt: now,
           })
           .where(eq(subscriptions.id, subscriptionId))
-          .returning();
+          ;
 
         await this.logSubscriptionEvent({
           subscriptionId,
@@ -940,7 +941,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1008,7 +1009,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1274,7 +1275,7 @@ class SubscriptionService {
         .update(subscriptions)
         .set(updateData)
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1319,7 +1320,7 @@ class SubscriptionService {
           updatedAt: now,
         })
         .where(eq(subscriptions.id, subscriptionId))
-        .returning();
+        ;
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1414,7 +1415,7 @@ class SubscriptionService {
           periodEnd: sub.currentPeriodEnd,
           couponId: sub.couponId,
         })
-        .returning();
+        ;
 
       // Insert line items
       const insertedItems: InvoiceLineItem[] = [];
@@ -1433,7 +1434,7 @@ class SubscriptionService {
             periodStart: item.periodStart || null,
             periodEnd: item.periodEnd || null,
           })
-          .returning();
+          ;
         insertedItems.push(lineItem);
       }
 
@@ -1540,7 +1541,7 @@ class SubscriptionService {
           source: data.source || "system",
           ipAddress: data.ipAddress || null,
         })
-        .returning();
+        ;
       return log;
     } catch (error) {
       // Audit logging should not break the main operation — log and continue

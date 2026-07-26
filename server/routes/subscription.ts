@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { Router } from "express";
 import multer from "multer";
 import * as crypto from "crypto";
@@ -556,7 +557,7 @@ router.post(
           proofImageUrl: `/uploads/payment-proofs/${req.file.filename}`,
           proofFilename: req.file.filename,
         })
-        .returning();
+        ;
 
       // Notify the user their proof was received (best-effort)
       const [user] = await db

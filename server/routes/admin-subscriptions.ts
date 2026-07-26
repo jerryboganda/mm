@@ -1,3 +1,4 @@
+import crypto from "crypto";
 /**
  * Admin Subscription Management API Routes
  *
@@ -265,7 +266,7 @@ router.post("/add-ons", async (req: AuthRequest, res: Response) => {
     const [addOn] = await db
       .insert(addOns)
       .values(parsed.data as any)
-      .returning();
+      ;
     res.status(201).json(addOn);
   } catch (error) {
     logger.error("Error creating add-on", { error: String(error) });
@@ -287,7 +288,7 @@ router.put("/add-ons/:id", async (req: AuthRequest, res: Response) => {
       .update(addOns)
       .set({ ...(parsed.data as any), updatedAt: new Date() })
       .where(eq(addOns.id, getParamValue(req.params.id)))
-      .returning();
+      ;
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json(addOn);
   } catch (error) {
@@ -303,7 +304,7 @@ router.delete("/add-ons/:id", async (req: AuthRequest, res: Response) => {
       .update(addOns)
       .set({ isActive: false, updatedAt: new Date() })
       .where(eq(addOns.id, getParamValue(req.params.id)))
-      .returning();
+      ;
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json({ message: "Add-on deactivated", addOn });
   } catch (error) {
@@ -729,7 +730,7 @@ router.put(
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.id, activeSub.id))
-        .returning();
+        ;
 
       await subscriptionService.logSubscriptionEvent({
         subscriptionId: activeSub.id,
