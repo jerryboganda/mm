@@ -1,0 +1,57 @@
+name: Deploy to Hostinger (Single Slot)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to Hostinger
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Unified Single-Slot App
+        run: npm run build
+
+      - name: Deploy via SSH to Hostinger
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
+          port: ${{ secrets.HOSTINGER_PORT || 65002 }}
+          username: ${{ secrets.HOSTINGER_USER || 'u776151780' }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          script: |
+            echo "Connected to Hostinger via GitHub Actions!"
+            mkdir -p ~/domains/maternalmind.com.pk/public_html
+            cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
+
+            # Pull latest repository changes
+            if [ -d ".git" ]; then
+              git fetch origin main
+              git reset --hard origin/main
+            else
+              git clone https://github.com/jerryboganda/mm.git .
+            fi
+
+            # Install dependencies and build
+            npm ci --production=false
+            npm run build
+
+            # Create tmp/restart.txt for Passenger/Hostinger process restart
+            mkdir -p tmp
+            touch tmp/restart.txt
+            echo "Hostinger single-slot deployment complete!"
