@@ -87,6 +87,7 @@ screenshots/
 # Misc generated files
 subscription-dashboard.png
 web_dist/
+website_dist/
 
 # Self-hosted OTA: published update bundles + code-signing private key material
 /updates/

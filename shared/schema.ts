@@ -1500,3 +1500,76 @@ export type SubscriptionAuditLog = typeof subscriptionAuditLogs.$inferSelect;
 export type ManualPaymentProof = typeof manualPaymentProofs.$inferSelect;
 export type InsertManualPaymentProof =
   typeof manualPaymentProofs.$inferInsert;
+
+// ── Website Marketing Tables ──────────────────────────────────
+export const waitlistEntries = pgTable("waitlist_entries", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const newsletterEntries = pgTable("newsletter_entries", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const contactMessages = pgTable("contact_messages", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const institutionalRequests = pgTable("institutional_requests", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  institution: text("institution").notNull(),
+  role: text("role").notNull(),
+  email: text("email").notNull(),
+  cohortSize: text("cohort_size"),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertWaitlistSchema = createInsertSchema(waitlistEntries).pick({
+  email: true,
+});
+
+export const insertNewsletterSchema = createInsertSchema(newsletterEntries).pick({
+  email: true,
+});
+
+export const insertContactSchema = createInsertSchema(contactMessages).pick({
+  name: true,
+  email: true,
+  subject: true,
+  message: true,
+});
+
+export const insertInstitutionalRequestSchema = createInsertSchema(
+  institutionalRequests,
+).pick({
+  name: true,
+  institution: true,
+  role: true,
+  email: true,
+  cohortSize: true,
+  message: true,
+});
+
+export type WaitlistEntry = typeof waitlistEntries.$inferSelect;
+export type NewsletterEntry = typeof newsletterEntries.$inferSelect;
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type InstitutionalRequest = typeof institutionalRequests.$inferSelect;
+
