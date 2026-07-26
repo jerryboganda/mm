@@ -36,6 +36,10 @@ try {
   const adminDir = path.join(rootDir, "admin");
   if (fs.existsSync(adminDir)) {
     log("Building Admin Panel SPA...");
+    if (!fs.existsSync(path.join(adminDir, "node_modules"))) {
+      log("Installing dependencies in admin/...");
+      run("npm install --no-audit --no-fund", adminDir);
+    }
     run("npm run build", adminDir);
   }
 
@@ -43,6 +47,10 @@ try {
   const websiteDir = path.join(rootDir, "Maternal Mind Website");
   if (fs.existsSync(websiteDir)) {
     log("Building Marketing Website SPA...");
+    if (!fs.existsSync(path.join(websiteDir, "node_modules"))) {
+      log("Installing dependencies in Maternal Mind Website/...");
+      run("npm install --no-audit --no-fund", websiteDir);
+    }
     run("npx vite build", websiteDir);
     const websiteViteOutput = path.join(websiteDir, "dist", "public");
     const targetWebsiteDist = path.join(rootDir, "website_dist");
