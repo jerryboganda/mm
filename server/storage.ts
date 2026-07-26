@@ -14,6 +14,10 @@ import {
   contentReports,
   appSettings,
   announcements,
+  waitlistEntries,
+  contactMessages,
+  institutionalRequests,
+  newsletterEntries,
   type User,
   type InsertUser,
   type Book,
@@ -29,6 +33,10 @@ import {
   type ReviewSchedule,
   type ContentReport,
   type AppSetting,
+  type WaitlistEntry,
+  type ContactMessage,
+  type InstitutionalRequest,
+  type NewsletterEntry,
 } from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
@@ -383,6 +391,24 @@ export interface IStorage {
    * @param settings - An array of key-value pairs to set
    */
   setAppSettings(settings: { key: string; value: string }[]): Promise<void>;
+
+  // Website marketing entries
+  createWaitlistEntry(data: { email: string }): Promise<WaitlistEntry>;
+  createNewsletterEntry(data: { email: string }): Promise<NewsletterEntry>;
+  createContactMessage(data: {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+  }): Promise<ContactMessage>;
+  createInstitutionalRequest(data: {
+    name: string;
+    institution: string;
+    role: string;
+    email: string;
+    cohortSize?: string | null;
+    message?: string | null;
+  }): Promise<InstitutionalRequest>;
 }
 
 /** Database-backed implementation of {@link IStorage} using Drizzle ORM. */
@@ -1594,6 +1620,41 @@ export class DatabaseStorage implements IStorage {
     for (const { key, value } of settings) {
       await this.setAppSetting(key, value);
     }
+  }
+
+  async createWaitlistEntry(data: { email: string }): Promise<WaitlistEntry> {
+    const [entry] = await db.insert(waitlistEntries).values(data).returning();
+    return entry;
+  }
+
+  async createNewsletterEntry(data: { email: string }): Promise<NewsletterEntry> {
+    const [entry] = await db.insert(newsletterEntries).values(data).returning();
+    return entry;
+  }
+
+  async createContactMessage(data: {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+  }): Promise<ContactMessage> {
+    const [msg] = await db.insert(contactMessages).values(data).returning();
+    return msg;
+  }
+
+  async createInstitutionalRequest(data: {
+    name: string;
+    institution: string;
+    role: string;
+    email: string;
+    cohortSize?: string | null;
+    message?: string | null;
+  }): Promise<InstitutionalRequest> {
+    const [req] = await db
+      .insert(institutionalRequests)
+      .values(data)
+      .returning();
+    return req;
   }
 }
 

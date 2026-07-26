@@ -22,6 +22,7 @@ import adminManualPaymentRoutes from "./admin-manual-payments";
 import adminDeviceLimitRoutes from "./admin-device-limits";
 import subscriptionRoutes from "./subscription";
 import updatesRoutes from "./updates";
+import websiteRoutes from "./website";
 
 // General API rate limits (per IP)
 const generalLimiter = rateLimiter(120, 60_000); // 120 requests/min for content browsing
@@ -34,6 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // bursts through a JS bundle + many content-addressed assets.
   app.use("/updates", updatesRoutes);
 
+  app.use("/api", generalLimiter, websiteRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/mobile-content", generalLimiter, mobileContentRoutes);
   app.use("/api/profile", generalLimiter, userRoutes);

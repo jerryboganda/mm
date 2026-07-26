@@ -326,27 +326,50 @@ function configureExpoAndLanding(app: express.Application) {
     logger.info("Mobile web app: web_dist not found — skipping");
   }
 
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith("/api")) {
-      return next();
-    }
+  // ── Serve Marketing Website SPA at / ──
+  const websiteDistPath = path.resolve(process.cwd(), "website_dist");
+  if (fs.existsSync(websiteDistPath)) {
+    app.use(express.static(websiteDistPath));
+    logger.info("Marketing Website: serving from / (website_dist)");
+  } else {
+    logger.info("Marketing Website: website_dist not found — using default template fallback");
+  }
 
-    if (req.path !== "/" && req.path !== "/manifest") {
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (
+      req.path.startsWith("/api") ||
+      req.path.startsWith("/admin") ||
+      req.path.startsWith("/app") ||
+      req.path.startsWith("/uploads") ||
+      req.path.startsWith("/updates")
+    ) {
       return next();
     }
 
     const platform = req.header("expo-platform");
-    if (platform && (platform === "ios" || platform === "android")) {
+    if (
+      (req.path === "/" || req.path === "/manifest") &&
+      platform &&
+      (platform === "ios" || platform === "android")
+    ) {
       return serveExpoManifest(platform, res);
     }
 
     if (req.path === "/") {
+      if (fs.existsSync(websiteDistPath)) {
+        return res.sendFile(path.join(websiteDistPath, "index.html"));
+      }
       return serveLandingPage({
         req,
         res,
         landingPageTemplate,
         appName,
       });
+    }
+
+    // SPA fallback for Marketing Website routes (/features, /pricing, etc.)
+    if (fs.existsSync(websiteDistPath)) {
+      return res.sendFile(path.join(websiteDistPath, "index.html"));
     }
 
     next();
