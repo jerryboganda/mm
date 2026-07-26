@@ -30,7 +30,18 @@ jobs:
       - name: Build Unified Single-Slot App
         run: npm run build
 
-      - name: Deploy via SSH to Hostinger
+      - name: Deploy Built Artifacts via SCP to Hostinger
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
+          port: ${{ secrets.HOSTINGER_PORT || 65002 }}
+          username: ${{ secrets.HOSTINGER_USER || 'u776151780' }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          target: "domains/maternalmind.com.pk/public_html"
+          rm: false
+          source: "server_dist,website_dist,admin_dist,web_dist,package.json,package-lock.json,app.json,server/templates"
+
+      - name: Trigger Hostinger Restart via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
@@ -38,25 +49,13 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER || 'u776151780' }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            echo "Connected to Hostinger via GitHub Actions!"
-            mkdir -p ~/domains/maternalmind.com.pk/public_html
+            echo "Restarting Hostinger Node.js Web App..."
             cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
 
-            # Pull latest repository changes
-            if [ -d ".git" ]; then
-              git fetch origin main
-              git reset --hard origin/main
-            else
-              git clone https://github.com/jerryboganda/mm.git .
-            fi
+            # Lightweight production install for external modules
+            npm ci --omit=dev --no-audit --no-fund || npm install --production --no-audit --no-fund
 
-            # Install dependencies for root and sub-projects
-            npm ci --production=false
-            (cd admin && npm install --no-audit --no-fund)
-            (cd "Maternal Mind Website" && npm install --no-audit --no-fund)
-            npm run build
-
-            # Create tmp/restart.txt for Passenger/Hostinger process restart
+            # Trigger Passenger/Hostinger process restart
             mkdir -p tmp
             touch tmp/restart.txt
-            echo "Hostinger single-slot deployment complete!"
+            echo "Hostinger single-slot deployment successfully activated!"
