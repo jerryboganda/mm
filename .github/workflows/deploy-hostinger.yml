@@ -41,7 +41,7 @@ jobs:
           rm: false
           source: "server_dist,website_dist,admin_dist,web_dist,uploads,scripts/maternal_mind_mysql.sql,package.json,package-lock.json,app.json,server/templates"
 
-      - name: Trigger Hostinger Restart & MySQL Import via SSH
+      - name: Trigger Hostinger Restart & Configure Environment via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
@@ -51,6 +51,14 @@ jobs:
           script: |
             echo "Connected to Hostinger via GitHub Actions!"
             cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
+
+            # Auto-create .env file so environment variables are 100% pre-configured automatically
+            cat << 'EOF' > .env
+NODE_ENV=production
+DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_maternalmind
+SESSION_SECRET=64H28SmybRTDp7iqXuv3UVJ1hsrt9KMxYZ5kNzLBWOlwcjno0CQgeIAfaPdEFG
+ALLOWED_ORIGIN=https://maternalmind.com.pk
+EOF
 
             # Import MySQL database dump into Hostinger MySQL
             if [ -f "scripts/maternal_mind_mysql.sql" ]; then
