@@ -22,7 +22,10 @@ jobs:
           cache: "npm"
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm ci
+          (cd admin && npm install --no-audit --no-fund)
+          (cd "Maternal Mind Website" && npm install --no-audit --no-fund)
 
       - name: Build Unified Single-Slot App
         run: npm run build
@@ -47,8 +50,10 @@ jobs:
               git clone https://github.com/jerryboganda/mm.git .
             fi
 
-            # Install dependencies and build
+            # Install dependencies for root and sub-projects
             npm ci --production=false
+            (cd admin && npm install --no-audit --no-fund)
+            (cd "Maternal Mind Website" && npm install --no-audit --no-fund)
             npm run build
 
             # Create tmp/restart.txt for Passenger/Hostinger process restart
