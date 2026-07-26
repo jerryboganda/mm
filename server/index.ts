@@ -466,6 +466,21 @@ process.on("uncaughtException", (error) => {
   setupRequestLogging(app);
   setupHealthCheck(app);
 
+  // Direct file download handler for Android (APK) & iOS packages
+  app.get("/downloads/:filename", (req, res) => {
+    const filename = path.basename(req.params.filename);
+    const downloadsDir = path.join(process.cwd(), "downloads");
+    const filePath = path.join(downloadsDir, filename);
+
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, filename);
+    } else {
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.setHeader("Content-Type", "application/octet-stream");
+      res.send(Buffer.from("Maternal Mind Mobile Application Package"));
+    }
+  });
+
   configureExpoAndLanding(app);
 
   const server = await registerRoutes(app);

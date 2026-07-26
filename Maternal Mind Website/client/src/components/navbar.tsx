@@ -72,9 +72,11 @@ export function Navbar() {
             <Link href="/support">
               <GhostButton size="sm" data-testid="button-support">Support</GhostButton>
             </Link>
-            <NeonButton size="sm" data-testid="button-get-app" onClick={openAppDownload}>
-              Get the App
-            </NeonButton>
+            <Link href="/download">
+              <NeonButton size="sm" data-testid="button-get-app">
+                Get the App
+              </NeonButton>
+            </Link>
           </div>
 
           <button
@@ -115,9 +117,11 @@ export function Navbar() {
                 <Link href="/support" className="block">
                   <GhostButton className="w-full" size="sm">Support</GhostButton>
                 </Link>
-                <NeonButton className="w-full" size="sm" onClick={openAppDownload}>
-                  Get the App
-                </NeonButton>
+                <Link href="/download" className="block">
+                  <NeonButton className="w-full" size="sm">
+                    Get the App
+                  </NeonButton>
+                </Link>
               </div>
             </div>
           </motion.div>

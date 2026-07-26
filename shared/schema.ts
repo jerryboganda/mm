@@ -1,22 +1,23 @@
-import crypto from "crypto";
 import { sql, relations } from "drizzle-orm";
 import {
-  mysqlTable,
+  pgTable,
   text,
   varchar,
-  int,
+  integer,
   boolean,
   timestamp,
-  json,
-  decimal,
+  jsonb,
+  numeric,
   index,
   uniqueIndex,
-} from "drizzle-orm/mysql-core";
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = mysqlTable("users", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const users = pgTable("users", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
@@ -41,7 +42,7 @@ export const users = mysqlTable("users", {
   deviceLimitOverrideEnabled: boolean("device_limit_override_enabled")
     .default(false)
     .notNull(),
-  deviceLimitMax: int("device_limit_max"),
+  deviceLimitMax: integer("device_limit_max"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -52,11 +53,13 @@ export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(userSessions),
 }));
 
-export const userSessions = mysqlTable(
+export const userSessions = pgTable(
   "user_sessions",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     deviceId: text("device_id").notNull(),
@@ -70,7 +73,7 @@ export const userSessions = mysqlTable(
     lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
     expiresAt: timestamp("expires_at").notNull(),
     revokedAt: timestamp("revoked_at"),
-    revokedBy: varchar("revoked_by", { length: 255 }).references(() => users.id, {
+    revokedBy: varchar("revoked_by").references(() => users.id, {
       onDelete: "set null",
     }),
     revokeReason: text("revoke_reason"),
@@ -92,13 +95,15 @@ export const userSessionsRelations = relations(userSessions, ({ one }) => ({
   }),
 }));
 
-export const books = mysqlTable("books", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const books = pgTable("books", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
   description: text("description"),
   imageUrl: text("image_url"),
   isPublished: boolean("is_published").default(false),
-  order: int("order").default(0),
+  order: integer("order").default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -107,16 +112,18 @@ export const booksRelations = relations(books, ({ many }) => ({
   chapters: many(chapters),
 }));
 
-export const chapters = mysqlTable(
+export const chapters = pgTable(
   "chapters",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    bookId: varchar("book_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    bookId: varchar("book_id")
       .notNull()
       .references(() => books.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     description: text("description"),
-    order: int("order").default(0),
+    order: integer("order").default(0),
     isPublished: boolean("is_published").default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -133,16 +140,18 @@ export const chaptersRelations = relations(chapters, ({ one, many }) => ({
   topics: many(topics),
 }));
 
-export const topics = mysqlTable(
+export const topics = pgTable(
   "topics",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    chapterId: varchar("chapter_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    chapterId: varchar("chapter_id")
       .notNull()
       .references(() => chapters.id, { onDelete: "cascade" }),
     title: text("title").notNull(),
     description: text("description"),
-    order: int("order").default(0),
+    order: integer("order").default(0),
     isPublished: boolean("is_published").default(false),
     author: text("author"),
     source: text("source"),
@@ -168,14 +177,16 @@ export const topicsRelations = relations(topics, ({ one, many }) => ({
   mcqs: many(mcqs),
 }));
 
-export const contentBlocks = mysqlTable("content_blocks", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-  topicId: varchar("topic_id", { length: 36 })
+export const contentBlocks = pgTable("content_blocks", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  topicId: varchar("topic_id")
     .notNull()
     .references(() => topics.id, { onDelete: "cascade" }),
   type: text("type").notNull(),
   content: text("content").notNull(),
-  order: int("order").default(0),
+  order: integer("order").default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -186,22 +197,24 @@ export const contentBlocksRelations = relations(contentBlocks, ({ one }) => ({
   }),
 }));
 
-export const mcqs = mysqlTable("mcqs", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-  topicId: varchar("topic_id", { length: 36 })
+export const mcqs = pgTable("mcqs", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  topicId: varchar("topic_id")
     .notNull()
     .references(() => topics.id, { onDelete: "cascade" }),
   question: text("question").notNull(),
-  options: json("options").notNull(),
+  options: jsonb("options").notNull(),
   correctAnswer: text("correct_answer").notNull(),
   explanation: text("explanation"),
-  optionExplanations: json("option_explanations"),
+  optionExplanations: jsonb("option_explanations"),
   difficulty: text("difficulty").notNull().default("medium"),
   references: text("references"),
-  tags: json("tags"),
+  tags: jsonb("tags"),
   // Optional explanation figures: [{ url: string, caption?: string }]
   // Additive/nullable so existing rows and callers are unaffected.
-  images: json("images"),
+  images: jsonb("images"),
   isPublished: boolean("is_published").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -214,14 +227,16 @@ export const mcqsRelations = relations(mcqs, ({ one }) => ({
   }),
 }));
 
-export const userProgress = mysqlTable(
+export const userProgress = pgTable(
   "user_progress",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: varchar("topic_id", { length: 36 })
+    topicId: varchar("topic_id")
       .notNull()
       .references(() => topics.id, { onDelete: "cascade" }),
     isCompleted: boolean("is_completed").default(false),
@@ -248,14 +263,16 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
   }),
 }));
 
-export const bookmarks = mysqlTable(
+export const bookmarks = pgTable(
   "bookmarks",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: varchar("topic_id", { length: 36 })
+    topicId: varchar("topic_id")
       .notNull()
       .references(() => topics.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -276,23 +293,25 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   }),
 }));
 
-export const quizAttempts = mysqlTable(
+export const quizAttempts = pgTable(
   "quiz_attempts",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: varchar("topic_id", { length: 36 }).references(() => topics.id, {
+    topicId: varchar("topic_id").references(() => topics.id, {
       onDelete: "set null",
     }),
     mode: text("mode").notNull(),
-    score: int("score").notNull(),
-    totalQuestions: int("total_questions").notNull(),
-    correctCount: int("correct_count").notNull(),
-    wrongCount: int("wrong_count").notNull(),
-    timeTaken: int("time_taken"),
-    answers: json("answers").notNull(),
+    score: integer("score").notNull(),
+    totalQuestions: integer("total_questions").notNull(),
+    correctCount: integer("correct_count").notNull(),
+    wrongCount: integer("wrong_count").notNull(),
+    timeTaken: integer("time_taken"),
+    answers: jsonb("answers").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -311,11 +330,13 @@ export const quizAttemptsRelations = relations(quizAttempts, ({ one }) => ({
   }),
 }));
 
-export const passwordResetTokens = mysqlTable(
+export const passwordResetTokens = pgTable(
   "password_reset_tokens",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     token: text("token").notNull().unique(),
@@ -342,14 +363,16 @@ export const passwordResetTokensRelations = relations(
   }),
 );
 
-export const recentActivity = mysqlTable(
+export const recentActivity = pgTable(
   "recent_activity",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: varchar("topic_id", { length: 36 })
+    topicId: varchar("topic_id")
       .notNull()
       .references(() => topics.id, { onDelete: "cascade" }),
     viewedAt: timestamp("viewed_at").defaultNow().notNull(),
@@ -371,19 +394,21 @@ export const recentActivityRelations = relations(recentActivity, ({ one }) => ({
 }));
 
 // ── Spaced Repetition (SM-2 algorithm) ──────────────────────────
-export const reviewSchedule = mysqlTable(
+export const reviewSchedule = pgTable(
   "review_schedule",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    mcqId: varchar("mcq_id", { length: 36 })
+    mcqId: varchar("mcq_id")
       .notNull()
       .references(() => mcqs.id, { onDelete: "cascade" }),
-    easeFactor: int("ease_factor").notNull().default(250), // stored as int × 100 (2.50 → 250)
-    interval: int("interval").notNull().default(1), // days until next review
-    repetitions: int("repetitions").notNull().default(0),
+    easeFactor: integer("ease_factor").notNull().default(250), // stored as int × 100 (2.50 → 250)
+    interval: integer("interval").notNull().default(1), // days until next review
+    repetitions: integer("repetitions").notNull().default(0),
     nextReviewAt: timestamp("next_review_at").defaultNow().notNull(),
     lastReviewedAt: timestamp("last_reviewed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -405,24 +430,28 @@ export const reviewScheduleRelations = relations(reviewSchedule, ({ one }) => ({
 }));
 
 // ── Admin App Settings (key-value store) ──────────────────────────
-export const appSettings = mysqlTable("app_settings", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const appSettings = pgTable("app_settings", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   key: text("key").notNull().unique(),
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // ── Announcements ──────────────────────────
-export const announcements = mysqlTable(
+export const announcements = pgTable(
   "announcements",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
     title: text("title").notNull(),
     message: text("message").notNull(),
     type: text("type").notNull().default("info"), // 'info' | 'warning' | 'update' | 'promo'
     isActive: boolean("is_active").default(true),
     expiresAt: timestamp("expires_at"),
-    createdBy: varchar("created_by", { length: 255 }).references(() => users.id),
+    createdBy: varchar("created_by").references(() => users.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -442,15 +471,17 @@ export const announcementsRelations = relations(announcements, ({ one }) => ({
 }));
 
 // ── Audit Logs ──────────────────────────
-export const auditLogs = mysqlTable("audit_logs", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-  adminUserId: varchar("admin_user_id", { length: 36 })
+export const auditLogs = pgTable("audit_logs", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  adminUserId: varchar("admin_user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   action: text("action").notNull(), // 'create' | 'update' | 'delete' | 'publish' | 'unpublish'
   entityType: text("entity_type").notNull(), // 'book' | 'chapter' | 'topic' | 'mcq' | 'user' | 'announcement'
-  entityId: varchar("entity_id", { length: 36 }),
-  details: json("details"),
+  entityId: varchar("entity_id"),
+  details: jsonb("details"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -462,19 +493,21 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
 }));
 
 // ── Content Error Reports (TRUST-003) ──────────────────────────
-export const contentReports = mysqlTable(
+export const contentReports = pgTable(
   "content_reports",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     contentType: text("content_type").notNull(), // 'topic' | 'mcq' | 'content_block'
-    contentId: varchar("content_id", { length: 36 }).notNull(),
+    contentId: varchar("content_id").notNull(),
     reportType: text("report_type").notNull(), // 'error' | 'outdated' | 'unclear' | 'other'
     description: text("description").notNull(),
     status: text("status").notNull().default("pending"), // 'pending' | 'reviewed' | 'resolved' | 'dismissed'
-    reviewedBy: varchar("reviewed_by", { length: 255 }).references(() => users.id),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
     reviewedAt: timestamp("reviewed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -498,10 +531,12 @@ export const contentReportsRelations = relations(contentReports, ({ one }) => ({
 // ══════════════════════════════════════════════════════════════════
 
 // ── 1. Subscription Packages ──────────────────────────────────
-export const subscriptionPackages = mysqlTable(
+export const subscriptionPackages = pgTable(
   "subscription_packages",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     description: text("description"),
@@ -510,20 +545,20 @@ export const subscriptionPackages = mysqlTable(
     // Status: active (purchasable), inactive (hidden), archived (soft-deleted, existing subs honored)
     status: text("status").notNull().default("active"),
     isVisibleToUsers: boolean("is_visible_to_users").default(true).notNull(),
-    displayOrder: int("display_order").default(0).notNull(),
+    displayOrder: integer("display_order").default(0).notNull(),
     // Trial configuration
-    trialDays: int("trial_days").default(0).notNull(),
+    trialDays: integer("trial_days").default(0).notNull(),
     trialRequiresPaymentMethod: boolean("trial_requires_payment_method")
       .default(false)
       .notNull(),
     // Grace period (days after expiry before feature lockout)
-    gracePeriodDays: int("grace_period_days").default(0).notNull(),
+    gracePeriodDays: integer("grace_period_days").default(0).notNull(),
     // Subscriber limits (0 = unlimited)
-    maxSubscribers: int("max_subscribers").default(0).notNull(),
+    maxSubscribers: integer("max_subscribers").default(0).notNull(),
     // Package versioning — version increments when pricing/features change
-    version: int("version").default(1).notNull(),
+    version: integer("version").default(1).notNull(),
     // Extensible metadata (for gateway-specific IDs, feature flags, etc.)
-    metadata: json("metadata"),
+    metadata: jsonb("metadata"),
     // RevenueCat product mapping
     revenuecatProductId: text("revenuecat_product_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -545,28 +580,30 @@ export const subscriptionPackagesRelations = relations(
 );
 
 // ── 2. Package Prices (polymorphic billing cycles) ────────────
-export const packagePrices = mysqlTable(
+export const packagePrices = pgTable(
   "package_prices",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    packageId: varchar("package_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    packageId: varchar("package_id")
       .notNull()
       .references(() => subscriptionPackages.id, { onDelete: "cascade" }),
     // Billing cycle: monthly, quarterly, semi_annual, annual, lifetime, custom
     billingCycle: text("billing_cycle").notNull(),
     // Custom cycle duration in days (used when billingCycle = 'custom')
-    customDurationDays: int("custom_duration_days"),
-    // Price in smallest currency unit (e.g., cents). Use decimal for precision.
-    price: decimal("price", { precision: 12, scale: 2 }).notNull(),
+    customDurationDays: integer("custom_duration_days"),
+    // Price in smallest currency unit (e.g., cents). Use numeric for precision.
+    price: numeric("price", { precision: 12, scale: 2 }).notNull(),
     currency: text("currency").notNull().default("PKR"),
     // Original price for strike-through display
-    originalPrice: decimal("original_price", { precision: 12, scale: 2 }),
+    originalPrice: numeric("original_price", { precision: 12, scale: 2 }),
     isActive: boolean("is_active").default(true).notNull(),
     // RevenueCat offering/package mapping
     revenuecatOfferingId: text("revenuecat_offering_id"),
     // Versioning — ties to package version when this price was created
-    packageVersion: int("package_version").default(1).notNull(),
-    metadata: json("metadata"),
+    packageVersion: integer("package_version").default(1).notNull(),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -584,11 +621,13 @@ export const packagePricesRelations = relations(packagePrices, ({ one }) => ({
 }));
 
 // ── 3. Package Features (for comparison matrix) ───────────────
-export const packageFeatures = mysqlTable(
+export const packageFeatures = pgTable(
   "package_features",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    packageId: varchar("package_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    packageId: varchar("package_id")
       .notNull()
       .references(() => subscriptionPackages.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
@@ -596,7 +635,7 @@ export const packageFeatures = mysqlTable(
     // For comparison matrix: check, cross, limited, number (e.g., "50 MCQs/day")
     valueType: text("value_type").notNull().default("check"),
     value: text("value"),
-    displayOrder: int("display_order").default(0).notNull(),
+    displayOrder: integer("display_order").default(0).notNull(),
     // Feature key for programmatic checking (e.g., "full_content_access", "unlimited_mcqs")
     featureKey: text("feature_key"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -615,26 +654,28 @@ export const packageFeaturesRelations = relations(
 );
 
 // ── 4. Add-Ons ────────────────────────────────────────────────
-export const addOns = mysqlTable(
+export const addOns = pgTable(
   "add_ons",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     description: text("description"),
     // Pricing: one_time or recurring
     pricingType: text("pricing_type").notNull().default("one_time"),
-    price: decimal("price", { precision: 12, scale: 2 }).notNull(),
+    price: numeric("price", { precision: 12, scale: 2 }).notNull(),
     currency: text("currency").notNull().default("PKR"),
     // If recurring, how often
     billingCycle: text("billing_cycle"),
     // Quantity limits per user (0 = unlimited)
-    maxQuantityPerUser: int("max_quantity_per_user").default(1).notNull(),
+    maxQuantityPerUser: integer("max_quantity_per_user").default(1).notNull(),
     // Compatibility: null = compatible with all packages, otherwise JSON array of package IDs
-    compatiblePackageIds: json("compatible_package_ids"),
+    compatiblePackageIds: jsonb("compatible_package_ids"),
     isActive: boolean("is_active").default(true).notNull(),
-    displayOrder: int("display_order").default(0).notNull(),
-    metadata: json("metadata"),
+    displayOrder: integer("display_order").default(0).notNull(),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -642,64 +683,68 @@ export const addOns = mysqlTable(
 );
 
 // ── 5. Add-On Bundles ─────────────────────────────────────────
-export const addOnBundles = mysqlTable("add_on_bundles", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const addOnBundles = pgTable("add_on_bundles", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
   // Discounted bundle price
-  price: decimal("price", { precision: 12, scale: 2 }).notNull(),
+  price: numeric("price", { precision: 12, scale: 2 }).notNull(),
   currency: text("currency").notNull().default("PKR"),
   // JSON array of add-on IDs in this bundle
-  addOnIds: json("add_on_ids").notNull(),
+  addOnIds: jsonb("add_on_ids").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
-  displayOrder: int("display_order").default(0).notNull(),
+  displayOrder: integer("display_order").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // ── 6. Coupons / Discount Engine ──────────────────────────────
-export const coupons = mysqlTable(
+export const coupons = pgTable(
   "coupons",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
     code: text("code").notNull().unique(),
     description: text("description"),
     // Campaign grouping for bulk-generated codes
-    campaignId: varchar("campaign_id", { length: 36 }),
+    campaignId: varchar("campaign_id"),
     // Discount type: percentage, fixed_amount, trial_extension
     discountType: text("discount_type").notNull(),
     // Discount value (percentage 0-100, or fixed amount, or trial days to add)
-    discountValue: decimal("discount_value", {
+    discountValue: numeric("discount_value", {
       precision: 12,
       scale: 2,
     }).notNull(),
     // Minimum purchase amount required
-    minPurchaseAmount: decimal("min_purchase_amount", {
+    minPurchaseAmount: numeric("min_purchase_amount", {
       precision: 12,
       scale: 2,
     }),
     // Maximum discount cap (for percentage discounts)
-    maxDiscountAmount: decimal("max_discount_amount", {
+    maxDiscountAmount: numeric("max_discount_amount", {
       precision: 12,
       scale: 2,
     }),
     // Applicability: null = all packages/add-ons, otherwise JSON arrays of IDs
-    applicablePackageIds: json("applicable_package_ids"),
-    applicableAddOnIds: json("applicable_add_on_ids"),
+    applicablePackageIds: jsonb("applicable_package_ids"),
+    applicableAddOnIds: jsonb("applicable_add_on_ids"),
     // Usage limits
-    maxTotalUses: int("max_total_uses"), // null = unlimited
-    maxUsesPerUser: int("max_uses_per_user").default(1).notNull(),
-    currentUseCount: int("current_use_count").default(0).notNull(),
+    maxTotalUses: integer("max_total_uses"), // null = unlimited
+    maxUsesPerUser: integer("max_uses_per_user").default(1).notNull(),
+    currentUseCount: integer("current_use_count").default(0).notNull(),
     // Validity period
     validFrom: timestamp("valid_from"),
     validUntil: timestamp("valid_until"),
     // Stacking rules
     isStackable: boolean("is_stackable").default(false).notNull(),
     // Referral/affiliate tracking
-    referralUserId: varchar("referral_user_id", { length: 36 }).references(() => users.id),
+    referralUserId: varchar("referral_user_id").references(() => users.id),
     isActive: boolean("is_active").default(true).notNull(),
-    metadata: json("metadata"),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -720,19 +765,21 @@ export const couponsRelations = relations(coupons, ({ one, many }) => ({
 }));
 
 // ── 7. Coupon Usage Tracking ──────────────────────────────────
-export const couponUsage = mysqlTable(
+export const couponUsage = pgTable(
   "coupon_usage",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    couponId: varchar("coupon_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    couponId: varchar("coupon_id")
       .notNull()
       .references(() => coupons.id, { onDelete: "cascade" }),
-    userId: varchar("user_id", { length: 36 })
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    subscriptionId: varchar("subscription_id", { length: 36 }),
+    subscriptionId: varchar("subscription_id"),
     // Amount discounted
-    discountApplied: decimal("discount_applied", {
+    discountApplied: numeric("discount_applied", {
       precision: 12,
       scale: 2,
     }).notNull(),
@@ -756,17 +803,19 @@ export const couponUsageRelations = relations(couponUsage, ({ one }) => ({
 }));
 
 // ── 8. Subscriptions (lifecycle tracking) ─────────────────────
-export const subscriptions = mysqlTable(
+export const subscriptions = pgTable(
   "subscriptions",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    packageId: varchar("package_id", { length: 36 })
+    packageId: varchar("package_id")
       .notNull()
       .references(() => subscriptionPackages.id),
-    priceId: varchar("price_id", { length: 36 }).references(() => packagePrices.id),
+    priceId: varchar("price_id").references(() => packagePrices.id),
     // State machine: trialing → active → past_due → paused → canceled → expired
     status: text("status").notNull().default("trialing"),
     // Dates for every lifecycle transition
@@ -785,27 +834,27 @@ export const subscriptions = mysqlTable(
     // Grace period tracking
     gracePeriodEndAt: timestamp("grace_period_end_at"),
     // Dunning management (failed payment retries)
-    failedPaymentCount: int("failed_payment_count").default(0).notNull(),
+    failedPaymentCount: integer("failed_payment_count").default(0).notNull(),
     lastPaymentFailedAt: timestamp("last_payment_failed_at"),
     nextRetryAt: timestamp("next_retry_at"),
     // Billing
     billingCycle: text("billing_cycle").notNull(),
-    priceAtPurchase: decimal("price_at_purchase", {
+    priceAtPurchase: numeric("price_at_purchase", {
       precision: 12,
       scale: 2,
     }).notNull(),
     currency: text("currency").notNull().default("PKR"),
     // Applied coupon
-    couponId: varchar("coupon_id", { length: 36 }).references(() => coupons.id),
-    discountAmount: decimal("discount_amount", { precision: 12, scale: 2 }),
+    couponId: varchar("coupon_id").references(() => coupons.id),
+    discountAmount: numeric("discount_amount", { precision: 12, scale: 2 }),
     // External references
     externalSubscriptionId: text("external_subscription_id"), // RevenueCat/Stripe/etc ID
     paymentGateway: text("payment_gateway").default("revenuecat"), // revenuecat, stripe, paypal, manual
     // Package version at time of subscription (for grandfathering)
-    packageVersionAtPurchase: int("package_version_at_purchase")
+    packageVersionAtPurchase: integer("package_version_at_purchase")
       .default(1)
       .notNull(),
-    metadata: json("metadata"),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -843,18 +892,20 @@ export const subscriptionsRelations = relations(
 );
 
 // ── 9. Subscription Add-Ons (attached to a subscription) ─────
-export const subscriptionAddOns = mysqlTable(
+export const subscriptionAddOns = pgTable(
   "subscription_add_ons",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    subscriptionId: varchar("subscription_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    subscriptionId: varchar("subscription_id")
       .notNull()
       .references(() => subscriptions.id, { onDelete: "cascade" }),
-    addOnId: varchar("add_on_id", { length: 36 })
+    addOnId: varchar("add_on_id")
       .notNull()
       .references(() => addOns.id),
-    quantity: int("quantity").default(1).notNull(),
-    priceAtPurchase: decimal("price_at_purchase", {
+    quantity: integer("quantity").default(1).notNull(),
+    priceAtPurchase: numeric("price_at_purchase", {
       precision: 12,
       scale: 2,
     }).notNull(),
@@ -884,28 +935,30 @@ export const subscriptionAddOnsRelations = relations(
 );
 
 // ── 10. Invoices ──────────────────────────────────────────────
-export const invoices = mysqlTable(
+export const invoices = pgTable(
   "invoices",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
     // Human-readable invoice number (e.g., INV-2026-0001)
     invoiceNumber: text("invoice_number").notNull().unique(),
-    userId: varchar("user_id", { length: 36 })
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    subscriptionId: varchar("subscription_id", { length: 36 }).references(
+    subscriptionId: varchar("subscription_id").references(
       () => subscriptions.id,
     ),
     // Status: draft, open, paid, void, uncollectible
     status: text("status").notNull().default("draft"),
     // Amounts
-    subtotal: decimal("subtotal", { precision: 12, scale: 2 }).notNull(),
-    discountTotal: decimal("discount_total", {
+    subtotal: numeric("subtotal", { precision: 12, scale: 2 }).notNull(),
+    discountTotal: numeric("discount_total", {
       precision: 12,
       scale: 2,
     }).default("0"),
-    taxTotal: decimal("tax_total", { precision: 12, scale: 2 }).default("0"),
-    total: decimal("total", { precision: 12, scale: 2 }).notNull(),
+    taxTotal: numeric("tax_total", { precision: 12, scale: 2 }).default("0"),
+    total: numeric("total", { precision: 12, scale: 2 }).notNull(),
     currency: text("currency").notNull().default("PKR"),
     // Payment tracking
     paidAt: timestamp("paid_at"),
@@ -914,9 +967,9 @@ export const invoices = mysqlTable(
     periodStart: timestamp("period_start"),
     periodEnd: timestamp("period_end"),
     // Applied coupon for reference
-    couponId: varchar("coupon_id", { length: 36 }).references(() => coupons.id),
+    couponId: varchar("coupon_id").references(() => coupons.id),
     notes: text("notes"),
-    metadata: json("metadata"),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -945,26 +998,28 @@ export const invoicesRelations = relations(invoices, ({ one, many }) => ({
 }));
 
 // ── 11. Invoice Line Items ────────────────────────────────────
-export const invoiceLineItems = mysqlTable(
+export const invoiceLineItems = pgTable(
   "invoice_line_items",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    invoiceId: varchar("invoice_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    invoiceId: varchar("invoice_id")
       .notNull()
       .references(() => invoices.id, { onDelete: "cascade" }),
     // Type: subscription, add_on, proration_credit, proration_charge
     type: text("type").notNull(),
     description: text("description").notNull(),
     // Reference to package/add-on
-    packageId: varchar("package_id", { length: 36 }).references(() => subscriptionPackages.id),
-    addOnId: varchar("add_on_id", { length: 36 }).references(() => addOns.id),
-    quantity: int("quantity").default(1).notNull(),
-    unitPrice: decimal("unit_price", { precision: 12, scale: 2 }).notNull(),
-    total: decimal("total", { precision: 12, scale: 2 }).notNull(),
+    packageId: varchar("package_id").references(() => subscriptionPackages.id),
+    addOnId: varchar("add_on_id").references(() => addOns.id),
+    quantity: integer("quantity").default(1).notNull(),
+    unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull(),
+    total: numeric("total", { precision: 12, scale: 2 }).notNull(),
     // Period for prorations
     periodStart: timestamp("period_start"),
     periodEnd: timestamp("period_end"),
-    metadata: json("metadata"),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [index("idx_line_item_invoice").on(table.invoiceId)],
@@ -989,31 +1044,33 @@ export const invoiceLineItemsRelations = relations(
 );
 
 // ── 12. Payment Transactions ──────────────────────────────────
-export const paymentTransactions = mysqlTable(
+export const paymentTransactions = pgTable(
   "payment_transactions",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    invoiceId: varchar("invoice_id", { length: 36 }).references(() => invoices.id),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    invoiceId: varchar("invoice_id").references(() => invoices.id),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     // Status: pending, succeeded, failed, refunded, disputed
     status: text("status").notNull().default("pending"),
     // Amount and currency
-    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
     currency: text("currency").notNull().default("PKR"),
     // Gateway details
     paymentGateway: text("payment_gateway").notNull(), // revenuecat, stripe, paypal, manual
     gatewayTransactionId: text("gateway_transaction_id"),
-    gatewayResponse: json("gateway_response"),
+    gatewayResponse: jsonb("gateway_response"),
     // Failure details
     failureReason: text("failure_reason"),
     failureCode: text("failure_code"),
     // Refund tracking
-    refundedAmount: decimal("refunded_amount", { precision: 12, scale: 2 }),
+    refundedAmount: numeric("refunded_amount", { precision: 12, scale: 2 }),
     refundedAt: timestamp("refunded_at"),
     refundReason: text("refund_reason"),
-    metadata: json("metadata"),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -1040,18 +1097,20 @@ export const paymentTransactionsRelations = relations(
 );
 
 // ── 13. Subscription Audit Log ────────────────────────────────
-export const subscriptionAuditLogs = mysqlTable(
+export const subscriptionAuditLogs = pgTable(
   "subscription_audit_logs",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    subscriptionId: varchar("subscription_id", { length: 36 }).references(
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    subscriptionId: varchar("subscription_id").references(
       () => subscriptions.id,
     ),
-    userId: varchar("user_id", { length: 36 })
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     // Who performed this action (null = system/webhook, non-null = admin/user)
-    performedBy: varchar("performed_by", { length: 255 }).references(() => users.id),
+    performedBy: varchar("performed_by").references(() => users.id),
     // Action: created, activated, renewed, upgraded, downgraded, paused, resumed,
     //         canceled, expired, reactivated, payment_failed, payment_succeeded,
     //         coupon_applied, add_on_added, add_on_removed, admin_override
@@ -1060,7 +1119,7 @@ export const subscriptionAuditLogs = mysqlTable(
     previousStatus: text("previous_status"),
     newStatus: text("new_status"),
     // Additional context
-    details: json("details"),
+    details: jsonb("details"),
     // Source: webhook, client_sync, admin_panel, system_cron, api
     source: text("source").notNull().default("system"),
     ipAddress: text("ip_address"),
@@ -1097,21 +1156,23 @@ export const subscriptionAuditLogsRelations = relations(
 // package. An admin reviews the proof and approves (which provisions a
 // subscription via subscriptionService.createSubscription with
 // paymentGateway="manual") or rejects it.
-export const manualPaymentProofs = mysqlTable(
+export const manualPaymentProofs = pgTable(
   "manual_payment_proofs",
   {
-    id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    packageId: varchar("package_id", { length: 36 })
+    packageId: varchar("package_id")
       .notNull()
       .references(() => subscriptionPackages.id),
-    priceId: varchar("price_id", { length: 36 }).references(() => packagePrices.id),
+    priceId: varchar("price_id").references(() => packagePrices.id),
     // Review state: pending → approved | rejected
     status: text("status").notNull().default("pending"),
     // What the user claims they paid (informational; admin verifies the image)
-    amountClaimed: decimal("amount_claimed", { precision: 12, scale: 2 }),
+    amountClaimed: numeric("amount_claimed", { precision: 12, scale: 2 }),
     currency: text("currency"),
     // e.g. "Bank Transfer", "JazzCash", "Easypaisa"
     paymentMethod: text("payment_method"),
@@ -1122,11 +1183,11 @@ export const manualPaymentProofs = mysqlTable(
     proofImageUrl: text("proof_image_url").notNull(),
     proofFilename: text("proof_filename"),
     // Admin review
-    reviewedBy: varchar("reviewed_by", { length: 255 }).references(() => users.id),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
     reviewedAt: timestamp("reviewed_at"),
     rejectionReason: text("rejection_reason"),
     // Subscription created on approval
-    createdSubscriptionId: varchar("created_subscription_id", { length: 36 }),
+    createdSubscriptionId: varchar("created_subscription_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -1441,20 +1502,26 @@ export type InsertManualPaymentProof =
   typeof manualPaymentProofs.$inferInsert;
 
 // ── Website Marketing Tables ──────────────────────────────────
-export const waitlistEntries = mysqlTable("waitlist_entries", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const waitlistEntries = pgTable("waitlist_entries", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   email: text("email").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const newsletterEntries = mysqlTable("newsletter_entries", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const newsletterEntries = pgTable("newsletter_entries", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   email: text("email").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const contactMessages = mysqlTable("contact_messages", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const contactMessages = pgTable("contact_messages", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").notNull(),
   subject: text("subject").notNull(),
@@ -1462,8 +1529,10 @@ export const contactMessages = mysqlTable("contact_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const institutionalRequests = mysqlTable("institutional_requests", {
-  id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),
+export const institutionalRequests = pgTable("institutional_requests", {
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   institution: text("institution").notNull(),
   role: text("role").notNull(),
