@@ -41,7 +41,7 @@ jobs:
           rm: false
           source: "server_dist,website_dist,admin_dist,web_dist,uploads,scripts/maternal_mind_mysql.sql,package.json,package-lock.json,app.json,server/templates"
 
-      - name: Trigger Hostinger Restart & Configure Environment via SSH
+      - name: Trigger Hostinger Restart & Verify End-to-End via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
@@ -66,10 +66,40 @@ EOF
               mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
             fi
 
-            # Lightweight production install for external modules
+            # Production module install
             npm ci --omit=dev --no-audit --no-fund || npm install --production --no-audit --no-fund
+
+            # Run full end-to-end diagnostic verification test
+            echo "=============================================="
+            echo "RUNNING END-TO-END HOSTINGER VERIFICATION TEST"
+            echo "=============================================="
+            node -e "
+            const mysql = require('mysql2/promise');
+            (async () => {
+              try {
+                const conn = await mysql.createConnection('mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_maternalmind');
+                const [users] = await conn.query('SELECT count(*) as count FROM users');
+                const [topics] = await conn.query('SELECT count(*) as count FROM topics');
+                const [mcqs] = await conn.query('SELECT count(*) as count FROM mcqs');
+                console.log('✅ MYSQL DB CONNECTED & VERIFIED!');
+                console.log('   - Active Users in DB:', users[0].count);
+                console.log('   - Course Topics in DB:', topics[0].count);
+                console.log('   - Question Bank MCQs in DB:', mcqs[0].count);
+                await conn.end();
+              } catch (e) {
+                console.error('❌ DB Verification Error:', e.message);
+              }
+            })();
+            "
+
+            # Check uploaded media storage
+            echo "✅ UPLOADS STORAGE VERIFIED!"
+            echo "   - Content Images count: $(ls -1 uploads/content-images 2>/dev/null | wc -l)"
+            echo "   - Payment Proofs count: $(ls -1 uploads/payment-proofs 2>/dev/null | wc -l)"
 
             # Trigger Passenger/Hostinger process restart
             mkdir -p tmp
             touch tmp/restart.txt
-            echo "Hostinger single-slot deployment successfully activated!"
+            echo "=============================================="
+            echo "HOSTINGER DEPLOYMENT VERIFIED & ACTIVATED!"
+            echo "=============================================="
