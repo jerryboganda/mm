@@ -39,7 +39,7 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           target: "domains/maternalmind.com.pk/public_html"
           rm: false
-          source: "server_dist,website_dist,admin_dist,web_dist,package.json,package-lock.json,app.json,server/templates"
+          source: "server_dist,website_dist,admin_dist,web_dist,uploads,package.json,package-lock.json,app.json,server/templates"
 
       - name: Trigger Hostinger Restart via SSH
         uses: appleboy/ssh-action@v1.0.3
