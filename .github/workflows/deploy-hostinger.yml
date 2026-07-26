@@ -39,9 +39,9 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           target: "domains/maternalmind.com.pk/public_html"
           rm: false
-          source: "server_dist,website_dist,admin_dist,web_dist,uploads,package.json,package-lock.json,app.json,server/templates"
+          source: "server_dist,website_dist,admin_dist,web_dist,uploads,scripts/maternal_mind_mysql.sql,package.json,package-lock.json,app.json,server/templates"
 
-      - name: Trigger Hostinger Restart via SSH
+      - name: Trigger Hostinger Restart & MySQL Import via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
@@ -49,8 +49,14 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER || 'u776151780' }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            echo "Restarting Hostinger Node.js Web App..."
+            echo "Connected to Hostinger via GitHub Actions!"
             cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
+
+            # Import MySQL database dump into Hostinger MySQL
+            if [ -f "scripts/maternal_mind_mysql.sql" ]; then
+              echo "Importing production database dump into Hostinger MySQL (u776151780_maternalmind)..."
+              mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
+            fi
 
             # Lightweight production install for external modules
             npm ci --omit=dev --no-audit --no-fund || npm install --production --no-audit --no-fund

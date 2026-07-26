@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { paymentTransactions } from "../../shared/schema";
@@ -595,7 +596,7 @@ class PaymentGatewayManager {
         refundReason: data.refundReason || null,
         metadata: data.metadata || null,
       })
-      .returning();
+      ;
 
     return transaction;
   }
@@ -656,7 +657,7 @@ class PaymentGatewayManager {
         updatedAt: new Date(),
       })
       .where(eq(paymentTransactions.id, id))
-      .returning();
+      ;
 
     return transaction || null;
   }

@@ -1,3 +1,4 @@
+import crypto from "crypto";
 /**
  * Admin Manual Payments API Routes
  *
@@ -309,7 +310,7 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
         updatedAt: new Date(),
       })
       .where(eq(manualPaymentProofs.id, id))
-      .returning();
+      ;
 
     // Notify the user (best-effort)
     const [user] = await db
@@ -370,7 +371,7 @@ router.post("/:id/reject", async (req: AuthRequest, res: Response) => {
         updatedAt: new Date(),
       })
       .where(eq(manualPaymentProofs.id, id))
-      .returning();
+      ;
 
     const [user] = await db
       .select()

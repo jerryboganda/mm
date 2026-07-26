@@ -282,7 +282,7 @@ class CouponService {
         isActive: data.isActive ?? true,
         metadata: data.metadata ?? null,
       })
-      .returning();
+      ;
     return coupon;
   }
 
@@ -335,7 +335,7 @@ class CouponService {
       .update(coupons)
       .set(values)
       .where(eq(coupons.id, id))
-      .returning();
+      ;
 
     return updated ?? undefined;
   }
@@ -348,7 +348,7 @@ class CouponService {
       .update(coupons)
       .set({ isActive: false, updatedAt: new Date() })
       .where(eq(coupons.id, id))
-      .returning();
+      ;
     return updated ?? undefined;
   }
 
@@ -669,7 +669,7 @@ class CouponService {
         subscriptionId,
         discountApplied: String(round2(amount)),
       })
-      .returning();
+      ;
 
     return usage;
   }
