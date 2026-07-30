@@ -52,52 +52,20 @@ jobs:
             echo "Connected to Hostinger via GitHub Actions!"
             cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
 
-            # Auto-create .env file so environment variables are 100% pre-configured automatically
             cat << 'EOF' > .env
-NODE_ENV=production
-DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_maternalmind
-SESSION_SECRET=64H28SmybRTDp7iqXuv3UVJ1hsrt9KMxYZ5kNzLBWOlwcjno0CQgeIAfaPdEFG
-ALLOWED_ORIGIN=https://maternalmind.com.pk
-EOF
+            NODE_ENV=production
+            DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_maternalmind
+            SESSION_SECRET=64H28SmybRTDp7iqXuv3UVJ1hsrt9KMxYZ5kNzLBWOlwcjno0CQgeIAfaPdEFG
+            ALLOWED_ORIGIN=https://maternalmind.com.pk
+            EOF
 
-            # Import MySQL database dump into Hostinger MySQL
             if [ -f "scripts/maternal_mind_mysql.sql" ]; then
-              echo "Importing production database dump into Hostinger MySQL (u776151780_maternalmind)..."
+              echo "Importing production database dump into Hostinger MySQL..."
               mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
             fi
 
-            # Production module install
             npm ci --omit=dev --no-audit --no-fund || npm install --production --no-audit --no-fund
 
-            # Run full end-to-end diagnostic verification test
-            echo "=============================================="
-            echo "RUNNING END-TO-END HOSTINGER VERIFICATION TEST"
-            echo "=============================================="
-            node -e "
-            const mysql = require('mysql2/promise');
-            (async () => {
-              try {
-                const conn = await mysql.createConnection('mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_maternalmind');
-                const [users] = await conn.query('SELECT count(*) as count FROM users');
-                const [topics] = await conn.query('SELECT count(*) as count FROM topics');
-                const [mcqs] = await conn.query('SELECT count(*) as count FROM mcqs');
-                console.log('✅ MYSQL DB CONNECTED & VERIFIED!');
-                console.log('   - Active Users in DB:', users[0].count);
-                console.log('   - Course Topics in DB:', topics[0].count);
-                console.log('   - Question Bank MCQs in DB:', mcqs[0].count);
-                await conn.end();
-              } catch (e) {
-                console.error('❌ DB Verification Error:', e.message);
-              }
-            })();
-            "
-
-            # Check uploaded media storage
-            echo "✅ UPLOADS STORAGE VERIFIED!"
-            echo "   - Content Images count: $(ls -1 uploads/content-images 2>/dev/null | wc -l)"
-            echo "   - Payment Proofs count: $(ls -1 uploads/payment-proofs 2>/dev/null | wc -l)"
-
-            # Trigger Passenger/Hostinger process restart
             mkdir -p tmp
             touch tmp/restart.txt
             echo "=============================================="
