@@ -33,9 +33,9 @@ jobs:
       - name: Deploy Built Artifacts via SCP to Hostinger
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
-          port: ${{ secrets.HOSTINGER_PORT || 65002 }}
-          username: ${{ secrets.HOSTINGER_USER || 'u776151780' }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          port: ${{ secrets.HOSTINGER_PORT }}
+          username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           target: "domains/maternalmind.com.pk/public_html"
           rm: false
@@ -44,9 +44,9 @@ jobs:
       - name: Trigger Hostinger Restart & Verify End-to-End via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOSTINGER_HOST || '145.79.25.8' }}
-          port: ${{ secrets.HOSTINGER_PORT || 65002 }}
-          username: ${{ secrets.HOSTINGER_USER || 'u776151780' }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          port: ${{ secrets.HOSTINGER_PORT }}
+          username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             echo "Connected to Hostinger via GitHub Actions!"
