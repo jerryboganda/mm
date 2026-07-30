@@ -66,7 +66,7 @@ jobs:
               mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
             fi
 
-            npm ci --omit=dev --no-audit --no-fund || npm install --production --no-audit --no-fund
+            echo "Server dist is fully self-contained standalone bundle."
 
             mkdir -p tmp
             touch tmp/restart.txt
