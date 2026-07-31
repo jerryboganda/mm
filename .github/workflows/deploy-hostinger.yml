@@ -68,6 +68,14 @@ jobs:
 
             echo "Server dist is fully self-contained standalone bundle."
 
+            echo "Testing Node.js execution on Hostinger..."
+            node -v || true
+            pwd
+            ls -la
+
+            echo "Testing app.js boot..."
+            timeout 5s node app.js || true
+
             mkdir -p tmp
             touch tmp/restart.txt
             echo "=============================================="
