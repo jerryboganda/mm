@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
+import TipTapEditor from '../components/TipTapEditor';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, Search, Upload,
   Loader2, AlertCircle, ClipboardList, X, Download,
@@ -57,6 +58,13 @@ export default function McqsPage() {
   const [importTopicId, setImportTopicId] = useState('');
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState('');
+
+  const uploadImage = async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const result = await api.upload<{ url: string }>('/admin/content/uploads/images', formData);
+    return result.url;
+  };
 
   const load = async () => {
     try {
@@ -269,13 +277,13 @@ export default function McqsPage() {
       {/* MCQ Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setShowForm(false)}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-2xl my-8" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-4xl shadow-2xl my-8" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">{editMcq ? 'Edit MCQ' : 'Create MCQ'}</h2>
               <button onClick={() => setShowForm(false)} className="p-1 text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
             </div>
             {error && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl mb-4 text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Topic *</label>
                 <select value={form.topicId} onChange={(e) => setForm({ ...form, topicId: e.target.value })} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
@@ -316,8 +324,17 @@ export default function McqsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">General Explanation</label>
-                <textarea value={form.explanation} onChange={(e) => setForm({ ...form, explanation: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none resize-none" />
+                <label className="block text-sm font-medium text-gray-700 mb-1 font-semibold">
+                  General Explanation (Rich Text / Tables / Diagrams / Formulas / Images)
+                </label>
+                <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                  <TipTapEditor
+                    content={form.explanation}
+                    onChange={(html) => setForm((prev) => ({ ...prev, explanation: html }))}
+                    placeholder="Write detailed explanation here... (supports rich text formatting, medical tables, formulas, and images)"
+                    uploadImage={uploadImage}
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
