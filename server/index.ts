@@ -487,20 +487,26 @@ process.on("uncaughtException", (error) => {
 
   setupErrorHandler(app);
 
-  const port = parseInt(process.env.PORT || "5000", 10);
-  const listenOptions: Parameters<typeof server.listen>[0] = {
-    port,
-    host: "0.0.0.0",
-  };
+  const rawPort = process.env.PORT || "5000";
+  const numPort = parseInt(rawPort, 10);
 
-  // `reusePort` is not supported on some Windows/socket setups used for local dev.
-  if (process.platform !== "win32") {
-    (listenOptions as any).reusePort = true;
+  if (isNaN(numPort)) {
+    // Hostinger Phusion Passenger Unix domain socket path (e.g. /tmp/passenger.xxx)
+    server.listen(rawPort, () => {
+      logger.info(`express server serving on unix domain socket ${rawPort}`);
+    });
+  } else {
+    const listenOptions: any = {
+      port: numPort,
+      host: "0.0.0.0",
+    };
+    if (process.platform !== "win32" && !process.env.PASSENGER_APP_ENV) {
+      listenOptions.reusePort = true;
+    }
+    server.listen(listenOptions, () => {
+      logger.info(`express server serving on port ${numPort}`);
+    });
   }
-
-  server.listen(listenOptions, () => {
-    logger.info(`express server serving on port ${port}`);
-  });
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {
