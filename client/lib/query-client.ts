@@ -9,7 +9,7 @@ import NetInfo from "@react-native-community/netinfo";
 
 const TOKEN_KEY = "auth_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
-const ADMIN_API_ORIGIN = "https://admin.maternalmind.com.pk";
+const DEFAULT_PROD_API_ORIGIN = "https://maternalmind.com.pk";
 
 function getHostedWebApiOrigin(): string | null {
   if (Platform.OS !== "web" || typeof window === "undefined") {
@@ -25,18 +25,8 @@ function getHostedWebApiOrigin(): string | null {
     return null;
   }
 
-  // The marketing site (maternalmind.com.pk / www.) does NOT serve the mobile
-  // auth API — it's a Laravel site. Force those visits to the admin API origin.
-  if (
-    hostname === "maternalmind.com.pk" ||
-    hostname === "www.maternalmind.com.pk"
-  ) {
-    return null;
-  }
-
-  // Any other hosted web deployment (admin.maternalmind.com.pk, app.maternalmind.com.pk,
-  // raw VPS IP, preview deployments, etc.) serves the API from its own origin.
-  // Using same-origin requests eliminates CORS entirely for the web build.
+  // Any hosted web deployment (maternalmind.com.pk, admin.maternalmind.com.pk, etc.)
+  // serves the Express API from its own origin under Single-Slot architecture.
   return origin;
 }
 
@@ -87,25 +77,15 @@ export function getApiUrl(): string {
 
   const configured = process.env.EXPO_PUBLIC_API_URL?.trim();
   if (!configured) {
-    return ADMIN_API_ORIGIN;
+    return DEFAULT_PROD_API_ORIGIN;
   }
 
   try {
     const parsed = new URL(configured);
-
-    // Guard against common production misconfiguration:
-    // the marketing site domain does not serve mobile auth APIs.
-    if (
-      parsed.hostname === "maternalmind.com.pk" ||
-      parsed.hostname === "www.maternalmind.com.pk"
-    ) {
-      return ADMIN_API_ORIGIN;
-    }
-
     return parsed.origin;
   } catch {
     // Invalid URL in env: fall back to known-good production API host.
-    return ADMIN_API_ORIGIN;
+    return DEFAULT_PROD_API_ORIGIN;
   }
 }
 
