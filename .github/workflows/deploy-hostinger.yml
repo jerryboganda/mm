@@ -66,15 +66,37 @@ jobs:
               mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
             fi
 
-            echo "Server dist is fully self-contained standalone bundle."
+            echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
+            cat << 'EOF' > .htaccess
+# Hostinger LiteSpeed / Phusion Passenger Node.js Configuration
+DirectoryIndex app.js
 
-            echo "Testing Node.js execution on Hostinger..."
-            node -v || true
-            pwd
-            ls -la
+<IfModule mod_passenger.c>
+  PassengerAppEnv production
+  PassengerAppRoot /home/u776151780/domains/maternalmind.com.pk/public_html
+  PassengerAppType node
+  PassengerStartupFile app.js
+  PassengerEnabled on
+</IfModule>
 
-            echo "Testing app.js boot..."
-            timeout 5s node app.js || true
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ app.js/$1 [QSA,L]
+</IfModule>
+EOF
+
+            echo "Contents of .htaccess:"
+            cat .htaccess
+
+            echo "Finding Node binary on Hostinger..."
+            export PATH=$PATH:/usr/local/bin:/usr/bin:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
+            NODE_BIN=$(which node 2>/dev/null || echo "node")
+            $NODE_BIN -v || true
+
+            echo "Testing app.js boot via $NODE_BIN..."
+            timeout 5s $NODE_BIN app.js || true
 
             mkdir -p tmp
             touch tmp/restart.txt
