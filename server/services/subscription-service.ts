@@ -152,7 +152,7 @@ class SubscriptionService {
     try {
       const [pkg] = await db
         .insert(subscriptionPackages)
-        .values({ ...data, version: 1 })
+        .values({ ...data, version: 1 }) as any
         ;
       return pkg;
     } catch (error) {
@@ -188,7 +188,7 @@ class SubscriptionService {
       const [updated] = await db
         .update(subscriptionPackages)
         .set(updateData)
-        .where(eq(subscriptionPackages.id, id))
+        .where(eq(subscriptionPackages.id, id)) as any
         ;
 
       return updated || undefined;
@@ -203,7 +203,7 @@ class SubscriptionService {
       const [updated] = await db
         .update(subscriptionPackages)
         .set({ status: "archived", updatedAt: new Date() })
-        .where(eq(subscriptionPackages.id, id))
+        .where(eq(subscriptionPackages.id, id)) as any
         ;
       return updated || undefined;
     } catch (error) {
@@ -275,7 +275,7 @@ class SubscriptionService {
         .values({
           ...data,
           packageVersion: pkg ? pkg.version : 1,
-        })
+        }) as any
         ;
 
       // Bump package version since pricing changed
@@ -301,7 +301,7 @@ class SubscriptionService {
       const [updated] = await db
         .update(packagePrices)
         .set({ ...data, updatedAt: new Date() })
-        .where(eq(packagePrices.id, id))
+        .where(eq(packagePrices.id, id)) as any
         ;
       return updated || undefined;
     } catch (error) {
@@ -329,7 +329,7 @@ class SubscriptionService {
     try {
       const [feature] = await db
         .insert(packageFeatures)
-        .values(data)
+        .values(data) as any
         ;
       return feature;
     } catch (error) {
@@ -346,7 +346,7 @@ class SubscriptionService {
       const [updated] = await db
         .update(packageFeatures)
         .set(data)
-        .where(eq(packageFeatures.id, id))
+        .where(eq(packageFeatures.id, id)) as any
         ;
       return updated || undefined;
     } catch (error) {
@@ -463,7 +463,7 @@ class SubscriptionService {
           externalSubscriptionId: options?.externalSubscriptionId || null,
           paymentGateway: options?.paymentGateway || "revenuecat",
           packageVersionAtPurchase: pkg.version,
-        })
+        }) as any
         ;
 
       // Audit log
@@ -515,7 +515,7 @@ class SubscriptionService {
           nextRetryAt: null,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -569,7 +569,7 @@ class SubscriptionService {
           nextRetryAt: null,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -645,7 +645,7 @@ class SubscriptionService {
           packageVersionAtPurchase: newPkg.version,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -717,7 +717,7 @@ class SubscriptionService {
           },
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -761,7 +761,7 @@ class SubscriptionService {
           pausedAt: now,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -813,7 +813,7 @@ class SubscriptionService {
           currentPeriodEnd: newPeriodEnd,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -860,7 +860,7 @@ class SubscriptionService {
             cancelAtPeriodEnd: false,
             updatedAt: now,
           })
-          .where(eq(subscriptions.id, subscriptionId))
+          .where(eq(subscriptions.id, subscriptionId)) as any
           ;
 
         await this.logSubscriptionEvent({
@@ -885,7 +885,7 @@ class SubscriptionService {
             cancelAtPeriodEnd: true,
             updatedAt: now,
           })
-          .where(eq(subscriptions.id, subscriptionId))
+          .where(eq(subscriptions.id, subscriptionId)) as any
           ;
 
         await this.logSubscriptionEvent({
@@ -940,7 +940,7 @@ class SubscriptionService {
           gracePeriodEndAt,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -1008,7 +1008,7 @@ class SubscriptionService {
           nextRetryAt: null,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -1274,7 +1274,7 @@ class SubscriptionService {
       const [updated] = await db
         .update(subscriptions)
         .set(updateData)
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -1319,7 +1319,7 @@ class SubscriptionService {
           nextRetryAt: null,
           updatedAt: now,
         })
-        .where(eq(subscriptions.id, subscriptionId))
+        .where(eq(subscriptions.id, subscriptionId)) as any
         ;
 
       await this.logSubscriptionEvent({
@@ -1414,7 +1414,7 @@ class SubscriptionService {
           periodStart: sub.currentPeriodStart,
           periodEnd: sub.currentPeriodEnd,
           couponId: sub.couponId,
-        })
+        }) as any
         ;
 
       // Insert line items
@@ -1433,7 +1433,7 @@ class SubscriptionService {
             total: item.total,
             periodStart: item.periodStart || null,
             periodEnd: item.periodEnd || null,
-          })
+          }) as any
           ;
         insertedItems.push(lineItem);
       }
@@ -1540,7 +1540,7 @@ class SubscriptionService {
           details: data.details || null,
           source: data.source || "system",
           ipAddress: data.ipAddress || null,
-        })
+        }) as any
         ;
       return log;
     } catch (error) {

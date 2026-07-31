@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { Router } from "express";
 import multer from "multer";
 import * as crypto from "crypto";
@@ -542,22 +541,22 @@ router.post(
         return res.status(404).json({ message: "Package not found" });
       }
 
-      const [proof] = await db
-        .insert(manualPaymentProofs)
-        .values({
-          userId,
-          packageId,
-          priceId,
-          status: "pending",
-          amountClaimed: amountClaimed ?? null,
-          currency: null,
-          paymentMethod: paymentMethod ?? null,
-          senderReference: senderReference ?? null,
-          userNote: userNote ?? null,
-          proofImageUrl: `/uploads/payment-proofs/${req.file.filename}`,
-          proofFilename: req.file.filename,
-        })
-        ;
+      const proofObj = {
+        id: crypto.randomUUID(),
+        userId,
+        packageId,
+        priceId,
+        status: "pending",
+        amountClaimed: amountClaimed ?? null,
+        currency: null,
+        paymentMethod: paymentMethod ?? null,
+        senderReference: senderReference ?? null,
+        userNote: userNote ?? null,
+        proofImageUrl: `/uploads/payment-proofs/${req.file.filename}`,
+        proofFilename: req.file.filename,
+      };
+
+      await db.insert(manualPaymentProofs).values(proofObj);
 
       // Notify the user their proof was received (best-effort)
       const [user] = await db
@@ -568,7 +567,7 @@ router.post(
         void sendProofReceivedEmail(user.email, user.name || "there", pkg.name);
       }
 
-      res.status(201).json({ proof });
+      res.status(201).json({ proof: proofObj });
     } catch (error) {
       logger.error("POST /proof error", { error: String(error) });
       res.status(500).json({ message: "Failed to submit payment proof" });

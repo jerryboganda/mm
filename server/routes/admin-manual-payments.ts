@@ -300,7 +300,7 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
       },
     );
 
-    const [updated] = await db
+    await db
       .update(manualPaymentProofs)
       .set({
         status: "approved",
@@ -309,8 +309,12 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
         createdSubscriptionId: subscription.id,
         updatedAt: new Date(),
       })
-      .where(eq(manualPaymentProofs.id, id))
-      ;
+      .where(eq(manualPaymentProofs.id, id));
+
+    const [updated] = await db
+      .select()
+      .from(manualPaymentProofs)
+      .where(eq(manualPaymentProofs.id, id));
 
     // Notify the user (best-effort)
     const [user] = await db
@@ -361,7 +365,7 @@ router.post("/:id/reject", async (req: AuthRequest, res: Response) => {
         .json({ message: `Proof has already been ${proof.status}` });
     }
 
-    const [updated] = await db
+    await db
       .update(manualPaymentProofs)
       .set({
         status: "rejected",
@@ -370,8 +374,12 @@ router.post("/:id/reject", async (req: AuthRequest, res: Response) => {
         reviewedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(manualPaymentProofs.id, id))
-      ;
+      .where(eq(manualPaymentProofs.id, id));
+
+    const [updated] = await db
+      .select()
+      .from(manualPaymentProofs)
+      .where(eq(manualPaymentProofs.id, id));
 
     const [user] = await db
       .select()

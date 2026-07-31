@@ -263,11 +263,10 @@ router.post("/add-ons", async (req: AuthRequest, res: Response) => {
         errors: parsed.error.flatten().fieldErrors,
       });
     }
-    const [addOn] = await db
-      .insert(addOns)
-      .values(parsed.data as any)
-      ;
-    res.status(201).json(addOn);
+    const id = crypto.randomUUID();
+    const addOnObj = { id, ...(parsed.data as any) };
+    await db.insert(addOns).values(addOnObj);
+    res.status(201).json(addOnObj);
   } catch (error) {
     logger.error("Error creating add-on", { error: String(error) });
     res.status(500).json({ message: "Error creating add-on" });
@@ -287,7 +286,7 @@ router.put("/add-ons/:id", async (req: AuthRequest, res: Response) => {
     const [addOn] = await db
       .update(addOns)
       .set({ ...(parsed.data as any), updatedAt: new Date() })
-      .where(eq(addOns.id, getParamValue(req.params.id)))
+      .where(eq(addOns.id, getParamValue(req.params.id))) as any
       ;
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json(addOn);
@@ -303,7 +302,7 @@ router.delete("/add-ons/:id", async (req: AuthRequest, res: Response) => {
     const [addOn] = await db
       .update(addOns)
       .set({ isActive: false, updatedAt: new Date() })
-      .where(eq(addOns.id, getParamValue(req.params.id)))
+      .where(eq(addOns.id, getParamValue(req.params.id))) as any
       ;
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json({ message: "Add-on deactivated", addOn });
@@ -723,14 +722,18 @@ router.put(
       const newEnd = new Date(currentEnd);
       newEnd.setDate(newEnd.getDate() + days);
 
-      const [updated] = await db
+      await db
         .update(subscriptions)
         .set({
           currentPeriodEnd: newEnd,
           updatedAt: new Date(),
         })
-        .where(eq(subscriptions.id, activeSub.id))
-        ;
+        .where(eq(subscriptions.id, activeSub.id));
+
+      const [updated] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.id, activeSub.id));
 
       await subscriptionService.logSubscriptionEvent({
         subscriptionId: activeSub.id,

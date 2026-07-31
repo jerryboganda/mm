@@ -595,7 +595,7 @@ class PaymentGatewayManager {
         refundedAt: data.refundedAt || null,
         refundReason: data.refundReason || null,
         metadata: data.metadata || null,
-      })
+      }) as any
       ;
 
     return transaction;
@@ -656,7 +656,7 @@ class PaymentGatewayManager {
         ...updates,
         updatedAt: new Date(),
       })
-      .where(eq(paymentTransactions.id, id))
+      .where(eq(paymentTransactions.id, id)) as any
       ;
 
     return transaction || null;

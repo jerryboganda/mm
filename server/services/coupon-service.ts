@@ -259,9 +259,11 @@ class CouponService {
    * Create a new coupon. Returns the inserted row.
    */
   async createCoupon(data: CreateCouponData): Promise<Coupon> {
-    const [coupon] = await db
+    const id = crypto.randomUUID();
+    await db
       .insert(coupons)
       .values({
+        id,
         code: data.code.toUpperCase().trim(),
         description: data.description ?? null,
         campaignId: data.campaignId ?? null,
@@ -281,9 +283,8 @@ class CouponService {
         referralUserId: data.referralUserId ?? null,
         isActive: data.isActive ?? true,
         metadata: data.metadata ?? null,
-      })
-      ;
-    return coupon;
+      });
+    return (await this.getCoupon(id))!;
   }
 
   /**
@@ -331,25 +332,23 @@ class CouponService {
     if (data.isActive !== undefined) values.isActive = data.isActive;
     if (data.metadata !== undefined) values.metadata = data.metadata;
 
-    const [updated] = await db
+    await db
       .update(coupons)
       .set(values)
-      .where(eq(coupons.id, id))
-      ;
+      .where(eq(coupons.id, id));
 
-    return updated ?? undefined;
+    return (await this.getCoupon(id)) ?? undefined;
   }
 
   /**
    * Soft-delete a coupon by marking isActive = false.
    */
   async deleteCoupon(id: string): Promise<Coupon | undefined> {
-    const [updated] = await db
+    await db
       .update(coupons)
       .set({ isActive: false, updatedAt: new Date() })
-      .where(eq(coupons.id, id))
-      ;
-    return updated ?? undefined;
+      .where(eq(coupons.id, id));
+    return (await this.getCoupon(id)) ?? undefined;
   }
 
   // ─── Bulk Generation ──────────────────────────────────────
@@ -661,17 +660,18 @@ class CouponService {
     }
 
     // Record the usage
-    const [usage] = await db
-      .insert(couponUsage)
-      .values({
-        couponId,
-        userId,
-        subscriptionId,
-        discountApplied: String(round2(amount)),
-      })
-      ;
+    const usageObj = {
+      id: crypto.randomUUID(),
+      couponId,
+      userId,
+      subscriptionId,
+      discountApplied: String(round2(amount)),
+      usedAt: new Date(),
+    };
 
-    return usage;
+    await db.insert(couponUsage).values(usageObj);
+
+    return usageObj;
   }
 
   // ─── Analytics ────────────────────────────────────────────
