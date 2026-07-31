@@ -20,8 +20,10 @@ export const SUPPORT_CONTACT_KEYS = {
   emailEnabled: "support_email_enabled",
 } as const;
 
-const DEFAULT_SUPPORT_EMAIL = "maternalmind.help@gmail.com";
-const DEFAULT_WHATSAPP_MESSAGE = "Hello Support Team, I need help.";
+const DEFAULT_SUPPORT_EMAIL = "support@maternalmind.com.pk";
+const DEFAULT_WHATSAPP_NUMBER = "+923360830836";
+const DEFAULT_PHONE_NUMBER = "+923360830836";
+const DEFAULT_WHATSAPP_MESSAGE = "Hello Support Team, I need help logging in.";
 
 const SUPPORT_CONTACT_KEY_ALIASES = {
   whatsappNumber: [
@@ -113,14 +115,12 @@ export async function getSupportContactSettings(): Promise<SupportContactSetting
     settings.map((entry) => [entry.key, entry.value]),
   );
 
-  const whatsappNumber = firstNonEmpty(
-    settingsMap,
-    SUPPORT_CONTACT_KEY_ALIASES.whatsappNumber,
-  );
-  const phoneNumber = firstNonEmpty(
-    settingsMap,
-    SUPPORT_CONTACT_KEY_ALIASES.phoneNumber,
-  );
+  const whatsappNumber =
+    firstNonEmpty(settingsMap, SUPPORT_CONTACT_KEY_ALIASES.whatsappNumber) ||
+    DEFAULT_WHATSAPP_NUMBER;
+  const phoneNumber =
+    firstNonEmpty(settingsMap, SUPPORT_CONTACT_KEY_ALIASES.phoneNumber) ||
+    DEFAULT_PHONE_NUMBER;
   const supportEmail =
     firstNonEmpty(settingsMap, SUPPORT_CONTACT_KEY_ALIASES.supportEmail) ||
     DEFAULT_SUPPORT_EMAIL;
