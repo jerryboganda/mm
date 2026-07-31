@@ -71,12 +71,12 @@ const faqs: FAQ[] = [
 ];
 
 const DEFAULT_SUPPORT_CONTACT_SETTINGS: SupportContactSettings = {
-  whatsappNumber: "",
-  phoneNumber: "",
-  supportEmail: "maternalmind.help@gmail.com",
+  whatsappNumber: "+923360830836",
+  phoneNumber: "+923360830836",
+  supportEmail: "support@maternalmind.com.pk",
   whatsappDefaultMessage: "Hello Support Team, I need help.",
-  whatsappEnabled: false,
-  phoneEnabled: false,
+  whatsappEnabled: true,
+  phoneEnabled: true,
   emailEnabled: true,
 };
 

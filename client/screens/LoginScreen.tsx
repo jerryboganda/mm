@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   Linking,
+  Modal,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -49,13 +50,14 @@ export default function LoginScreen() {
   const [scanLoginButtonText, setScanLoginButtonText] =
     useState("Scan to login");
   const [scanLoginEnabled, setScanLoginEnabled] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
   const [supportContact, setSupportContact] = useState({
-    whatsappNumber: "",
-    phoneNumber: "",
-    supportEmail: "maternalmind.help@gmail.com",
+    whatsappNumber: "+923360830836",
+    phoneNumber: "+923360830836",
+    supportEmail: "support@maternalmind.com.pk",
     whatsappDefaultMessage: "Hello Support Team, I need help logging in.",
-    whatsappEnabled: false,
-    phoneEnabled: false,
+    whatsappEnabled: true,
+    phoneEnabled: true,
     emailEnabled: true,
   });
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
@@ -160,63 +162,51 @@ export default function LoginScreen() {
     }
   };
 
-  const openSupportContact = async () => {
-    const message = encodeURIComponent(
-      supportContact.whatsappDefaultMessage ||
-        "Hello Support Team, I need help logging in.",
+  const openSupportContact = () => {
+    Haptics.selectionAsync();
+    setShowSupportModal(true);
+  };
+
+  const handleOpenWhatsApp = async () => {
+    const rawNumber = supportContact.whatsappNumber || "+923360830836";
+    const cleanNumber = rawNumber.replace(/[^\d]/g, "");
+    const msg = encodeURIComponent(
+      supportContact.whatsappDefaultMessage || "Hello Support Team, I need help logging in.",
     );
-    const whatsappNumber = supportContact.whatsappNumber.replace(/[^\d]/g, "");
-    const options = [
-      supportContact.whatsappEnabled && whatsappNumber
-        ? `https://wa.me/${whatsappNumber}?text=${message}`
-        : "",
-      supportContact.phoneEnabled && supportContact.phoneNumber
-        ? `tel:${supportContact.phoneNumber}`
-        : "",
-      supportContact.emailEnabled && supportContact.supportEmail
-        ? `mailto:${supportContact.supportEmail}?subject=${encodeURIComponent(
-            "Trouble logging in",
-          )}&body=${message}`
-        : "",
-    ].filter((url): url is string => Boolean(url));
-
-    for (const url of options) {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) {
-        await Linking.openURL(url);
-        return;
-      }
-    }
-
-    if (supportContact.supportEmail) {
-      const mailtoUrl = `mailto:${supportContact.supportEmail}?subject=${encodeURIComponent(
-        "Trouble logging in",
-      )}&body=${message}`;
+    const url = `https://wa.me/${cleanNumber}?text=${msg}`;
+    try {
+      await Linking.openURL(url);
+    } catch {
       Alert.alert(
-        "Contact Support",
-        `Please email ${supportContact.supportEmail} for login help.`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Email Support",
-            onPress: () => {
-              Linking.openURL(mailtoUrl).catch(() => {
-                Alert.alert(
-                  "Contact Support",
-                  `Please email ${supportContact.supportEmail} for login help.`,
-                );
-              });
-            },
-          },
-        ],
+        "WhatsApp Helpline",
+        `WhatsApp helpline number: ${rawNumber}`,
       );
-      return;
     }
+  };
 
-    Alert.alert(
-      "Contact Support",
-      "Support contact is not configured yet.",
+  const handleOpenPhone = async () => {
+    const rawNumber = supportContact.phoneNumber || "+923360830836";
+    const url = `tel:${rawNumber}`;
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Phone Helpline", `Call us directly at: ${rawNumber}`);
+    }
+  };
+
+  const handleOpenEmail = async () => {
+    const emailAddr = supportContact.supportEmail || "support@maternalmind.com.pk";
+    const msg = encodeURIComponent(
+      supportContact.whatsappDefaultMessage || "Hello Support Team, I need help logging in.",
     );
+    const url = `mailto:${emailAddr}?subject=${encodeURIComponent(
+      "Trouble logging in",
+    )}&body=${msg}`;
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Email Support", `Please email us at: ${emailAddr}`);
+    }
   };
 
   return (
@@ -395,6 +385,126 @@ export default function LoginScreen() {
           </Pressable>
         </View>
       </KeyboardAwareScrollViewCompat>
+
+      <Modal
+        visible={showSupportModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSupportModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowSupportModal(false)}
+        >
+          <Pressable
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: isDark ? "#0F172A" : "#FFFFFF",
+                borderColor: isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)",
+              },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalBadgeContainer}>
+              <View style={[styles.modalBadge, { backgroundColor: `${theme.primary}20` }]}>
+                <Ionicons name="headset-outline" size={28} color={theme.primary} />
+              </View>
+            </View>
+
+            <ThemedText style={[styles.modalTitle, { color: theme.text }]}>
+              Login Support & Helpline
+            </ThemedText>
+            <ThemedText style={[styles.modalSubtitle, { color: theme.textSecondary }]}>
+              Need help accessing your account? Reach out to us directly through any of our support channels.
+            </ThemedText>
+
+            <Pressable
+              style={styles.whatsappCard}
+              onPress={handleOpenWhatsApp}
+              accessibilityRole="button"
+              accessibilityLabel="Contact via WhatsApp Helpline"
+            >
+              <View style={styles.contactIconBgWhatsapp}>
+                <Ionicons name="logo-whatsapp" size={24} color="#FFFFFF" />
+              </View>
+              <View style={styles.contactTextContainer}>
+                <ThemedText style={styles.whatsappCardTitle}>
+                  WhatsApp Helpline
+                </ThemedText>
+                <ThemedText style={styles.whatsappCardSub}>
+                  {supportContact.whatsappNumber || "+92 336 0830836"} • Direct Message
+                </ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+            </Pressable>
+
+            <Pressable
+              style={[
+                styles.contactOptionCard,
+                {
+                  backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
+                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+                },
+              ]}
+              onPress={handleOpenPhone}
+              accessibilityRole="button"
+              accessibilityLabel="Call helpline"
+            >
+              <View style={[styles.contactIconBg, { backgroundColor: `${theme.primary}20` }]}>
+                <Ionicons name="call-outline" size={22} color={theme.primary} />
+              </View>
+              <View style={styles.contactTextContainer}>
+                <ThemedText style={[styles.optionCardTitle, { color: theme.text }]}>
+                  Phone Helpline
+                </ThemedText>
+                <ThemedText style={[styles.optionCardSub, { color: theme.textSecondary }]}>
+                  {supportContact.phoneNumber || "+92 336 0830836"}
+                </ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+            </Pressable>
+
+            <Pressable
+              style={[
+                styles.contactOptionCard,
+                {
+                  backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
+                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+                },
+              ]}
+              onPress={handleOpenEmail}
+              accessibilityRole="button"
+              accessibilityLabel="Send email support"
+            >
+              <View style={[styles.contactIconBg, { backgroundColor: "rgba(56, 189, 248, 0.2)" }]}>
+                <Ionicons name="mail-outline" size={22} color="#38BDF8" />
+              </View>
+              <View style={styles.contactTextContainer}>
+                <ThemedText style={[styles.optionCardTitle, { color: theme.text }]}>
+                  Email Support
+                </ThemedText>
+                <ThemedText style={[styles.optionCardSub, { color: theme.textSecondary }]}>
+                  {supportContact.supportEmail || "support@maternalmind.com.pk"}
+                </ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+            </Pressable>
+
+            <Pressable
+              style={[
+                styles.modalCloseButton,
+                { backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)" },
+              ]}
+              onPress={() => setShowSupportModal(false)}
+            >
+              <ThemedText style={[styles.modalCloseText, { color: theme.text }]}>
+                Close
+              </ThemedText>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </BackgroundGradient>
   );
 }
@@ -499,6 +609,117 @@ const styles = StyleSheet.create({
   },
   footerText: {},
   signUpLink: {
+    fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 360,
+    borderRadius: 24,
+    padding: 24,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalBadgeContainer: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  modalBadge: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  whatsappCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#25D366",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: "#25D366",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  contactIconBgWhatsapp: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  whatsappCardTitle: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  whatsappCardSub: {
+    color: "rgba(255, 255, 255, 0.9)",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  contactOptionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  contactIconBg: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  contactTextContainer: {
+    flex: 1,
+  },
+  optionCardTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  optionCardSub: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  modalCloseButton: {
+    borderRadius: 14,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  modalCloseText: {
+    fontSize: 15,
     fontWeight: "600",
   },
 });
