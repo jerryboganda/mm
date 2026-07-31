@@ -90,13 +90,12 @@ EOF
             echo "Contents of .htaccess:"
             cat .htaccess
 
-            echo "Finding Node binary on Hostinger..."
-            export PATH=$PATH:/usr/local/bin:/usr/bin:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
-            NODE_BIN=$(which node 2>/dev/null || echo "node")
-            $NODE_BIN -v || true
+            export PATH=$PATH:/usr/local/bin:/usr/bin
+            which node || true
+            node -v || true
 
-            echo "Testing app.js boot via $NODE_BIN..."
-            timeout 5s $NODE_BIN app.js || true
+            echo "Testing app.js boot..."
+            timeout 5s node app.js || true
 
             mkdir -p tmp
             touch tmp/restart.txt
