@@ -38,12 +38,16 @@ if [ -d "$TARGET_DIR/web_dist" ]; then
 fi
 
 APP_ROOT=$(pwd -P)
-VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
-RAW_NODE="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
+
+# Preserve original Hostinger PassengerNodejs path if present in existing .htaccess
+EXISTING_PASSENGER_NODE=$(grep -i "PassengerNodejs" .htaccess 2>/dev/null | head -n 1 | awk '{print $2}' | tr -d '"' | tr -d "'")
+
+VENV_NODE=$(find /home/u776151780/nodevenv -name "node" -type f 2>/dev/null | head -n 1)
+RAW_NODE="${EXISTING_PASSENGER_NODE:-${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}}"
 NODE_PATH=$(readlink -f "$RAW_NODE" 2>/dev/null || echo "$RAW_NODE")
 
 echo "Canonical App Root: $APP_ROOT"
-echo "Canonical Node binary: $NODE_PATH"
+echo "Hostinger Node binary: $NODE_PATH"
 
 echo "Configuring Hostinger .htaccess for Phusion Passenger Node.js..."
 cat << EOF > .htaccess
