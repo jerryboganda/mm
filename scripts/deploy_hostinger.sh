@@ -43,6 +43,9 @@ echo "Detected Node binary at: $NODE_PATH"
 
 echo "Configuring Hostinger .htaccess for Phusion Passenger Node.js..."
 cat << EOF > .htaccess
+# Hostinger LiteSpeed / Phusion Passenger Node.js Configuration
+Options +ExecCGI +FollowSymLinks -Indexes
+
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
 PassengerBaseURI "/"
