@@ -69,18 +69,19 @@ PassengerEnabled on
   RewriteCond %{REQUEST_URI} ^/admin
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^admin(?:/.*)?$ /admin/index.html [L]
+  RewriteRule ^admin(?:/.*)?$ admin/index.html [L]
 
   # SPA Routing for User Panel (/app)
   RewriteCond %{REQUEST_URI} ^/app
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^app(?:/.*)?$ /app/index.html [L]
+  RewriteRule ^app(?:/.*)?$ app/index.html [L]
 
   # SPA Routing for Marketing Website (/)
+  RewriteCond %{REQUEST_URI} !^/index\.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^.*$ /index.html [L]
+  RewriteRule ^ index.html [L]
 </IfModule>
 EOF
 
