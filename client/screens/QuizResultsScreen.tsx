@@ -16,6 +16,7 @@ import {
   ExplanationFigures,
   ExplanationImage,
 } from "@/components/ExplanationFigures";
+import { RichTextHtml } from "@/components/RichTextHtml";
 import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -234,15 +235,10 @@ export default function QuizResultsScreen() {
                   { backgroundColor: `${theme.primary}1A` },
                 ]}
               >
-                <Feather name="info" size={14} color={theme.primary} />
-                <ThemedText
-                  style={[
-                    styles.explanationText,
-                    { color: theme.textSecondary },
-                  ]}
-                >
-                  {q.explanation}
-                </ThemedText>
+                <Feather name="info" size={14} color={theme.primary} style={{ marginTop: 2, marginRight: 6 }} />
+                <View style={{ flex: 1 }}>
+                  <RichTextHtml content={q.explanation} />
+                </View>
               </View>
               <ExplanationFigures images={q.images} />
             </GlassCard>
