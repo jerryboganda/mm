@@ -37,9 +37,13 @@ if [ -d "$TARGET_DIR/web_dist" ]; then
   cp -rf "$TARGET_DIR/web_dist/"* "$TARGET_DIR/app/" 2>/dev/null || true
 fi
 
+APP_ROOT=$(pwd -P)
 VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
-NODE_PATH="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
-echo "Detected Node binary at: $NODE_PATH"
+RAW_NODE="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
+NODE_PATH=$(readlink -f "$RAW_NODE" 2>/dev/null || echo "$RAW_NODE")
+
+echo "Canonical App Root: $APP_ROOT"
+echo "Canonical Node binary: $NODE_PATH"
 
 echo "Configuring Hostinger .htaccess for Phusion Passenger Node.js..."
 cat << EOF > .htaccess
@@ -47,7 +51,7 @@ cat << EOF > .htaccess
 Options +ExecCGI +FollowSymLinks -Indexes
 
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
-PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
+PassengerAppRoot "$APP_ROOT"
 PassengerBaseURI "/"
 PassengerNodejs "$NODE_PATH"
 PassengerAppType node
