@@ -20,7 +20,7 @@ TARGET_DIR=$(pwd)
 echo "Current deployment working directory: $TARGET_DIR"
 
 echo "Cleaning up root entry points to prevent static file conflicts..."
-rm -f app.js 2>/dev/null || true
+rm -f "$TARGET_DIR/app.js" ~/domains/maternalmind.com.pk/public_html/app.js ~/public_html/app.js 2>/dev/null || true
 
 echo "Organizing single-slot static frontends..."
 if [ -d "$TARGET_DIR/website_dist" ]; then
