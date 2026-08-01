@@ -19,6 +19,8 @@ fi
 echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
 cat << 'EOF' > .htaccess
 # Hostinger LiteSpeed / Phusion Passenger Node.js Configuration
+Options +FollowSymLinks -Indexes
+
 PassengerAppEnv production
 PassengerAppRoot /home/u776151780/domains/maternalmind.com.pk/public_html
 PassengerAppType node
