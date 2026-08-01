@@ -84,6 +84,10 @@ PassengerEnabled on
 </IfModule>
 EOF
 
+echo "Setting directory and file permissions for Hostinger LiteSpeed..."
+chmod -R 755 . 2>/dev/null || true
+chmod 644 .htaccess 2>/dev/null || true
+
 echo "Contents of .htaccess:"
 cat .htaccess
 
