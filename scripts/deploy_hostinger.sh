@@ -27,6 +27,7 @@ PassengerEnabled on
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteRule ^$ app.js [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^(.*)$ app.js/$1 [QSA,L]
