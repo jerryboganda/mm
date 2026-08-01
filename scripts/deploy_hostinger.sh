@@ -16,7 +16,8 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
   mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
 fi
 
-NODE_PATH=$(which node 2>/dev/null || echo "/usr/bin/node")
+VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
+NODE_PATH="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
 echo "Detected Node binary at: $NODE_PATH"
 
 echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
@@ -32,6 +33,10 @@ PassengerStartupFile app.js
 Options +FollowSymLinks -Indexes
 PassengerAppEnv production
 PassengerEnabled on
+
+<IfModule Litespeed>
+  SetHandler process-with-nodejs
+</IfModule>
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
