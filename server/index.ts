@@ -528,3 +528,6 @@ process.on("uncaughtException", (error) => {
   process.on("SIGTERM", () => shutdown("SIGTERM"));
   process.on("SIGINT", () => shutdown("SIGINT"));
 })();
+
+export default app;
+export { app };

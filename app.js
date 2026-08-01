@@ -1,2 +1,5 @@
 // Hostinger Phusion Passenger Node.js Web App Entry Point
-module.exports = require('./server_dist/index.js');
+const serverModule = require('./server_dist/index.js');
+const app = serverModule.default || serverModule.app || serverModule;
+
+module.exports = app;
