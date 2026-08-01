@@ -55,9 +55,7 @@ PassengerStartupFile app.js
 PassengerAppEnv production
 PassengerEnabled on
 
-<IfModule Litespeed>
-  SetHandler process-with-nodejs
-</IfModule>
+
 
 <IfModule mod_rewrite.c>
   RewriteEngine On

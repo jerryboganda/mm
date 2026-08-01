@@ -286,13 +286,20 @@ function serveLandingPage({
 }
 
 function configureExpoAndLanding(app: express.Application) {
-  const templatePath = path.resolve(
-    process.cwd(),
-    "server",
-    "templates",
-    "landing-page.html",
-  );
-  const landingPageTemplate = fs.readFileSync(templatePath, "utf-8");
+  let landingPageTemplate = "";
+  try {
+    const templatePath = path.resolve(
+      process.cwd(),
+      "server",
+      "templates",
+      "landing-page.html",
+    );
+    if (fs.existsSync(templatePath)) {
+      landingPageTemplate = fs.readFileSync(templatePath, "utf-8");
+    }
+  } catch (err) {
+    logger.warn("Could not load landing-page.html template", { error: String(err) });
+  }
   const appName = getAppName();
   const webDistPath = path.resolve(process.cwd(), "web_dist");
 
@@ -487,15 +494,14 @@ process.on("uncaughtException", (error) => {
 
   setupErrorHandler(app);
 
-  const rawPort = process.env.PORT || "5000";
-  const numPort = parseInt(rawPort, 10);
-
-  if (isNaN(numPort)) {
-    // Hostinger Phusion Passenger Unix domain socket path (e.g. /tmp/passenger.xxx)
-    server.listen(rawPort, () => {
-      logger.info(`express server serving on unix domain socket ${rawPort}`);
+  const port = process.env.PORT || 5000;
+  if (typeof port === "string" && isNaN(Number(port))) {
+    // Phusion Passenger Unix domain socket or named pipe
+    server.listen(port, () => {
+      logger.info(`express server serving on socket ${port}`);
     });
   } else {
+    const numPort = Number(port);
     const listenOptions: any = {
       port: numPort,
       host: "0.0.0.0",
