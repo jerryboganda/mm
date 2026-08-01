@@ -49,7 +49,7 @@ Options +FollowSymLinks -Indexes
 
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
-PassengerBaseURI "/"
+PassengerBaseURI "/api"
 PassengerNodejs "$NODE_PATH"
 PassengerAppType node
 PassengerStartupFile app.js
