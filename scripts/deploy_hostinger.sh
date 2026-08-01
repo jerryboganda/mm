@@ -41,12 +41,8 @@ VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
 NODE_PATH="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
 echo "Detected Node binary at: $NODE_PATH"
 
-echo "Configuring Hostinger .htaccess for Static SPAs + Passenger Node API..."
+echo "Configuring Hostinger .htaccess for Phusion Passenger Node.js..."
 cat << EOF > .htaccess
-# Hostinger Single-Slot Architecture Configuration
-DirectoryIndex index.html index.php
-Options +FollowSymLinks -Indexes
-
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
 PassengerBaseURI "/"
@@ -60,28 +56,9 @@ PassengerEnabled on
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-
-  # Route /api and /uploads requests to Node.js Express API server
-  RewriteRule ^api(?:/.*)?$ app.js/\$0 [QSA,L]
-  RewriteRule ^uploads(?:/.*)?$ app.js/\$0 [QSA,L]
-
-  # SPA Routing for Admin (/admin)
-  RewriteCond %{REQUEST_URI} ^/admin
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^admin(?:/.*)?$ admin/index.html [L]
-
-  # SPA Routing for User Panel (/app)
-  RewriteCond %{REQUEST_URI} ^/app
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^app(?:/.*)?$ app/index.html [L]
-
-  # SPA Routing for Marketing Website (/)
-  RewriteCond %{REQUEST_URI} !^/index\.html
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^ index.html [L]
+  RewriteRule ^(.*)$ app.js/\$1 [QSA,L]
 </IfModule>
 EOF
 
