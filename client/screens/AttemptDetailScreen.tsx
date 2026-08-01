@@ -15,6 +15,7 @@ import {
   ExplanationFigures,
   ExplanationImage,
 } from "@/components/ExplanationFigures";
+import { RichTextHtml } from "@/components/RichTextHtml";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -320,14 +321,7 @@ export default function AttemptDetailScreen() {
                       Explanation
                     </ThemedText>
                   </View>
-                  <ThemedText
-                    style={[
-                      styles.explanationText,
-                      { color: theme.textSecondary },
-                    ]}
-                  >
-                    {q.explanation}
-                  </ThemedText>
+                  <RichTextHtml content={q.explanation} />
                 </View>
               ) : null}
               <ExplanationFigures images={q.images} />
