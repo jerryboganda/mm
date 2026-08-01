@@ -512,7 +512,7 @@ process.on("uncaughtException", (error) => {
           logger.info("DB pool drained");
           process.exit(0);
         })
-        .catch((err) => {
+        .catch((err: any) => {
           logger.error("Error draining DB pool", { error: String(err) });
           process.exit(1);
         });
