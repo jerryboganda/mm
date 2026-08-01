@@ -16,12 +16,34 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
   mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
 fi
 
+echo "Organizing single-slot static frontends..."
+if [ -d "website_dist" ]; then
+  echo "Deploying Marketing Website to root public_html..."
+  cp -rf website_dist/* . 2>/dev/null || true
+fi
+
+if [ -d "admin_dist" ]; then
+  echo "Deploying Admin Panel to public_html/admin..."
+  mkdir -p admin
+  cp -rf admin_dist/* admin/ 2>/dev/null || true
+fi
+
+if [ -d "web_dist" ]; then
+  echo "Deploying Expo User Panel to public_html/app..."
+  mkdir -p app
+  cp -rf web_dist/* app/ 2>/dev/null || true
+fi
+
 VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
 NODE_PATH="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
 echo "Detected Node binary at: $NODE_PATH"
 
-echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
+echo "Configuring Hostinger .htaccess for Single-Slot Static + Node API..."
 cat << EOF > .htaccess
+# Hostinger Single-Slot Architecture Configuration
+Options +FollowSymLinks -Indexes
+DirectoryIndex index.html
+
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
 PassengerBaseURI "/"
@@ -30,7 +52,6 @@ PassengerAppType node
 PassengerStartupFile app.js
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
 
-Options +FollowSymLinks -Indexes
 PassengerAppEnv production
 PassengerEnabled on
 
@@ -40,10 +61,27 @@ PassengerEnabled on
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^$ app.js [L]
+
+  # Route /api and /uploads requests to Node.js backend
+  RewriteRule ^api(?:/.*)?$ app.js/\$0 [QSA,L]
+  RewriteRule ^uploads(?:/.*)?$ app.js/\$0 [QSA,L]
+
+  # SPA Routing for Admin (/admin)
+  RewriteCond %{REQUEST_URI} ^/admin
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^(.*)$ app.js/\$1 [QSA,L]
+  RewriteRule ^admin(?:/.*)?$ /admin/index.html [L]
+
+  # SPA Routing for User Panel (/app)
+  RewriteCond %{REQUEST_URI} ^/app
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^app(?:/.*)?$ /app/index.html [L]
+
+  # SPA Routing for Marketing Website (/)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^.*$ /index.html [L]
 </IfModule>
 EOF
 
@@ -54,11 +92,8 @@ export PATH=$PATH:/usr/local/bin:/usr/bin
 which node || true
 node -v || true
 
-echo "Testing app.js boot..."
-timeout 5s node app.js || true
-
 mkdir -p tmp
 touch tmp/restart.txt
 echo "=============================================="
-echo "HOSTINGER DEPLOYMENT VERIFIED & ACTIVATED!"
+echo "HOSTINGER SINGLE-SLOT DEPLOYMENT VERIFIED!"
 echo "=============================================="
