@@ -464,7 +464,9 @@ process.on("uncaughtException", (error) => {
 });
 
 (async () => {
-  await ensureDatabaseConnection();
+  void ensureDatabaseConnection().catch((err) =>
+    logger.error("[DB] Non-blocking connection check failed", { error: String(err) }),
+  );
 
   setupSecurityHeaders(app);
   setupRequestId(app);

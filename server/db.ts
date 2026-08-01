@@ -1,7 +1,12 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+dotenv.config();
+
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 import * as schema from "../shared/schema";
 import { logger } from "./lib/logger";
+
+const { Pool } = pg;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -9,13 +14,34 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL,
-  connectionLimit: parseInt(process.env.DB_POOL_MAX || "20", 10),
-  idleTimeout: 30000,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000,
+export const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: parseInt(process.env.DB_POOL_MAX || "20", 10),
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
+  allowExitOnIdle: false,
 });
+
+// Log pool errors so they don't crash the process silently
+pool.on("error", (err) => {
+  logger.error("[DB Pool] Unexpected client error", { error: err.message });
+});
+
+// Warn when pool usage exceeds 80%
+setInterval(() => {
+  const { totalCount, idleCount, waitingCount } = pool;
+  const usage =
+    ((totalCount - idleCount) / parseInt(process.env.DB_POOL_MAX || "20", 10)) *
+    100;
+  if (usage > 80 || waitingCount > 0) {
+    logger.warn("DB pool pressure", {
+      totalCount,
+      idleCount,
+      waitingCount,
+      usagePercent: Math.round(usage),
+    });
+  }
+}, 30_000);
 
 /**
  * Verify database connectivity at startup with retries.
@@ -24,19 +50,18 @@ export const pool = mysql.createPool({
 export async function ensureDatabaseConnection(maxRetries = 5): Promise<void> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const connection = await pool.getConnection();
-      await connection.query("SELECT 1");
-      connection.release();
-      logger.info(`[DB] Connected successfully to MySQL (attempt ${attempt})`);
+      const client = await pool.connect();
+      await client.query("SELECT 1");
+      client.release();
+      logger.info(`[DB] Connected successfully (attempt ${attempt})`);
       return;
     } catch (error) {
       logger.error(`[DB] Connection attempt ${attempt}/${maxRetries} failed`, {
         error: error instanceof Error ? error.message : String(error),
       });
       if (attempt === maxRetries) {
-        throw new Error(
-          `Failed to connect to database after ${maxRetries} attempts`,
-        );
+        logger.error(`[DB] Warning: DB unreachable after ${maxRetries} attempts — server will continue running and retry on requests`);
+        return;
       }
       const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -44,4 +69,4 @@ export async function ensureDatabaseConnection(maxRetries = 5): Promise<void> {
   }
 }
 
-export const db = drizzle(pool, { schema, mode: "default" });
+export const db = drizzle(pool, { schema });

@@ -34,28 +34,33 @@ if [ -d "web_dist" ]; then
   cp -rf web_dist/* app/ 2>/dev/null || true
 fi
 
-echo "Starting Node.js Express API server on port 5000..."
-pkill -f "node app.js" 2>/dev/null || true
-pkill -f "server_dist/index.js" 2>/dev/null || true
+VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
+NODE_PATH="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
+echo "Detected Node binary at: $NODE_PATH"
 
-export PORT=5000
-export NODE_ENV=production
-nohup node app.js > app.log 2>&1 &
-sleep 2
-
-echo "Configuring Hostinger .htaccess for Static SPAs + Reverse Proxy API..."
-cat << 'EOF' > .htaccess
+echo "Configuring Hostinger .htaccess for Static SPAs + Passenger Node API..."
+cat << EOF > .htaccess
 # Hostinger Single-Slot Architecture Configuration
-PassengerEnabled off
+DirectoryIndex index.html index.php
 Options +FollowSymLinks -Indexes
-DirectoryIndex index.html
+
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
+PassengerBaseURI "/"
+PassengerNodejs "$NODE_PATH"
+PassengerAppType node
+PassengerStartupFile app.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+PassengerAppEnv production
+PassengerEnabled on
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Route /api and /uploads requests to Node.js Express API server on port 5000
-  RewriteRule ^api(?:/.*)?$ http://127.0.0.1:5000/$0 [P,L]
-  RewriteRule ^uploads(?:/.*)?$ http://127.0.0.1:5000/$0 [P,L]
+  # Route /api and /uploads requests to Node.js Express API server
+  RewriteRule ^api(?:/.*)?$ app.js/\$0 [QSA,L]
+  RewriteRule ^uploads(?:/.*)?$ app.js/\$0 [QSA,L]
 
   # SPA Routing for Admin (/admin)
   RewriteCond %{REQUEST_URI} ^/admin
