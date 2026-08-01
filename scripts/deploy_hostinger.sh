@@ -41,8 +41,8 @@ echo "Detected Node binary at: $NODE_PATH"
 echo "Configuring Hostinger .htaccess for Single-Slot Static + Node API..."
 cat << EOF > .htaccess
 # Hostinger Single-Slot Architecture Configuration
+DirectoryIndex index.html index.php
 Options +FollowSymLinks -Indexes
-DirectoryIndex index.html
 
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
