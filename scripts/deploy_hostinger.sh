@@ -34,35 +34,27 @@ if [ -d "web_dist" ]; then
   cp -rf web_dist/* app/ 2>/dev/null || true
 fi
 
-VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
-NODE_PATH="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
-echo "Detected Node binary at: $NODE_PATH"
+echo "Starting Node.js Express API server on port 5000..."
+pkill -f "node app.js" 2>/dev/null || true
+pkill -f "server_dist/index.js" 2>/dev/null || true
 
-echo "Configuring Hostinger .htaccess for Single-Slot Static + Node API..."
-cat << EOF > .htaccess
+export PORT=5000
+export NODE_ENV=production
+nohup node app.js > app.log 2>&1 &
+sleep 2
+
+echo "Configuring Hostinger .htaccess for Static SPAs + Reverse Proxy API..."
+cat << 'EOF' > .htaccess
 # Hostinger Single-Slot Architecture Configuration
-DirectoryIndex index.html index.php
 Options +FollowSymLinks -Indexes
-
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
-PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
-PassengerBaseURI "/"
-PassengerNodejs "$NODE_PATH"
-PassengerAppType node
-PassengerStartupFile app.js
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
-
-PassengerAppEnv production
-PassengerEnabled on
-
-
+DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Route /api and /uploads requests to Node.js backend
-  RewriteRule ^api(?:/.*)?$ app.js/\$0 [QSA,L]
-  RewriteRule ^uploads(?:/.*)?$ app.js/\$0 [QSA,L]
+  # Route /api and /uploads requests to Node.js Express API server on port 5000
+  RewriteRule ^api(?:/.*)?$ http://127.0.0.1:5000/$0 [P,L]
+  RewriteRule ^uploads(?:/.*)?$ http://127.0.0.1:5000/$0 [P,L]
 
   # SPA Routing for Admin (/admin)
   RewriteCond %{REQUEST_URI} ^/admin
@@ -86,12 +78,8 @@ EOF
 echo "Contents of .htaccess:"
 cat .htaccess
 
-export PATH=$PATH:/usr/local/bin:/usr/bin
-which node || true
-node -v || true
-
 mkdir -p tmp
 touch tmp/restart.txt
 echo "=============================================="
-echo "HOSTINGER SINGLE-SLOT DEPLOYMENT VERIFIED!"
+echo "HOSTINGER SINGLE-SLOT DEPLOYMENT COMPLETE!"
 echo "=============================================="
