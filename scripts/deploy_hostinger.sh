@@ -46,6 +46,7 @@ sleep 2
 echo "Configuring Hostinger .htaccess for Static SPAs + Reverse Proxy API..."
 cat << 'EOF' > .htaccess
 # Hostinger Single-Slot Architecture Configuration
+PassengerEnabled off
 Options +FollowSymLinks -Indexes
 DirectoryIndex index.html
 
