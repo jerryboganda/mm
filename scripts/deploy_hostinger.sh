@@ -19,15 +19,11 @@ fi
 echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
 cat << 'EOF' > .htaccess
 # Hostinger LiteSpeed / Phusion Passenger Node.js Configuration
-DirectoryIndex app.js
-
-<IfModule mod_passenger.c>
-  PassengerAppEnv production
-  PassengerAppRoot /home/u776151780/domains/maternalmind.com.pk/public_html
-  PassengerAppType node
-  PassengerStartupFile app.js
-  PassengerEnabled on
-</IfModule>
+PassengerAppEnv production
+PassengerAppRoot /home/u776151780/domains/maternalmind.com.pk/public_html
+PassengerAppType node
+PassengerStartupFile app.js
+PassengerEnabled on
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
