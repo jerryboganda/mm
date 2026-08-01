@@ -497,24 +497,9 @@ process.on("uncaughtException", (error) => {
   setupErrorHandler(app);
 
   const port = process.env.PORT || 5000;
-  if (typeof port === "string" && isNaN(Number(port))) {
-    // Phusion Passenger Unix domain socket or named pipe
-    server.listen(port, () => {
-      logger.info(`express server serving on socket ${port}`);
-    });
-  } else {
-    const numPort = Number(port);
-    const listenOptions: any = {
-      port: numPort,
-      host: "0.0.0.0",
-    };
-    if (process.platform !== "win32" && !process.env.PASSENGER_APP_ENV) {
-      listenOptions.reusePort = true;
-    }
-    server.listen(listenOptions, () => {
-      logger.info(`express server serving on port ${numPort}`);
-    });
-  }
+  server.listen(port, () => {
+    logger.info(`express server serving on ${port}`);
+  });
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {
