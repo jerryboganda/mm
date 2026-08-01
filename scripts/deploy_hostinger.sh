@@ -16,15 +16,21 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
   mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
 fi
 
-echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
-cat << 'EOF' > .htaccess
-# Hostinger LiteSpeed / Phusion Passenger Node.js Configuration
-Options +FollowSymLinks -Indexes
+NODE_PATH=$(which node 2>/dev/null || echo "/usr/bin/node")
+echo "Detected Node binary at: $NODE_PATH"
 
-PassengerAppEnv production
-PassengerAppRoot /home/u776151780/domains/maternalmind.com.pk/public_html
+echo "Configuring Hostinger .htaccess for LiteSpeed Phusion Passenger..."
+cat << EOF > .htaccess
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/u776151780/domains/maternalmind.com.pk/public_html"
+PassengerBaseURI "/"
+PassengerNodejs "$NODE_PATH"
 PassengerAppType node
 PassengerStartupFile app.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+Options +FollowSymLinks -Indexes
+PassengerAppEnv production
 PassengerEnabled on
 
 <IfModule mod_rewrite.c>
@@ -32,7 +38,7 @@ PassengerEnabled on
   RewriteRule ^$ app.js [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^(.*)$ app.js/$1 [QSA,L]
+  RewriteRule ^(.*)$ app.js/\$1 [QSA,L]
 </IfModule>
 EOF
 
