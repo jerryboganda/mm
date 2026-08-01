@@ -16,22 +16,25 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
   mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
 fi
 
+TARGET_DIR=$(pwd)
+echo "Current deployment working directory: $TARGET_DIR"
+
 echo "Organizing single-slot static frontends..."
-if [ -d "website_dist" ]; then
-  echo "Deploying Marketing Website to root public_html..."
-  cp -rf website_dist/* . 2>/dev/null || true
+if [ -d "$TARGET_DIR/website_dist" ]; then
+  echo "Deploying Marketing Website to $TARGET_DIR..."
+  cp -rf "$TARGET_DIR/website_dist/"* "$TARGET_DIR/" 2>/dev/null || true
 fi
 
-if [ -d "admin_dist" ]; then
-  echo "Deploying Admin Panel to public_html/admin..."
-  mkdir -p admin
-  cp -rf admin_dist/* admin/ 2>/dev/null || true
+if [ -d "$TARGET_DIR/admin_dist" ]; then
+  echo "Deploying Admin Panel to $TARGET_DIR/admin..."
+  mkdir -p "$TARGET_DIR/admin"
+  cp -rf "$TARGET_DIR/admin_dist/"* "$TARGET_DIR/admin/" 2>/dev/null || true
 fi
 
-if [ -d "web_dist" ]; then
-  echo "Deploying Expo User Panel to public_html/app..."
-  mkdir -p app
-  cp -rf web_dist/* app/ 2>/dev/null || true
+if [ -d "$TARGET_DIR/web_dist" ]; then
+  echo "Deploying Expo User Panel to $TARGET_DIR/app..."
+  mkdir -p "$TARGET_DIR/app"
+  cp -rf "$TARGET_DIR/web_dist/"* "$TARGET_DIR/app/" 2>/dev/null || true
 fi
 
 VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
