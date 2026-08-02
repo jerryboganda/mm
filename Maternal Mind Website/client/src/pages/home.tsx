@@ -190,7 +190,7 @@ const productTabs = [
     label: "Subscribe",
     icon: CreditCard,
     title: "Flexible Plans",
-    description: "Choose the plan that fits your training schedule. Monthly, quarterly, or yearly options with full access to all learning tools.",
+    description: "Choose the plan that fits your training schedule. 6 Months (700 PKR) or 1 Year (1000 PKR) with full access to all learning tools.",
     bullets: [
       "Unlock all topics, MCQs, and analytics",
       "Offline access for studying anywhere",
@@ -200,11 +200,11 @@ const productTabs = [
       <div className="space-y-3 p-4">
         <div className="glass rounded-md p-3 neon-border">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-white/90">Yearly Plan</p>
+            <p className="text-sm font-medium text-white/90">1 Year Plan</p>
             <span className="text-xs px-2 py-0.5 rounded-full bg-[#11a4d4]/20 text-[#11a4d4]">Best Value</span>
           </div>
-          <p className="text-2xl font-semibold text-[#11a4d4]">$49.99<span className="text-xs text-white/40 font-normal">/year</span></p>
-          <p className="text-xs text-white/40 mt-1">Save 58% vs monthly</p>
+          <p className="text-2xl font-semibold text-[#11a4d4]">1000 PKR<span className="text-xs text-white/40 font-normal">/year</span></p>
+          <p className="text-xs text-white/40 mt-1">Full 12-month complete access</p>
         </div>
         <div className="space-y-2">
           {["All topics & MCQs", "Progress analytics", "Offline access"].map((f, i) => (

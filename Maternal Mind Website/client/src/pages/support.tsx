@@ -6,6 +6,8 @@ import {
   Clock,
   Shield,
   Loader2,
+  MessageSquare,
+  Globe,
 } from "lucide-react";
 import {
   GlassCard,
@@ -125,32 +127,42 @@ export default function Support() {
                   icon: Mail,
                   title: "Email Support",
                   desc: "maternalmind.help@gmail.com",
-                  sub: "Response within 24 hours",
+                  sub: "24/7 Email Help",
+                  href: "mailto:maternalmind.help@gmail.com",
                 },
                 {
-                  icon: Clock,
-                  title: "Support Hours",
-                  desc: "Monday - Friday",
-                  sub: "9:00 AM - 5:00 PM GMT",
+                  icon: MessageSquare,
+                  title: "WhatsApp Helpline",
+                  desc: "+923360830836",
+                  sub: "Instant Chat Support",
+                  href: "https://wa.me/923360830836",
                 },
                 {
-                  icon: Shield,
-                  title: "System Status",
-                  desc: "All Systems Operational",
-                  sub: "Last checked: Today",
+                  icon: Globe,
+                  title: "Official Website",
+                  desc: "maternalmind.com.pk",
+                  sub: "Online Portal & Portal Access",
+                  href: "https://maternalmind.com.pk/",
                 },
               ].map((item, i) => (
-                <GlassCard
+                <a
                   key={i}
-                  className="p-5 text-center glass-hover transition-all duration-300"
+                  href={item.href}
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel={item.href.startsWith("http") ? "noreferrer" : undefined}
+                  className="block text-left"
                 >
-                  <item.icon className="w-6 h-6 text-[#11a4d4] mx-auto mb-3" />
-                  <h3 className="text-sm font-medium text-white mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-white/70">{item.desc}</p>
-                  <p className="text-xs text-white/40 mt-1">{item.sub}</p>
-                </GlassCard>
+                  <GlassCard
+                    className="p-5 text-center glass-hover transition-all duration-300 h-full"
+                  >
+                    <item.icon className="w-6 h-6 text-[#11a4d4] mx-auto mb-3" />
+                    <h3 className="text-sm font-medium text-white mb-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-white/70 font-mono">{item.desc}</p>
+                    <p className="text-xs text-white/40 mt-1">{item.sub}</p>
+                  </GlassCard>
+                </a>
               ))}
             </div>
           </ScrollReveal>

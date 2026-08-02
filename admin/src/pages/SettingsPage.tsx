@@ -170,7 +170,7 @@ function PaymentSettingsTab() {
   const addWallet = () =>
     setForm((f) => ({
       ...f,
-      wallets: [...f.wallets, { name: "", accountTitle: "", number: "" }],
+      wallets: [...f.wallets, { name: "", accountTitle: "", number: "", iban: "" }],
     }));
 
   const removeWallet = (i: number) =>
@@ -263,7 +263,7 @@ function PaymentSettingsTab() {
               onChange={(e) => setBank("iban", e.target.value)}
             />
           </div>
-          <div>
+          <div className="col-span-2">
             <label className="block text-xs text-gray-500 mb-1">Branch</label>
             <input
               className={inputCls}
@@ -295,11 +295,11 @@ function PaymentSettingsTab() {
           form.wallets.map((w, i) => (
             <div
               key={i}
-              className="grid grid-cols-3 gap-3 items-end border-b border-gray-50 pb-3"
+              className="grid grid-cols-2 gap-3 items-end border-b border-gray-50 pb-3"
             >
               <div>
                 <label className="block text-xs text-gray-500 mb-1">
-                  Wallet
+                  Wallet Name
                 </label>
                 <input
                   className={inputCls}
@@ -318,15 +318,25 @@ function PaymentSettingsTab() {
                   onChange={(e) => setWallet(i, "accountTitle", e.target.value)}
                 />
               </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">
+                  Account Number
+                </label>
+                <input
+                  className={inputCls}
+                  value={w.number}
+                  onChange={(e) => setWallet(i, "number", e.target.value)}
+                />
+              </div>
               <div className="flex gap-2 items-end">
                 <div className="flex-1">
                   <label className="block text-xs text-gray-500 mb-1">
-                    Number
+                    IBAN (Optional)
                   </label>
                   <input
                     className={inputCls}
-                    value={w.number}
-                    onChange={(e) => setWallet(i, "number", e.target.value)}
+                    value={(w as any).iban || ""}
+                    onChange={(e) => setWallet(i, "iban", e.target.value as any)}
                   />
                 </div>
                 <button

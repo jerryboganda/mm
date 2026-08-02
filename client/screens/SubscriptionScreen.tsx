@@ -162,7 +162,7 @@ export default function SubscriptionScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: headerHeight + Spacing.xl,
+            paddingTop: (headerHeight > 0 ? headerHeight : insets.top) + Spacing["2xl"],
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
