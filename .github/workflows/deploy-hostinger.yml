@@ -1,10 +1,17 @@
-name: Deploy to Hostinger (Single Slot)
+name: Manual Deploy to Hostinger
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Select component to deploy'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - website
+          - app_and_admin
 
 jobs:
   build-and-deploy:
