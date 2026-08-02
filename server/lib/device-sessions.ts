@@ -149,7 +149,7 @@ export async function createOrReplaceUserSession(options: {
       expiresAt: getRefreshTokenExpiry(),
       lastSeenAt: now,
     })
-    ;
+    .returning();
 
   await enforceDeviceLimit(
     options.user.id,

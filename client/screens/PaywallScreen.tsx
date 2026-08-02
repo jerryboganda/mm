@@ -76,7 +76,7 @@ export default function PaywallScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: Math.max(insets.top, headerHeight) + Spacing.xl,
+            paddingTop: (headerHeight > 0 ? headerHeight : insets.top) + Spacing["2xl"],
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -171,7 +171,9 @@ const styles = StyleSheet.create({
     marginBottom: Spacing["2xl"],
   },
   crownContainer: {
+    marginTop: Spacing.md,
     marginBottom: Spacing.xl,
+    paddingTop: Spacing.xs,
   },
   crownGradient: {
     width: 80,

@@ -34,29 +34,13 @@ const CURRENCY = "PKR";
 
 const PACKAGES: SeedPackage[] = [
   {
-    slug: "monthly",
-    name: "Monthly",
-    shortDescription: "Full access, billed monthly",
-    description:
-      "Unlock all premium content and tools with a monthly subscription.",
+    slug: "six_months",
+    name: "6 Months",
+    shortDescription: "Full access for 6 months",
+    description: "6 months of full premium access to all OB-GYN topics and MCQs.",
     displayOrder: 1,
-    billingCycle: "monthly",
-    price: "1500.00",
-    features: [
-      { name: "Full content access", valueType: "check", key: "full_content_access" },
-      { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
-      { name: "Priority support", valueType: "check", key: "priority_support" },
-    ],
-  },
-  {
-    slug: "quarterly",
-    name: "Quarterly",
-    shortDescription: "Full access, billed every 3 months",
-    description: "Three months of full premium access at a discounted rate.",
-    displayOrder: 2,
-    billingCycle: "quarterly",
-    price: "3900.00",
-    originalPrice: "4500.00",
+    billingCycle: "semi_annual",
+    price: "700.00",
     features: [
       { name: "Full content access", valueType: "check", key: "full_content_access" },
       { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
@@ -65,13 +49,12 @@ const PACKAGES: SeedPackage[] = [
   },
   {
     slug: "annual",
-    name: "Annual",
-    shortDescription: "Best value, billed yearly",
-    description: "A full year of premium access at our best price.",
-    displayOrder: 3,
+    name: "1 Year",
+    shortDescription: "Best value, full access for 1 year",
+    description: "A full year of premium access to all OB-GYN topics and MCQs.",
+    displayOrder: 2,
     billingCycle: "annual",
-    price: "12000.00",
-    originalPrice: "18000.00",
+    price: "1000.00",
     features: [
       { name: "Full content access", valueType: "check", key: "full_content_access" },
       { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
@@ -112,10 +95,21 @@ async function seed(): Promise<void> {
           .returning();
         logger.info(`[seed-packages] Created package: ${p.slug}`);
       } else {
-        logger.info(`[seed-packages] Package already exists: ${p.slug}`);
+        await db
+          .update(subscriptionPackages)
+          .set({
+            name: p.name,
+            description: p.description,
+            shortDescription: p.shortDescription,
+            displayOrder: p.displayOrder,
+            status: "active",
+            isVisibleToUsers: true,
+          })
+          .where(eq(subscriptionPackages.id, pkg.id));
+        logger.info(`[seed-packages] Updated package: ${p.slug}`);
       }
 
-      // Ensure a price for the billing cycle exists
+      // Ensure a price for the billing cycle exists and update if changed
       const [existingPrice] = await db
         .select()
         .from(packagePrices)
@@ -138,6 +132,19 @@ async function seed(): Promise<void> {
         logger.info(
           `[seed-packages] Added ${p.billingCycle} price for ${p.slug}`,
         );
+      } else {
+        await db
+          .update(packagePrices)
+          .set({
+            price: p.price,
+            currency: CURRENCY,
+            originalPrice: p.originalPrice ?? null,
+            isActive: true,
+          })
+          .where(eq(packagePrices.id, existingPrice.id));
+        logger.info(
+          `[seed-packages] Updated ${p.billingCycle} price to ${p.price} PKR for ${p.slug}`,
+        );
       }
 
       // Ensure features exist (match by name)
@@ -145,7 +152,9 @@ async function seed(): Promise<void> {
         .select()
         .from(packageFeatures)
         .where(eq(packageFeatures.packageId, pkg.id));
-      const existingNames = new Set(existingFeatures.map((f) => f.name));
+      const existingNames = new Set(
+        existingFeatures.map((f: { name: string }) => f.name),
+      );
 
       let order = 0;
       for (const f of p.features) {

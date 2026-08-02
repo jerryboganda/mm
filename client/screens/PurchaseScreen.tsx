@@ -3,6 +3,8 @@ import {
   StyleSheet,
   View,
   ScrollView,
+  Pressable,
+  Linking,
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,11 +36,14 @@ interface Wallet {
   name: string;
   accountTitle: string;
   number: string;
+  iban?: string;
 }
 
 interface PaymentInstructions {
   currency: string;
   instructions: string;
+  whatsappNumber?: string;
+  supportEmail?: string;
   bank: {
     bankName: string;
     accountTitle: string;
@@ -91,6 +96,9 @@ export default function PurchaseScreen() {
   const instructions = data?.instructions;
   const bank = instructions?.bank;
   const wallets = instructions?.wallets || [];
+  const whatsappNumber = instructions?.whatsappNumber || "+923360830836";
+  const supportEmail = instructions?.supportEmail || "maternalmind.help@gmail.com";
+
   const hasBank =
     !!bank && (bank.accountNumber || bank.iban || bank.bankName);
 
@@ -103,6 +111,20 @@ export default function PurchaseScreen() {
       price,
       currency,
     });
+  };
+
+  const handleWhatsApp = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const cleanNum = whatsappNumber.replace(/[^0-9]/g, "");
+    const msg = encodeURIComponent(`Hi, I have made a payment for Maternal Mind ${packageName} (${formatPrice(price)}). Here is my payment receipt.`);
+    Linking.openURL(`https://wa.me/${cleanNum}?text=${msg}`);
+  };
+
+  const handleEmail = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const subject = encodeURIComponent(`Payment Proof - Maternal Mind ${packageName}`);
+    const body = encodeURIComponent(`Hi Maternal Mind Team,\n\nI have transferred payment for ${packageName} (${formatPrice(price)}).\n\nPlease find my payment proof attached.\n\nThank you!`);
+    Linking.openURL(`mailto:${supportEmail}?subject=${subject}&body=${body}`);
   };
 
   const DetailRow = ({ label, value }: { label: string; value: string }) => (
@@ -200,33 +222,63 @@ export default function PurchaseScreen() {
                     <DetailRow label="Account Title" value={w.accountTitle} />
                   ) : null}
                   {w.number ? (
-                    <DetailRow label="Number" value={w.number} />
+                    <DetailRow label="Account Number" value={w.number} />
+                  ) : null}
+                  {w.iban ? (
+                    <DetailRow label="IBAN" value={w.iban} />
                   ) : null}
                 </GlassCard>
               ))}
 
-            {!hasBank && wallets.length === 0 ? (
-              <ThemedText
-                style={[styles.instructionsText, { color: theme.textMuted }]}
-              >
-                Payment details are not configured yet. Please contact support.
+            <ThemedText style={[styles.sectionLabel, { color: theme.primary, marginTop: Spacing.lg }]}>
+              UPLOAD PROOF OF PAYMENT
+            </ThemedText>
+
+            <GlassCard style={styles.proofOptionsCard}>
+              <ThemedText style={[styles.proofSubtext, { color: theme.textSecondary }]}>
+                Send your payment screenshot through any of the 3 easy methods below:
               </ThemedText>
-            ) : null}
+
+              <Pressable style={styles.contactRow} onPress={handleWhatsApp}>
+                <View style={[styles.contactIconBg, { backgroundColor: "#25D36622" }]}>
+                  <Feather name="message-circle" size={18} color="#25D366" />
+                </View>
+                <View style={styles.contactTextCol}>
+                  <ThemedText style={styles.contactTitle}>WhatsApp Proof</ThemedText>
+                  <ThemedText style={[styles.contactSub, { color: theme.textMuted }]}>
+                    {whatsappNumber}
+                  </ThemedText>
+                </View>
+                <Feather name="chevron-right" size={16} color={theme.textMuted} />
+              </Pressable>
+
+              <Pressable style={styles.contactRow} onPress={handleEmail}>
+                <View style={[styles.contactIconBg, { backgroundColor: `${theme.primary}22` }]}>
+                  <Feather name="mail" size={18} color={theme.primary} />
+                </View>
+                <View style={styles.contactTextCol}>
+                  <ThemedText style={styles.contactTitle}>Email Proof</ThemedText>
+                  <ThemedText style={[styles.contactSub, { color: theme.textMuted }]}>
+                    {supportEmail}
+                  </ThemedText>
+                </View>
+                <Feather name="chevron-right" size={16} color={theme.textMuted} />
+              </Pressable>
+            </GlassCard>
 
             <View
               style={[styles.noteBox, { backgroundColor: `${theme.primary}12` }]}
             >
               <Feather name="info" size={16} color={theme.primary} />
               <ThemedText style={[styles.noteText, { color: theme.textSecondary }]}>
-                Tip: long-press any value above to copy it. After paying, tap the
-                button below to upload your receipt.
+                Tip: long-press any account value to copy it. You can upload in-app below or send via WhatsApp / Email.
               </ThemedText>
             </View>
           </>
         )}
 
         <PrimaryButton
-          title="I've Paid — Upload Proof"
+          title="I've Paid — Upload Proof In-App"
           onPress={handleUpload}
           icon="upload"
           style={styles.uploadButton}
@@ -278,6 +330,27 @@ const styles = StyleSheet.create({
   detailLabel: { fontSize: 13 },
   detailValue: { fontSize: 14, fontWeight: "600", flexShrink: 1, textAlign: "right" },
   loadingBox: { paddingVertical: Spacing["2xl"], alignItems: "center" },
+  proofOptionsCard: { padding: Spacing.md, marginBottom: Spacing.md },
+  proofSubtext: { fontSize: 13, marginBottom: Spacing.md, lineHeight: 18 },
+  contactRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    gap: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255, 255, 255, 0.08)",
+  },
+  contactIconBg: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contactTextCol: { flex: 1 },
+  contactTitle: { fontSize: 14, fontWeight: "600" },
+  contactSub: { fontSize: 12, marginTop: 2 },
   noteBox: {
     flexDirection: "row",
     gap: Spacing.sm,

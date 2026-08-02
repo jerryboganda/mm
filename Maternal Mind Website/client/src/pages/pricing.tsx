@@ -18,32 +18,15 @@ import {
 
 const plans = [
   {
-    name: "Monthly",
-    price: "$9.99",
-    period: "/month",
-    description: "Flexible month-to-month access",
+    name: "6 Months Plan",
+    price: "700 PKR",
+    period: "/6 months",
+    description: "Full access to all topics & MCQs for 6 months",
     features: {
       "Full topic library": true,
-      "All MCQ modes": true,
+      "All MCQ practice modes": true,
       "Progress analytics": true,
-      "Bookmarks": true,
-      "Wrong-questions mode": true,
-      "Offline access": true,
-      "Priority support": false,
-      "Early access to new content": false,
-    },
-    popular: false,
-  },
-  {
-    name: "Quarterly",
-    price: "$19.99",
-    period: "/3 months",
-    description: "Save 33% with quarterly billing",
-    features: {
-      "Full topic library": true,
-      "All MCQ modes": true,
-      "Progress analytics": true,
-      "Bookmarks": true,
+      "Bookmarks & notes": true,
       "Wrong-questions mode": true,
       "Offline access": true,
       "Priority support": true,
@@ -52,16 +35,16 @@ const plans = [
     popular: false,
   },
   {
-    name: "Yearly",
-    price: "$49.99",
+    name: "1 Year Plan",
+    price: "1000 PKR",
     period: "/year",
-    description: "Best value for serious preparation",
+    description: "Best value for complete OB-GYN exam preparation",
     badge: "Best Value",
     features: {
       "Full topic library": true,
-      "All MCQ modes": true,
+      "All MCQ practice modes": true,
       "Progress analytics": true,
-      "Bookmarks": true,
+      "Bookmarks & notes": true,
       "Wrong-questions mode": true,
       "Offline access": true,
       "Priority support": true,
@@ -74,34 +57,34 @@ const plans = [
 const faqs = [
   {
     q: "Can I switch between plans?",
-    a: "Yes, you can upgrade or downgrade your plan at any time. If upgrading, the price difference is prorated. If downgrading, the change takes effect at the end of your current billing period.",
+    a: "Yes, you can upgrade or renew your plan at any time through your profile or subscription settings.",
   },
   {
     q: "Is there a free trial?",
-    a: "We offer a selection of free topics and MCQs so you can experience the platform before subscribing. Create an account to explore the free content.",
+    a: "We offer a selection of free topics and MCQs so you can experience the platform before subscribing. Create an account to explore free content.",
   },
   {
     q: "How do I cancel my subscription?",
-    a: "You can cancel your subscription at any time through the app's subscription management section. Your access will continue until the end of the current billing period. No questions asked.",
+    a: "You can cancel your subscription at any time through the app's subscription management section. Your access will continue until the end of your current billing period.",
   },
   {
     q: "Can I restore purchases on a new device?",
-    a: "Yes. Simply sign in with your account on any device and use the 'Restore Purchases' option to re-activate your subscription. Works across iOS and Android.",
+    a: "Yes. Simply sign in with your account on any device and use the 'Restore Purchases' option to re-activate your subscription.",
   },
   {
     q: "Do you offer institutional pricing?",
-    a: "Yes, we offer special pricing for hospitals, training programs, and medical institutions. Contact us through our Institutions page to discuss volume licensing and cohort management.",
+    a: "Yes, we offer special pricing for hospitals, training programs, and medical institutions. Contact us through our Institutions page to discuss volume licensing.",
   },
   {
     q: "What payment methods do you accept?",
-    a: "We accept all major credit cards, Apple Pay, and Google Pay through secure in-app purchase systems on iOS and Android.",
+    a: "We accept local bank transfers, JazzCash, EasyPaisa, and major cards with quick admin verification.",
   },
 ];
 
 export default function Pricing() {
   return (
     <div className="min-h-screen bg-void">
-      <SEO title="Pricing" description="Simple, transparent pricing plans for Maternal Mind. Monthly, quarterly, and yearly options with full access to structured OB-GYN content and MCQ practice." path="/pricing" />
+      <SEO title="Pricing" description="Simple, transparent pricing plans for Maternal Mind: 6 Months (700 PKR) and 1 Year (1000 PKR) with full access to structured OB-GYN content and MCQ practice." path="/pricing" />
       <BackgroundOrbs />
 
       <section className="relative pt-32 pb-16 px-4 sm:px-6 lg:px-8">
@@ -120,9 +103,9 @@ export default function Pricing() {
       </section>
 
       <section className="relative py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <ScrollReveal>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {plans.map((plan, i) => (
                 <GlassCard
                   key={i}
@@ -180,6 +163,126 @@ export default function Pricing() {
               <span className="text-sm text-white/40">
                 Already subscribed? <button className="text-[#11a4d4] hover:text-[#3dbde8] transition-colors" data-testid="button-restore-purchases">Restore purchases</button>
               </span>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <section className="relative py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal>
+            <div className="text-center mb-8">
+              <SectionLabel className="mb-3 inline-block">Payment Options</SectionLabel>
+              <h2 className="text-2xl font-semibold text-white">
+                Official Payment Accounts
+              </h2>
+              <p className="text-sm text-white/60 mt-2">
+                Transfer subscription payment directly to any of our official accounts below:
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <GlassCard className="p-6">
+                <div className="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#11a4d4]/10 border border-[#11a4d4]/30 flex items-center justify-center text-[#11a4d4] font-bold text-sm">
+                    HBL
+                  </div>
+                  <div>
+                    <h3 className="text-base font-medium text-white">HBL Bank Transfer</h3>
+                    <p className="text-xs text-white/50">Habib Bank Limited</p>
+                  </div>
+                </div>
+                <div className="space-y-2.5 text-xs text-white/70">
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Account Title:</span>
+                    <span className="text-white font-medium">Farzana Muneer</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Account Number:</span>
+                    <span className="font-mono text-white select-all">08477902077901</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">IBAN:</span>
+                    <span className="font-mono text-[#11a4d4] select-all">PK85HABB0008477902077901</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Branch:</span>
+                    <span className="text-white/80">Chowk Azam Layyah</span>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard className="p-6">
+                <div className="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/30 flex items-center justify-center text-[#22c55e] font-bold text-sm">
+                    JC
+                  </div>
+                  <div>
+                    <h3 className="text-base font-medium text-white">JazzCash Mobile Wallet</h3>
+                    <p className="text-xs text-white/50">Mobile Wallet & Bank Transfer</p>
+                  </div>
+                </div>
+                <div className="space-y-2.5 text-xs text-white/70">
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Account Title:</span>
+                    <span className="text-white font-medium">Farzana Muneer</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Account Number:</span>
+                    <span className="font-mono text-white select-all">03360830836</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">IBAN:</span>
+                    <span className="font-mono text-[#22c55e] select-all">PK77JCMA3101923360830836</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Bank:</span>
+                    <span className="text-white/80">JazzCash</span>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.2}>
+            <div className="mt-8 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <h3 className="text-base font-semibold text-white mb-2">
+                📸 How to Send Payment Proof
+              </h3>
+              <p className="text-xs text-white/60 mb-4 leading-relaxed">
+                After completing your payment transfer, send your receipt screenshot through any of the following channels:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <a
+                  href="https://wa.me/923360830836?text=Hi%2C%20I%20have%20transferred%20payment%20for%20Maternal%20Mind%20subscription.%20Here%20is%20my%20receipt."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-[#25D366]/10 border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#25D366] text-white flex items-center justify-center font-bold shrink-0">
+                    WA
+                  </div>
+                  <div>
+                    <span className="block text-white font-medium group-hover:text-[#25D366]">Send via WhatsApp</span>
+                    <span className="text-white/50 font-mono">+923360830836</span>
+                  </div>
+                </a>
+
+                <a
+                  href="mailto:maternalmind.help@gmail.com?subject=Payment%20Proof%20-%20Maternal%20Mind%20Subscription"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-[#11a4d4]/10 border border-[#11a4d4]/30 hover:bg-[#11a4d4]/20 transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#11a4d4] text-white flex items-center justify-center font-bold shrink-0">
+                    @
+                  </div>
+                  <div>
+                    <span className="block text-white font-medium group-hover:text-[#11a4d4]">Send via Email</span>
+                    <span className="text-white/50 font-mono">maternalmind.help@gmail.com</span>
+                  </div>
+                </a>
+              </div>
             </div>
           </ScrollReveal>
         </div>

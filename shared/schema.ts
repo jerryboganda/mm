@@ -1420,6 +1420,8 @@ export const manualGrantSchema = z
 export const paymentInstructionsSchema = z.object({
   currency: z.string().default("PKR"),
   instructions: z.string().default(""),
+  whatsappNumber: z.string().default("+923360830836"),
+  supportEmail: z.string().default("maternalmind.help@gmail.com"),
   bank: z
     .object({
       bankName: z.string().default(""),
@@ -1441,6 +1443,7 @@ export const paymentInstructionsSchema = z.object({
         name: z.string().default(""),
         accountTitle: z.string().default(""),
         number: z.string().default(""),
+        iban: z.string().optional(),
       }),
     )
     .default([]),

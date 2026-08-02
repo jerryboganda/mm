@@ -54,7 +54,8 @@ export default function LoginScreen() {
   const [supportContact, setSupportContact] = useState({
     whatsappNumber: "+923360830836",
     phoneNumber: "+923360830836",
-    supportEmail: "support@maternalmind.com.pk",
+    supportEmail: "maternalmind.help@gmail.com",
+    websiteUrl: "https://maternalmind.com.pk/",
     whatsappDefaultMessage: "Hello Support Team, I need help logging in.",
     whatsappEnabled: true,
     phoneEnabled: true,
@@ -195,7 +196,7 @@ export default function LoginScreen() {
   };
 
   const handleOpenEmail = async () => {
-    const emailAddr = supportContact.supportEmail || "support@maternalmind.com.pk";
+    const emailAddr = supportContact.supportEmail || "maternalmind.help@gmail.com";
     const msg = encodeURIComponent(
       supportContact.whatsappDefaultMessage || "Hello Support Team, I need help logging in.",
     );
@@ -206,6 +207,15 @@ export default function LoginScreen() {
       await Linking.openURL(url);
     } catch {
       Alert.alert("Email Support", `Please email us at: ${emailAddr}`);
+    }
+  };
+
+  const handleOpenWebsite = async () => {
+    const webUrl = (supportContact as any).websiteUrl || "https://maternalmind.com.pk/";
+    try {
+      await Linking.openURL(webUrl);
+    } catch {
+      Alert.alert("Official Website", `Visit our website at: ${webUrl}`);
     }
   };
 
@@ -433,7 +443,7 @@ export default function LoginScreen() {
                   WhatsApp Helpline
                 </ThemedText>
                 <ThemedText style={styles.whatsappCardSub}>
-                  {supportContact.whatsappNumber || "+92 336 0830836"} • Direct Message
+                  {supportContact.whatsappNumber || "+923360830836"} • Direct Chat
                 </ThemedText>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
@@ -447,19 +457,19 @@ export default function LoginScreen() {
                   borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
                 },
               ]}
-              onPress={handleOpenPhone}
+              onPress={handleOpenWebsite}
               accessibilityRole="button"
-              accessibilityLabel="Call helpline"
+              accessibilityLabel="Visit Official Website"
             >
               <View style={[styles.contactIconBg, { backgroundColor: `${theme.primary}20` }]}>
-                <Ionicons name="call-outline" size={22} color={theme.primary} />
+                <Ionicons name="globe-outline" size={22} color={theme.primary} />
               </View>
               <View style={styles.contactTextContainer}>
                 <ThemedText style={[styles.optionCardTitle, { color: theme.text }]}>
-                  Phone Helpline
+                  Official Website
                 </ThemedText>
                 <ThemedText style={[styles.optionCardSub, { color: theme.textSecondary }]}>
-                  {supportContact.phoneNumber || "+92 336 0830836"}
+                  {(supportContact as any).websiteUrl || "https://maternalmind.com.pk/"}
                 </ThemedText>
               </View>
               <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
@@ -485,7 +495,7 @@ export default function LoginScreen() {
                   Email Support
                 </ThemedText>
                 <ThemedText style={[styles.optionCardSub, { color: theme.textSecondary }]}>
-                  {supportContact.supportEmail || "support@maternalmind.com.pk"}
+                  {supportContact.supportEmail || "maternalmind.help@gmail.com"}
                 </ThemedText>
               </View>
               <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />

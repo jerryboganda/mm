@@ -20,15 +20,24 @@ export const PAYMENT_INSTRUCTIONS_KEY = "payment_instructions";
 const DEFAULT_INSTRUCTIONS: PaymentInstructions = {
   currency: "PKR",
   instructions:
-    "Transfer the package amount to one of the accounts below, then upload a screenshot of your payment receipt. Your subscription will activate once an admin verifies it.",
+    "Transfer the package amount (700 PKR for 6 Months or 1000 PKR for 1 Year) to one of the accounts below, then upload your payment proof in-app or send via WhatsApp / Email. Your subscription will activate once verified.",
+  whatsappNumber: "+923360830836",
+  supportEmail: "maternalmind.help@gmail.com",
   bank: {
-    bankName: "",
-    accountTitle: "",
-    accountNumber: "",
-    iban: "",
-    branch: "",
+    bankName: "HBL",
+    accountTitle: "Farzana Muneer",
+    accountNumber: "08477902077901",
+    iban: "PK85HABB0008477902077901",
+    branch: "Chowk Azam Layyah",
   },
-  wallets: [],
+  wallets: [
+    {
+      name: "JazzCash",
+      accountTitle: "Farzana Muneer",
+      number: "03360830836",
+      iban: "PK77JCMA3101923360830836",
+    },
+  ],
 };
 
 /** Read the admin-configured payment instructions (returns defaults if unset). */
