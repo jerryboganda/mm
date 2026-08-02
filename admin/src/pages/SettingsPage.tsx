@@ -99,6 +99,7 @@ interface Wallet {
   name: string;
   accountTitle: string;
   number: string;
+  iban?: string;
 }
 
 interface PaymentInstructions {
