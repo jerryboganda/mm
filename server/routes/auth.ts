@@ -91,11 +91,14 @@ function clearOtpAttempts(email: string): void {
   otpAttemptStore.delete(email.toLowerCase());
 }
 
-const JWT_SECRET = process.env.SESSION_SECRET;
-if (!JWT_SECRET) {
-  throw new Error(
-    "SESSION_SECRET environment variable must be set. Never use a hardcoded secret in production.",
-  );
+function getJwtSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    throw new Error(
+      "SESSION_SECRET environment variable must be set. Never use a hardcoded secret in production.",
+    );
+  }
+  return secret;
 }
 const JWT_EXPIRES_IN = "7d";
 const REFRESH_EXPIRES_IN = "30d";
@@ -106,13 +109,13 @@ const ACCOUNT_DELETION_PENDING_MESSAGE =
   "Your account deletion request is in progress. Please contact support if you need help.";
 
 function generateToken(userId: string, sessionId: string): string {
-  return jwt.sign({ userId, sessionId }, JWT_SECRET, {
+  return jwt.sign({ userId, sessionId }, getJwtSecret(), {
     expiresIn: JWT_EXPIRES_IN,
   });
 }
 
 function generateRefreshToken(userId: string, sessionId: string): string {
-  return jwt.sign({ userId, sessionId, type: "refresh" }, JWT_SECRET, {
+  return jwt.sign({ userId, sessionId, type: "refresh" }, getJwtSecret(), {
     expiresIn: REFRESH_EXPIRES_IN,
   });
 }

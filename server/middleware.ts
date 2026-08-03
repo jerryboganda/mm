@@ -2,11 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { getActiveSession, touchSession } from "./lib/device-sessions";
 
-const JWT_SECRET = process.env.SESSION_SECRET;
-if (!JWT_SECRET) {
-  throw new Error(
-    "SESSION_SECRET environment variable must be set. Never use a hardcoded secret in production.",
-  );
+function getJwtSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    throw new Error(
+      "SESSION_SECRET environment variable must be set. Never use a hardcoded secret in production.",
+    );
+  }
+  return secret;
 }
 
 export interface AuthRequest extends Request {
@@ -29,7 +32,7 @@ function verifyToken(
   token: string,
 ): { userId: string; sessionId: string } | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(token, getJwtSecret()) as {
       userId?: string;
       sessionId?: string;
       type?: string;
