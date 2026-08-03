@@ -29,7 +29,7 @@ const generalLimiter = rateLimiter(120, 60_000); // 120 requests/min for content
 const quizLimiter = rateLimiter(30, 60_000); // 30 requests/min for quiz operations
 const adminLimiter = rateLimiter(600, 60_000); // 600 requests/min for admin operations (bulk saves need headroom)
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export function registerRoutes(app: Express): Server {
   // Self-hosted Expo OTA updates. Mounted outside /api (no `no-store` header,
   // no /api 404 handler) and intentionally un-rate-limited: one OTA download
   // bursts through a JS bundle + many content-addressed assets.

@@ -463,71 +463,69 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
-(async () => {
-  void ensureDatabaseConnection().catch((err) =>
-    logger.error("[DB] Non-blocking connection check failed", { error: String(err) }),
-  );
+void ensureDatabaseConnection().catch((err) =>
+  logger.error("[DB] Non-blocking connection check failed", { error: String(err) }),
+);
 
-  setupSecurityHeaders(app);
-  setupRequestId(app);
-  setupCors(app);
-  setupBodyParsing(app);
-  setupRequestLogging(app);
-  setupHealthCheck(app);
+setupSecurityHeaders(app);
+setupRequestId(app);
+setupCors(app);
+setupBodyParsing(app);
+setupRequestLogging(app);
+setupHealthCheck(app);
 
-  // Direct file download handler for Android (APK) & iOS packages
-  app.get("/downloads/:filename", (req, res) => {
-    const filename = path.basename(req.params.filename);
-    const downloadsDir = path.join(process.cwd(), "downloads");
-    const filePath = path.join(downloadsDir, filename);
+// Direct file download handler for Android (APK) & iOS packages
+app.get("/downloads/:filename", (req, res) => {
+  const filename = path.basename(req.params.filename);
+  const downloadsDir = path.join(process.cwd(), "downloads");
+  const filePath = path.join(downloadsDir, filename);
 
-    if (fs.existsSync(filePath)) {
-      res.download(filePath, filename);
-    } else {
-      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-      res.setHeader("Content-Type", "application/octet-stream");
-      res.send(Buffer.from("Maternal Mind Mobile Application Package"));
-    }
+  if (fs.existsSync(filePath)) {
+    res.download(filePath, filename);
+  } else {
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.send(Buffer.from("Maternal Mind Mobile Application Package"));
+  }
+});
+
+configureExpoAndLanding(app);
+
+const server = registerRoutes(app);
+
+setupErrorHandler(app);
+
+const port = process.env.PORT || 5000;
+server.listen(port, () => {
+  logger.info(`express server serving on ${port}`);
+});
+
+// Graceful shutdown
+const shutdown = async (signal: string) => {
+  logger.info(`${signal} received — shutting down gracefully...`);
+  server.close(() => {
+    logger.info("HTTP server closed");
+    pool
+      .end()
+      .then(() => {
+        logger.info("DB pool drained");
+        process.exit(0);
+      })
+      .catch((err: any) => {
+        logger.error("Error draining DB pool", { error: String(err) });
+        process.exit(1);
+      });
   });
 
-  configureExpoAndLanding(app);
+  // Force exit after 10s
+  setTimeout(() => {
+    logger.error("Forced shutdown after timeout");
+    process.exit(1);
+  }, 10_000);
+};
 
-  const server = await registerRoutes(app);
-
-  setupErrorHandler(app);
-
-  const port = process.env.PORT || 5000;
-  server.listen(port, () => {
-    logger.info(`express server serving on ${port}`);
-  });
-
-  // Graceful shutdown
-  const shutdown = async (signal: string) => {
-    logger.info(`${signal} received — shutting down gracefully...`);
-    server.close(() => {
-      logger.info("HTTP server closed");
-      pool
-        .end()
-        .then(() => {
-          logger.info("DB pool drained");
-          process.exit(0);
-        })
-        .catch((err: any) => {
-          logger.error("Error draining DB pool", { error: String(err) });
-          process.exit(1);
-        });
-    });
-
-    // Force exit after 10s
-    setTimeout(() => {
-      logger.error("Forced shutdown after timeout");
-      process.exit(1);
-    }, 10_000);
-  };
-
-  process.on("SIGTERM", () => shutdown("SIGTERM"));
-  process.on("SIGINT", () => shutdown("SIGINT"));
-})();
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
 
 export default app;
 export { app };
