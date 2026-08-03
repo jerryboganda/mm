@@ -227,7 +227,7 @@ class SubscriptionService {
 
       if (activePkgs.length === 0) return [];
 
-      const pkgIds = activePkgs.map((p) => p.id);
+      const pkgIds = activePkgs.map((p: any) => p.id);
 
       const allPrices = await db
         .select()
@@ -245,10 +245,10 @@ class SubscriptionService {
         .where(inArray(packageFeatures.packageId, pkgIds))
         .orderBy(packageFeatures.displayOrder);
 
-      return activePkgs.map((pkg) => ({
+      return activePkgs.map((pkg: any) => ({
         ...pkg,
-        prices: allPrices.filter((p) => p.packageId === pkg.id),
-        features: allFeatures.filter((f) => f.packageId === pkg.id),
+        prices: allPrices.filter((p: any) => p.packageId === pkg.id),
+        features: allFeatures.filter((f: any) => f.packageId === pkg.id),
       }));
     } catch (error) {
       logger.error("SubscriptionService getPackageComparison error", { error: String(error) });
@@ -1616,7 +1616,7 @@ class SubscriptionService {
         .groupBy(subscriptions.status);
 
       const getCount = (status: string) =>
-        Number(statusCounts.find((s) => s.status === status)?.total ?? 0);
+        Number(statusCounts.find((s: any) => s.status === status)?.total ?? 0);
 
       const totalActive = getCount("active");
       const totalTrialing = getCount("trialing");
@@ -1909,13 +1909,13 @@ class SubscriptionService {
         .groupBy(sql`to_char(${subscriptions.createdAt}, 'YYYY-MM-DD')`)
         .orderBy(sql`to_char(${subscriptions.createdAt}, 'YYYY-MM-DD')`);
 
-      const growthByDay = rows.map((r) => ({
+      const growthByDay = rows.map((r: any) => ({
         date: r.date,
         newSubscribers: Number(r.total),
       }));
 
       const totalNewSubscribers = growthByDay.reduce(
-        (s, d) => s + d.newSubscribers,
+        (s: number, d: any) => s + d.newSubscribers,
         0,
       );
 

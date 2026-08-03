@@ -702,7 +702,7 @@ class CouponService {
       .orderBy(desc(count()))
       .limit(100);
 
-    return rows.map((r) => ({
+    return rows.map((r: any) => ({
       couponId: r.couponId,
       code: r.code,
       totalRedemptions: r.totalRedemptions,
@@ -760,7 +760,7 @@ class CouponService {
       totalRedemptions: usageAgg?.totalRedemptions ?? 0,
       totalDiscountGiven: Number(usageAgg?.totalDiscountGiven ?? 0),
       uniqueUsers: Number(usageAgg?.uniqueUsers ?? 0),
-      topPerformers: topPerformers.map((r) => ({
+      topPerformers: topPerformers.map((r: any) => ({
         couponId: r.couponId,
         code: r.code,
         totalRedemptions: r.totalRedemptions,
@@ -786,7 +786,7 @@ class CouponService {
       .where(eq(couponUsage.userId, userId))
       .orderBy(desc(couponUsage.usedAt));
 
-    return rows.map((r) => ({
+    return rows.map((r: any) => ({
       ...r.usage,
       coupon: r.coupon,
     }));
@@ -821,8 +821,8 @@ class CouponService {
       return { canStack: false, reason: "One or both coupons not found" };
     }
 
-    const couponA = results.find((c) => c.id === couponId)!;
-    const couponB = results.find((c) => c.id === otherCouponId)!;
+    const couponA = results.find((c: any) => c.id === couponId)!;
+    const couponB = results.find((c: any) => c.id === otherCouponId)!;
 
     if (!couponA.isActive || !couponB.isActive) {
       return { canStack: false, reason: "One or both coupons are inactive" };
@@ -902,13 +902,13 @@ class CouponService {
 
     // Separate by type for ordered application
     const percentageCoupons = couponRows.filter(
-      (c) => c.discountType === "percentage",
+      (c: any) => c.discountType === "percentage",
     );
     const fixedCoupons = couponRows.filter(
-      (c) => c.discountType === "fixed_amount",
+      (c: any) => c.discountType === "fixed_amount",
     );
     const trialCoupons = couponRows.filter(
-      (c) => c.discountType === "trial_extension",
+      (c: any) => c.discountType === "trial_extension",
     );
 
     const breakdown: StackedDiscountResult["breakdown"] = [];

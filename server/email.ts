@@ -42,7 +42,7 @@ async function getSmtpConfig(): Promise<SmtpConfig | null> {
       .from(appSettings)
       .where(inArray(appSettings.key, Object.values(SETTING_KEYS)));
 
-    const settingsMap = new Map(settings.map((s) => [s.key, s.value]));
+    const settingsMap = new Map(settings.map((s: any) => [s.key, s.value]));
 
     const host =
       settingsMap.get(SETTING_KEYS.SMTP_HOST) ||

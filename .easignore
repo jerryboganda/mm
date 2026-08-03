@@ -7,6 +7,7 @@ drizzle.config.ts
 # Docker / deployment
 Dockerfile
 docker-compose.yml
+Maternal Mind Education Content/
 
 # Android native build (EAS builds its own)
 android/
@@ -20,6 +21,8 @@ admin_dist/
 
 # Website (separate project, not needed for mobile)
 Maternal Mind Website/
+website_dist/
+web_dist/
 
 # Test output / screenshots / playwright
 output/

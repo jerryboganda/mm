@@ -472,11 +472,11 @@ export async function adminGetUsers(filters?: {
     .offset(offset);
 
   const activeDeviceCounts = await countActiveSessionsByUserIds(
-    data.map((user) => user.id),
+    data.map((user: any) => user.id),
   );
 
   return {
-    data: data.map((user) => ({
+    data: data.map((user: any) => ({
       ...user,
       activeDeviceCount: activeDeviceCounts.get(user.id) || 0,
     })),
@@ -605,7 +605,7 @@ export async function adminGetUserGrowth(days: number = 30) {
     .groupBy(sql`date(${users.createdAt})`)
     .orderBy(sql`date(${users.createdAt})`);
 
-  return rows.map((r) => ({ date: r.date, count: Number(r.count) }));
+  return rows.map((r: any) => ({ date: r.date, count: Number(r.count) }));
 }
 
 export async function adminGetQuizAnalytics() {
@@ -622,7 +622,7 @@ export async function adminGetQuizAnalytics() {
     .groupBy(sql`date(${quizAttempts.createdAt})`)
     .orderBy(sql`date(${quizAttempts.createdAt})`);
 
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     date: r.date,
     attempts: Number(r.attempts),
     avgScore: Number(r.avgScore),
@@ -648,7 +648,7 @@ export async function adminGetContentStats() {
     .groupBy(books.id, books.title)
     .orderBy(asc(books.order));
 
-  return bookStats.map((r) => ({
+  return bookStats.map((r: any) => ({
     bookId: r.bookId,
     bookTitle: r.bookTitle,
     chapterCount: Number(r.chapterCount),
