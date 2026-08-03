@@ -8,8 +8,6 @@ RUN npm run server:build
 RUN npm run expo:web:build
 # Ensure static-build exists even if no Expo build has been run
 RUN mkdir -p static-build
-# Mark server_dist as ESM to avoid Node.js reparsing overhead
-RUN echo '{"type":"module"}' > server_dist/package.json
 
 # ── Build admin SPA ──
 WORKDIR /app/admin
