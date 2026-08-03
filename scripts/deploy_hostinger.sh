@@ -121,6 +121,19 @@ cat .htaccess
 
 mkdir -p tmp
 touch tmp/restart.txt
+
+sleep 2
+echo "Warming up Passenger Node app..."
+curl -s -k "http://127.0.0.1/health" || true
+echo ""
+curl -s -k "http://127.0.0.1/api/auth/login" -H "Content-Type: application/json" -d '{"email":"test@test.com","password":"test"}' || true
+echo ""
+
+if [ -f "passenger_error.log" ]; then
+  echo "--- passenger_error.log ---"
+  cat passenger_error.log
+fi
+
 echo "=============================================="
 echo "HOSTINGER SINGLE-SLOT DEPLOYMENT COMPLETE!"
 echo "=============================================="
