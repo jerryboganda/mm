@@ -4,14 +4,21 @@
 
 ---
 
-## 🏗️ Architecture Summary
+## 🏗️ Production Hosting Architecture
 
-| Component | Target Location / URL | Source Directory | Build Command |
-|---|---|---|---|
-| **Marketing Website** | `https://maternalmind.com.pk/` | `Maternal Mind Website/` | `npm --prefix "Maternal Mind Website" run build` |
-| **Admin Panel** | `https://maternalmind.com.pk/admin/` | `admin/` | `npm --prefix admin run build` |
-| **Mobile App API** | `https://maternalmind.com.pk/api/` | `server/` | `npm run server:build` |
-| **User Expo Web** | `https://maternalmind.com.pk/app/` | `client/` | `npm run expo:web:build` |
+All Maternal Mind production deployments run on **Hostinger** under a single parent **Hostinger Business Hosting Account**:
+
+1. **Marketing Landing Page Website**:
+   - **URL**: `https://maternalmind.com.pk/`
+   - **Source Directory**: `Maternal Mind Website/`
+   - **Hosting**: Separate Hostinger Website deployment.
+
+2. **Unified Web Application (Single-Slot Deployment)**:
+   - **API Server**: `https://maternalmind.com.pk/api/`
+   - **Admin Panel**: `https://maternalmind.com.pk/admin/`
+   - **User Web App**: `https://maternalmind.com.pk/app/`
+   - **Source Directory**: `server/`, `admin/`, `client/`
+   - **Hosting**: Separate Hostinger Web App deployment on port 5000 / proxy.
 
 ---
 
@@ -56,16 +63,16 @@ If using GitHub Actions SCP upload, ensure these 4 secrets are configured in `ht
 
 | Secret Name | Value Description | Example |
 |---|---|---|
-| `HOSTINGER_HOST` | Hostinger SSH Host / IP | `185.252.233.186` or domain |
+| `HOSTINGER_HOST` | Hostinger SSH Host / Domain | `maternalmind.com.pk` |
 | `HOSTINGER_PORT` | SSH Port | `6588` or `22` |
-| `HOSTINGER_USER` | SSH Username | `u776151780` or `root` |
+| `HOSTINGER_USER` | Hostinger SSH Username | `u776151780` |
 | `HOSTINGER_SSH_KEY` | Private SSH Key | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
 
 ---
 
 ## 🛠️ Direct Hostinger Server Environment Variables (`.env`)
 
-For manual server restarts on Hostinger, the `.env` file at `~/domains/maternalmind.com.pk/public_html/.env` contains:
+For Hostinger Node.js environments, the `.env` file at `~/domains/maternalmind.com.pk/public_html/.env` contains:
 
 ```env
 NODE_ENV=production

@@ -1,8 +1,8 @@
 #!/bin/bash
 # Comprehensive E2E API Test Suite for Maternal Mind
-# Tests against production: http://185.252.233.186:5000
+# Tests against production: https://maternalmind.com.pk
 
-BASE="http://185.252.233.186:5000"
+BASE="https://maternalmind.com.pk"
 PASS=0
 FAIL=0
 WARN=0
