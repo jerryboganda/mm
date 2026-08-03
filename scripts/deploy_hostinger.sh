@@ -68,7 +68,7 @@ process.on('unhandledRejection', (reason) => {
   log(`UNHANDLED REJECTION: ${reason?.stack || reason}`);
 });
 
-log('Starting Maternal Mind Express API via Hostinger Passenger...');
+log(\`Starting Maternal Mind Express API via Hostinger Passenger (Node \${process.version})...\`);
 try {
   require('./server_dist/index.js');
   log('server_dist/index.js loaded successfully!');
