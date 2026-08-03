@@ -25,8 +25,11 @@ if (isMysql) {
   poolInstance = mysql.createPool({
     uri: dbUrl,
     waitForConnections: true,
-    connectionLimit: parseInt(process.env.DB_POOL_MAX || "20", 10),
+    connectionLimit: parseInt(process.env.DB_POOL_MAX || "10", 10),
     queueLimit: 0,
+    connectTimeout: 5000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
   });
 
   dbInstance = drizzleMysql(poolInstance, { schema, mode: "default" });
