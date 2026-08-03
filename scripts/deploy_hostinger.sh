@@ -127,11 +127,33 @@ cat .htaccess
 mkdir -p tmp
 touch tmp/restart.txt
 
+echo "Verifying the Node entrypoint can start before Passenger reload..."
+rm -f passenger_error.log
+set +e
+timeout 12 "$NODE_PATH" app.js > /tmp/maternal-mind-startup.log 2>&1
+STARTUP_STATUS=$?
+set -e
+cat /tmp/maternal-mind-startup.log
+if [ "$STARTUP_STATUS" -ne 0 ] && [ "$STARTUP_STATUS" -ne 124 ]; then
+  echo "Node entrypoint failed with exit code $STARTUP_STATUS"
+  exit "$STARTUP_STATUS"
+fi
+
 sleep 2
 echo "Warming up Passenger Node app via domain host..."
+HEALTHY=0
 for i in 1 2 3; do
   echo "Request $i:"
-  curl -s -k "https://maternalmind.com.pk/api/auth/login" -H "Content-Type: application/json" -d '{"email":"test@test.com","password":"test"}' || true
+  STATUS=$(curl -sS -k -o /tmp/maternal-mind-response.txt -w '%{http_code}' \
+    "https://maternalmind.com.pk/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@test.com","password":"test"}' || true)
+  cat /tmp/maternal-mind-response.txt
+  echo "HTTP status: $STATUS"
+  if [ "$STATUS" = "401" ]; then
+    HEALTHY=1
+    break
+  fi
   echo ""
   sleep 1
 done
@@ -140,6 +162,11 @@ if [ -f "passenger_error.log" ]; then
   echo "=================== PASSENGER ERROR LOG ==================="
   cat passenger_error.log
   echo "==========================================================="
+fi
+
+if [ "$HEALTHY" -ne 1 ]; then
+  echo "Deployment verification failed: login endpoint did not return the expected JSON 401 response."
+  exit 1
 fi
 
 echo "=============================================="
