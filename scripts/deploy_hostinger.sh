@@ -125,7 +125,6 @@ echo "Contents of .htaccess:"
 cat .htaccess
 
 mkdir -p tmp
-touch tmp/restart.txt
 
 echo "Verifying the Node entrypoint can start before Passenger reload..."
 rm -f passenger_error.log
@@ -139,6 +138,8 @@ if [ "$STARTUP_STATUS" -ne 0 ] && [ "$STARTUP_STATUS" -ne 124 ]; then
   exit "$STARTUP_STATUS"
 fi
 
+echo "Restarting Passenger after the standalone process has stopped..."
+touch tmp/restart.txt
 sleep 2
 echo "Warming up Passenger Node app via domain host..."
 HEALTHY=0
