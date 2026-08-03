@@ -16,12 +16,6 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
   mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
 fi
 
-TARGET_DIR=$(pwd)
-echo "Current deployment working directory: $TARGET_DIR"
-
-echo "Cleaning up root entry points to prevent static file conflicts..."
-rm -f "$TARGET_DIR/app.js" ~/domains/maternalmind.com.pk/public_html/app.js ~/public_html/app.js 2>/dev/null || true
-
 echo "Organizing single-slot static frontends..."
 if [ -d "$TARGET_DIR/website_dist" ]; then
   echo "Deploying Marketing Website to $TARGET_DIR..."
@@ -40,25 +34,36 @@ if [ -d "$TARGET_DIR/web_dist" ]; then
   cp -rf "$TARGET_DIR/web_dist/"* "$TARGET_DIR/app/" 2>/dev/null || true
 fi
 
-echo "Starting Node.js Express API server on port 5000..."
-pkill -f "server_dist/index.js" 2>/dev/null || true
+APP_ROOT=$(pwd -P)
+VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
+RAW_NODE="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
+NODE_PATH=$(readlink -f "$RAW_NODE" 2>/dev/null || echo "$RAW_NODE")
 
-NODE_BIN=$(which node 2>/dev/null || echo "node")
-PORT=5000 NODE_ENV=production nohup $NODE_BIN server_dist/index.js > app.log 2>&1 &
-sleep 2
+echo "Canonical App Root: $APP_ROOT"
+echo "Canonical Node binary: $NODE_PATH"
 
-echo "Configuring Hostinger .htaccess for Static SPAs + ProxyPass API..."
-cat << 'EOF' > .htaccess
+echo "Creating Hostinger Phusion Passenger app.js entrypoint..."
+cat << 'EOF' > app.js
+// Hostinger Phusion Passenger Entrypoint
+require('./server_dist/index.js');
+EOF
+
+echo "Configuring Hostinger .htaccess for Phusion Passenger Node.js + Static SPAs..."
+cat << EOF > .htaccess
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "$APP_ROOT"
+PassengerBaseURI "/"
+PassengerNodejs "$NODE_PATH"
+PassengerAppType node
+PassengerStartupFile app.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
 # Hostinger Single-Slot Architecture Configuration
 Options +FollowSymLinks -Indexes
 DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
-
-  # Route /api and /uploads requests to Node.js Express API server on port 5000
-  RewriteRule ^api(?:/.*)?$ http://127.0.0.1:5000/$0 [P,L]
-  RewriteRule ^uploads(?:/.*)?$ http://127.0.0.1:5000/$0 [P,L]
 
   # SPA Routing for Admin (/admin)
   RewriteCond %{REQUEST_URI} ^/admin
@@ -76,6 +81,8 @@ DirectoryIndex index.html
   RewriteCond %{REQUEST_URI} !^/index\.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^/api
+  RewriteCond %{REQUEST_URI} !^/uploads
   RewriteRule ^ index.html [L]
 </IfModule>
 EOF

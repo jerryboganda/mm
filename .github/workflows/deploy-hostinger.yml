@@ -48,7 +48,7 @@ jobs:
           rm: false
           timeout: 30m
           command_timeout: 15m
-          source: "server_dist,website_dist,admin_dist,web_dist,uploads,scripts,package.json,package-lock.json,app.json,server/templates"
+          source: "server_dist,website_dist,admin_dist,web_dist,uploads,scripts,package.json,package-lock.json,app.json,app.js,server/templates"
 
       - name: Trigger Hostinger Restart & Verify End-to-End via SSH
         uses: appleboy/ssh-action@v1.0.3
