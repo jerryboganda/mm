@@ -15,7 +15,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 const dbUrl = process.env.DATABASE_URL;
-const isMysql = dbUrl.startsWith("mysql:") || dbUrl.startsWith("mysql://");
+export const isMysql = dbUrl.startsWith("mysql:") || dbUrl.startsWith("mysql://");
 
 let poolInstance: any;
 let dbInstance: any;
