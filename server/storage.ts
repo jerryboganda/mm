@@ -692,7 +692,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(mcqs)
       .where(eq(mcqs.isPublished, true));
-    return allMcqs.filter((m) => wrongIds.includes(m.id));
+    return allMcqs.filter((m: any) => wrongIds.includes(m.id));
   }
 
   /** @inheritdoc */
@@ -977,7 +977,7 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(chapters, eq(topics.chapterId, chapters.id))
       .where(and(eq(chapters.bookId, bookId), eq(topics.isPublished, true)))
       .orderBy(chapters.order, topics.order)
-      .then((rows) => rows.map((r) => r.topic));
+      .then((rows: any) => rows.map((r: any) => r.topic));
   }
 
   /**
@@ -1144,7 +1144,7 @@ export class DatabaseStorage implements IStorage {
       .groupBy(topics.id, topics.title, chapters.title)
       .having(sql`count(${mcqs.id}) > 0`);
 
-    return rows.map((r) => ({
+    return rows.map((r: any) => ({
       id: r.topicId,
       title: r.topicTitle,
       chapterTitle: r.chapterTitle,
@@ -1537,7 +1537,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(sql`RANDOM()`)
       .limit(limit);
 
-    return result.map((r) => ({
+    return result.map((r: any) => ({
       id: r.id,
       title: r.title,
       chapterTitle: r.chapterTitle,
@@ -1568,7 +1568,7 @@ export class DatabaseStorage implements IStorage {
         ),
       )
       .orderBy(desc(announcements.createdAt));
-    return rows.map((r) => ({
+    return rows.map((r: any) => ({
       id: String(r.id),
       title: r.title,
       message: r.message,

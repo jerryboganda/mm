@@ -571,7 +571,7 @@ router.get("/subscribers", async (req: AuthRequest, res: Response) => {
         .offset(offset);
 
       res.json({
-        data: rows.map((r) => ({
+        data: rows.map((r: any) => ({
           ...r.subscription,
           userName: r.userName,
           userEmail: r.userEmail,
@@ -600,7 +600,7 @@ router.get("/subscribers", async (req: AuthRequest, res: Response) => {
         .offset(offset);
 
       res.json({
-        data: rows.map((r) => ({
+        data: rows.map((r: any) => ({
           ...r.subscription,
           userName: r.userName,
           userEmail: r.userEmail,
@@ -1025,7 +1025,7 @@ router.get("/analytics/events", async (req: AuthRequest, res: Response) => {
 
     // Map to frontend expected shape
     res.json(
-      logs.map((l) => ({
+      logs.map((l: any) => ({
         id: l.id,
         type: l.action,
         description: `${l.action}${l.previousStatus ? ` (${l.previousStatus} → ${l.newStatus})` : ""}`,

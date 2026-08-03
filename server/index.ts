@@ -310,7 +310,7 @@ function configureExpoAndLanding(app: express.Application) {
   if (fs.existsSync(adminDistPath)) {
     app.use("/admin", express.static(adminDistPath));
     // SPA fallback: any /admin/* route serves index.html
-    app.get("/admin/*", (_req: Request, res: Response) => {
+    app.get("/admin/{*path}", (_req: Request, res: Response) => {
       const indexPath = path.join(adminDistPath, "index.html");
       if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
@@ -328,7 +328,7 @@ function configureExpoAndLanding(app: express.Application) {
     app.get("/app", (_req: Request, res: Response) => {
       res.sendFile(path.join(webDistPath, "index.html"));
     });
-    app.get("/app/*", (_req: Request, res: Response) => {
+    app.get("/app/{*path}", (_req: Request, res: Response) => {
       res.sendFile(path.join(webDistPath, "index.html"));
     });
     logger.info("Mobile web app: serving from /app/");

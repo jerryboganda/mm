@@ -178,13 +178,13 @@ export async function enforceDeviceLimit(
   if (revokeCount <= 0) return;
 
   const sessionsToRevoke = activeSessions
-    .filter((session) => session.id !== protectedSessionId)
+    .filter((session: any) => session.id !== protectedSessionId)
     .slice(0, revokeCount);
 
   if (sessionsToRevoke.length === 0) return;
 
   await revokeSessionsByIds(
-    sessionsToRevoke.map((session) => session.id),
+    sessionsToRevoke.map((session: any) => session.id),
     "device_limit_kick_oldest",
   );
 }
@@ -284,7 +284,7 @@ export async function countActiveSessionsByUserIds(
     .groupBy(userSessions.userId);
 
   return new Map(
-    rows.map((row) => [row.userId, Number(row.activeDeviceCount)]),
+    rows.map((row: any) => [row.userId, Number(row.activeDeviceCount)]),
   );
 }
 
