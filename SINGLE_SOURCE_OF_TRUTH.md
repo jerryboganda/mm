@@ -13,45 +13,15 @@ Purpose: Canonical project memory, technical baseline, risk register, and execut
 
 ## 2) Environments and Infrastructure
 
-### Production VPS
+### Hostinger Production Hosting (Business Hosting Plan)
 
-- Host: `185.252.233.186`
-- OS: Ubuntu 24.04.3 LTS
-- Access: `ssh root@185.252.233.186` (key: `~/.ssh/id_rsa_new`)
-- Runtime: Docker Engine 29.1.5
-- Edge/proxy: Nginx Proxy Manager
-
-### Maternal Mind Service
-
-- API port: `5000` (containerized app + PostgreSQL)
-- Known project path references:
-  - `/root/maternalmind`
-  - `/root/maternal-mind`
-- Action required: confirm the active path and standardize to one.
-
-### Relevant VPS Ports
-
-- `80`, `443`: HTTP/HTTPS (Nginx Proxy Manager)
-- `81`: Nginx Proxy Manager admin
-- `8000`, `9443`: Portainer
-- `22`: SSH
-- `5000`: Maternal Mind API
-
-### Operations Commands
-
-```bash
-# SSH
-ssh root@185.252.233.186
-
-# Logs
-cd /root/maternalmind && docker compose logs -f app
-
-# Rebuild/restart backend app
-cd /root/maternalmind && docker compose up -d --build app
-
-# Run migrations/schema sync
-cd /root/maternalmind && docker compose exec app npm run db:push
-```
+- **Domain**: `maternalmind.com.pk`
+- **Provider**: Hostinger Business Hosting Plan (Single Parent Account)
+- **Deployments**:
+  1. **Marketing Landing Page (`https://maternalmind.com.pk/`)**: Separately hosted Hostinger deployment built from `Maternal Mind Website/`.
+  2. **Unified Web Application (`https://maternalmind.com.pk/`)**: Separately hosted Hostinger deployment running backend API (`/api`), Admin Panel (`/admin`), and User App (`/app`).
+- **Database**: Hostinger MySQL (`u776151780_maternalmind`).
+- **Deployment Control**: Manual deployment via Hostinger hPanel Git Deploy, GitHub Actions (`deploy-hostinger.yml`), or CLI (`npm run deploy:hostinger`).
 
 ## 3) Mobile Build and Delivery
 
@@ -335,15 +305,12 @@ This section is the canonical technical baseline for the marketing website at `M
 
 ### Production Deployment Record (Website)
 
-- Date: 2026-02-11
-- VPS host: `185.252.233.186`
-- Deployed path: `/root/maternalmind-website`
-- Runtime mode: Docker Compose (`maternalmind-website` container)
-- Live container port mapping: `5001:5001`
-- Public domain: `https://maternalmind.com.pk`
-- Reverse proxy: Nginx Proxy Manager host `id=11` now forwards to `185.252.233.186:5001`
-- Persistence note:
-  - NPM DB record was updated in `/opt/docker/nginx-proxy-manager/data/database.sqlite` (`proxy_host.id=11`, `forward_port=5001`) so config survives NPM restarts.
+- Domain: `https://maternalmind.com.pk`
+- Hosting: Hostinger Business Hosting Plan
+- Runtime mode: Hostinger Web Application
+- Deployments:
+  1. **Landing Page Website**: Built from `Maternal Mind Website/` and hosted at `https://maternalmind.com.pk/`.
+  2. **Unified Web Application**: Node.js Express server + Admin Panel (`/admin`) + Expo Web App (`/app`).
 - Branding/title updates deployed:
   - Browser/tab title format standardized to `Maternal Mind | <Page Title>` (SEO component + base `index.html` title).
   - Favicon replaced with Maternal Mind icon asset (`client/public/favicon.png`).
@@ -373,25 +340,16 @@ This section is the canonical technical baseline for the marketing website at `M
 ### Admin Panel Surface (Production State)
 
 - Application source: `admin/` (Vite React admin app) in root project.
-- Backend serves admin UI routes from the main Maternal Mind app on port `5000` (verified `/admin/login`).
-- Live website domain `maternalmind.com.pk` intentionally points to marketing website container on `5001`.
-- `mm.polytronx.com` is explicitly out-of-scope for Maternal Mind and must remain untouched (separate project).
-- New admin domain target:
-  - `admin.maternalmind.com.pk` created and pointed to server via Cloudflare DNS.
-  - Proxy routing to backend/admin is configured over HTTP.
-  - HTTPS currently pending final SSL certificate issuance in Nginx Proxy Manager (observed `525` before cert binding).
+- Production hosting: Hostinger Business Hosting Plan.
+- Served at: `https://maternalmind.com.pk/admin` (integrated into unified Hostinger Web App deployment).
 
-### Nginx Proxy Manager State (Maternal Mind)
+### Hostinger Routing & Web Architecture
 
-- Host `id=11`:
-  - Domain: `maternalmind.com.pk`
-  - Forward target: `185.252.233.186:5001` (marketing website)
-  - Certificate: existing Let's Encrypt entry (`certificate_id=12`)
-- Host `id=13`:
-  - Domain: `admin.maternalmind.com.pk`
-  - Forward target: `185.252.233.186:5000` (main backend with `/admin` UI)
-  - Root redirect behavior: `/` -> `/admin/login`
-  - SSL: certificate assignment still required for stable HTTPS
+- **Landing Page Website**: Hosted separately on Hostinger at `https://maternalmind.com.pk/`.
+- **Unified Web App (API + Admin + App)**: Hosted separately on Hostinger using `.htaccess` routing rules:
+  - `/api` -> Express Node.js API server
+  - `/admin` -> Admin Panel SPA (`/admin/index.html`)
+  - `/app` -> User Expo Web App SPA (`/app/index.html`)
 
 ### Website Risk Register (Prioritized)
 

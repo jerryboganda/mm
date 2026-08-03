@@ -43,23 +43,21 @@ Installed app ◀── GET /updates/manifest ─┘   (signed manifest)
 Already generated (run `scripts/generate-code-signing-keys.ps1`/`.sh` to regenerate):
 
 - `client/certs/certificate.pem` — **public** cert, committed, bundled into the app.
-- `secrets/code-signing-private-key.pem` — **private** key, git-ignored, **VPS only**.
+- `secrets/code-signing-private-key.pem` — **private** key, git-ignored, **Hostinger Server only**.
 
-Copy the private key to the VPS (never commit it, never email it):
+Copy the private key to Hostinger (never commit it, never email it):
 
 ```bash
-scp secrets/code-signing-private-key.pem root@185.252.233.186:/root/maternal-mind/secrets/code-signing-private-key.pem
+scp -P 6588 secrets/code-signing-private-key.pem u776151780@maternalmind.com.pk:~/domains/maternalmind.com.pk/public_html/secrets/code-signing-private-key.pem
 ```
 
-### 2. VPS
+### 2. Hostinger Production Server
 
 ```bash
-ssh root@185.252.233.186
-cd /root/maternal-mind
+ssh -p 6588 u776151780@maternalmind.com.pk
+cd ~/domains/maternalmind.com.pk/public_html
 mkdir -p updates secrets                       # bind-mount targets
 chmod 600 secrets/code-signing-private-key.pem
-git pull --rebase                              # pick up compose + server changes
-docker compose up -d --build app               # server now serves /updates/*
 curl -s -H "expo-platform: android" -H "expo-runtime-version: test" \
      -H "expo-protocol-version: 1" \
      http://127.0.0.1:5000/updates/manifest     # expect a noUpdateAvailable directive
@@ -73,9 +71,10 @@ Check the app logs say `Expo Updates: code signing ENABLED`.
 
 | Secret | Value |
 |---|---|
-| `VPS_SSH_KEY` | private SSH key of a user that can write `/root/maternal-mind/updates` |
-| `VPS_HOST` | `185.252.233.186` |
-| `VPS_USER` | `root` |
+| `HOSTINGER_SSH_KEY` | private SSH key of a user that can write to Hostinger |
+| `HOSTINGER_HOST` | `maternalmind.com.pk` |
+| `HOSTINGER_USER` | `u776151780` |
+| `HOSTINGER_PORT` | `6588` |
 
 For `android-release.yml` also: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, and optionally `PLAY_SERVICE_ACCOUNT_JSON`.
