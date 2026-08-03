@@ -38,7 +38,7 @@ import {
   type InstitutionalRequest,
   type NewsletterEntry,
 } from "../shared/schema";
-import { db } from "./db";
+import { db, isMysql } from "./db";
 import { eq, and, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
 import crypto from "crypto";
 
@@ -427,6 +427,11 @@ export class DatabaseStorage implements IStorage {
 
   /** @inheritdoc */
   async createUser(insertUser: InsertUser): Promise<User> {
+    if (isMysql) {
+      await db.insert(users).values(insertUser);
+      const user = await this.getUserByEmail(insertUser.email);
+      return user!;
+    }
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }

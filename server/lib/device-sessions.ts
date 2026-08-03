@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import type { Request } from "express";
 import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
-import { db } from "../db";
+import { db, isMysql } from "../db";
 import { storage } from "../storage";
 import {
   userSessions,
@@ -135,21 +135,29 @@ export async function createOrReplaceUserSession(options: {
       ),
     );
 
-  const [session] = await db
-    .insert(userSessions)
-    .values({
-      id: options.sessionId,
-      userId: options.user.id,
-      deviceId,
-      deviceLabel: options.device.deviceLabel?.trim() || null,
-      platform: options.device.platform?.trim() || null,
-      userAgent: getHeaderValue(options.req.headers["user-agent"]),
-      ipAddress: getRequestIpAddress(options.req),
-      refreshTokenHash,
-      expiresAt: getRefreshTokenExpiry(),
-      lastSeenAt: now,
-    })
-    .returning();
+  const sessionData = {
+    id: options.sessionId,
+    userId: options.user.id,
+    deviceId,
+    deviceLabel: options.device.deviceLabel?.trim() || null,
+    platform: options.device.platform?.trim() || null,
+    userAgent: getHeaderValue(options.req.headers["user-agent"]),
+    ipAddress: getRequestIpAddress(options.req),
+    refreshTokenHash,
+    expiresAt: getRefreshTokenExpiry(),
+    lastSeenAt: now,
+  };
+
+  let session: any;
+  if (isMysql) {
+    await db.insert(userSessions).values(sessionData);
+    session = sessionData;
+  } else {
+    [session] = await db
+      .insert(userSessions)
+      .values(sessionData)
+      .returning();
+  }
 
   await enforceDeviceLimit(
     options.user.id,
