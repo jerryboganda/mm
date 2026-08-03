@@ -126,18 +126,19 @@ cat .htaccess
 mkdir -p tmp
 touch tmp/restart.txt
 
-sleep 3
+sleep 2
 echo "Warming up Passenger Node app via domain host..."
-curl -s -k -H "Host: maternalmind.com.pk" "http://127.0.0.1/health" || true
-echo ""
-curl -s -k "https://maternalmind.com.pk/health" || true
-echo ""
-curl -s -k "https://maternalmind.com.pk/api/auth/login" -H "Content-Type: application/json" -d '{"email":"test@test.com","password":"test"}' || true
-echo ""
+for i in 1 2 3; do
+  echo "Request $i:"
+  curl -s -k "https://maternalmind.com.pk/api/auth/login" -H "Content-Type: application/json" -d '{"email":"test@test.com","password":"test"}' || true
+  echo ""
+  sleep 1
+done
 
 if [ -f "passenger_error.log" ]; then
-  echo "--- passenger_error.log ---"
+  echo "=================== PASSENGER ERROR LOG ==================="
   cat passenger_error.log
+  echo "==========================================================="
 fi
 
 echo "=============================================="
