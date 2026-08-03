@@ -47,6 +47,10 @@ cat << 'EOF' > app.js
 const fs = require('fs');
 const path = require('path');
 
+try {
+  require('dotenv').config();
+} catch (e) {}
+
 const logFile = path.join(__dirname, 'passenger_error.log');
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}\n`;

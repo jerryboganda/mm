@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+// Load environment variables from .env BEFORE requiring server bundle
+try {
+  require("dotenv").config();
+} catch (e) {}
+
 const logFile = path.join(__dirname, "passenger_error.log");
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}\n`;
