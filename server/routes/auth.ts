@@ -734,7 +734,7 @@ router.post("/refresh", rateLimiter(20, 60 * 1000), async (req, res) => {
       return res.status(400).json({ message: "Refresh token is required" });
     }
 
-    const decoded = jwt.verify(refreshToken, JWT_SECRET) as {
+    const decoded = jwt.verify(refreshToken, getJwtSecret()) as {
       userId: string;
       sessionId?: string;
       type?: string;
