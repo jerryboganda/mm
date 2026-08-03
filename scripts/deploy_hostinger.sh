@@ -2,7 +2,11 @@
 set -e
 
 echo "Connected to Hostinger via GitHub Actions!"
-cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
+DOMAIN_ROOT="$HOME/domains/maternalmind.com.pk"
+NODE_ROOT="$DOMAIN_ROOT/nodejs"
+PUBLIC_ROOT="$DOMAIN_ROOT/public_html"
+mkdir -p "$NODE_ROOT" "$PUBLIC_ROOT"
+cd "$NODE_ROOT"
 
 cat << 'EOF' > .env
 NODE_ENV=production
@@ -17,21 +21,21 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
 fi
 
 echo "Organizing single-slot static frontends..."
-if [ -d "$TARGET_DIR/website_dist" ]; then
-  echo "Deploying Marketing Website to $TARGET_DIR..."
-  cp -rf "$TARGET_DIR/website_dist/"* "$TARGET_DIR/" 2>/dev/null || true
+if [ -d "$NODE_ROOT/website_dist" ]; then
+  echo "Deploying Marketing Website to $PUBLIC_ROOT..."
+  cp -rf "$NODE_ROOT/website_dist/"* "$PUBLIC_ROOT/"
 fi
 
-if [ -d "$TARGET_DIR/admin_dist" ]; then
-  echo "Deploying Admin Panel to $TARGET_DIR/admin..."
-  mkdir -p "$TARGET_DIR/admin"
-  cp -rf "$TARGET_DIR/admin_dist/"* "$TARGET_DIR/admin/" 2>/dev/null || true
+if [ -d "$NODE_ROOT/admin_dist" ]; then
+  echo "Deploying Admin Panel to $PUBLIC_ROOT/admin..."
+  mkdir -p "$PUBLIC_ROOT/admin"
+  cp -rf "$NODE_ROOT/admin_dist/"* "$PUBLIC_ROOT/admin/"
 fi
 
-if [ -d "$TARGET_DIR/web_dist" ]; then
-  echo "Deploying Expo User Panel to $TARGET_DIR/app..."
-  mkdir -p "$TARGET_DIR/app"
-  cp -rf "$TARGET_DIR/web_dist/"* "$TARGET_DIR/app/" 2>/dev/null || true
+if [ -d "$NODE_ROOT/web_dist" ]; then
+  echo "Deploying Expo User Panel to $PUBLIC_ROOT/app..."
+  mkdir -p "$PUBLIC_ROOT/app"
+  cp -rf "$NODE_ROOT/web_dist/"* "$PUBLIC_ROOT/app/"
 fi
 
 APP_ROOT=$(pwd -P)
@@ -77,8 +81,8 @@ try {
 }
 EOF
 
-echo "Configuring Hostinger .htaccess for Phusion Passenger Node.js + Static SPAs..."
-cat << EOF > .htaccess
+echo "Configuring public_html routing to the Hostinger Node runtime..."
+cat << EOF > "$PUBLIC_ROOT/.htaccess"
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "$APP_ROOT"
 PassengerBaseURI "/"
@@ -118,11 +122,13 @@ DirectoryIndex index.html
 EOF
 
 echo "Setting directory and file permissions for Hostinger LiteSpeed..."
-chmod -R 755 . 2>/dev/null || true
-chmod 644 .htaccess 2>/dev/null || true
+chmod 755 "$NODE_ROOT" "$PUBLIC_ROOT"
+find "$NODE_ROOT" "$PUBLIC_ROOT" -type d -exec chmod 755 {} +
+find "$NODE_ROOT" "$PUBLIC_ROOT" -type f -exec chmod 644 {} +
+chmod 644 "$PUBLIC_ROOT/.htaccess"
 
 echo "Contents of .htaccess:"
-cat .htaccess
+cat "$PUBLIC_ROOT/.htaccess"
 
 mkdir -p tmp
 

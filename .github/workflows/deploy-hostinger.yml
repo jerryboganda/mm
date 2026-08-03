@@ -44,7 +44,9 @@ jobs:
           port: ${{ secrets.HOSTINGER_PORT }}
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
-          target: "domains/maternalmind.com.pk/public_html"
+          # Hostinger's managed Node runtime loads backend artifacts from the
+          # domain's nodejs directory. public_html is reserved for static files.
+          target: "domains/maternalmind.com.pk/nodejs"
           rm: false
           timeout: 30m
           command_timeout: 15m
@@ -58,6 +60,6 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
-            cd ~/domains/maternalmind.com.pk/public_html || cd ~/public_html || cd ~
+            cd ~/domains/maternalmind.com.pk/nodejs
             chmod +x scripts/deploy_hostinger.sh
             bash scripts/deploy_hostinger.sh
