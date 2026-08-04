@@ -62,12 +62,15 @@ def get_p_html(p_elem):
             continue
         is_b = r.find('.//w:b', ns) is not None
         is_i = r.find('.//w:i', ns) is not None
+        is_u = r.find('.//w:u', ns) is not None
         
         safe_txt = txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         if is_b:
             safe_txt = f"<strong>{safe_txt}</strong>"
         if is_i:
             safe_txt = f"<em>{safe_txt}</em>"
+        if is_u:
+            safe_txt = f"<u>{safe_txt}</u>"
         runs_html.append(safe_txt)
         
     return "".join(runs_html).strip()
@@ -195,9 +198,23 @@ for elem in body:
         p_html = get_p_html(elem)
         p_imgs = get_p_images(elem)
         
-        pStyle = elem.find('.//w:pStyle', ns)
+        pPr = elem.find('.//w:pPr', ns)
+        pStyle = pPr.find('.//w:pStyle', ns) if pPr is not None else None
         style_val = pStyle.attrib.get(f"{{{ns['w']}}}val") if pStyle is not None else None
-        numPr = elem.find('.//w:numPr', ns)
+        
+        numPr = pPr.find('.//w:numPr', ns) if pPr is not None else None
+        numId_val = None
+        ilvl_val = 0
+        if numPr is not None:
+            numId = numPr.find('.//w:numId', ns)
+            if numId is not None:
+                numId_val = numId.attrib.get(f"{{{ns['w']}}}val")
+            ilvl = numPr.find('.//w:ilvl', ns)
+            if ilvl is not None:
+                try:
+                    ilvl_val = int(ilvl.attrib.get(f"{{{ns['w']}}}val", "0"))
+                except:
+                    ilvl_val = 0
         
         is_heading = False
         if style_val and ('Heading' in style_val or 'Title' in style_val or style_val in ['1', '2', '3']):
@@ -219,14 +236,16 @@ for elem in body:
         else:
             if p_txt and current_active_topic:
                 is_note = any(k in p_txt.upper() for k in ["NOTE:", "MNEMONIC:", "CLINICAL PEARL:", "WARNING:", "KEY POINT:", "IMPORTANT:"])
-                is_bullet = (numPr is not None) or (style_val == 'ListParagraph') or p_txt.startswith("- ") or p_txt.startswith("> ") or p_txt.startswith("• ")
+                is_bullet = (numId_val is not None) or (style_val == 'ListParagraph') or p_txt.startswith("- ") or p_txt.startswith("> ") or p_txt.startswith("• ") or p_txt.startswith("⇒ ")
                 
                 kind = "note" if is_note else ("bullet" if is_bullet else "paragraph")
                 current_active_topic["raw_elements"].append({
                     "kind": kind,
                     "text": p_txt,
                     "html": p_html,
-                    "style": style_val
+                    "style": style_val,
+                    "numId": numId_val,
+                    "ilvl": ilvl_val
                 })
                 
         if p_imgs and current_active_topic:
@@ -243,23 +262,59 @@ for elem in body:
             "html": tbl_html
         })
 
+def render_nested_list_group(list_items):
+    if not list_items:
+        return ""
+    primary_numId = list_items[0][0]
+    
+    html_out = ["<ul>"]
+    in_sublist = False
+    
+    for idx, (numId, ilvl, text) in enumerate(list_items):
+        is_sub = (numId != primary_numId) or (ilvl > 0)
+        
+        if not is_sub:
+            if in_sublist:
+                html_out.append("</ul></li>")
+                in_sublist = False
+                
+            next_is_sub = False
+            if idx + 1 < len(list_items):
+                next_numId, next_ilvl, _ = list_items[idx+1]
+                if (next_numId != primary_numId) or (next_ilvl > 0):
+                    next_is_sub = True
+                    
+            if next_is_sub:
+                html_out.append(f"<li>{text}<ul>")
+                in_sublist = True
+            else:
+                html_out.append(f"<li>{text}</li>")
+        else:
+            if not in_sublist:
+                html_out.append("<ul>")
+                in_sublist = True
+            html_out.append(f"<li>{text}</li>")
+            
+    if in_sublist:
+        html_out.append("</ul></li>")
+    html_out.append("</ul>")
+    return "".join(html_out)
+
 # 6. Group raw elements into cohesive Content Blocks for each Topic
 for book in books_structure:
     for chap in book["chapters"]:
         for topic in chap["topics"]:
             blocks = []
             html_buffer = []
-            in_list = False
-            list_items = []
+            bullet_group = []
 
             for item in topic.get("raw_elements", []):
                 kind = item.get("kind")
 
-                if kind == "heading":
-                    if in_list and list_items:
-                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
-                        in_list = False
-                        list_items = []
+                if kind in ["heading", "note", "image", "table"]:
+                    if bullet_group:
+                        html_buffer.append(render_nested_list_group(bullet_group))
+                        bullet_group = []
                     if html_buffer:
                         blocks.append({
                             "id": f"cb-{uuid.uuid4().hex[:8]}",
@@ -268,102 +323,60 @@ for book in books_structure:
                             "order": len(blocks) + 1
                         })
                         html_buffer = []
-                    blocks.append({
-                        "id": f"cb-{uuid.uuid4().hex[:8]}",
-                        "type": "heading",
-                        "content": item["text"],
-                        "order": len(blocks) + 1
-                    })
-
-                elif kind == "note":
-                    if in_list and list_items:
-                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
-                        in_list = False
-                        list_items = []
-                    if html_buffer:
+                    
+                    if kind == "heading":
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "heading",
+                            "content": item["text"],
+                            "order": len(blocks) + 1
+                        })
+                    elif kind == "note":
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "note",
+                            "content": item["text"],
+                            "order": len(blocks) + 1
+                        })
+                    elif kind == "image":
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "image",
+                            "content": item["url"],
+                            "order": len(blocks) + 1
+                        })
+                    elif kind == "table":
                         blocks.append({
                             "id": f"cb-{uuid.uuid4().hex[:8]}",
                             "type": "html",
-                            "content": "\n".join(html_buffer),
+                            "content": item["html"],
                             "order": len(blocks) + 1
                         })
-                        html_buffer = []
-                    blocks.append({
-                        "id": f"cb-{uuid.uuid4().hex[:8]}",
-                        "type": "note",
-                        "content": item["text"],
-                        "order": len(blocks) + 1
-                    })
-
-                elif kind == "image":
-                    if in_list and list_items:
-                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
-                        in_list = False
-                        list_items = []
-                    if html_buffer:
-                        blocks.append({
-                            "id": f"cb-{uuid.uuid4().hex[:8]}",
-                            "type": "html",
-                            "content": "\n".join(html_buffer),
-                            "order": len(blocks) + 1
-                        })
-                        html_buffer = []
-                    blocks.append({
-                        "id": f"cb-{uuid.uuid4().hex[:8]}",
-                        "type": "image",
-                        "content": item["url"],
-                        "order": len(blocks) + 1
-                    })
-
-                elif kind == "table":
-                    if in_list and list_items:
-                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
-                        in_list = False
-                        list_items = []
-                    if html_buffer:
-                        blocks.append({
-                            "id": f"cb-{uuid.uuid4().hex[:8]}",
-                            "type": "html",
-                            "content": "\n".join(html_buffer),
-                            "order": len(blocks) + 1
-                        })
-                        html_buffer = []
-                    blocks.append({
-                        "id": f"cb-{uuid.uuid4().hex[:8]}",
-                        "type": "html",
-                        "content": item["html"],
-                        "order": len(blocks) + 1
-                    })
 
                 elif kind == "bullet":
                     h = item["html"]
                     clean_h = h
-                    for prefix in ["- ", "&gt; ", "• ", "* "]:
+                    for prefix in ["- ", "&gt; ", "• ", "* ", "⇒ "]:
                         if clean_h.startswith(prefix):
                             clean_h = clean_h[len(prefix):]
                             break
-                    if not in_list:
-                        in_list = True
-                        list_items = []
-                    list_items.append(f"<li>{clean_h}</li>")
+                    bullet_group.append((item.get("numId"), item.get("ilvl", 0), clean_h))
 
                 elif kind == "paragraph":
+                    if bullet_group:
+                        html_buffer.append(render_nested_list_group(bullet_group))
+                        bullet_group = []
+                        
                     h = item["html"]
-                    if in_list and list_items:
-                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
-                        in_list = False
-                        list_items = []
-
                     plain_txt = item["text"]
-                    if (h.startswith("<strong>") and h.endswith("</strong>")) or plain_txt.endswith(":"):
+                    if (h.startswith("<strong>") and h.endswith("</strong>")) or plain_txt.endswith(":") or h.startswith("<u>"):
                         html_buffer.append(f"<h3>{h}</h3>")
                     else:
                         html_buffer.append(f"<p>{h}</p>")
 
-            if in_list and list_items:
-                html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
-                in_list = False
-                list_items = []
+            if bullet_group:
+                html_buffer.append(render_nested_list_group(bullet_group))
+                bullet_group = []
             if html_buffer:
                 blocks.append({
                     "id": f"cb-{uuid.uuid4().hex[:8]}",
@@ -378,7 +391,7 @@ for book in books_structure:
                 del topic["raw_elements"]
 
 total_blocks = sum(len(t["content_blocks"]) for b in books_structure for c in b["chapters"] for t in c["topics"])
-print(f"Refactored Extraction Complete! Total Content Blocks: {total_blocks} across {total_topics_count} Topics.")
+print(f"Multi-Level Nested Extraction Complete! Total Content Blocks: {total_blocks} across {total_topics_count} Topics.")
 
 with open(output_json_path, "w", encoding="utf-8") as out_f:
     json.dump(books_structure, out_f, indent=2, ensure_ascii=False)
