@@ -13,15 +13,18 @@ Purpose: Canonical project memory, technical baseline, risk register, and execut
 
 ## 2) Environments and Infrastructure
 
-### Hostinger Production Hosting (Business Hosting Plan)
+### Production VPS Architecture (`185.252.233.186`)
 
-- **Domain**: `maternalmind.com.pk`
-- **Provider**: Hostinger Business Hosting Plan (Single Parent Account)
-- **Deployments**:
-  1. **Marketing Landing Page (`https://maternalmind.com.pk/`)**: Separately hosted Hostinger deployment built from `Maternal Mind Website/`.
-  2. **Unified Web Application (`https://maternalmind.com.pk/`)**: Separately hosted Hostinger deployment running backend API (`/api`), Admin Panel (`/admin`), and User App (`/app`).
-- **Database**: Hostinger MySQL (`u776151780_maternalmind`).
-- **Deployment Control**: Manual deployment via Hostinger hPanel Git Deploy, GitHub Actions (`deploy-hostinger.yml`), or CLI (`npm run deploy:hostinger`).
+- **Domain**: `maternalmind.com.pk` (API: `https://maternalmind.com.pk/api/`, Admin: `https://maternalmind.com.pk/admin/`, App: `https://maternalmind.com.pk/app/`)
+- **Server IP**: `185.252.233.186` (Ubuntu VPS)
+- **Deployment Location**: `/opt/docker/maternal-mind`
+- **Containers**:
+  - `maternal-mind-app-1`: Express API, Expo Web App, and Admin Panel container (Port 5000)
+  - `platform-postgres`: Shared PostgreSQL database container (Database: `maternal_mind`)
+  - `platform-minio`: S3-compatible asset storage
+  - `nginx-proxy-manager-app-1`: Reverse proxy & TLS termination
+- **Database**: PostgreSQL (`maternal_mind` database) containing the 13 textbook modules, 285 topics, and 17,831 content blocks.
+- **Deployment Control**: Passwordless SSH deployment from PC (`ssh -i "C:\Users\Dr Faisal Maqsood PC\.ssh\id_ed25519" root@185.252.233.186`).
 
 ## 3) Mobile Build and Delivery
 
