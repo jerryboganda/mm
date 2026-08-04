@@ -346,7 +346,7 @@ export default function TopicReaderScreen() {
 
   const htmlRenderers = useMemo(
     () => ({
-      table: TableRenderer,
+      ...(Platform.OS !== "web" ? { table: TableRenderer } : {}),
       img: ArrowAwareImageRenderer,
     }),
     [],
@@ -354,7 +354,7 @@ export default function TopicReaderScreen() {
 
   const htmlCustomModels = useMemo(
     () => ({
-      table: tableModel,
+      ...(Platform.OS !== "web" ? { table: tableModel } : {}),
     }),
     [],
   );

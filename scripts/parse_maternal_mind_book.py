@@ -35,7 +35,6 @@ for r_id, target in rid_to_file.items():
     out_path = os.path.join(output_img_dir, filename)
     with open(out_path, "wb") as img_f:
         img_f.write(img_bytes)
-    # Server relative path used in app
     extracted_images[r_id] = f"/uploads/content-images/maternal_mind_book/{filename}"
 
 print(f"Extracted {len(extracted_images)} media files to {output_img_dir}")
@@ -51,19 +50,34 @@ ns = {
     'v': 'urn:schemas-microsoft-microsoft-com:vml'
 }
 
-# 4. Helper functions to extract text and elements
 def get_p_text(p_elem):
     texts = [t.text for t in p_elem.findall('.//w:t', ns) if t.text]
     return "".join(texts).strip()
 
+def get_p_html(p_elem):
+    runs_html = []
+    for r in p_elem.findall('.//w:r', ns):
+        txt = "".join([t.text for t in r.findall('.//w:t', ns) if t.text])
+        if not txt:
+            continue
+        is_b = r.find('.//w:b', ns) is not None
+        is_i = r.find('.//w:i', ns) is not None
+        
+        safe_txt = txt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        if is_b:
+            safe_txt = f"<strong>{safe_txt}</strong>"
+        if is_i:
+            safe_txt = f"<em>{safe_txt}</em>"
+        runs_html.append(safe_txt)
+        
+    return "".join(runs_html).strip()
+
 def get_p_images(p_elem):
     img_urls = []
-    # Check drawing blips
     for blip in p_elem.findall('.//a:blip', ns):
         embed_id = blip.attrib.get(f"{{{ns['r']}}}embed")
         if embed_id in extracted_images:
             img_urls.append(extracted_images[embed_id])
-    # Check VML imagedata
     for vml in p_elem.findall('.//v:imagedata', ns):
         r_id = vml.attrib.get(f"{{{ns['r']}}}id")
         if r_id in extracted_images:
@@ -82,16 +96,16 @@ def table_to_html(tbl_elem):
         for tc in tr.findall('.//w:tc', ns):
             cell_texts = []
             for p in tc.findall('.//w:p', ns):
-                txt = get_p_text(p)
-                if txt:
-                    cell_texts.append(txt)
-            cell_content = "<br/>".join(cell_texts)
+                p_h = get_p_html(p)
+                if p_h:
+                    cell_texts.append(p_h)
+            cell_content = "<br/>".join(cell_texts) if cell_texts else "&nbsp;"
             tag = "th" if is_header else "td"
             cells_html.append(f"<{tag}>{cell_content}</{tag}>")
         rows_html.append(f"<tr>{''.join(cells_html)}</tr>")
     return f"<table><tbody>{''.join(rows_html)}</tbody></table>"
 
-# 5. Extract TOC to know official Books and Topics list
+# 4. Extract TOC items
 paragraphs = doc_root.findall('.//w:p', ns)
 
 toc_items = []
@@ -106,7 +120,7 @@ for p in paragraphs:
             toc_items.append((style_val, txt))
     elif in_toc and not (style_val and 'TOC' in style_val):
         if len(toc_items) > 100:
-            break # TOC ended
+            break
 
 print(f"Extracted {len(toc_items)} TOC items.")
 
@@ -147,14 +161,14 @@ for style, raw_txt in toc_items:
             "description": f"Detailed medical reference and study guide on {clean_t}.",
             "author": "Dr. Farzana Muneer",
             "source": "Maternal Mind FCPS/MRCOG Textbook",
-            "content_blocks": []
+            "raw_elements": []
         }
         current_chap["topics"].append(topic_obj)
 
 total_topics_count = sum(len(c["topics"]) for b in books_structure for c in b["chapters"])
 print(f"Structured {len(books_structure)} Books containing {total_topics_count} Topics.")
 
-# 6. Process document elements body sequentially into Topics and Content Blocks
+# 5. Process document elements into raw topic buffers
 body = doc_root.find('w:body', ns)
 
 def find_matching_topic(heading_text):
@@ -173,17 +187,17 @@ current_active_topic = None
 if books_structure and books_structure[0]["chapters"][0]["topics"]:
     current_active_topic = books_structure[0]["chapters"][0]["topics"][0]
 
-block_order_counter = 1
-
 for elem in body:
     tag = elem.tag.split('}')[-1]
     
     if tag == 'p':
         p_txt = get_p_text(elem)
+        p_html = get_p_html(elem)
         p_imgs = get_p_images(elem)
         
         pStyle = elem.find('.//w:pStyle', ns)
         style_val = pStyle.attrib.get(f"{{{ns['w']}}}val") if pStyle is not None else None
+        numPr = elem.find('.//w:numPr', ns)
         
         is_heading = False
         if style_val and ('Heading' in style_val or 'Title' in style_val or style_val in ['1', '2', '3']):
@@ -195,49 +209,178 @@ for elem in body:
             matched_topic = find_matching_topic(p_txt)
             if matched_topic:
                 current_active_topic = matched_topic
-                block_order_counter = len(current_active_topic["content_blocks"]) + 1
             else:
                 if current_active_topic:
-                    current_active_topic["content_blocks"].append({
-                        "id": f"cb-{uuid.uuid4().hex[:8]}",
-                        "type": "heading",
-                        "content": p_txt,
-                        "order": len(current_active_topic["content_blocks"]) + 1
+                    current_active_topic["raw_elements"].append({
+                        "kind": "heading",
+                        "text": p_txt,
+                        "html": p_html
                     })
         else:
             if p_txt and current_active_topic:
                 is_note = any(k in p_txt.upper() for k in ["NOTE:", "MNEMONIC:", "CLINICAL PEARL:", "WARNING:", "KEY POINT:", "IMPORTANT:"])
-                block_type = "note" if is_note else "text"
+                is_bullet = (numPr is not None) or (style_val == 'ListParagraph') or p_txt.startswith("- ") or p_txt.startswith("> ") or p_txt.startswith("• ")
                 
-                current_active_topic["content_blocks"].append({
-                    "id": f"cb-{uuid.uuid4().hex[:8]}",
-                    "type": block_type,
-                    "content": p_txt,
-                    "order": len(current_active_topic["content_blocks"]) + 1
+                kind = "note" if is_note else ("bullet" if is_bullet else "paragraph")
+                current_active_topic["raw_elements"].append({
+                    "kind": kind,
+                    "text": p_txt,
+                    "html": p_html,
+                    "style": style_val
                 })
-        
+                
         if p_imgs and current_active_topic:
             for img_url in p_imgs:
-                current_active_topic["content_blocks"].append({
-                    "id": f"cb-{uuid.uuid4().hex[:8]}",
-                    "type": "image",
-                    "content": img_url,
-                    "order": len(current_active_topic["content_blocks"]) + 1
+                current_active_topic["raw_elements"].append({
+                    "kind": "image",
+                    "url": img_url
                 })
                 
     elif tag == 'tbl' and current_active_topic:
         tbl_html = table_to_html(elem)
-        current_active_topic["content_blocks"].append({
-            "id": f"cb-{uuid.uuid4().hex[:8]}",
-            "type": "html",
-            "content": tbl_html,
-            "order": len(current_active_topic["content_blocks"]) + 1
+        current_active_topic["raw_elements"].append({
+            "kind": "table",
+            "html": tbl_html
         })
 
+# 6. Group raw elements into cohesive Content Blocks for each Topic
+for book in books_structure:
+    for chap in book["chapters"]:
+        for topic in chap["topics"]:
+            blocks = []
+            html_buffer = []
+            in_list = False
+            list_items = []
+
+            for item in topic.get("raw_elements", []):
+                kind = item.get("kind")
+
+                if kind == "heading":
+                    if in_list and list_items:
+                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
+                        in_list = False
+                        list_items = []
+                    if html_buffer:
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "html",
+                            "content": "\n".join(html_buffer),
+                            "order": len(blocks) + 1
+                        })
+                        html_buffer = []
+                    blocks.append({
+                        "id": f"cb-{uuid.uuid4().hex[:8]}",
+                        "type": "heading",
+                        "content": item["text"],
+                        "order": len(blocks) + 1
+                    })
+
+                elif kind == "note":
+                    if in_list and list_items:
+                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
+                        in_list = False
+                        list_items = []
+                    if html_buffer:
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "html",
+                            "content": "\n".join(html_buffer),
+                            "order": len(blocks) + 1
+                        })
+                        html_buffer = []
+                    blocks.append({
+                        "id": f"cb-{uuid.uuid4().hex[:8]}",
+                        "type": "note",
+                        "content": item["text"],
+                        "order": len(blocks) + 1
+                    })
+
+                elif kind == "image":
+                    if in_list and list_items:
+                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
+                        in_list = False
+                        list_items = []
+                    if html_buffer:
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "html",
+                            "content": "\n".join(html_buffer),
+                            "order": len(blocks) + 1
+                        })
+                        html_buffer = []
+                    blocks.append({
+                        "id": f"cb-{uuid.uuid4().hex[:8]}",
+                        "type": "image",
+                        "content": item["url"],
+                        "order": len(blocks) + 1
+                    })
+
+                elif kind == "table":
+                    if in_list and list_items:
+                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
+                        in_list = False
+                        list_items = []
+                    if html_buffer:
+                        blocks.append({
+                            "id": f"cb-{uuid.uuid4().hex[:8]}",
+                            "type": "html",
+                            "content": "\n".join(html_buffer),
+                            "order": len(blocks) + 1
+                        })
+                        html_buffer = []
+                    blocks.append({
+                        "id": f"cb-{uuid.uuid4().hex[:8]}",
+                        "type": "html",
+                        "content": item["html"],
+                        "order": len(blocks) + 1
+                    })
+
+                elif kind == "bullet":
+                    h = item["html"]
+                    clean_h = h
+                    for prefix in ["- ", "&gt; ", "• ", "* "]:
+                        if clean_h.startswith(prefix):
+                            clean_h = clean_h[len(prefix):]
+                            break
+                    if not in_list:
+                        in_list = True
+                        list_items = []
+                    list_items.append(f"<li>{clean_h}</li>")
+
+                elif kind == "paragraph":
+                    h = item["html"]
+                    if in_list and list_items:
+                        html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
+                        in_list = False
+                        list_items = []
+
+                    plain_txt = item["text"]
+                    if (h.startswith("<strong>") and h.endswith("</strong>")) or plain_txt.endswith(":"):
+                        html_buffer.append(f"<h3>{h}</h3>")
+                    else:
+                        html_buffer.append(f"<p>{h}</p>")
+
+            if in_list and list_items:
+                html_buffer.append(f"<ul>{''.join(list_items)}</ul>")
+                in_list = False
+                list_items = []
+            if html_buffer:
+                blocks.append({
+                    "id": f"cb-{uuid.uuid4().hex[:8]}",
+                    "type": "html",
+                    "content": "\n".join(html_buffer),
+                    "order": len(blocks) + 1
+                })
+                html_buffer = []
+
+            topic["content_blocks"] = blocks
+            if "raw_elements" in topic:
+                del topic["raw_elements"]
+
 total_blocks = sum(len(t["content_blocks"]) for b in books_structure for c in b["chapters"] for t in c["topics"])
-print(f"Extraction Complete! Total Content Blocks: {total_blocks}")
+print(f"Refactored Extraction Complete! Total Content Blocks: {total_blocks} across {total_topics_count} Topics.")
 
 with open(output_json_path, "w", encoding="utf-8") as out_f:
     json.dump(books_structure, out_f, indent=2, ensure_ascii=False)
 
-print(f"Saved JSON payload to {output_json_path}")
+print(f"Saved refined JSON payload to {output_json_path}")
