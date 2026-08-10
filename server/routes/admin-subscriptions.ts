@@ -387,6 +387,7 @@ router.get("/coupons", async (req: AuthRequest, res: Response) => {
       isActive: c.isActive ?? true,
       minimumAmount: parseFloat(c.minPurchaseAmount) || 0,
       applicablePackages: c.applicablePackageIds || [],
+      durationDaysOverride: c.durationDaysOverride ?? null,
       createdAt: c.createdAt,
     }));
     res.json(coupons);
