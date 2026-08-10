@@ -3,10 +3,17 @@ server/
 server_dist/
 scripts/
 drizzle.config.ts
+*.sql
+
+# Large tar archives & backups
+*.tar.gz
+backups/
+uploads/
+MCQ_Extraction_July2024_02/
 
 # Docker / deployment
 Dockerfile
-docker-compose.yml
+docker-compose*
 Maternal Mind Education Content/
 
 # Android native build (EAS builds its own)
@@ -35,8 +42,11 @@ playwright.config.ts
 .tmp_incident_fix/
 .tmp_livefix/
 .agent/
+.agents/
 .local/
 .playwright-cli/
+.remember/
+.serena/
 
 # SSH keys & VPS docs
 office_pc_ed25519
