@@ -35,6 +35,8 @@ interface TopicDetail {
   title: string;
   description: string | null;
   chapterId: string;
+  isPublished?: boolean;
+  isPaid?: boolean;
 }
 
 type BlockType = "text" | "heading" | "code" | "image" | "html" | "diagram";
@@ -377,6 +379,17 @@ export default function TopicEditorPage() {
     }
   };
 
+  const togglePaid = async () => {
+    if (!topic) return;
+    try {
+      const newPaid = !topic.isPaid;
+      await api.put(`/admin/content/topics/${topic.id}`, { isPaid: newPaid });
+      setTopic((prev) => (prev ? { ...prev, isPaid: newPaid } : null));
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   if (loading)
     return (
       <div className="flex justify-center py-20">
@@ -395,11 +408,38 @@ export default function TopicEditorPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
-          <p className="text-sm text-gray-500">Topic Content Editor</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-gray-500">Topic Content Editor</p>
+            {topic && (
+              <span
+                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  topic.isPaid
+                    ? "bg-amber-100 text-amber-800 border border-amber-200"
+                    : "bg-green-100 text-green-800 border border-green-200"
+                }`}
+              >
+                {topic.isPaid ? "Paid Content" : "Free Content"}
+              </span>
+            )}
+          </div>
           <h1 className="text-xl font-bold text-gray-900">
             {topic?.title || "Loading..."}
           </h1>
         </div>
+        {topic && (
+          <button
+            type="button"
+            onClick={togglePaid}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+              topic.isPaid
+                ? "bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100"
+                : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+            }`}
+            title="Toggle Paid / Free status"
+          >
+            {topic.isPaid ? "Make Free" : "Make Paid"}
+          </button>
+        )}
         <button
           onClick={saveAll}
           disabled={saving}

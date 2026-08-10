@@ -177,6 +177,7 @@ export async function adminCreateTopic(data: {
   title: string;
   description?: string | null;
   isPublished?: boolean;
+  isPaid?: boolean;
   order?: number;
   author?: string | null;
   source?: string | null;
@@ -199,6 +200,7 @@ export async function adminUpdateTopic(
     title: string;
     description: string | null;
     isPublished: boolean;
+    isPaid: boolean;
     order: number;
     chapterId: string;
     author: string | null;
@@ -302,6 +304,7 @@ export async function adminGetMcqs(filters?: {
   topicId?: string;
   difficulty?: string;
   isPublished?: boolean;
+  isPaid?: boolean;
   search?: string;
   page?: number;
   pageSize?: number;
@@ -316,6 +319,8 @@ export async function adminGetMcqs(filters?: {
     conditions.push(eq(mcqs.difficulty, filters.difficulty));
   if (filters?.isPublished !== undefined)
     conditions.push(eq(mcqs.isPublished, filters.isPublished));
+  if (filters?.isPaid !== undefined)
+    conditions.push(eq(mcqs.isPaid, filters.isPaid));
   if (filters?.search)
     conditions.push(ilike(mcqs.question, `%${filters.search}%`));
 
@@ -353,8 +358,13 @@ export async function adminCreateMcq(data: {
   tags?: unknown | null;
   images?: unknown | null;
   isPublished?: boolean;
+  isPaid?: boolean;
 }): Promise<MCQ> {
-  const [m] = await db.insert(mcqs).values(data).returning();
+  const payload = {
+    ...data,
+    isPublished: data.isPublished !== false,
+  };
+  const [m] = await db.insert(mcqs).values(payload).returning();
   return m;
 }
 
@@ -371,6 +381,7 @@ export async function adminUpdateMcq(
     tags: unknown | null;
     images: unknown | null;
     isPublished: boolean;
+    isPaid: boolean;
     topicId: string;
   }>,
 ): Promise<MCQ | undefined> {
@@ -399,10 +410,15 @@ export async function adminBulkCreateMcqs(
     tags?: unknown | null;
     images?: unknown | null;
     isPublished?: boolean;
+    isPaid?: boolean;
   }[],
 ): Promise<number> {
   if (mcqList.length === 0) return 0;
-  const result = await db.insert(mcqs).values(mcqList).returning();
+  const listToInsert = mcqList.map((m) => ({
+    ...m,
+    isPublished: m.isPublished !== false,
+  }));
+  const result = await db.insert(mcqs).values(listToInsert).returning();
   return result.length;
 }
 

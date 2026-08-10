@@ -11,6 +11,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { z } from "zod";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
+import { uploadToMinIO } from "../lib/s3";
 import {
   adminGetBooks,
   adminGetBook,
@@ -67,6 +68,7 @@ const topicSchema = z.object({
   title: z.string().min(1, "Title is required").max(300),
   description: z.string().max(5000).optional().nullable(),
   isPublished: z.boolean().optional(),
+  isPaid: z.boolean().optional(),
   order: z.number().int().optional(),
   author: z.string().max(200).optional().nullable(),
   source: z.string().max(500).optional().nullable(),
@@ -108,6 +110,7 @@ const mcqSchema = z.object({
     .optional()
     .nullable(),
   isPublished: z.boolean().optional(),
+  isPaid: z.boolean().optional(),
 });
 
 const reorderSchema = z.object({
@@ -198,6 +201,12 @@ router.post(
       if (!req.file) {
         return res.status(400).json({ message: "Image file is required" });
       }
+
+      await uploadToMinIO(
+        `uploads/content-images/${req.file.filename}`,
+        req.file.path,
+        req.file.mimetype,
+      );
 
       await createAuditLog({
         adminUserId: req.userId!,
@@ -657,7 +666,7 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
 
 router.get("/mcqs", async (req: AuthRequest, res) => {
   try {
-    const { topicId, difficulty, isPublished, search, page, pageSize } =
+    const { topicId, difficulty, isPublished, isPaid, search, page, pageSize } =
       req.query as any;
     const result = await adminGetMcqs({
       topicId,
@@ -666,6 +675,12 @@ router.get("/mcqs", async (req: AuthRequest, res) => {
         isPublished === "true"
           ? true
           : isPublished === "false"
+            ? false
+            : undefined,
+      isPaid:
+        isPaid === "true"
+          ? true
+          : isPaid === "false"
             ? false
             : undefined,
       search,
