@@ -15,6 +15,7 @@ interface MCQ {
   explanation: string | null;
   difficulty: string;
   isPublished: boolean;
+  isPaid: boolean;
   createdAt: string;
 }
 
@@ -34,6 +35,7 @@ export default function McqsPage() {
   const [search, setSearch] = useState('');
   const [filterTopic, setFilterTopic] = useState('');
   const [filterDifficulty, setFilterDifficulty] = useState('');
+  const [filterPaid, setFilterPaid] = useState('');
 
   // Form
   const [showForm, setShowForm] = useState(false);
@@ -48,6 +50,7 @@ export default function McqsPage() {
     difficulty: 'medium',
     references: '',
     tags: '',
+    isPaid: false,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -72,6 +75,7 @@ export default function McqsPage() {
       if (search) params.set('search', search);
       if (filterTopic) params.set('topicId', filterTopic);
       if (filterDifficulty) params.set('difficulty', filterDifficulty);
+      if (filterPaid) params.set('isPaid', filterPaid);
 
       const [result, topics] = await Promise.all([
         api.get<{ data: MCQ[]; total: number }>(`/admin/content/mcqs?${params}`),
@@ -87,14 +91,14 @@ export default function McqsPage() {
     }
   };
 
-  useEffect(() => { load(); }, [page, search, filterTopic, filterDifficulty]);
+  useEffect(() => { load(); }, [page, search, filterTopic, filterDifficulty, filterPaid]);
 
   const openCreate = () => {
     setEditMcq(null);
     setForm({
       topicId: filterTopic || '', question: '', optA: '', optB: '', optC: '', optD: '', optE: '',
       correctAnswer: 'A', explanation: '', explA: '', explB: '', explC: '', explD: '', explE: '',
-      difficulty: 'medium', references: '', tags: '',
+      difficulty: 'medium', references: '', tags: '', isPaid: false,
     });
     setShowForm(true);
     setError('');
@@ -114,6 +118,7 @@ export default function McqsPage() {
       difficulty: m.difficulty,
       references: (m as any).references || '',
       tags: Array.isArray((m as any).tags) ? (m as any).tags.join(', ') : '',
+      isPaid: m.isPaid ?? false,
     });
     setShowForm(true);
     setError('');
@@ -144,6 +149,8 @@ export default function McqsPage() {
       difficulty: form.difficulty,
       references: form.references || undefined,
       tags: form.tags ? form.tags.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
+      isPublished: true,
+      isPaid: form.isPaid,
     };
   };
 
@@ -217,6 +224,7 @@ export default function McqsPage() {
         options: m.options || { A: m.optA, B: m.optB, C: m.optC, D: m.optD },
         correctAnswer: m.correctAnswer || m.correct || 'A',
         difficulty: m.difficulty || 'medium',
+        isPublished: m.isPublished !== undefined ? m.isPublished : true,
       }));
 
       const res = await api.post<{ count: number }>('/admin/content/mcqs/bulk', { mcqs: mcqList });
@@ -272,6 +280,11 @@ export default function McqsPage() {
           <option value="medium">Medium</option>
           <option value="hard">Hard</option>
         </select>
+        <select value={filterPaid} onChange={(e) => { setFilterPaid(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none">
+          <option value="">All Access Types</option>
+          <option value="false">Free Questions</option>
+          <option value="true">Paid Questions</option>
+        </select>
       </div>
 
       {/* MCQ Form Modal */}
@@ -295,6 +308,20 @@ export default function McqsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Question *</label>
                 <textarea value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} rows={3} className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none resize-none text-sm" />
               </div>
+              <label className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.isPaid}
+                  onChange={(e) => setForm({ ...form, isPaid: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                />
+                <span>
+                  <span className="block text-sm font-semibold text-gray-900">Paid Question (Requires Premium Subscription)</span>
+                  <span className="block text-xs text-gray-500 mt-0.5">
+                    If checked, users must have an active premium subscription to attempt or view this question.
+                  </span>
+                </span>
+              </label>
               {['A', 'B', 'C', 'D', 'E'].map((opt) => (
                 <div key={opt} className="grid grid-cols-2 gap-3">
                   <div>
@@ -428,6 +455,9 @@ export default function McqsPage() {
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.isPaid ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                        {m.isPaid ? 'Paid' : 'Free'}
+                      </span>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                         {m.isPublished ? 'Published' : 'Draft'}
                       </span>

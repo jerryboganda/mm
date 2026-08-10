@@ -13,6 +13,7 @@ interface Topic {
   description: string | null;
   order: number;
   isPublished: boolean;
+  isPaid: boolean;
   author: string | null;
 }
 
@@ -37,7 +38,7 @@ export default function TopicsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editTopic, setEditTopic] = useState<Topic | null>(null);
   const [parentBook, setParentBook] = useState<Book | null>(null);
-  const [form, setForm] = useState({ title: '', description: '', author: '', isPublished: true });
+  const [form, setForm] = useState({ title: '', description: '', author: '', isPublished: true, isPaid: false });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -60,8 +61,8 @@ export default function TopicsPage() {
 
   useEffect(() => { load(); }, [chapterId]);
 
-  const openCreate = () => { setEditTopic(null); setForm({ title: '', description: '', author: '', isPublished: true }); setShowForm(true); setError(''); };
-  const openEdit = (t: Topic) => { setEditTopic(t); setForm({ title: t.title, description: t.description || '', author: t.author || '', isPublished: t.isPublished }); setShowForm(true); setError(''); };
+  const openCreate = () => { setEditTopic(null); setForm({ title: '', description: '', author: '', isPublished: true, isPaid: false }); setShowForm(true); setError(''); };
+  const openEdit = (t: Topic) => { setEditTopic(t); setForm({ title: t.title, description: t.description || '', author: t.author || '', isPublished: t.isPublished, isPaid: t.isPaid ?? false }); setShowForm(true); setError(''); };
 
   const handleSave = async () => {
     if (!form.title.trim()) { setError('Title is required'); return; }
@@ -125,6 +126,20 @@ export default function TopicsPage() {
               <label className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
                 <input
                   type="checkbox"
+                  checked={form.isPaid}
+                  onChange={(e) => setForm({ ...form, isPaid: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                />
+                <span>
+                  <span className="block text-sm font-semibold text-gray-900">Paid Content (Requires Premium Subscription)</span>
+                  <span className="block text-xs text-gray-500 mt-0.5">
+                    If checked, users must have an active premium subscription to access this topic.
+                  </span>
+                </span>
+              </label>
+              <label className="flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 cursor-pointer">
+                <input
+                  type="checkbox"
                   checked={form.isPublished}
                   onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
                   className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
@@ -171,6 +186,9 @@ export default function TopicsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-gray-900 truncate">{t.title}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${t.isPaid ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                      {t.isPaid ? 'Paid' : 'Free'}
+                    </span>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${t.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                       {t.isPublished ? 'Published' : 'Draft'}
                     </span>
