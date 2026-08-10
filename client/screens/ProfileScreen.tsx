@@ -1,15 +1,25 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, Image, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Image,
+  Pressable,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { DangerActionModal } from "@/components/DangerActionModal";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
+import { apiRequest } from "@/lib/query-client";
 import { useAuth } from "@/lib/auth";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
@@ -21,12 +31,52 @@ type ProfileScreenNavigationProp =
 
 type ProfileActionType = "deactivate" | "delete" | "logout";
 
+interface InvoiceItem {
+  id: string;
+  invoiceNumber: string;
+  userId: string;
+  subscriptionId: string;
+  status: string;
+  subtotal: string;
+  discountTotal: string;
+  taxTotal: string;
+  total: string;
+  currency: string;
+  paidAt: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "N/A";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "N/A";
+    return d.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return "N/A";
+  }
+}
+
+function formatAmount(val: string | number): string {
+  const n = typeof val === "number" ? val : parseFloat(val);
+  if (isNaN(n)) return `PKR ${val}`;
+  return `PKR ${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
 export default function ProfileScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
   const { user, logout, deactivateAccount, requestAccountDeletion } = useAuth();
   const { theme, isDark } = useTheme();
   const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
+
   const [isProcessingProfileAction, setIsProcessingProfileAction] =
     React.useState(false);
   const [activeProfileAction, setActiveProfileAction] =
@@ -40,6 +90,20 @@ export default function ProfileScreen() {
   const [profileActionError, setProfileActionError] = React.useState<
     string | null
   >(null);
+
+  const [showInvoicesModal, setShowInvoicesModal] = React.useState(false);
+
+  const {
+    data: invoicesData,
+    isLoading: isLoadingInvoices,
+  } = useQuery<{ invoices: InvoiceItem[] }>({
+    queryKey: ["/api/subscriptions/invoices"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", "/api/subscriptions/invoices");
+      return res.json();
+    },
+    enabled: showInvoicesModal,
+  });
 
   const handleLogout = () => {
     openProfileAction("logout");
@@ -265,6 +329,16 @@ export default function ProfileScreen() {
       onPress: () => navigation.navigate("Subscription"),
     },
     {
+      id: "invoices",
+      title: "My Invoices & Redeemed Coupons",
+      subtitle: "View receipt history & redeemed promo codes",
+      icon: "file-text" as const,
+      onPress: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setShowInvoicesModal(true);
+      },
+    },
+    {
       id: "bookmarks",
       title: "Bookmarks",
       subtitle: "Your saved topics",
@@ -362,6 +436,156 @@ export default function ProfileScreen() {
           }
         />
       ) : null}
+
+      {/* Invoices & Redeemed Coupons Modal */}
+      <Modal
+        visible={showInvoicesModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowInvoicesModal(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View
+            style={[
+              styles.modalContainer,
+              {
+                backgroundColor: theme.backgroundElevated,
+                borderColor: theme.glassBorder,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <View style={styles.modalTitleCol}>
+                <ThemedText type="h3" style={styles.modalTitle}>
+                  My Invoices &amp; Coupons
+                </ThemedText>
+                <ThemedText style={[styles.modalSubtitle, { color: theme.textSecondary }]}>
+                  Receipt history and redeemed promo codes
+                </ThemedText>
+              </View>
+              <Pressable
+                onPress={() => setShowInvoicesModal(false)}
+                style={styles.modalCloseBtn}
+                accessibilityLabel="Close invoices modal"
+              >
+                <Feather name="x" size={22} color={theme.textSecondary} />
+              </Pressable>
+            </View>
+
+            {isLoadingInvoices ? (
+              <View style={styles.invoicesLoadingBox}>
+                <ActivityIndicator size="large" color={theme.primary} />
+                <ThemedText style={[styles.invoicesLoadingText, { color: theme.textSecondary }]}>
+                  Loading invoice history...
+                </ThemedText>
+              </View>
+            ) : !invoicesData?.invoices || invoicesData.invoices.length === 0 ? (
+              <View style={styles.invoicesEmptyBox}>
+                <Feather name="file-text" size={48} color={theme.textMuted} />
+                <ThemedText type="h4" style={styles.invoicesEmptyTitle}>
+                  No Invoices Found
+                </ThemedText>
+                <ThemedText style={[styles.invoicesEmptySub, { color: theme.textSecondary }]}>
+                  Your past invoice receipts and redeemed coupon records will appear here.
+                </ThemedText>
+              </View>
+            ) : (
+              <ScrollView
+                style={styles.invoicesList}
+                showsVerticalScrollIndicator={false}
+              >
+                {invoicesData.invoices.map((inv) => {
+                  const isFree = Number(inv.total) === 0;
+                  const hasDiscount = Number(inv.discountTotal) > 0;
+
+                  return (
+                    <GlassCard key={inv.id} style={styles.invoiceCard}>
+                      <View style={styles.invoiceTopRow}>
+                        <View style={styles.invoiceNumCol}>
+                          <ThemedText type="h4" style={styles.invoiceNumberText}>
+                            {inv.invoiceNumber}
+                          </ThemedText>
+                          <ThemedText style={[styles.invoiceDateText, { color: theme.textMuted }]}>
+                            {formatDate(inv.paidAt || inv.createdAt)}
+                          </ThemedText>
+                        </View>
+                        <View
+                          style={[
+                            styles.invoiceStatusBadge,
+                            { backgroundColor: `${theme.success}20` },
+                          ]}
+                        >
+                          <ThemedText style={[styles.invoiceStatusText, { color: theme.success }]}>
+                            {inv.status.toUpperCase()}
+                          </ThemedText>
+                        </View>
+                      </View>
+
+                      {inv.notes ? (
+                        <View style={[styles.invoiceNoteRow, { backgroundColor: `${theme.primary}12` }]}>
+                          <Feather name="tag" size={13} color={theme.primary} />
+                          <ThemedText style={[styles.invoiceNoteText, { color: theme.textSecondary }]}>
+                            {inv.notes}
+                          </ThemedText>
+                        </View>
+                      ) : null}
+
+                      <View style={[styles.invoiceDivider, { backgroundColor: theme.glassBorder }]} />
+
+                      <View style={styles.invoiceDetailRow}>
+                        <ThemedText style={[styles.invoiceDetailLabel, { color: theme.textSecondary }]}>
+                          Original Price
+                        </ThemedText>
+                        <ThemedText style={styles.invoiceDetailValue}>
+                          {formatAmount(inv.subtotal)}
+                        </ThemedText>
+                      </View>
+
+                      {hasDiscount ? (
+                        <View style={styles.invoiceDetailRow}>
+                          <ThemedText style={[styles.invoiceDetailLabel, { color: theme.success }]}>
+                            Coupon Discount
+                          </ThemedText>
+                          <ThemedText style={[styles.invoiceDetailValue, { color: theme.success }]}>
+                            -{formatAmount(inv.discountTotal)}
+                          </ThemedText>
+                        </View>
+                      ) : null}
+
+                      <View style={styles.invoiceDetailRow}>
+                        <ThemedText style={[styles.invoiceDetailLabel, { color: theme.text, fontWeight: "600" }]}>
+                          Final Amount
+                        </ThemedText>
+                        <ThemedText
+                          style={[
+                            styles.invoiceDetailValue,
+                            {
+                              fontWeight: "700",
+                              color: isFree ? theme.success : theme.primary,
+                            },
+                          ]}
+                        >
+                          {isFree ? "PKR 0 (Free Access)" : formatAmount(inv.total)}
+                        </ThemedText>
+                      </View>
+
+                      {inv.periodEnd ? (
+                        <View style={styles.invoiceExpiryRow}>
+                          <Feather name="calendar" size={13} color={theme.textMuted} />
+                          <ThemedText style={[styles.invoiceExpiryText, { color: theme.textMuted }]}>
+                            Access Expiry: {formatDate(inv.periodEnd)}
+                          </ThemedText>
+                        </View>
+                      ) : null}
+                    </GlassCard>
+                  );
+                })}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView
         style={styles.container}
         contentContainerStyle={[
@@ -715,5 +939,134 @@ const styles = StyleSheet.create({
   },
   logoutCard: {
     borderWidth: 1,
+  },
+  // Invoices Modal Styles
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    borderTopLeftRadius: BorderRadius["2xl"],
+    borderTopRightRadius: BorderRadius["2xl"],
+    borderWidth: 1,
+    padding: Spacing.xl,
+    maxHeight: "85%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: Spacing.lg,
+  },
+  modalTitleCol: {
+    flex: 1,
+    paddingRight: Spacing.md,
+  },
+  modalTitle: {
+    marginBottom: 2,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+  },
+  modalCloseBtn: {
+    padding: Spacing.xs,
+  },
+  invoicesLoadingBox: {
+    paddingVertical: Spacing["3xl"],
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  invoicesLoadingText: {
+    marginTop: Spacing.md,
+    fontSize: 14,
+  },
+  invoicesEmptyBox: {
+    paddingVertical: Spacing["3xl"],
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.md,
+  },
+  invoicesEmptyTitle: {
+    textAlign: "center",
+  },
+  invoicesEmptySub: {
+    textAlign: "center",
+    fontSize: 13,
+    paddingHorizontal: Spacing.xl,
+  },
+  invoicesList: {
+    marginBottom: Spacing.md,
+  },
+  invoiceCard: {
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
+  },
+  invoiceTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: Spacing.xs,
+  },
+  invoiceNumCol: {
+    flex: 1,
+  },
+  invoiceNumberText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  invoiceDateText: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  invoiceStatusBadge: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
+  },
+  invoiceStatusText: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  invoiceNoteRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.sm,
+    marginTop: Spacing.xs,
+  },
+  invoiceNoteText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  invoiceDivider: {
+    height: 1,
+    marginVertical: Spacing.sm,
+  },
+  invoiceDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 2,
+  },
+  invoiceDetailLabel: {
+    fontSize: 13,
+  },
+  invoiceDetailValue: {
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  invoiceExpiryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    marginTop: Spacing.sm,
+    paddingTop: Spacing.xs,
+  },
+  invoiceExpiryText: {
+    fontSize: 12,
   },
 });

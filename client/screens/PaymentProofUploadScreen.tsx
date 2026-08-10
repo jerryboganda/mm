@@ -72,7 +72,15 @@ export default function PaymentProofUploadScreen() {
   const { theme } = useTheme();
   const { user, refreshUser } = useAuth();
 
-  const { packageId, priceId, packageName, price } = route.params;
+  const {
+    packageId,
+    priceId,
+    packageName,
+    price,
+    couponId,
+    couponCode,
+    discountedPrice,
+  } = route.params;
 
   const [image, setImage] = useState<PickedImage | null>(null);
   const [amount, setAmount] = useState(price || "");
@@ -150,6 +158,8 @@ export default function PaymentProofUploadScreen() {
       if (method.trim()) formData.append("paymentMethod", method.trim());
       if (reference.trim()) formData.append("senderReference", reference.trim());
       if (note.trim()) formData.append("userNote", note.trim());
+      if (couponCode) formData.append("couponCode", couponCode);
+      if (couponId) formData.append("couponId", couponId);
 
       await apiUpload("/api/subscriptions/proof", formData);
 
@@ -205,7 +215,7 @@ export default function PaymentProofUploadScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedText style={[styles.summary, { color: theme.textSecondary }]}>
-          {packageName} — PKR {price}
+          {packageName} — PKR {price}{couponCode ? ` (Coupon ${couponCode} Applied)` : ""}
         </ThemedText>
 
         <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
