@@ -2,6 +2,7 @@ import { Router } from "express";
 import { storage } from "../storage";
 import { AuthRequest, authMiddleware } from "../middleware";
 import { logger } from "../lib/logger";
+import { effectiveSubscriptionStatus } from "../lib/subscription-status";
 
 const router = Router();
 
@@ -133,6 +134,7 @@ router.get(
         title: topic.title,
         description: topic.description,
         order: topic.order,
+        isPaid: topic.isPaid,
         isCompleted: userProgressData.some(
           (p) => p.topicId === topic.id && p.isCompleted,
         ),
@@ -156,6 +158,21 @@ router.get(
       const topic = await storage.getTopic(topicId);
       if (!topic) {
         return res.status(404).json({ message: "Topic not found" });
+      }
+
+      const user = await storage.getUser(req.userId!);
+      const subscriptionStatus = effectiveSubscriptionStatus(
+        user?.subscriptionStatus,
+        user?.subscriptionExpiresAt,
+      );
+
+      if (topic.isPaid && subscriptionStatus !== "active") {
+        return res.status(403).json({
+          code: "SUBSCRIPTION_REQUIRED",
+          message: "This material requires an active Premium subscription.",
+          topicId: topic.id,
+          topicTitle: topic.title,
+        });
       }
 
       // Record this topic view for recent activity tracking
@@ -183,6 +200,7 @@ router.get(
         updatedAt: topic.updatedAt?.toISOString() || null,
         isCompleted: progress?.isCompleted || false,
         isBookmarked,
+        isPaid: topic.isPaid,
         blocks: blocks.map((b) => ({
           id: b.id,
           type: b.type,

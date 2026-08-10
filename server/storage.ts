@@ -344,6 +344,7 @@ export interface IStorage {
       title: string;
       chapterTitle: string;
       bookTitle: string;
+      isPaid: boolean;
       progress: number;
     }[]
   >;
@@ -498,7 +499,8 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(mcqs)
-      .where(and(eq(mcqs.topicId, topicId), eq(mcqs.isPublished, true)));
+      .where(and(eq(mcqs.topicId, topicId), eq(mcqs.isPublished, true)))
+      .orderBy(mcqs.createdAt);
   }
 
   /** @inheritdoc */
@@ -1133,26 +1135,28 @@ export class DatabaseStorage implements IStorage {
    * @returns An array of topic objects with their chapter title and question count
    */
   async getQuizTopicsWithCounts(): Promise<
-    { id: string; title: string; chapterTitle: string; questionCount: number }[]
+    { id: string; title: string; chapterTitle: string; isPaid: boolean; questionCount: number }[]
   > {
     const rows = await db
       .select({
         topicId: topics.id,
         topicTitle: topics.title,
         chapterTitle: chapters.title,
+        isPaid: topics.isPaid,
         questionCount: sql<number>`count(${mcqs.id})`.as("question_count"),
       })
       .from(topics)
       .innerJoin(chapters, eq(topics.chapterId, chapters.id))
       .innerJoin(mcqs, eq(mcqs.topicId, topics.id))
       .where(and(eq(topics.isPublished, true), eq(mcqs.isPublished, true)))
-      .groupBy(topics.id, topics.title, chapters.title)
+      .groupBy(topics.id, topics.title, chapters.title, topics.isPaid)
       .having(sql`count(${mcqs.id}) > 0`);
 
     return rows.map((r: any) => ({
       id: r.topicId,
       title: r.topicTitle,
       chapterTitle: r.chapterTitle,
+      isPaid: Boolean(r.isPaid),
       questionCount: Number(r.questionCount),
     }));
   }
@@ -1514,6 +1518,7 @@ export class DatabaseStorage implements IStorage {
       title: string;
       chapterTitle: string;
       bookTitle: string;
+      isPaid: boolean;
       progress: number;
     }[]
   > {
@@ -1524,6 +1529,7 @@ export class DatabaseStorage implements IStorage {
         title: topics.title,
         chapterTitle: chapters.title,
         bookTitle: books.title,
+        isPaid: topics.isPaid,
       })
       .from(topics)
       .innerJoin(chapters, eq(topics.chapterId, chapters.id))
@@ -1547,6 +1553,7 @@ export class DatabaseStorage implements IStorage {
       title: r.title,
       chapterTitle: r.chapterTitle,
       bookTitle: r.bookTitle,
+      isPaid: Boolean(r.isPaid),
       progress: 0,
     }));
   }
