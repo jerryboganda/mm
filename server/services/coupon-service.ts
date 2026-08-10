@@ -12,6 +12,10 @@ import {
   subscriptionPackages,
   addOns,
   packagePrices,
+  invoices,
+  invoiceLineItems,
+  subscriptions,
+  users,
   type Coupon,
   type CouponUsage,
 } from "../../shared/schema";
@@ -968,6 +972,393 @@ class CouponService {
     const finalPrice = round2(Math.max(runningPrice, 0));
 
     return { totalDiscount, finalPrice, breakdown };
+  }
+
+  // ─── Detailed Validation & Free Activation ──────────────
+
+  /**
+   * Detailed coupon validation for package and price checkout flows.
+   */
+  async validateCouponDetailed(params: {
+    code: string;
+    userId: string;
+    packageId: string;
+    priceId?: string;
+  }): Promise<{
+    valid: boolean;
+    couponId?: string;
+    code?: string;
+    discountType?: string;
+    discountValue?: string;
+    discountAmount?: number;
+    originalPrice?: number;
+    finalPrice?: number;
+    isFreeAccess?: boolean;
+    accessDurationDays?: number;
+    message: string;
+  }> {
+    const { code, userId, packageId, priceId } = params;
+
+    // 1. Lookup coupon (case-insensitive)
+    const coupon = await this.getCouponByCode(code);
+    if (!coupon) {
+      return { valid: false, message: "Coupon code not found" };
+    }
+
+    // 2. Active check
+    if (!coupon.isActive) {
+      return { valid: false, message: "This coupon is no longer active" };
+    }
+
+    // 3. Date range check
+    const now = new Date();
+    if (coupon.validFrom && now < new Date(coupon.validFrom)) {
+      return { valid: false, message: "This coupon is not yet valid" };
+    }
+    if (coupon.validUntil && now > new Date(coupon.validUntil)) {
+      return { valid: false, message: "This coupon has expired" };
+    }
+
+    // 4. Total usage limit
+    if (
+      coupon.maxTotalUses !== null &&
+      coupon.maxTotalUses !== undefined &&
+      coupon.currentUseCount >= coupon.maxTotalUses
+    ) {
+      return {
+        valid: false,
+        message: "This coupon has reached its maximum total uses",
+      };
+    }
+
+    // 5. Per-user usage limit
+    const [userUsage] = await db
+      .select({ uses: count() })
+      .from(couponUsage)
+      .where(
+        and(
+          eq(couponUsage.couponId, coupon.id),
+          eq(couponUsage.userId, userId),
+        ),
+      );
+
+    const maxPerUser = coupon.maxUsesPerUser ?? 1;
+    if ((userUsage?.uses ?? 0) >= maxPerUser) {
+      return {
+        valid: false,
+        message: "You have already reached the maximum usage limit for this coupon",
+      };
+    }
+
+    // 6. Package compatibility
+    if (coupon.applicablePackageIds) {
+      const allowedPkgs = coupon.applicablePackageIds as string[];
+      if (Array.isArray(allowedPkgs) && allowedPkgs.length > 0 && !allowedPkgs.includes(packageId)) {
+        return {
+          valid: false,
+          message: "This coupon is not valid for the selected package",
+        };
+      }
+    }
+
+    // 7. Verify package exists and determine price & duration
+    const [pkg] = await db
+      .select()
+      .from(subscriptionPackages)
+      .where(eq(subscriptionPackages.id, packageId));
+
+    if (!pkg) {
+      return { valid: false, message: "Package not found" };
+    }
+
+    let originalPrice = 0;
+    let priceRow: any = null;
+
+    if (priceId) {
+      const [p] = await db
+        .select()
+        .from(packagePrices)
+        .where(
+          and(
+            eq(packagePrices.id, priceId),
+            eq(packagePrices.packageId, packageId),
+          ),
+        );
+      if (p) {
+        priceRow = p;
+        originalPrice = num(p.price);
+      }
+    }
+
+    if (!priceRow) {
+      const [p] = await db
+        .select()
+        .from(packagePrices)
+        .where(
+          and(
+            eq(packagePrices.packageId, packageId),
+            eq(packagePrices.isActive, true),
+          ),
+        )
+        .orderBy(packagePrices.price)
+        .limit(1);
+      if (p) {
+        priceRow = p;
+        originalPrice = num(p.price);
+      }
+    }
+
+    // Determine duration in days
+    let accessDurationDays = 30;
+    if (
+      coupon.durationDaysOverride !== null &&
+      coupon.durationDaysOverride !== undefined &&
+      coupon.durationDaysOverride > 0
+    ) {
+      accessDurationDays = coupon.durationDaysOverride;
+    } else if (priceRow) {
+      const cycleMap: Record<string, number> = {
+        monthly: 30,
+        quarterly: 90,
+        semi_annual: 180,
+        annual: 365,
+        lifetime: 36500,
+      };
+      if (
+        priceRow.billingCycle === "custom" &&
+        priceRow.customDurationDays &&
+        priceRow.customDurationDays > 0
+      ) {
+        accessDurationDays = priceRow.customDurationDays;
+      } else {
+        accessDurationDays = cycleMap[priceRow.billingCycle] ?? 30;
+      }
+    } else if (pkg.trialDays > 0) {
+      accessDurationDays = pkg.trialDays;
+    }
+
+    // 8. Calculate discount & final price
+    const discountVal = num(coupon.discountValue);
+    let discountAmount = 0;
+
+    if (coupon.discountType === "percentage") {
+      discountAmount = round2((originalPrice * discountVal) / 100);
+      if (coupon.maxDiscountAmount) {
+        const maxCap = num(coupon.maxDiscountAmount);
+        if (maxCap > 0 && discountAmount > maxCap) {
+          discountAmount = maxCap;
+        }
+      }
+    } else if (coupon.discountType === "fixed_amount") {
+      discountAmount = discountVal;
+    } else if (coupon.discountType === "trial_extension") {
+      discountAmount = 0;
+    }
+
+    discountAmount = round2(Math.min(discountAmount, originalPrice));
+    const finalPrice = round2(Math.max(originalPrice - discountAmount, 0));
+    const isFreeAccess = finalPrice === 0;
+
+    return {
+      valid: true,
+      couponId: coupon.id,
+      code: coupon.code,
+      discountType: coupon.discountType,
+      discountValue: coupon.discountValue,
+      discountAmount,
+      originalPrice,
+      finalPrice,
+      isFreeAccess,
+      accessDurationDays,
+      message: isFreeAccess
+        ? "100% free access coupon validated!"
+        : "Coupon validated successfully",
+    };
+  }
+
+  /**
+   * Atomically redeem a 100% free coupon and activate user subscription.
+   */
+  async redeemFreeCoupon(params: {
+    code: string;
+    userId: string;
+    packageId: string;
+    priceId?: string;
+  }): Promise<{
+    success: boolean;
+    invoiceId: string;
+    subscriptionExpiresAt: string;
+    message: string;
+  }> {
+    const val = await this.validateCouponDetailed(params);
+    if (!val.valid) {
+      throw new Error(val.message || "Invalid coupon code");
+    }
+    if (!val.isFreeAccess || val.finalPrice !== 0) {
+      throw new Error("Coupon does not grant 100% free access");
+    }
+
+    const durationDays = val.accessDurationDays || 30;
+    const subscriptionExpiresAt = new Date(
+      Date.now() + durationDays * 86400000,
+    );
+
+    return await db.transaction(async (tx: any) => {
+      // 1. Increment coupons.currentUseCount atomically
+      const [updatedCoupon] = await tx
+        .update(coupons)
+        .set({
+          currentUseCount: sql`${coupons.currentUseCount} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(coupons.id, val.couponId!),
+            eq(coupons.isActive, true),
+            or(
+              isNull(coupons.maxTotalUses),
+              sql`${coupons.currentUseCount} < ${coupons.maxTotalUses}`,
+            ),
+          ),
+        )
+        .returning({ id: coupons.id });
+
+      if (!updatedCoupon) {
+        throw new Error(
+          "Coupon redemption failed: limit reached or inactive",
+        );
+      }
+
+      // Fetch package and price details for records
+      const [pkg] = await tx
+        .select()
+        .from(subscriptionPackages)
+        .where(eq(subscriptionPackages.id, params.packageId));
+
+      let priceRow: any = null;
+      if (params.priceId) {
+        const [p] = await tx
+          .select()
+          .from(packagePrices)
+          .where(eq(packagePrices.id, params.priceId));
+        priceRow = p;
+      }
+      if (!priceRow) {
+        const [p] = await tx
+          .select()
+          .from(packagePrices)
+          .where(
+            and(
+              eq(packagePrices.packageId, params.packageId),
+              eq(packagePrices.isActive, true),
+            ),
+          )
+          .orderBy(packagePrices.price)
+          .limit(1);
+        priceRow = p;
+      }
+
+      // 2. Insert active subscription record
+      const subId = crypto.randomUUID();
+      await tx.insert(subscriptions).values({
+        id: subId,
+        userId: params.userId,
+        packageId: params.packageId,
+        priceId: params.priceId || priceRow?.id || null,
+        status: "active",
+        activatedAt: new Date(),
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: subscriptionExpiresAt,
+        billingCycle: priceRow?.billingCycle || "monthly",
+        priceAtPurchase: String(val.originalPrice),
+        currency: priceRow?.currency || "PKR",
+        couponId: val.couponId,
+        discountAmount: String(val.originalPrice),
+        paymentGateway: "coupon",
+      });
+
+      // 3. Insert record into couponUsage
+      const usageId = crypto.randomUUID();
+      await tx.insert(couponUsage).values({
+        id: usageId,
+        couponId: val.couponId!,
+        userId: params.userId,
+        subscriptionId: subId,
+        discountApplied: String(val.originalPrice),
+        usedAt: new Date(),
+      });
+
+      // 4. Generate invoice number & insert itemized invoice into invoices table
+      const year = new Date().getFullYear();
+      const prefix = `INV-${year}-`;
+      const [lastInvoice] = await tx
+        .select({ invoiceNumber: invoices.invoiceNumber })
+        .from(invoices)
+        .where(sql`${invoices.invoiceNumber} LIKE ${prefix + "%"}`)
+        .orderBy(desc(invoices.invoiceNumber))
+        .limit(1);
+
+      let nextSeq = 1;
+      if (lastInvoice) {
+        const lastSeq = parseInt(
+          lastInvoice.invoiceNumber.replace(prefix, ""),
+          10,
+        );
+        if (!isNaN(lastSeq)) nextSeq = lastSeq + 1;
+      }
+      const invoiceNumber = `${prefix}${String(nextSeq).padStart(4, "0")}`;
+
+      const invoiceId = crypto.randomUUID();
+      await tx.insert(invoices).values({
+        id: invoiceId,
+        invoiceNumber,
+        userId: params.userId,
+        subscriptionId: subId,
+        status: "paid",
+        subtotal: String(val.originalPrice),
+        discountTotal: String(val.originalPrice),
+        taxTotal: "0.00",
+        total: "0.00",
+        currency: priceRow?.currency || "PKR",
+        paidAt: new Date(),
+        periodStart: new Date(),
+        periodEnd: subscriptionExpiresAt,
+        couponId: val.couponId,
+        notes: `Coupon ${val.code}`,
+      });
+
+      // Insert line item into invoiceLineItems
+      await tx.insert(invoiceLineItems).values({
+        id: crypto.randomUUID(),
+        invoiceId,
+        type: "subscription",
+        description: `100% Free Access Coupon Redemption (${pkg?.name || "Subscription"})`,
+        packageId: params.packageId,
+        quantity: 1,
+        unitPrice: String(val.originalPrice),
+        total: "0.00",
+        periodStart: new Date(),
+        periodEnd: subscriptionExpiresAt,
+      });
+
+      // 5. Update users table
+      await tx
+        .update(users)
+        .set({
+          subscriptionStatus: "active",
+          subscriptionPlan: pkg?.name || params.packageId,
+          subscriptionExpiresAt: subscriptionExpiresAt,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, params.userId));
+
+      return {
+        success: true,
+        invoiceId,
+        subscriptionExpiresAt: subscriptionExpiresAt.toISOString(),
+        message: "Subscription activated successfully!",
+      };
+    });
   }
 }
 
