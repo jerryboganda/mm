@@ -15,7 +15,7 @@ import {
   ExplanationFigures,
   ExplanationImage,
 } from "@/components/ExplanationFigures";
-import { RichTextHtml } from "@/components/RichTextHtml";
+import { McqExplanationRenderer } from "@/components/McqExplanationRenderer";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -321,7 +321,7 @@ export default function AttemptDetailScreen() {
                       Explanation
                     </ThemedText>
                   </View>
-                  <RichTextHtml content={q.explanation} />
+                  <McqExplanationRenderer explanation={q.explanation} />
                 </View>
               ) : null}
               <ExplanationFigures images={q.images} />

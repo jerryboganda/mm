@@ -16,7 +16,7 @@ import {
   ExplanationFigures,
   ExplanationImage,
 } from "@/components/ExplanationFigures";
-import { RichTextHtml } from "@/components/RichTextHtml";
+import { McqExplanationRenderer } from "@/components/McqExplanationRenderer";
 import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -237,7 +237,7 @@ export default function QuizResultsScreen() {
               >
                 <Feather name="info" size={14} color={theme.primary} style={{ marginTop: 2, marginRight: 6 }} />
                 <View style={{ flex: 1 }}>
-                  <RichTextHtml content={q.explanation} />
+                  <McqExplanationRenderer explanation={q.explanation} />
                 </View>
               </View>
               <ExplanationFigures images={q.images} />
