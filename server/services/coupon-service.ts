@@ -49,6 +49,7 @@ interface CreateCouponData {
   discountValue: string;
   minPurchaseAmount?: string | null;
   maxDiscountAmount?: string | null;
+  durationDaysOverride?: number | null;
   applicablePackageIds?: string[] | null;
   applicableAddOnIds?: string[] | null;
   maxTotalUses?: number | null;
@@ -69,6 +70,7 @@ interface UpdateCouponData {
   discountValue?: string;
   minPurchaseAmount?: string | null;
   maxDiscountAmount?: string | null;
+  durationDaysOverride?: number | null;
   applicablePackageIds?: string[] | null;
   applicableAddOnIds?: string[] | null;
   maxTotalUses?: number | null;
@@ -89,6 +91,7 @@ interface BulkCouponConfig {
   discountValue: string;
   minPurchaseAmount?: string | null;
   maxDiscountAmount?: string | null;
+  durationDaysOverride?: number | null;
   applicablePackageIds?: string[] | null;
   applicableAddOnIds?: string[] | null;
   maxTotalUses?: number | null;
@@ -271,6 +274,7 @@ class CouponService {
         discountValue: data.discountValue,
         minPurchaseAmount: data.minPurchaseAmount ?? null,
         maxDiscountAmount: data.maxDiscountAmount ?? null,
+        durationDaysOverride: data.durationDaysOverride ?? null,
         applicablePackageIds: data.applicablePackageIds ?? null,
         applicableAddOnIds: data.applicableAddOnIds ?? null,
         maxTotalUses: data.maxTotalUses ?? null,
@@ -310,6 +314,8 @@ class CouponService {
       values.minPurchaseAmount = data.minPurchaseAmount;
     if (data.maxDiscountAmount !== undefined)
       values.maxDiscountAmount = data.maxDiscountAmount;
+    if (data.durationDaysOverride !== undefined)
+      values.durationDaysOverride = data.durationDaysOverride;
     if (data.applicablePackageIds !== undefined)
       values.applicablePackageIds = data.applicablePackageIds;
     if (data.applicableAddOnIds !== undefined)
@@ -371,6 +377,7 @@ class CouponService {
       discountValue,
       minPurchaseAmount,
       maxDiscountAmount,
+      durationDaysOverride,
       applicablePackageIds,
       applicableAddOnIds,
       maxTotalUses,
@@ -413,6 +420,7 @@ class CouponService {
         discountValue,
         minPurchaseAmount: minPurchaseAmount ?? null,
         maxDiscountAmount: maxDiscountAmount ?? null,
+        durationDaysOverride: durationDaysOverride ?? null,
         applicablePackageIds: applicablePackageIds ?? null,
         applicableAddOnIds: applicableAddOnIds ?? null,
         maxTotalUses: maxTotalUses ?? null,

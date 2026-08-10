@@ -1356,28 +1356,31 @@ export const updateAddOnSchema = createAddOnSchema.partial();
 
 export const createCouponSchema = z.object({
   code: z.string().min(1).max(50),
-  description: z.string().optional(),
-  campaignId: z.string().optional(),
+  description: z.string().optional().nullable(),
+  campaignId: z.string().optional().nullable(),
   discountType: discountTypeEnum,
   discountValue: z.string().regex(/^\d+(\.\d{1,2})?$/),
   minPurchaseAmount: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
-    .optional(),
+    .optional()
+    .nullable(),
   maxDiscountAmount: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
-    .optional(),
-  applicablePackageIds: z.array(z.string()).optional(),
-  applicableAddOnIds: z.array(z.string()).optional(),
-  maxTotalUses: z.number().int().min(1).optional(),
+    .optional()
+    .nullable(),
+  durationDaysOverride: z.coerce.number().optional().nullable(),
+  applicablePackageIds: z.array(z.string()).optional().nullable(),
+  applicableAddOnIds: z.array(z.string()).optional().nullable(),
+  maxTotalUses: z.number().int().min(1).optional().nullable(),
   maxUsesPerUser: z.number().int().min(1).default(1),
-  validFrom: z.string().datetime().optional(),
-  validUntil: z.string().datetime().optional(),
+  validFrom: z.string().optional().nullable(),
+  validUntil: z.string().optional().nullable(),
   isStackable: z.boolean().default(false),
-  referralUserId: z.string().optional(),
+  referralUserId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
-  metadata: z.any().optional(),
+  metadata: z.any().optional().nullable(),
 });
 
 export const updateCouponSchema = createCouponSchema.partial();
@@ -1456,16 +1459,17 @@ export type PaymentInstructions = z.infer<typeof paymentInstructionsSchema>;
 export const bulkCouponGenerationSchema = z.object({
   count: z.number().int().min(1).max(10000),
   prefix: z.string().min(1).max(20),
-  campaignId: z.string().optional(),
+  campaignId: z.string().optional().nullable(),
   discountType: discountTypeEnum,
   discountValue: z.string().regex(/^\d+(\.\d{1,2})?$/),
   maxUsesPerUser: z.number().int().min(1).default(1),
-  maxTotalUses: z.number().int().min(1).optional(),
-  validFrom: z.string().datetime().optional(),
-  validUntil: z.string().datetime().optional(),
-  applicablePackageIds: z.array(z.string()).optional(),
+  maxTotalUses: z.number().int().min(1).optional().nullable(),
+  durationDaysOverride: z.coerce.number().optional().nullable(),
+  validFrom: z.string().optional().nullable(),
+  validUntil: z.string().optional().nullable(),
+  applicablePackageIds: z.array(z.string()).optional().nullable(),
   isStackable: z.boolean().default(false),
-  metadata: z.any().optional(),
+  metadata: z.any().optional().nullable(),
 });
 
 // ── Type Exports ──────────────────────────────────────────────

@@ -17,6 +17,8 @@ import {
   Hash,
   Filter,
   Download,
+  Link as LinkIcon,
+  Check,
 } from "lucide-react";
 
 /* ─── Types ─── */
@@ -35,7 +37,14 @@ interface Coupon {
   isActive: boolean;
   minimumAmount: number;
   applicablePackages: string[];
+  durationDaysOverride?: number | null;
   createdAt: string;
+}
+
+interface PackageOption {
+  id: string;
+  name: string;
+  code: string;
 }
 
 interface CouponAnalytics {
@@ -75,6 +84,7 @@ const emptyForm = () => ({
   isActive: true,
   minimumAmount: 0,
   applicablePackages: [] as string[],
+  durationDaysOverride: "" as string | number,
 });
 
 const emptyBulkForm = () => ({
@@ -87,14 +97,19 @@ const emptyBulkForm = () => ({
   validFrom: new Date().toISOString().slice(0, 10),
   validUntil: "",
   campaign: "",
+  applicablePackages: [] as string[],
+  durationDaysOverride: "" as string | number,
 });
 
 /* ─── Component ─── */
 
 export default function SubscriptionCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [packages, setPackages] = useState<PackageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -130,6 +145,15 @@ export default function SubscriptionCouponsPage() {
     }
   };
 
+  const fetchPackages = async () => {
+    try {
+      const data = await api.get<PackageOption[]>("/admin/subscriptions/packages");
+      setPackages(data || []);
+    } catch (err: any) {
+      console.error("Error fetching packages", err);
+    }
+  };
+
   const fetchAnalytics = async () => {
     setAnalyticsLoading(true);
     try {
@@ -146,6 +170,7 @@ export default function SubscriptionCouponsPage() {
 
   useEffect(() => {
     fetchCoupons();
+    fetchPackages();
   }, []);
 
   /* ─── Derived Data ─── */
@@ -188,10 +213,11 @@ export default function SubscriptionCouponsPage() {
       maxUses: c.maxUses ?? "",
       validFrom: c.validFrom ? c.validFrom.slice(0, 10) : "",
       validUntil: c.validUntil ? c.validUntil.slice(0, 10) : "",
-      campaign: c.campaign,
+      campaign: c.campaign || "",
       isActive: c.isActive,
-      minimumAmount: c.minimumAmount,
+      minimumAmount: c.minimumAmount || 0,
       applicablePackages: c.applicablePackages || [],
+      durationDaysOverride: c.durationDaysOverride ?? "",
     });
     setFormError("");
     setModal("edit");
@@ -222,9 +248,21 @@ export default function SubscriptionCouponsPage() {
     setFormError("");
     try {
       const body = {
-        ...form,
-        maxUses: form.maxUses === "" ? null : Number(form.maxUses),
+        code: form.code.trim().toUpperCase(),
+        discountType: form.discountType,
+        discountValue: String(form.discountValue),
+        minPurchaseAmount: form.minimumAmount ? String(form.minimumAmount) : null,
+        durationDaysOverride:
+          form.durationDaysOverride !== "" && form.durationDaysOverride !== null
+            ? Number(form.durationDaysOverride)
+            : null,
+        applicablePackageIds:
+          form.applicablePackages.length > 0 ? form.applicablePackages : null,
+        maxTotalUses: form.maxUses === "" ? null : Number(form.maxUses),
+        validFrom: form.validFrom || null,
         validUntil: form.validUntil || null,
+        campaignId: form.campaign.trim() || null,
+        isActive: form.isActive,
       };
 
       if (editing) {
@@ -259,12 +297,26 @@ export default function SubscriptionCouponsPage() {
     setFormError("");
     try {
       const body = {
-        ...bulkForm,
-        maxUsesPerCoupon:
+        prefix: bulkForm.prefix.trim().toUpperCase(),
+        count: Number(bulkForm.count),
+        discountType: bulkForm.discountType,
+        discountValue: String(bulkForm.discountValue),
+        maxUsesPerUser:
           bulkForm.maxUsesPerCoupon === ""
-            ? null
+            ? 1
             : Number(bulkForm.maxUsesPerCoupon),
+        durationDaysOverride:
+          bulkForm.durationDaysOverride !== "" &&
+          bulkForm.durationDaysOverride !== null
+            ? Number(bulkForm.durationDaysOverride)
+            : null,
+        applicablePackageIds:
+          bulkForm.applicablePackages.length > 0
+            ? bulkForm.applicablePackages
+            : null,
+        validFrom: bulkForm.validFrom || null,
         validUntil: bulkForm.validUntil || null,
+        campaignId: bulkForm.campaign.trim() || null,
       };
       await api.post("/admin/subscriptions/coupons/bulk", body);
       setModal(null);
@@ -295,6 +347,19 @@ export default function SubscriptionCouponsPage() {
     } catch (err: any) {
       alert(err.message);
     }
+  };
+
+  const copyCode = (code: string, id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCodeId(id);
+    setTimeout(() => setCopiedCodeId(null), 2000);
+  };
+
+  const copyShareLink = (code: string, id: string) => {
+    const link = `https://maternalmind.com.pk/subscription?coupon=${encodeURIComponent(code)}`;
+    navigator.clipboard.writeText(link);
+    setCopiedLinkId(id);
+    setTimeout(() => setCopiedLinkId(null), 2000);
   };
 
   /* ─── Render ─── */
@@ -410,7 +475,7 @@ export default function SubscriptionCouponsPage() {
                     Code
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Discount
+                    Discount / Duration
                   </th>
                   <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Uses
@@ -446,20 +511,25 @@ export default function SubscriptionCouponsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5">
-                          {c.discountType === "percentage" ? (
-                            <Percent className="w-3.5 h-3.5 text-emerald-500" />
-                          ) : (
-                            <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
-                          )}
-                          <span className="text-sm font-medium text-gray-900">
-                            {c.discountType === "percentage"
-                              ? `${c.discountValue}%`
-                              : `${c.currency} ${c.discountValue}`}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {c.discountType === "percentage" ? "off" : "off"}
-                          </span>
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1.5">
+                            {c.discountType === "percentage" ? (
+                              <Percent className="w-3.5 h-3.5 text-emerald-500" />
+                            ) : (
+                              <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
+                            )}
+                            <span className="text-sm font-medium text-gray-900">
+                              {c.discountType === "percentage"
+                                ? `${c.discountValue}%`
+                                : `${c.currency} ${c.discountValue}`}
+                            </span>
+                            <span className="text-xs text-gray-400">off</span>
+                          </div>
+                          {c.durationDaysOverride ? (
+                            <span className="text-xs text-purple-600 font-medium">
+                              Duration: {c.durationDaysOverride} days
+                            </span>
+                          ) : null}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -501,24 +571,58 @@ export default function SubscriptionCouponsPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => copyCode(c.code, c.id)}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-700 hover:text-primary-600 bg-gray-50 hover:bg-primary-50 border border-gray-200 rounded-lg transition-colors"
+                            title="Copy Code"
+                          >
+                            {copiedCodeId === c.id ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-green-600" />
+                                <span className="text-green-600">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                <span>Copy Code</span>
+                              </>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => copyShareLink(c.code, c.id)}
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-700 hover:text-primary-600 bg-gray-50 hover:bg-primary-50 border border-gray-200 rounded-lg transition-colors"
+                            title="Copy Share Link"
+                          >
+                            {copiedLinkId === c.id ? (
+                              <>
+                                <Check className="w-3.5 h-3.5 text-green-600" />
+                                <span className="text-green-600">Link Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <LinkIcon className="w-3.5 h-3.5" />
+                                <span>Copy Link</span>
+                              </>
+                            )}
+                          </button>
                           <button
                             onClick={() => toggleActive(c)}
-                            className={`p-2 rounded-lg text-xs font-medium ${c.isActive ? "text-amber-600 hover:bg-amber-50" : "text-green-600 hover:bg-green-50"}`}
+                            className={`px-2 py-1 rounded-lg text-xs font-medium ${c.isActive ? "text-amber-600 hover:bg-amber-50" : "text-green-600 hover:bg-green-50"}`}
                             title={c.isActive ? "Deactivate" : "Activate"}
                           >
                             {c.isActive ? "Disable" : "Enable"}
                           </button>
                           <button
                             onClick={() => openEdit(c)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                             title="Edit"
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(c)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -656,6 +760,64 @@ export default function SubscriptionCouponsPage() {
                   </div>
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Access Duration Override (Days) — e.g. 14, 30, 90, 365. Leave empty to default to package duration
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={form.durationDaysOverride}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      durationDaysOverride:
+                        e.target.value === "" ? "" : parseInt(e.target.value),
+                    })
+                  }
+                  placeholder="e.g. 14, 30, 90, 365 (Leave empty for package default)"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Target Packages (Applicable Packages)
+                </label>
+                <div className="space-y-1.5 max-h-36 overflow-y-auto border border-gray-200 rounded-xl p-2.5 bg-gray-50/50">
+                  {packages.length === 0 ? (
+                    <p className="text-xs text-gray-400">All packages (or loading packages…)</p>
+                  ) : (
+                    packages.map((pkg) => {
+                      const isSelected = form.applicablePackages.includes(pkg.id);
+                      return (
+                        <label
+                          key={pkg.id}
+                          className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100/70 p-1 rounded"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              const next = e.target.checked
+                                ? [...form.applicablePackages, pkg.id]
+                                : form.applicablePackages.filter((id) => id !== pkg.id);
+                              setForm({ ...form, applicablePackages: next });
+                            }}
+                            className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="font-medium">{pkg.name}</span>
+                          <span className="text-xs text-gray-400 font-mono">({pkg.code})</span>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Leave empty to make valid for all packages.
+                </p>
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -860,6 +1022,64 @@ export default function SubscriptionCouponsPage() {
                     className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Access Duration Override (Days) — e.g. 14, 30, 90, 365. Leave empty to default to package duration
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={bulkForm.durationDaysOverride}
+                  onChange={(e) =>
+                    setBulkForm({
+                      ...bulkForm,
+                      durationDaysOverride:
+                        e.target.value === "" ? "" : parseInt(e.target.value),
+                    })
+                  }
+                  placeholder="e.g. 14, 30, 90, 365 (Leave empty for package default)"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Target Packages (Applicable Packages)
+                </label>
+                <div className="space-y-1.5 max-h-36 overflow-y-auto border border-gray-200 rounded-xl p-2.5 bg-gray-50/50">
+                  {packages.length === 0 ? (
+                    <p className="text-xs text-gray-400">All packages (or loading packages…)</p>
+                  ) : (
+                    packages.map((pkg) => {
+                      const isSelected = bulkForm.applicablePackages.includes(pkg.id);
+                      return (
+                        <label
+                          key={pkg.id}
+                          className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100/70 p-1 rounded"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              const next = e.target.checked
+                                ? [...bulkForm.applicablePackages, pkg.id]
+                                : bulkForm.applicablePackages.filter((id) => id !== pkg.id);
+                              setBulkForm({ ...bulkForm, applicablePackages: next });
+                            }}
+                            className="w-4 h-4 rounded text-primary-500 focus:ring-primary-500"
+                          />
+                          <span className="font-medium">{pkg.name}</span>
+                          <span className="text-xs text-gray-400 font-mono">({pkg.code})</span>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Leave empty to apply to all packages.
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
