@@ -30,6 +30,7 @@ interface Book {
   progress: number;
   imageUrl?: string;
   isPremium?: boolean;
+  isPaid?: boolean;
 }
 
 export default function LearnScreen() {
@@ -57,57 +58,61 @@ export default function LearnScreen() {
     setRefreshing(false);
   }, [refetch]);
 
-  const renderBook = ({ item, index }: { item: Book; index: number }) => (
-    <GlassCard
-      title={item.title}
-      subtitle={`${item.chaptersCount} Chapters`}
-      density="compact"
-      titleNumberOfLines={2}
-      subtitleNumberOfLines={1}
-      onPress={() =>
-        navigation.navigate("Chapters", {
-          bookId: item.id,
-          bookTitle: item.title,
-        })
-      }
-      icon={<Feather name="book-open" size={24} color={theme.primary} />}
-      rightElement={
-        <View
-          style={[
-            styles.badge,
-            item.isPremium
-              ? { backgroundColor: theme.warningGlow }
-              : { backgroundColor: `${theme.success}26` },
-          ]}
-        >
-          <Feather
-            name={item.isPremium ? "star" : "unlock"}
-            size={10}
-            color={item.isPremium ? theme.warning : theme.success}
-          />
-          <ThemedText
+  const renderBook = ({ item, index }: { item: Book; index: number }) => {
+    const isPaid = Boolean(item.isPaid || item.isPremium);
+
+    return (
+      <GlassCard
+        title={item.title}
+        subtitle={`${item.chaptersCount} Chapters`}
+        density="compact"
+        titleNumberOfLines={2}
+        subtitleNumberOfLines={1}
+        onPress={() =>
+          navigation.navigate("Chapters", {
+            bookId: item.id,
+            bookTitle: item.title,
+          })
+        }
+        icon={<Feather name="book-open" size={24} color={theme.primary} />}
+        rightElement={
+          <View
             style={[
-              styles.badgeText,
-              { color: item.isPremium ? theme.warning : theme.success },
+              styles.badge,
+              isPaid
+                ? { backgroundColor: theme.warningGlow }
+                : { backgroundColor: `${theme.success}26` },
             ]}
           >
-            {item.isPremium ? "Premium" : "Free"}
+            <Feather
+              name={isPaid ? "star" : "unlock"}
+              size={10}
+              color={isPaid ? theme.warning : theme.success}
+            />
+            <ThemedText
+              style={[
+                styles.badgeText,
+                { color: isPaid ? theme.warning : theme.success },
+              ]}
+            >
+              {isPaid ? "Premium" : "Free"}
+            </ThemedText>
+          </View>
+        }
+        testID={`card-book-${item.id}`}
+        style={{ marginBottom: Spacing.sm }}
+      >
+        <View style={styles.progressContainer}>
+          <ProgressBar progress={item.progress} height={6} />
+          <ThemedText
+            style={[styles.progressText, { color: theme.textSecondary }]}
+          >
+            {item.progress}% Complete
           </ThemedText>
         </View>
-      }
-      testID={`card-book-${item.id}`}
-      style={{ marginBottom: Spacing.sm }}
-    >
-      <View style={styles.progressContainer}>
-        <ProgressBar progress={item.progress} height={6} />
-        <ThemedText
-          style={[styles.progressText, { color: theme.textSecondary }]}
-        >
-          {item.progress}% Complete
-        </ThemedText>
-      </View>
-    </GlassCard>
-  );
+      </GlassCard>
+    );
+  };
 
   const renderEmpty = () => (
     <EmptyState

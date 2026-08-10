@@ -119,12 +119,6 @@ export default function RootStackNavigator() {
 
   const requiresEmailVerification = user && !user.isEmailVerified;
 
-  // Hard paywall: a user only reaches the app when they have an active
-  // subscription. The (expiry-aware) server status is the single source of
-  // truth — manual payments are approved by an admin server-side, which flips
-  // the user's subscription status. refreshUser() re-checks after approval.
-  const hasActiveSubscription = user?.subscriptionStatus === "active";
-
   if (authLoading || onboardingLoading) {
     return (
       <View
@@ -151,81 +145,6 @@ export default function RootStackNavigator() {
               headerTransparent: true,
             }}
           />
-        ) : !hasActiveSubscription ? (
-          <>
-            <Stack.Screen
-              name="Paywall"
-              component={PaywallScreen}
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerTitle: "",
-                headerBackVisible: false,
-                gestureEnabled: false,
-                headerRight: () => (
-                  <Pressable
-                    onPress={logout}
-                    hitSlop={8}
-                    style={{ paddingHorizontal: 4 }}
-                  >
-                    <ThemedText
-                      style={{ color: theme.primary, fontWeight: "600" }}
-                    >
-                      Sign Out
-                    </ThemedText>
-                  </Pressable>
-                ),
-              }}
-            />
-            <Stack.Screen
-              name="Subscription"
-              component={SubscriptionScreen}
-              options={{
-                headerTitle: t("Subscription"),
-                presentation: "card",
-              }}
-            />
-            <Stack.Screen
-              name="Purchase"
-              component={PurchaseScreen}
-              options={{
-                headerTitle: t("Payment Details"),
-                presentation: "card",
-              }}
-            />
-            <Stack.Screen
-              name="PaymentProofUpload"
-              component={PaymentProofUploadScreen}
-              options={{
-                headerTitle: t("Upload Payment Proof"),
-                presentation: "card",
-              }}
-            />
-            <Stack.Screen
-              name="PendingApproval"
-              component={PendingApprovalScreen}
-              options={{
-                headerShown: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="PurchaseSuccess"
-              component={PurchaseSuccessScreen}
-              options={{
-                headerShown: false,
-                gestureEnabled: false,
-              }}
-            />
-            <Stack.Screen
-              name="PurchaseFailed"
-              component={PurchaseFailedScreen}
-              options={{
-                headerTitle: t("Payment Failed"),
-                presentation: "card",
-              }}
-            />
-          </>
         ) : (
           <>
             <Stack.Screen

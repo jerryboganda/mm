@@ -12,6 +12,7 @@ import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/lib/auth";
 import { LearnStackParamList } from "@/navigation/LearnStackNavigator";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useBottomLayout } from "@/hooks/useBottomLayout";
@@ -25,8 +26,9 @@ interface Topic {
   description: string;
   isCompleted: boolean;
   isBookmarked: boolean;
-  isLocked: boolean;
-  isPremium: boolean;
+  isLocked?: boolean;
+  isPremium?: boolean;
+  isPaid?: boolean;
   order: number;
 }
 
@@ -37,6 +39,7 @@ export default function TopicsScreen() {
   const { chapterId, chapterTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
+  const { user } = useAuth();
   const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
 
   const {
@@ -56,62 +59,72 @@ export default function TopicsScreen() {
     setRefreshing(false);
   }, [refetch]);
 
-  const renderTopic = ({ item, index }: { item: Topic; index: number }) => (
-    <GlassCard
-      title={item.title}
-      subtitle={item.description}
-      density="compact"
-      titleNumberOfLines={2}
-      subtitleNumberOfLines={1}
-      onPress={() => {
-        if (!item.isLocked) {
-          navigation.navigate("TopicReader", {
-            topicId: item.id,
-            topicTitle: item.title,
-          });
+  const renderTopic = ({ item, index }: { item: Topic; index: number }) => {
+    const isPaid = Boolean(item.isPaid || item.isPremium);
+
+    return (
+      <GlassCard
+        title={item.title}
+        subtitle={item.description}
+        density="compact"
+        titleNumberOfLines={2}
+        subtitleNumberOfLines={1}
+        onPress={() => {
+          const hasActiveSubscription = user?.subscriptionStatus === "active";
+          if (isPaid && !hasActiveSubscription) {
+            navigation.navigate("Paywall");
+          } else {
+            navigation.navigate("TopicReader", {
+              topicId: item.id,
+              topicTitle: item.title,
+            });
+          }
+        }}
+        icon={
+          item.isCompleted ? (
+            <View
+              style={[styles.completedIcon, { backgroundColor: theme.success }]}
+            >
+              <Feather name="check" size={20} color="#fff" />
+            </View>
+          ) : (
+            <Feather name="file-text" size={24} color={theme.primary} />
+          )
         }
-      }}
-      icon={
-        item.isLocked ? (
-          <View
-            style={[
-              styles.lockedIcon,
-              { backgroundColor: theme.glass, borderColor: theme.glassBorder },
-            ]}
-          >
-            <Feather name="lock" size={18} color={theme.textMuted} />
-          </View>
-        ) : item.isCompleted ? (
-          <View
-            style={[styles.completedIcon, { backgroundColor: theme.success }]}
-          >
-            <Feather name="check" size={20} color="#fff" />
-          </View>
-        ) : (
-          <Feather name="file-text" size={24} color={theme.primary} />
-        )
-      }
-      rightElement={
-        <View style={styles.rightElements}>
-          {item.isPremium && (
+        rightElement={
+          <View style={styles.rightElements}>
             <View
               style={[
-                styles.premiumBadge,
-                { backgroundColor: theme.warningGlow },
+                styles.badge,
+                isPaid
+                  ? { backgroundColor: theme.warningGlow }
+                  : { backgroundColor: `${theme.success}26` },
               ]}
             >
-              <Feather name="star" size={10} color={theme.warning} />
+              <Feather
+                name={isPaid ? "star" : "unlock"}
+                size={10}
+                color={isPaid ? theme.warning : theme.success}
+              />
+              <ThemedText
+                style={[
+                  styles.badgeText,
+                  { color: isPaid ? theme.warning : theme.success },
+                ]}
+              >
+                {isPaid ? "Premium" : "Free"}
+              </ThemedText>
             </View>
-          )}
-          {item.isBookmarked && (
-            <Feather name="bookmark" size={20} color={theme.primary} />
-          )}
-        </View>
-      }
-      testID={`card-topic-${item.id}`}
-      style={[styles.topicCard, item.isLocked && styles.lockedCard]}
-    />
-  );
+            {item.isBookmarked && (
+              <Feather name="bookmark" size={20} color={theme.primary} />
+            )}
+          </View>
+        }
+        testID={`card-topic-${item.id}`}
+        style={styles.topicCard}
+      />
+    );
+  };
 
   const renderLoading = () => (
     <View>
@@ -205,11 +218,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Spacing.sm,
   },
-  premiumBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  badge: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "600",
+    marginLeft: 4,
   },
 });
