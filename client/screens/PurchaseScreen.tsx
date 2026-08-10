@@ -78,8 +78,17 @@ export default function PurchaseScreen() {
   const route = useRoute<PurchaseScreenRouteProp>();
   const { theme } = useTheme();
 
-  const { packageId, priceId, packageName, price, currency, billingCycle } =
-    route.params;
+  const {
+    packageId,
+    priceId,
+    packageName,
+    price,
+    currency,
+    billingCycle,
+    couponId,
+    couponCode,
+    discountedPrice,
+  } = route.params;
 
   const { data, isLoading } = useQuery<{ instructions: PaymentInstructions }>({
     queryKey: ["/api/subscriptions/payment-instructions"],
@@ -110,6 +119,9 @@ export default function PurchaseScreen() {
       packageName,
       price,
       currency,
+      couponId,
+      couponCode,
+      discountedPrice,
     });
   };
 
@@ -164,6 +176,22 @@ export default function PurchaseScreen() {
           <ThemedText style={[styles.summaryCycle, { color: theme.textMuted }]}>
             {CYCLE_LABELS[billingCycle] ?? ""}
           </ThemedText>
+          {couponCode ? (
+            <View
+              style={[
+                styles.couponBannerRow,
+                {
+                  backgroundColor: `${theme.success}18`,
+                  borderColor: `${theme.success}40`,
+                },
+              ]}
+            >
+              <Feather name="tag" size={14} color={theme.success} />
+              <ThemedText style={[styles.couponBannerText, { color: theme.success }]}>
+                Coupon <ThemedText style={{ fontWeight: "700", color: theme.success }}>{couponCode}</ThemedText> Applied
+              </ThemedText>
+            </View>
+          ) : null}
         </GlassCard>
 
         <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
@@ -361,4 +389,17 @@ const styles = StyleSheet.create({
   },
   noteText: { flex: 1, fontSize: 13, lineHeight: 19 },
   uploadButton: { marginTop: Spacing.md },
+  couponBannerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    marginTop: Spacing.md,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+  },
+  couponBannerText: {
+    fontSize: 13,
+  },
 });

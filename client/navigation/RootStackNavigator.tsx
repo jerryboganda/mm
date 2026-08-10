@@ -84,6 +84,9 @@ export type RootStackParamList = {
     price: string;
     currency: string;
     billingCycle: string;
+    couponId?: string;
+    couponCode?: string;
+    discountedPrice?: string;
   };
   PaymentProofUpload: {
     packageId: string;
@@ -91,6 +94,9 @@ export type RootStackParamList = {
     packageName: string;
     price: string;
     currency: string;
+    couponId?: string;
+    couponCode?: string;
+    discountedPrice?: string;
   };
   PendingApproval: undefined;
   PurchaseSuccess: undefined;
