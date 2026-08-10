@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -144,9 +144,18 @@ export default function TopicReaderScreen() {
     anchorSpacing: Spacing.lg,
   });
 
-  const { data: topic, isLoading } = useQuery<TopicDetail>({
+  const { data: topic, isLoading, error } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
   });
+
+  useEffect(() => {
+    if (error) {
+      const errStr = String((error as Error)?.message || error);
+      if (errStr.includes("403") || errStr.includes("SUBSCRIPTION_REQUIRED")) {
+        navigation.navigate("Paywall");
+      }
+    }
+  }, [error, navigation]);
 
   /* ─── HTML rendering configuration for react-native-render-html ─── */
   const htmlTagsStyles = useMemo(

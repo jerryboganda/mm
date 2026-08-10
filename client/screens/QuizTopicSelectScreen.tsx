@@ -13,6 +13,7 @@ import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/lib/auth";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useBottomLayout } from "@/hooks/useBottomLayout";
 
@@ -26,6 +27,7 @@ interface QuizTopic {
   title: string;
   chapterTitle: string;
   questionCount: number;
+  isPaid?: boolean;
 }
 
 export default function QuizTopicSelectScreen() {
@@ -33,6 +35,7 @@ export default function QuizTopicSelectScreen() {
   const navigation = useNavigation<QuizTopicSelectNavigationProp>();
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const { theme } = useTheme();
+  const { user } = useAuth();
   const bottomLayout = useBottomLayout({
     footerHeight: 58,
     footerSpacing: Spacing["2xl"],
@@ -47,6 +50,13 @@ export default function QuizTopicSelectScreen() {
 
   const handleStartQuiz = () => {
     if (selectedTopicId) {
+      const selectedTopic = topics?.find((t) => t.id === selectedTopicId);
+      const hasActiveSubscription = user?.subscriptionStatus === "active";
+      if (selectedTopic?.isPaid && !hasActiveSubscription) {
+        navigation.navigate("Paywall");
+        return;
+      }
+
       navigation.navigate("QuizPlayer", {
         mode: "topic",
         topicId: selectedTopicId,
@@ -54,25 +64,60 @@ export default function QuizTopicSelectScreen() {
     }
   };
 
-  const renderTopic = ({ item }: { item: QuizTopic }) => (
-    <GlassCard
-      title={item.title}
-      subtitle={`${item.chapterTitle} • ${item.questionCount} questions`}
-      onPress={() => setSelectedTopicId(item.id)}
-      active={selectedTopicId === item.id}
-      icon={
-        <Feather
-          name="file-text"
-          size={24}
-          color={
-            selectedTopicId === item.id ? theme.primary : theme.textSecondary
+  const renderTopic = ({ item }: { item: QuizTopic }) => {
+    const isPaid = Boolean(item.isPaid);
+
+    return (
+      <GlassCard
+        title={item.title}
+        subtitle={`${item.chapterTitle} • ${item.questionCount} questions`}
+        onPress={() => {
+          const hasActiveSubscription = user?.subscriptionStatus === "active";
+          if (isPaid && !hasActiveSubscription) {
+            navigation.navigate("Paywall");
+          } else {
+            setSelectedTopicId(item.id);
           }
-        />
-      }
-      testID={`card-topic-${item.id}`}
-      style={{ marginBottom: Spacing.md }}
-    />
-  );
+        }}
+        active={selectedTopicId === item.id}
+        icon={
+          <Feather
+            name="file-text"
+            size={24}
+            color={
+              selectedTopicId === item.id ? theme.primary : theme.textSecondary
+            }
+          />
+        }
+        rightElement={
+          <View
+            style={[
+              styles.badge,
+              isPaid
+                ? { backgroundColor: theme.warningGlow }
+                : { backgroundColor: `${theme.success}26` },
+            ]}
+          >
+            <Feather
+              name={isPaid ? "star" : "unlock"}
+              size={10}
+              color={isPaid ? theme.warning : theme.success}
+            />
+            <ThemedText
+              style={[
+                styles.badgeText,
+                { color: isPaid ? theme.warning : theme.success },
+              ]}
+            >
+              {isPaid ? "Premium" : "Free"}
+            </ThemedText>
+          </View>
+        }
+        testID={`card-topic-${item.id}`}
+        style={{ marginBottom: Spacing.md }}
+      />
+    );
+  };
 
   const renderLoading = () => (
     <View>
@@ -157,5 +202,17 @@ const styles = StyleSheet.create({
     right: Spacing.lg,
     bottom: 0,
     paddingTop: Spacing.lg,
+  },
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "600",
+    marginLeft: 4,
   },
 });

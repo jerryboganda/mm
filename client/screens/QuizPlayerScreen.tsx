@@ -78,7 +78,7 @@ export default function QuizPlayerScreen() {
   const warned60Ref = useRef(false);
   const warned30Ref = useRef(false);
 
-  const { data: quizData, isLoading } = useQuery<QuizData>({
+  const { data: quizData, isLoading, error } = useQuery<QuizData>({
     queryKey: [
       "/api/quiz/start",
       mode === "exam" ? "mixed" : mode,
@@ -99,6 +99,15 @@ export default function QuizPlayerScreen() {
     },
   });
 
+  useEffect(() => {
+    if (error) {
+      const errStr = String((error as Error)?.message || error);
+      if (errStr.includes("403") || errStr.includes("SUBSCRIPTION_REQUIRED")) {
+        navigation.navigate("Paywall");
+      }
+    }
+  }, [error, navigation]);
+
   const submitMutation = useMutation({
     mutationFn: async (data: {
       quizId: string;
@@ -115,6 +124,12 @@ export default function QuizPlayerScreen() {
       queryClient.invalidateQueries({ queryKey: ["/api/quiz/start", "wrong"] });
       queryClient.invalidateQueries({ queryKey: ["/api/attempts"] });
       navigation.replace("QuizResults", { resultId: result.id });
+    },
+    onError: (err: Error) => {
+      const errStr = String(err?.message || err);
+      if (errStr.includes("403") || errStr.includes("SUBSCRIPTION_REQUIRED")) {
+        navigation.navigate("Paywall");
+      }
     },
   });
 
