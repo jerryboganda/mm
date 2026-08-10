@@ -731,6 +731,7 @@ export const coupons = pgTable(
       precision: 12,
       scale: 2,
     }),
+    durationDaysOverride: integer("duration_days_override"),
     // Applicability: null = all packages/add-ons, otherwise JSON arrays of IDs
     applicablePackageIds: jsonb("applicable_package_ids"),
     applicableAddOnIds: jsonb("applicable_add_on_ids"),
