@@ -1,10 +1,49 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
-import TipTapEditor from '../components/TipTapEditor';
+import BlockEditor, { ContentBlock } from '../components/BlockEditor';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, Search, Upload,
   Loader2, AlertCircle, ClipboardList, X, Download,
 } from 'lucide-react';
+
+function parseExplanationToBlocks(explanationStr: string | null | undefined): ContentBlock[] {
+  if (!explanationStr || !explanationStr.trim()) {
+    return [{ id: `block-${Date.now()}-0`, type: 'text', content: '', order: 0 }];
+  }
+  const trimmed = explanationStr.trim();
+  if (trimmed.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((b: any, idx: number) => ({
+          id: b.id || `block-${Date.now()}-${idx}`,
+          type: b.type || 'text',
+          content: b.content || '',
+          order: typeof b.order === 'number' ? b.order : idx,
+        }));
+      }
+    } catch {
+      // Fallback to text block if JSON parsing fails
+    }
+  }
+  return [{ id: `block-${Date.now()}-0`, type: 'text', content: explanationStr, order: 0 }];
+}
+
+function serializeBlocksToExplanation(blocks: ContentBlock[]): string {
+  const activeBlocks = blocks.filter((b) => {
+    if (!b.content) return false;
+    if (b.type === 'text' || b.type === 'html') {
+      return b.content.replace(/<[^>]*>/g, '').trim().length > 0;
+    }
+    return b.content.trim().length > 0;
+  });
+
+  if (activeBlocks.length === 0) return '';
+  if (activeBlocks.length === 1 && (activeBlocks[0].type === 'text' || activeBlocks[0].type === 'html')) {
+    return activeBlocks[0].content;
+  }
+  return JSON.stringify(activeBlocks);
+}
 
 interface MCQ {
   id: string;
@@ -46,6 +85,7 @@ export default function McqsPage() {
     optA: '', optB: '', optC: '', optD: '', optE: '',
     correctAnswer: 'A',
     explanation: '',
+    explanationBlocks: [] as ContentBlock[],
     explA: '', explB: '', explC: '', explD: '', explE: '',
     difficulty: 'medium',
     references: '',
@@ -97,7 +137,7 @@ export default function McqsPage() {
     setEditMcq(null);
     setForm({
       topicId: filterTopic || '', question: '', optA: '', optB: '', optC: '', optD: '', optE: '',
-      correctAnswer: 'A', explanation: '', explA: '', explB: '', explC: '', explD: '', explE: '',
+      correctAnswer: 'A', explanation: '', explanationBlocks: parseExplanationToBlocks(''), explA: '', explB: '', explC: '', explD: '', explE: '',
       difficulty: 'medium', references: '', tags: '', isPaid: false,
     });
     setShowForm(true);
@@ -114,6 +154,7 @@ export default function McqsPage() {
       optA: opts?.A || '', optB: opts?.B || '', optC: opts?.C || '', optD: opts?.D || '', optE: opts?.E || '',
       correctAnswer: m.correctAnswer,
       explanation: m.explanation || '',
+      explanationBlocks: parseExplanationToBlocks(m.explanation),
       explA: optExpls?.A || '', explB: optExpls?.B || '', explC: optExpls?.C || '', explD: optExpls?.D || '', explE: optExpls?.E || '',
       difficulty: m.difficulty,
       references: (m as any).references || '',
@@ -144,7 +185,7 @@ export default function McqsPage() {
       question: form.question,
       options,
       correctAnswer: form.correctAnswer,
-      explanation: form.explanation || undefined,
+      explanation: serializeBlocksToExplanation(form.explanationBlocks) || undefined,
       optionExplanations: Object.keys(optionExplanations).length > 0 ? optionExplanations : undefined,
       difficulty: form.difficulty,
       references: form.references || undefined,
@@ -354,14 +395,11 @@ export default function McqsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1 font-semibold">
                   General Explanation (Rich Text / Tables / Diagrams / Formulas / Images)
                 </label>
-                <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-                  <TipTapEditor
-                    content={form.explanation}
-                    onChange={(html) => setForm((prev) => ({ ...prev, explanation: html }))}
-                    placeholder="Write detailed explanation here... (supports rich text formatting, medical tables, formulas, and images)"
-                    uploadImage={uploadImage}
-                  />
-                </div>
+                <BlockEditor
+                  blocks={form.explanationBlocks}
+                  onChange={(blocks) => setForm((prev) => ({ ...prev, explanationBlocks: blocks }))}
+                  uploadImage={uploadImage}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
