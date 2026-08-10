@@ -153,6 +153,7 @@ export const topics = pgTable(
     description: text("description"),
     order: integer("order").default(0),
     isPublished: boolean("is_published").default(false),
+    isPaid: boolean("is_paid").default(false).notNull(),
     author: text("author"),
     source: text("source"),
     references: text("references"),
@@ -215,7 +216,8 @@ export const mcqs = pgTable("mcqs", {
   // Optional explanation figures: [{ url: string, caption?: string }]
   // Additive/nullable so existing rows and callers are unaffected.
   images: jsonb("images"),
-  isPublished: boolean("is_published").default(false),
+  isPublished: boolean("is_published").default(true),
+  isPaid: boolean("is_paid").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
