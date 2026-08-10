@@ -15,6 +15,13 @@ RUN npm ci --legacy-peer-deps
 RUN npm run build
 WORKDIR /app
 
+# ── Build marketing website SPA ──
+WORKDIR "/app/Maternal Mind Website"
+RUN npm ci --legacy-peer-deps
+RUN npx vite build
+RUN mkdir -p /app/website_dist && cp -r dist/public/* /app/website_dist/
+WORKDIR /app
+
 # ── Production stage ──
 FROM node:20-alpine
 
@@ -34,6 +41,7 @@ COPY --from=builder /app/server_dist ./server_dist
 COPY --from=builder /app/server/templates ./server/templates
 COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/web_dist ./web_dist
+COPY --from=builder /app/website_dist ./website_dist
 COPY --from=builder /app/static-build ./static-build
 COPY --from=builder /app/admin_dist ./admin_dist
 COPY --from=builder /app/app.json ./app.json

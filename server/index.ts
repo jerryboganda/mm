@@ -6,6 +6,7 @@ import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { pool, ensureDatabaseConnection } from "./db";
 import { logger } from "./lib/logger";
+import { getObjectFromMinIO } from "./lib/s3";
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
@@ -390,10 +391,19 @@ function configureExpoAndLanding(app: express.Application) {
   app.use(
     "/uploads/content-images",
     express.static(uploadsPath, {
-      fallthrough: false,
+      fallthrough: true,
       immutable: true,
       maxAge: "30d",
     }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const filename = path.basename(req.path);
+      const minioRes = await getObjectFromMinIO(`uploads/content-images/${filename}`);
+      if (minioRes?.body) {
+        if (minioRes.contentType) res.setHeader("Content-Type", minioRes.contentType);
+        return (minioRes.body as any).pipe(res);
+      }
+      next();
+    },
   );
 
   const paymentProofsPath = path.resolve(
@@ -405,10 +415,19 @@ function configureExpoAndLanding(app: express.Application) {
   app.use(
     "/uploads/payment-proofs",
     express.static(paymentProofsPath, {
-      fallthrough: false,
+      fallthrough: true,
       immutable: true,
       maxAge: "30d",
     }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const filename = path.basename(req.path);
+      const minioRes = await getObjectFromMinIO(`uploads/payment-proofs/${filename}`);
+      if (minioRes?.body) {
+        if (minioRes.contentType) res.setHeader("Content-Type", minioRes.contentType);
+        return (minioRes.body as any).pipe(res);
+      }
+      next();
+    },
   );
   app.use("/assets", express.static(path.resolve(process.cwd(), "assets")));
   app.use(express.static(path.resolve(process.cwd(), "static-build")));

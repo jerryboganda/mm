@@ -18,6 +18,7 @@ import { db } from "../db";
 import { getPaymentInstructions } from "../services/payment-settings";
 import { sendProofReceivedEmail } from "../services/subscription-emails";
 import { logger } from "../lib/logger";
+import { uploadToMinIO } from "../lib/s3";
 
 const router = Router();
 
@@ -540,6 +541,12 @@ router.post(
       if (!pkg) {
         return res.status(404).json({ message: "Package not found" });
       }
+
+      await uploadToMinIO(
+        `uploads/payment-proofs/${req.file.filename}`,
+        req.file.path,
+        req.file.mimetype,
+      );
 
       const proofObj = {
         id: crypto.randomUUID(),
