@@ -9,6 +9,7 @@ import {
   resolveCorrectLabel,
 } from "../lib/mcq-options";
 import { logger } from "../lib/logger";
+import { effectiveSubscriptionStatus } from "../lib/subscription-status";
 
 const router = Router();
 
@@ -41,6 +42,26 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
       Math.max(parseInt(req.query.count as string) || 10, 1),
       50, // cap at 50
     );
+
+    const user = await storage.getUser(req.userId!);
+    const subscriptionStatus = effectiveSubscriptionStatus(
+      user?.subscriptionStatus,
+      user?.subscriptionExpiresAt,
+    );
+    const hasActiveSubscription = subscriptionStatus === "active";
+
+    if (mode === "topic" && topicId) {
+      const topic = await storage.getTopic(topicId);
+      if (topic?.isPaid && !hasActiveSubscription) {
+        return res.status(403).json({
+          code: "SUBSCRIPTION_REQUIRED",
+          message: "This material requires an active Premium subscription.",
+          topicId: topic.id,
+          topicTitle: topic.title,
+        });
+      }
+    }
+
     let questions: MCQ[] = [];
 
     if (mode === "topic" && topicId) {
@@ -51,21 +72,34 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
       questions = await storage.getMCQs(questionCount);
     }
 
-    const shuffledQuestions = questions
-      .sort(() => Math.random() - 0.5)
-      .slice(0, questionCount)
-      .map((q) => ({
-        id: q.id,
-        question: q.question,
-        options: normalizeOptions(q.options),
-        difficulty: q.difficulty,
-      }));
+    if (!hasActiveSubscription) {
+      questions = questions.filter((q) => !q.isPaid);
+      if (questions.length === 0) {
+        return res.status(403).json({
+          code: "SUBSCRIPTION_REQUIRED",
+          message: "This material requires an active Premium subscription.",
+        });
+      }
+    }
+
+    const isTopicMode = mode === "topic";
+    const selectedQuestions = isTopicMode
+      ? questions
+      : [...questions].sort(() => Math.random() - 0.5).slice(0, questionCount);
+
+    const formattedQuestions = selectedQuestions.map((q) => ({
+      id: q.id,
+      question: q.question,
+      options: normalizeOptions(q.options),
+      difficulty: q.difficulty,
+      isPaid: q.isPaid ?? false,
+    }));
 
     res.json({
       quizId: `quiz-${Date.now()}`,
-      questions: shuffledQuestions,
-      questionCount,
-      timeLimit: questionCount, // 1 minute per question
+      questions: formattedQuestions,
+      questionCount: formattedQuestions.length,
+      timeLimit: Math.max(formattedQuestions.length, 1), // 1 minute per question
     });
   } catch (error) {
     logger.error("Start quiz error", { error: String(error) });
@@ -88,11 +122,40 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
       return res.status(400).json({ message: "Quiz mode is required" });
     }
 
+    const user = await storage.getUser(req.userId!);
+    const subscriptionStatus = effectiveSubscriptionStatus(
+      user?.subscriptionStatus,
+      user?.subscriptionExpiresAt,
+    );
+    const hasActiveSubscription = subscriptionStatus === "active";
+
+    if (!hasActiveSubscription) {
+      if (topicId) {
+        const topic = await storage.getTopic(topicId);
+        if (topic?.isPaid) {
+          return res.status(403).json({
+            code: "SUBSCRIPTION_REQUIRED",
+            message: "This material requires an active Premium subscription.",
+            topicId: topic.id,
+            topicTitle: topic.title,
+          });
+        }
+      }
+    }
+
     const answerEntries = Object.entries(answers as Record<string, string>);
 
     // Batch-fetch all MCQs in one query instead of N individual fetches
     const mcqIds = answerEntries.map(([mcqId]) => mcqId);
     const allMcqs = await storage.getMCQsByIds(mcqIds);
+
+    if (!hasActiveSubscription && allMcqs.some((m) => m.isPaid)) {
+      return res.status(403).json({
+        code: "SUBSCRIPTION_REQUIRED",
+        message: "This material requires an active Premium subscription.",
+      });
+    }
+
     const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
 
     let correctCount = 0;
