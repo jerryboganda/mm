@@ -7,6 +7,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { authMiddleware, type AuthRequest } from "../middleware";
 import { subscriptionService } from "../services/subscription-service";
 import { couponService } from "../services/coupon-service";
+import { z } from "zod";
 import {
   validateCouponSchema,
   submitPaymentProofSchema,
@@ -297,42 +298,86 @@ router.get("/invoices/:id", authMiddleware, async (req: AuthRequest, res) => {
 /**
  * POST /validate-coupon
  * Validate a coupon code for the current user.
- * Body: { code, packageId? }
- * Returns: { valid, discountAmount, discountedPrice, error }
+ * Body: { code: string, packageId: string, priceId?: string }
  */
 router.post(
   "/validate-coupon",
   authMiddleware,
   async (req: AuthRequest, res) => {
     try {
-      const parsed = validateCouponSchema.safeParse(req.body);
-      if (!parsed.success) {
+      const { code, packageId, priceId } = req.body || {};
+      if (!code || typeof code !== "string" || !code.trim()) {
         return res.status(400).json({
           valid: false,
-          error: parsed.error.errors[0]?.message || "Invalid request body",
+          message: "Coupon code is required",
+        });
+      }
+      if (!packageId || typeof packageId !== "string") {
+        return res.status(400).json({
+          valid: false,
+          message: "Package ID is required",
         });
       }
 
-      const { code, packageId, addOnId } = parsed.data;
-      const result = await couponService.validateCoupon(
-        code,
-        req.userId!,
+      const result = await couponService.validateCouponDetailed({
+        code: code.trim(),
+        userId: req.userId!,
         packageId,
-        addOnId,
-      );
-
-      res.json({
-        valid: result.valid,
-        discountAmount: result.discountAmount ?? null,
-        discountedPrice: result.discountedPrice ?? null,
-        trialDaysExtension: result.trialDaysExtension ?? null,
-        error: result.error ?? null,
+        priceId: typeof priceId === "string" ? priceId : undefined,
       });
+
+      if (!result.valid) {
+        return res.status(400).json(result);
+      }
+
+      res.json(result);
     } catch (error) {
       logger.error("POST /validate-coupon error", { error: String(error) });
       res.status(500).json({
         valid: false,
-        error: "Failed to validate coupon",
+        message: "Failed to validate coupon",
+      });
+    }
+  },
+);
+
+/**
+ * POST /redeem-free-coupon
+ * Instantly redeem a 100% free access coupon.
+ * Body: { code: string, packageId: string, priceId?: string }
+ */
+router.post(
+  "/redeem-free-coupon",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const { code, packageId, priceId } = req.body || {};
+      if (!code || typeof code !== "string" || !code.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Coupon code is required",
+        });
+      }
+      if (!packageId || typeof packageId !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Package ID is required",
+        });
+      }
+
+      const result = await couponService.redeemFreeCoupon({
+        code: code.trim(),
+        userId: req.userId!,
+        packageId,
+        priceId: typeof priceId === "string" ? priceId : undefined,
+      });
+
+      res.json(result);
+    } catch (error: any) {
+      logger.error("POST /redeem-free-coupon error", { error: String(error) });
+      res.status(400).json({
+        success: false,
+        message: error?.message || "Failed to redeem free coupon",
       });
     }
   },
@@ -459,14 +504,19 @@ router.get("/history", authMiddleware, async (req: AuthRequest, res) => {
 // ══════════════════════════════════════════════════════════════
 
 /**
- * POST /proof
+ * POST /proof & POST /upload-proof
  * Submit a payment-proof image for a package. Multipart form-data:
  * field `proof` (image) + packageId, priceId, amountClaimed?,
- * paymentMethod?, senderReference?, userNote?.
+ * paymentMethod?, senderReference?, userNote?, couponCode?, couponId?.
  * Creates a `pending` manual_payment_proofs row for admin review.
  */
+const uploadProofBodySchema = submitPaymentProofSchema.extend({
+  couponCode: z.string().optional(),
+  couponId: z.string().optional(),
+});
+
 router.post(
-  "/proof",
+  ["/proof", "/upload-proof"],
   authMiddleware,
   (req, res, next) => {
     uploadSingleProof(req, res, (err: unknown) => {
@@ -491,7 +541,7 @@ router.post(
         return res.status(400).json({ message: "Proof image is required" });
       }
 
-      const parsed = submitPaymentProofSchema.safeParse(req.body);
+      const parsed = uploadProofBodySchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({
           message:
@@ -505,6 +555,8 @@ router.post(
         paymentMethod,
         senderReference,
         userNote,
+        couponCode,
+        couponId,
       } = parsed.data;
 
       // Block if the user already has an active subscription
@@ -548,6 +600,14 @@ router.post(
         req.file.mimetype,
       );
 
+      let finalUserNote = userNote ?? null;
+      const appliedCoupon = couponCode || couponId;
+      if (appliedCoupon) {
+        finalUserNote = finalUserNote
+          ? `${finalUserNote} (Coupon applied: ${appliedCoupon})`
+          : `Coupon applied: ${appliedCoupon}`;
+      }
+
       const proofObj = {
         id: crypto.randomUUID(),
         userId,
@@ -558,7 +618,7 @@ router.post(
         currency: null,
         paymentMethod: paymentMethod ?? null,
         senderReference: senderReference ?? null,
-        userNote: userNote ?? null,
+        userNote: finalUserNote,
         proofImageUrl: `/uploads/payment-proofs/${req.file.filename}`,
         proofFilename: req.file.filename,
       };
