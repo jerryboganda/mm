@@ -3,7 +3,7 @@
     "name": "Maternal Mind",
     "slug": "maternalmind",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "maternalmind",
     "userInterfaceStyle": "automatic",
@@ -40,7 +40,7 @@
         "backgroundColor": "#0c1e2e"
       },
       "versionCode": 4,
-      "edgeToEdgeEnabled": true,
+      "supportsTablet": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.maternalmind.app"
     },
@@ -73,7 +73,9 @@
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": false
+            "usesCleartextTraffic": false,
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
           }
         }
       ]
