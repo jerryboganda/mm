@@ -350,10 +350,11 @@ export interface IStorage {
   >;
 
   /**
-   * Retrieve all active, non-expired announcements for display to users.
+   * Retrieve all active, non-expired announcements for display to users (including targeted notifications).
+   * @param userId Optional user ID to include targeted user notifications
    * @returns An array of announcement objects with isRead defaulting to false
    */
-  getAnnouncements(): Promise<
+  getAnnouncements(userId?: string): Promise<
     {
       id: string;
       title: string;
@@ -1559,7 +1560,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   /** @inheritdoc */
-  async getAnnouncements(): Promise<
+  async getAnnouncements(userId?: string): Promise<
     {
       id: string;
       title: string;
@@ -1577,6 +1578,9 @@ export class DatabaseStorage implements IStorage {
         and(
           eq(announcements.isActive, true),
           sql`(${announcements.expiresAt} IS NULL OR ${announcements.expiresAt} > ${now})`,
+          userId
+            ? sql`(${announcements.userId} IS NULL OR ${announcements.userId} = ${userId})`
+            : sql`${announcements.userId} IS NULL`,
         ),
       )
       .orderBy(desc(announcements.createdAt));

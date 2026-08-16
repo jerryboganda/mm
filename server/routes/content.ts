@@ -297,9 +297,9 @@ router.get(
 );
 
 // Announcements for the notification feed
-router.get("/announcements", authMiddleware, async (_req: AuthRequest, res) => {
+router.get("/announcements", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const announcements = await storage.getAnnouncements();
+    const announcements = await storage.getAnnouncements(req.userId);
     res.json(announcements);
   } catch (error) {
     logger.error("Get announcements error", { error: String(error) });

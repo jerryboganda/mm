@@ -667,10 +667,50 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {user?.subscriptionStatus !== "active" ? (
+        {user?.subscriptionStatus === "active" ? (
+          <GlassCard
+            style={[styles.upgradeCard, { borderColor: theme.success }]}
+            onPress={() => navigation.navigate("Subscription")}
+            accessibilityRole="button"
+            accessibilityLabel="Premium User verified. Tap to view subscription details"
+          >
+            <View style={styles.upgradeContent}>
+              <View
+                style={[
+                  styles.upgradeIcon,
+                  { backgroundColor: `${theme.success}25` },
+                ]}
+              >
+                <Feather name="check-circle" size={24} color={theme.success} />
+              </View>
+              <View style={styles.upgradeText}>
+                <ThemedText type="h4" style={[styles.upgradeTitle, { color: theme.success }]}>
+                  Premium User ✅
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.upgradeSubtitle,
+                    { color: theme.textSecondary },
+                  ]}
+                >
+                  {user.subscriptionPlan
+                    ? `All content unlocked • ${user.subscriptionPlan}`
+                    : "All content and features unlocked"}
+                </ThemedText>
+              </View>
+              <Feather
+                name="chevron-right"
+                size={24}
+                color={theme.textSecondary}
+              />
+            </View>
+          </GlassCard>
+        ) : (
           <GlassCard
             style={[styles.upgradeCard, { borderColor: theme.warning }]}
             onPress={() => navigation.navigate("Subscription")}
+            accessibilityRole="button"
+            accessibilityLabel="Upgrade to Premium. Unlock all content and features"
           >
             <View style={styles.upgradeContent}>
               <View
@@ -701,7 +741,7 @@ export default function ProfileScreen() {
               />
             </View>
           </GlassCard>
-        ) : null}
+        )}
 
         <View style={styles.settingsSection}>
           <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>

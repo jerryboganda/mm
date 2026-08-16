@@ -40,6 +40,9 @@ interface GlassCardProps {
   density?: "default" | "compact";
   titleNumberOfLines?: number;
   subtitleNumberOfLines?: number;
+  accessibilityRole?: "button" | "link" | "none" | "image" | "header" | "summary";
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 const springConfig: WithSpringConfig = {
@@ -74,6 +77,9 @@ export function GlassCard({
   density = "default",
   titleNumberOfLines,
   subtitleNumberOfLines,
+  accessibilityRole,
+  accessibilityLabel,
+  accessibilityHint,
 }: GlassCardProps) {
   const { theme, isDark } = useTheme();
   const reduceMotion = useReducedMotion();
@@ -237,10 +243,11 @@ export function GlassCard({
       disabled={disabled || !onPress}
       testID={testID}
       style={cardStyles}
-      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityRole={accessibilityRole || (onPress ? "button" : undefined)}
       accessibilityLabel={
-        title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined
+        accessibilityLabel || (title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined)
       }
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled, selected: active }}
     >
       {renderBackground()}

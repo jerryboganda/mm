@@ -453,6 +453,7 @@ export const announcements = pgTable(
     type: text("type").notNull().default("info"), // 'info' | 'warning' | 'update' | 'promo'
     isActive: boolean("is_active").default(true),
     expiresAt: timestamp("expires_at"),
+    userId: varchar("user_id").references(() => users.id),
     createdBy: varchar("created_by").references(() => users.id),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -462,12 +463,17 @@ export const announcements = pgTable(
       table.isActive,
       table.createdAt,
     ),
+    index("idx_announcements_user_id").on(table.userId),
   ],
 );
 
 export const announcementsRelations = relations(announcements, ({ one }) => ({
   creator: one(users, {
     fields: [announcements.createdBy],
+    references: [users.id],
+  }),
+  targetUser: one(users, {
+    fields: [announcements.userId],
     references: [users.id],
   }),
 }));
