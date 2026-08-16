@@ -45,6 +45,80 @@ function serializeBlocksToExplanation(blocks: ContentBlock[]): string {
   return JSON.stringify(activeBlocks);
 }
 
+export function normalizeOptionsMap(rawOptions: unknown): Record<string, string> {
+  if (!rawOptions) return {};
+  let options = rawOptions;
+  if (typeof options === 'string') {
+    try {
+      options = JSON.parse(options);
+    } catch {
+      return {};
+    }
+  }
+  if (Array.isArray(options)) {
+    const map: Record<string, string> = {};
+    const fallbackLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    options.forEach((item, idx) => {
+      const fallback = fallbackLabels[idx] || String.fromCharCode(65 + idx);
+      if (typeof item === 'string') {
+        map[fallback] = item;
+      } else if (item && typeof item === 'object') {
+        const label = String((item as any).label || (item as any).key || fallback).toUpperCase().trim();
+        const text = String((item as any).text ?? (item as any).value ?? (item as any).option ?? (item as any).content ?? '');
+        map[label] = text;
+      }
+    });
+    return map;
+  }
+  if (typeof options === 'object') {
+    const map: Record<string, string> = {};
+    for (const [k, v] of Object.entries(options as Record<string, unknown>)) {
+      if (v !== null && v !== undefined) {
+        map[k.toUpperCase().trim()] = String(v);
+      }
+    }
+    return map;
+  }
+  return {};
+}
+
+export function normalizeOptionExplanationsMap(rawExpls: unknown): Record<string, string> {
+  if (!rawExpls) return {};
+  let expls = rawExpls;
+  if (typeof expls === 'string') {
+    try {
+      expls = JSON.parse(expls);
+    } catch {
+      return {};
+    }
+  }
+  if (Array.isArray(expls)) {
+    const map: Record<string, string> = {};
+    const fallbackLabels = ['A', 'B', 'C', 'D', 'E'];
+    expls.forEach((item, idx) => {
+      const fallback = fallbackLabels[idx] || String.fromCharCode(65 + idx);
+      if (typeof item === 'string') {
+        map[fallback] = item;
+      } else if (item && typeof item === 'object') {
+        const label = String((item as any).label || (item as any).key || fallback).toUpperCase().trim();
+        const text = String((item as any).text ?? (item as any).explanation ?? (item as any).value ?? '');
+        map[label] = text;
+      }
+    });
+    return map;
+  }
+  if (typeof expls === 'object') {
+    const map: Record<string, string> = {};
+    for (const [k, v] of Object.entries(expls as Record<string, unknown>)) {
+      if (v !== null && v !== undefined) {
+        map[k.toUpperCase().trim()] = String(v);
+      }
+    }
+    return map;
+  }
+  return {};
+}
+
 interface MCQ {
   id: string;
   topicId: string;
@@ -146,20 +220,20 @@ export default function McqsPage() {
   };
 
   const openEdit = (m: MCQ) => {
-    const opts = m.options as Record<string, string>;
-    const optExpls = (m as any).optionExplanations as Record<string, string> | null;
+    const opts = normalizeOptionsMap(m.options);
+    const optExpls = normalizeOptionExplanationsMap((m as any).optionExplanations);
     setEditMcq(m);
     setForm({
       topicId: m.topicId,
       question: m.question,
-      optA: opts?.A || '', optB: opts?.B || '', optC: opts?.C || '', optD: opts?.D || '', optE: opts?.E || '',
+      optA: opts.A || '', optB: opts.B || '', optC: opts.C || '', optD: opts.D || '', optE: opts.E || '',
       correctAnswer: m.correctAnswer,
       explanation: m.explanation || '',
       explanationBlocks: parseExplanationToBlocks(m.explanation),
-      explA: optExpls?.A || '', explB: optExpls?.B || '', explC: optExpls?.C || '', explD: optExpls?.D || '', explE: optExpls?.E || '',
+      explA: optExpls.A || '', explB: optExpls.B || '', explC: optExpls.C || '', explD: optExpls.D || '', explE: optExpls.E || '',
       difficulty: m.difficulty,
       references: (m as any).references || '',
-      tags: Array.isArray((m as any).tags) ? (m as any).tags.join(', ') : '',
+      tags: Array.isArray((m as any).tags) ? (m as any).tags.join(', ') : ((m as any).tags || ''),
       isPaid: m.isPaid ?? false,
     });
     setShowForm(true);
@@ -259,15 +333,24 @@ export default function McqsPage() {
 
       if (mcqList.length === 0) { setImportResult('❌ No valid MCQs found'); setImporting(false); return; }
 
-      // Attach topicId
-      mcqList = mcqList.map((m) => ({
-        ...m,
-        topicId: importTopicId,
-        options: m.options || { A: m.optA, B: m.optB, C: m.optC, D: m.optD },
-        correctAnswer: m.correctAnswer || m.correct || 'A',
-        difficulty: m.difficulty || 'medium',
-        isPublished: m.isPublished !== undefined ? m.isPublished : true,
-      }));
+      // Attach topicId and normalize options
+      mcqList = mcqList.map((m) => {
+        const rawOpts = m.options || { A: m.optA, B: m.optB, C: m.optC, D: m.optD, E: m.optE };
+        const normalizedOpts = normalizeOptionsMap(rawOpts);
+        const normalizedOptExpls = normalizeOptionExplanationsMap(
+          m.optionExplanations || { A: m.explA, B: m.explB, C: m.explC, D: m.explD, E: m.explE }
+        );
+
+        return {
+          ...m,
+          topicId: importTopicId,
+          options: normalizedOpts,
+          optionExplanations: Object.keys(normalizedOptExpls).length > 0 ? normalizedOptExpls : undefined,
+          correctAnswer: String(m.correctAnswer || m.correct || 'A').toUpperCase().trim(),
+          difficulty: m.difficulty || 'medium',
+          isPublished: m.isPublished !== undefined ? m.isPublished : true,
+        };
+      });
 
       const res = await api.post<{ count: number }>('/admin/content/mcqs/bulk', { mcqs: mcqList });
       setImportResult(`✅ Successfully imported ${res.count} MCQs!`);
@@ -481,8 +564,8 @@ export default function McqsPage() {
 
       {/* MCQ Preview Modal */}
       {previewMcq && (() => {
-        const opts = (previewMcq.options || {}) as Record<string, string>;
-        const optExpls = ((previewMcq as any).optionExplanations || {}) as Record<string, string>;
+        const opts = normalizeOptionsMap(previewMcq.options);
+        const optExpls = normalizeOptionExplanationsMap((previewMcq as any).optionExplanations);
         const explanationBlocks = parseExplanationToBlocks(previewMcq.explanation);
         const topicRef = topicsList.find((t) => t.id === previewMcq.topicId);
         const rawTags = (previewMcq as any).tags;
@@ -675,7 +758,8 @@ export default function McqsPage() {
       ) : (
         <div className="space-y-3">
           {mcqs.map((m) => {
-            const opts = m.options as Record<string, string>;
+            const opts = normalizeOptionsMap(m.options);
+            const optKeys = Object.keys(opts);
             return (
               <div key={m.id} className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-sm transition-all">
                 <div className="flex items-start gap-3">
@@ -693,7 +777,7 @@ export default function McqsPage() {
                     </div>
                     <p className="text-sm font-medium text-gray-900 line-clamp-2">{m.question}</p>
                     <p className="text-xs text-gray-400 mt-1">
-                      Correct: {m.correctAnswer} • Options: {Object.keys(opts).join(', ')}
+                      Correct: {m.correctAnswer} • Options: {optKeys.length > 0 ? optKeys.join(', ') : 'None'}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">

@@ -102,6 +102,64 @@ const mcqOptionsSchema = z.union([
     .max(10),
 ]);
 
+function normalizeMcqOptionsToRecord(rawOptions: unknown): Record<string, string> {
+  if (!rawOptions) return {};
+  if (Array.isArray(rawOptions)) {
+    const map: Record<string, string> = {};
+    const fallbackLabels = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    rawOptions.forEach((item, idx) => {
+      const fallback = fallbackLabels[idx] || String.fromCharCode(65 + idx);
+      if (typeof item === "string") {
+        map[fallback] = item;
+      } else if (item && typeof item === "object") {
+        const label = String((item as any).label || (item as any).key || fallback).toUpperCase().trim();
+        const text = String((item as any).text ?? (item as any).value ?? (item as any).option ?? (item as any).content ?? "");
+        map[label] = text;
+      }
+    });
+    return map;
+  }
+  if (typeof rawOptions === "object" && rawOptions !== null) {
+    const map: Record<string, string> = {};
+    for (const [k, v] of Object.entries(rawOptions as Record<string, unknown>)) {
+      if (v !== null && v !== undefined) {
+        map[k.toUpperCase().trim()] = String(v);
+      }
+    }
+    return map;
+  }
+  return {};
+}
+
+function normalizeMcqOptionExplanationsToRecord(rawExpls: unknown): Record<string, string> | undefined {
+  if (!rawExpls) return undefined;
+  if (Array.isArray(rawExpls)) {
+    const map: Record<string, string> = {};
+    const fallbackLabels = ["A", "B", "C", "D", "E"];
+    rawExpls.forEach((item, idx) => {
+      const fallback = fallbackLabels[idx] || String.fromCharCode(65 + idx);
+      if (typeof item === "string") {
+        map[fallback] = item;
+      } else if (item && typeof item === "object") {
+        const label = String((item as any).label || (item as any).key || fallback).toUpperCase().trim();
+        const text = String((item as any).text ?? (item as any).explanation ?? (item as any).value ?? "");
+        map[label] = text;
+      }
+    });
+    return Object.keys(map).length > 0 ? map : undefined;
+  }
+  if (typeof rawExpls === "object" && rawExpls !== null) {
+    const map: Record<string, string> = {};
+    for (const [k, v] of Object.entries(rawExpls as Record<string, unknown>)) {
+      if (v !== null && v !== undefined) {
+        map[k.toUpperCase().trim()] = String(v);
+      }
+    }
+    return Object.keys(map).length > 0 ? map : undefined;
+  }
+  return undefined;
+}
+
 const mcqSchema = z.object({
   topicId: z.string().min(1, "Topic ID is required"),
   question: z.string().min(1, "Question is required").max(5000),
@@ -724,7 +782,11 @@ router.post("/mcqs", async (req: AuthRequest, res) => {
   try {
     const data = validateBody(mcqSchema, req.body, res);
     if (!data) return;
-    const m = await adminCreateMcq(data);
+    const m = await adminCreateMcq({
+      ...data,
+      options: normalizeMcqOptionsToRecord(data.options),
+      optionExplanations: normalizeMcqOptionExplanationsToRecord(data.optionExplanations),
+    });
     await createAuditLog({
       adminUserId: req.userId!,
       action: "create",
@@ -744,7 +806,14 @@ router.put("/mcqs/:id", async (req: AuthRequest, res) => {
     const mcqId = getParamValue(req.params.id);
     const data = validateBody(mcqSchema.partial(), req.body, res);
     if (!data) return;
-    const m = await adminUpdateMcq(mcqId, data);
+    const payload = {
+      ...data,
+      ...(data.options ? { options: normalizeMcqOptionsToRecord(data.options) } : {}),
+      ...(data.optionExplanations !== undefined
+        ? { optionExplanations: normalizeMcqOptionExplanationsToRecord(data.optionExplanations) }
+        : {}),
+    };
+    const m = await adminUpdateMcq(mcqId, payload);
     if (!m) return res.status(404).json({ message: "MCQ not found" });
     await createAuditLog({
       adminUserId: req.userId!,
@@ -788,7 +857,12 @@ router.post("/mcqs/bulk", async (req: AuthRequest, res) => {
     });
     const data = validateBody(bulkSchema, req.body, res);
     if (!data) return;
-    const created = await adminBulkCreateMcqs(data.mcqs);
+    const normalizedMcqs = data.mcqs.map((mcq) => ({
+      ...mcq,
+      options: normalizeMcqOptionsToRecord(mcq.options),
+      optionExplanations: normalizeMcqOptionExplanationsToRecord(mcq.optionExplanations),
+    }));
+    const created = await adminBulkCreateMcqs(normalizedMcqs);
     await createAuditLog({
       adminUserId: req.userId!,
       action: "bulk_create",
