@@ -13,6 +13,7 @@ import {
   submitPaymentProofSchema,
   manualPaymentProofs,
   subscriptionPackages,
+  packagePrices,
   users,
 } from "../../shared/schema";
 import { db } from "../db";
@@ -638,6 +639,113 @@ router.post(
     } catch (error) {
       logger.error("POST /proof error", { error: String(error) });
       res.status(500).json({ message: "Failed to submit payment proof" });
+    }
+  },
+);
+
+/**
+ * POST /submit-coupon-proof
+ * Submit a coupon / promo code directly for review and verification.
+ * Body: { code: string, packageId?: string, priceId?: string }
+ */
+router.post(
+  "/submit-coupon-proof",
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const userId = req.userId!;
+      const { code, packageId, priceId } = req.body || {};
+
+      if (!code || typeof code !== "string" || !code.trim()) {
+        return res.status(400).json({ message: "Coupon code is required" });
+      }
+
+      const cleanCode = code.trim().toUpperCase();
+
+      // Block if the user already has an active subscription
+      const existingSub =
+        await subscriptionService.getUserActiveSubscription(userId);
+      if (existingSub) {
+        return res.status(409).json({
+          message: "You already have an active subscription.",
+        });
+      }
+
+      // Resolve package & price
+      let resolvedPkgId = packageId;
+      let resolvedPriceId = priceId;
+
+      if (!resolvedPkgId || !resolvedPriceId) {
+        const [firstPrice] = await db
+          .select({
+            packageId: packagePrices.packageId,
+            priceId: packagePrices.id,
+          })
+          .from(packagePrices)
+          .innerJoin(
+            subscriptionPackages,
+            eq(packagePrices.packageId, subscriptionPackages.id),
+          )
+          .where(eq(subscriptionPackages.status, "active"))
+          .orderBy(subscriptionPackages.displayOrder)
+          .limit(1);
+
+        if (firstPrice) {
+          resolvedPkgId = firstPrice.packageId;
+          resolvedPriceId = firstPrice.priceId;
+        }
+      }
+
+      if (!resolvedPkgId || !resolvedPriceId) {
+        return res.status(400).json({
+          message: "No subscription package available to apply coupon to",
+        });
+      }
+
+      // Check if the user already has a pending proof under review
+      const [pending] = await db
+        .select()
+        .from(manualPaymentProofs)
+        .where(
+          and(
+            eq(manualPaymentProofs.userId, userId),
+            eq(manualPaymentProofs.status, "pending"),
+          ),
+        );
+
+      if (pending) {
+        return res.status(409).json({
+          message: "You already have a verification request awaiting review.",
+          proof: pending,
+        });
+      }
+
+      const [proof] = await db
+        .insert(manualPaymentProofs)
+        .values({
+          userId,
+          packageId: resolvedPkgId,
+          priceId: resolvedPriceId,
+          proofImageUrl:
+            "https://maternalmind.com.pk/assets/coupon-verification.png",
+          amountClaimed: "0",
+          paymentMethod: "Promo / Coupon Code",
+          senderReference: cleanCode,
+          userNote: `Submitted promo/coupon code: ${cleanCode}`,
+          status: "pending",
+        })
+        .returning();
+
+      return res.status(201).json({
+        success: true,
+        message: "Promo/coupon code received for verification.",
+        proof,
+      });
+    } catch (error) {
+      logger.error("POST /submit-coupon-proof error", { error: String(error) });
+      const message =
+        error instanceof Error ? error.message : "Failed to submit coupon code";
+      return res.status(500).json({ message });
     }
   },
 );

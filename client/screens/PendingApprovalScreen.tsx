@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ActivityIndicator, Pressable } from "react-native";
+import { StyleSheet, View, ScrollView, ActivityIndicator, Pressable, Linking } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "@/lib/haptics-wrapper";
 
@@ -91,14 +91,16 @@ export default function PendingApprovalScreen() {
 
   return (
     <BackgroundGradient>
-      <View
-        style={[
-          styles.container,
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.content,
           {
-            paddingTop: insets.top + Spacing["3xl"],
-            paddingBottom: insets.bottom + Spacing["2xl"],
+            paddingTop: insets.top + Spacing.xl,
+            paddingBottom: insets.bottom + Spacing.xl,
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
         {isRejected ? (
           <>
@@ -134,19 +136,79 @@ export default function PendingApprovalScreen() {
               <ActivityIndicator size="large" color={theme.primary} />
             </View>
             <ThemedText type="h2" style={styles.title}>
-              Pending Review
+              Verification in Progress
             </ThemedText>
             <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
-              Thanks! We&apos;ve received your payment proof
-              {latest?.packageName ? ` for ${latest.packageName}` : ""}. Our team
-              will verify it shortly. This screen will update automatically once
-              your subscription is approved, and we&apos;ll notify you in-app and by email.
+              Your promo/coupon code or payment proof has been received, we shall verify soon. This screen will update automatically once verified.
             </ThemedText>
             <GlassCard style={styles.statusCard}>
               <Feather name="clock" size={18} color={theme.primary} />
               <ThemedText style={[styles.statusText, { color: theme.textSecondary }]}>
-                Awaiting admin approval
+                Awaiting admin verification
               </ThemedText>
+            </GlassCard>
+
+            {/* Query & Contact Section */}
+            <GlassCard style={styles.contactCard}>
+              <ThemedText style={[styles.contactCardTitle, { color: theme.primary }]}>
+                For further queries please contact on
+              </ThemedText>
+
+              <View style={styles.contactList}>
+                <Pressable
+                  style={styles.contactItem}
+                  onPress={() => Linking.openURL("https://wa.me/923360830836")}
+                  accessibilityRole="button"
+                  accessibilityLabel="Contact on WhatsApp +923360830836"
+                >
+                  <View style={[styles.contactIconCircle, { backgroundColor: "#25D36620" }]}>
+                    <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
+                  </View>
+                  <View style={styles.contactItemTextCol}>
+                    <ThemedText style={styles.contactItemLabel}>Whatsapp</ThemedText>
+                    <ThemedText style={[styles.contactItemValue, { color: theme.textSecondary }]}>
+                      +923360830836
+                    </ThemedText>
+                  </View>
+                  <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                </Pressable>
+
+                <Pressable
+                  style={styles.contactItem}
+                  onPress={() => Linking.openURL("https://maternalmind.com.pk/")}
+                  accessibilityRole="button"
+                  accessibilityLabel="Visit Website https://maternalmind.com.pk/"
+                >
+                  <View style={[styles.contactIconCircle, { backgroundColor: `${theme.primary}20` }]}>
+                    <Feather name="globe" size={18} color={theme.primary} />
+                  </View>
+                  <View style={styles.contactItemTextCol}>
+                    <ThemedText style={styles.contactItemLabel}>Web</ThemedText>
+                    <ThemedText style={[styles.contactItemValue, { color: theme.textSecondary }]}>
+                      https://maternalmind.com.pk/
+                    </ThemedText>
+                  </View>
+                  <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                </Pressable>
+
+                <Pressable
+                  style={styles.contactItem}
+                  onPress={() => Linking.openURL("mailto:maternalmind.help@gmail.com")}
+                  accessibilityRole="button"
+                  accessibilityLabel="Send email to maternalmind.help@gmail.com"
+                >
+                  <View style={[styles.contactIconCircle, { backgroundColor: `${theme.info}20` }]}>
+                    <Feather name="mail" size={18} color={theme.info} />
+                  </View>
+                  <View style={styles.contactItemTextCol}>
+                    <ThemedText style={styles.contactItemLabel}>Email</ThemedText>
+                    <ThemedText style={[styles.contactItemValue, { color: theme.textSecondary }]}>
+                      maternalmind.help@gmail.com
+                    </ThemedText>
+                  </View>
+                  <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                </Pressable>
+              </View>
             </GlassCard>
 
             <View style={styles.actionsContainer}>
@@ -188,7 +250,7 @@ export default function PendingApprovalScreen() {
             Sign Out
           </ThemedText>
         </Pressable>
-      </View>
+      </ScrollView>
     </BackgroundGradient>
   );
 }
@@ -196,22 +258,25 @@ export default function PendingApprovalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
     alignItems: "center",
     paddingHorizontal: Spacing.xl,
   },
   iconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: Spacing["2xl"],
+    marginBottom: Spacing.xl,
+    marginTop: Spacing.md,
   },
-  title: { textAlign: "center", marginBottom: Spacing.md },
+  title: { textAlign: "center", marginBottom: Spacing.sm },
   subtitle: {
     textAlign: "center",
     lineHeight: 22,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   statusCard: {
     flexDirection: "row",
@@ -222,11 +287,50 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   statusText: { fontSize: 14 },
+  contactCard: {
+    width: "100%",
+    padding: Spacing.lg,
+    marginBottom: Spacing.lg,
+  },
+  contactCardTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    marginBottom: Spacing.md,
+    textAlign: "center",
+  },
+  contactList: {
+    gap: Spacing.sm,
+  },
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: Spacing.xs,
+  },
+  contactIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Spacing.sm,
+  },
+  contactItemTextCol: {
+    flex: 1,
+  },
+  contactItemLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  contactItemValue: {
+    fontSize: 13,
+  },
   actionsContainer: {
     width: "100%",
     alignItems: "center",
-    gap: Spacing.sm,
-    marginTop: Spacing.md,
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
   },
   continueButton: {
     width: "100%",
@@ -243,7 +347,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.sm,
-    padding: Spacing.md,
+    padding: Spacing.sm,
   },
   refreshButtonDisabled: {
     opacity: 0.6,
@@ -251,8 +355,8 @@ const styles = StyleSheet.create({
   checkErrorText: {
     fontSize: 13,
     textAlign: "center",
-    marginTop: -Spacing.xs,
+    marginTop: Spacing.xs,
   },
-  signOut: { marginTop: "auto", padding: Spacing.md },
+  signOut: { marginTop: Spacing.xl, padding: Spacing.md, marginBottom: Spacing.lg },
   signOutText: { fontSize: 14 },
 });
