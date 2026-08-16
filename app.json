@@ -28,6 +28,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.maternalmind.app",
+      "buildNumber": "5",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
