@@ -15,6 +15,7 @@ import {
   manualPaymentProofs,
   subscriptionPackages,
   users,
+  announcements,
   reviewPaymentProofSchema,
   manualGrantSchema,
   paymentInstructionsSchema,
@@ -140,6 +141,21 @@ router.post("/grant", async (req: AuthRequest, res: Response) => {
         pkg.name,
         formatDate(subscription.currentPeriodEnd),
       );
+    }
+
+    // In-app notification for the user
+    try {
+      await db.insert(announcements).values({
+        title: "Subscription Verified ✅",
+        message: `Your subscription for ${pkg.name} is now active! All premium OB-GYN modules, MCQs, and notes are fully unlocked.`,
+        type: "update",
+        userId,
+        isActive: true,
+      });
+    } catch (notifErr) {
+      logger.error("Failed to insert grant in-app notification", {
+        error: String(notifErr),
+      });
     }
 
     res.status(201).json({ subscription });
@@ -332,6 +348,21 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
         pkg?.name || "your plan",
         formatDate(subscription.currentPeriodEnd),
       );
+    }
+
+    // In-app notification for the user
+    try {
+      await db.insert(announcements).values({
+        title: "Subscription Verified ✅",
+        message: `Your payment for ${pkg?.name || "your plan"} has been approved! All premium OB-GYN modules, MCQs, and notes are now fully unlocked.`,
+        type: "update",
+        userId: proof.userId,
+        isActive: true,
+      });
+    } catch (notifErr) {
+      logger.error("Failed to insert approval in-app notification", {
+        error: String(notifErr),
+      });
     }
 
     res.json({ proof: updated, subscription });

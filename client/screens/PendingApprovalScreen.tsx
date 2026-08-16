@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import * as Haptics from "@/lib/haptics-wrapper";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
@@ -64,6 +65,11 @@ export default function PendingApprovalScreen() {
       navigation.reset({ index: 0, routes: [{ name: "Main" }] });
     }
   }, [user?.subscriptionStatus, navigation]);
+
+  const handleContinueToApp = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.reset({ index: 0, routes: [{ name: "Main" }] });
+  };
 
   const handleTryAgain = () => {
     navigation.reset({ index: 0, routes: [{ name: "Subscription" }] });
@@ -134,7 +140,7 @@ export default function PendingApprovalScreen() {
               Thanks! We&apos;ve received your payment proof
               {latest?.packageName ? ` for ${latest.packageName}` : ""}. Our team
               will verify it shortly. This screen will update automatically once
-              your subscription is approved, and we&apos;ll email you too.
+              your subscription is approved, and we&apos;ll notify you in-app and by email.
             </ThemedText>
             <GlassCard style={styles.statusCard}>
               <Feather name="clock" size={18} color={theme.primary} />
@@ -142,20 +148,33 @@ export default function PendingApprovalScreen() {
                 Awaiting admin approval
               </ThemedText>
             </GlassCard>
-            <Pressable
-              onPress={handleCheckAgain}
-              disabled={isChecking}
-              style={[styles.refreshButton, isChecking && styles.refreshButtonDisabled]}
-            >
-              {isChecking ? (
-                <ActivityIndicator size="small" color={theme.primary} />
-              ) : (
-                <Feather name="refresh-cw" size={16} color={theme.primary} />
-              )}
-              <ThemedText style={{ color: theme.primary, fontSize: 14 }}>
-                {isChecking ? "Checking..." : "Check again"}
-              </ThemedText>
-            </Pressable>
+
+            <View style={styles.actionsContainer}>
+              <PrimaryButton
+                title="Continue to App"
+                onPress={handleContinueToApp}
+                icon="arrow-right"
+                style={styles.continueButton}
+              />
+
+              <Pressable
+                onPress={handleCheckAgain}
+                disabled={isChecking}
+                style={[styles.refreshButton, isChecking && styles.refreshButtonDisabled]}
+                accessibilityRole="button"
+                accessibilityLabel="Check status again"
+              >
+                {isChecking ? (
+                  <ActivityIndicator size="small" color={theme.primary} />
+                ) : (
+                  <Feather name="refresh-cw" size={16} color={theme.primary} />
+                )}
+                <ThemedText style={{ color: theme.primary, fontSize: 14, fontWeight: "600" }}>
+                  {isChecking ? "Checking Status..." : "Check Status Again"}
+                </ThemedText>
+              </Pressable>
+            </View>
+
             {checkError ? (
               <ThemedText style={[styles.checkErrorText, { color: theme.error }]}>
                 {checkError}
@@ -200,8 +219,18 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
   },
   statusText: { fontSize: 14 },
+  actionsContainer: {
+    width: "100%",
+    alignItems: "center",
+    gap: Spacing.sm,
+    marginTop: Spacing.md,
+  },
+  continueButton: {
+    width: "100%",
+  },
   reasonCard: {
     width: "100%",
     padding: Spacing.lg,
@@ -214,7 +243,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.sm,
-    marginTop: Spacing.xl,
     padding: Spacing.md,
   },
   refreshButtonDisabled: {
@@ -223,7 +251,7 @@ const styles = StyleSheet.create({
   checkErrorText: {
     fontSize: 13,
     textAlign: "center",
-    marginTop: -Spacing.sm,
+    marginTop: -Spacing.xs,
   },
   signOut: { marginTop: "auto", padding: Spacing.md },
   signOutText: { fontSize: 14 },
