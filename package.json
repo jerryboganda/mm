@@ -1,7 +1,7 @@
 {
   "name": "maternal-mind",
   "main": "client/index.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Maternal Mind — OB-GYN Learning Platform",
   "scripts": {
     "dev": "tsx server/index.ts",
