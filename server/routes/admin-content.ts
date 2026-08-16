@@ -87,19 +87,31 @@ const mcqOptionSchema = z.object({
   text: z.string().min(1),
 });
 
-const mcqSchema = z.object({
-  topicId: z.string().min(1, "Topic ID is required"),
-  question: z.string().min(1, "Question is required").max(5000),
-  options: z
+const mcqOptionsSchema = z.union([
+  z.record(z.string()).refine(
+    (obj) => Object.keys(obj).length >= 2,
+    "At least 2 options required",
+  ),
+  z
     .array(mcqOptionSchema)
     .min(2, "At least 2 options required")
     .max(10),
+  z
+    .array(z.string().min(1))
+    .min(2, "At least 2 options required")
+    .max(10),
+]);
+
+const mcqSchema = z.object({
+  topicId: z.string().min(1, "Topic ID is required"),
+  question: z.string().min(1, "Question is required").max(5000),
+  options: mcqOptionsSchema,
   correctAnswer: z.string().min(1, "Correct answer is required"),
-  explanation: z.string().max(10000).optional().nullable(),
-  optionExplanations: z.record(z.string()).optional().nullable(),
+  explanation: z.string().max(100000).optional().nullable(),
+  optionExplanations: z.record(z.string().optional().nullable()).optional().nullable(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
-  references: z.string().max(5000).optional().nullable(),
-  tags: z.array(z.string()).optional().nullable(),
+  references: z.string().max(10000).optional().nullable(),
+  tags: z.union([z.array(z.string()), z.string()]).optional().nullable(),
   images: z
     .array(
       z.object({
