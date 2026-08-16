@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import BlockEditor, { ContentBlock } from '../components/BlockEditor';
 import {
-  Plus, Pencil, Trash2, Eye, EyeOff, Search, Upload,
-  Loader2, AlertCircle, ClipboardList, X, Download,
+  Plus, Pencil, Trash2, Eye, Globe, Search, Upload,
+  Loader2, AlertCircle, ClipboardList, X, Download, CheckCircle2, Check,
 } from 'lucide-react';
 
 function parseExplanationToBlocks(explanationStr: string | null | undefined): ContentBlock[] {
@@ -79,6 +79,7 @@ export default function McqsPage() {
   // Form
   const [showForm, setShowForm] = useState(false);
   const [editMcq, setEditMcq] = useState<MCQ | null>(null);
+  const [previewMcq, setPreviewMcq] = useState<MCQ | null>(null);
   const [form, setForm] = useState({
     topicId: '',
     question: '',
@@ -478,6 +479,193 @@ export default function McqsPage() {
         </div>
       )}
 
+      {/* MCQ Preview Modal */}
+      {previewMcq && (() => {
+        const opts = (previewMcq.options || {}) as Record<string, string>;
+        const optExpls = ((previewMcq as any).optionExplanations || {}) as Record<string, string>;
+        const explanationBlocks = parseExplanationToBlocks(previewMcq.explanation);
+        const topicRef = topicsList.find((t) => t.id === previewMcq.topicId);
+        const rawTags = (previewMcq as any).tags;
+        const tags = Array.isArray(rawTags)
+          ? rawTags
+          : typeof rawTags === 'string' && rawTags
+          ? rawTags.split(',').map((t: string) => t.trim()).filter(Boolean)
+          : [];
+        const references = (previewMcq as any).references;
+
+        return (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setPreviewMcq(null)}>
+            <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl my-8 flex flex-col max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
+              {/* Modal Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-gray-100 flex-shrink-0">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">MCQ Preview</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${previewMcq.isPaid ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                      {previewMcq.isPaid ? 'Paid' : 'Free'}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${previewMcq.isPublished ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {previewMcq.isPublished ? 'Published' : 'Draft'}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${previewMcq.difficulty === 'easy' ? 'bg-blue-100 text-blue-700' : previewMcq.difficulty === 'hard' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {previewMcq.difficulty}
+                    </span>
+                  </div>
+                  {topicRef && (
+                    <p className="text-xs text-gray-500">
+                      {topicRef.bookTitle} › {topicRef.chapterTitle} › <span className="font-medium text-gray-700">{topicRef.title}</span>
+                    </p>
+                  )}
+                </div>
+                <button onClick={() => setPreviewMcq(null)} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="space-y-6 overflow-y-auto py-4 pr-1 flex-1">
+                {/* Question */}
+                <div className="bg-gray-50/80 rounded-xl p-4 border border-gray-100">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Question</span>
+                  <p className="text-base font-semibold text-gray-900 leading-relaxed whitespace-pre-wrap">{previewMcq.question}</p>
+                </div>
+
+                {/* Options List */}
+                <div>
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2.5">Options & Explanations</span>
+                  <div className="space-y-2.5">
+                    {['A', 'B', 'C', 'D', 'E'].map((key) => {
+                      const optText = opts[key];
+                      if (!optText) return null;
+                      const isCorrect = previewMcq.correctAnswer === key;
+                      const expl = optExpls[key];
+
+                      return (
+                        <div
+                          key={key}
+                          className={`rounded-xl border p-3 transition-all ${
+                            isCorrect
+                              ? 'bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-300/50'
+                              : 'bg-white border-gray-200'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span
+                              className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                                isCorrect
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-gray-100 text-gray-700'
+                              }`}
+                            >
+                              {key}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className={`text-sm ${isCorrect ? 'font-semibold text-emerald-950' : 'text-gray-800'}`}>
+                                  {optText}
+                                </p>
+                                {isCorrect && (
+                                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                                    <Check className="w-3.5 h-3.5" /> Correct Answer
+                                  </span>
+                                )}
+                              </div>
+                              {expl && (
+                                <div className="mt-2 text-xs text-gray-600 bg-gray-50/90 rounded-lg p-2 border border-gray-100">
+                                  <span className="font-semibold text-gray-700">Option {key} Explanation: </span>
+                                  {expl}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* General Explanation */}
+                {explanationBlocks.some((b) => b.content && b.content.trim()) && (
+                  <div>
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">General Explanation</span>
+                    <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 space-y-3">
+                      {explanationBlocks.map((b) => {
+                        if (!b.content || !b.content.trim()) return null;
+                        if (b.type === 'image') {
+                          return (
+                            <div key={b.id} className="text-center my-2">
+                              <img src={b.content} alt="Explanation diagram" className="max-h-72 max-w-full rounded-lg border border-gray-200 shadow-sm mx-auto object-contain" />
+                            </div>
+                          );
+                        }
+                        if (b.type === 'callout') {
+                          return (
+                            <div key={b.id} className="p-3 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg text-sm text-amber-900">
+                              <div dangerouslySetInnerHTML={{ __html: b.content }} />
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={b.id}
+                            className="text-sm text-gray-800 leading-relaxed prose prose-sm max-w-none"
+                            dangerouslySetInnerHTML={{ __html: b.content }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* References & Tags */}
+                {(references || (tags && tags.length > 0)) && (
+                  <div className="pt-3 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    {references && (
+                      <div>
+                        <span className="font-semibold text-gray-500 block mb-0.5">References:</span>
+                        <p className="text-gray-700">{references}</p>
+                      </div>
+                    )}
+                    {tags && tags.length > 0 && (
+                      <div>
+                        <span className="font-semibold text-gray-500 block mb-1">Tags:</span>
+                        <div className="flex flex-wrap gap-1">
+                          {tags.map((t: string, idx: number) => (
+                            <span key={idx} className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md text-[11px]">
+                              #{t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100 flex-shrink-0 mt-2">
+                <button
+                  onClick={() => {
+                    const target = previewMcq;
+                    setPreviewMcq(null);
+                    openEdit(target);
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-xl transition-colors"
+                >
+                  <Pencil className="w-4 h-4" /> Edit this MCQ
+                </button>
+                <button
+                  onClick={() => setPreviewMcq(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* MCQ List */}
       {mcqs.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
@@ -509,13 +697,40 @@ export default function McqsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button onClick={() => togglePublish(m)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors">
-                      {m.isPublished ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    <button
+                      onClick={() => setPreviewMcq(m)}
+                      className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                      title="Preview MCQ"
+                      aria-label="Preview MCQ"
+                    >
+                      <Eye className="w-4 h-4" />
                     </button>
-                    <button onClick={() => openEdit(m)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button
+                      onClick={() => togglePublish(m)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        m.isPublished
+                          ? 'text-green-600 hover:bg-green-50'
+                          : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+                      }`}
+                      title={m.isPublished ? 'Published — Click to make Draft' : 'Draft — Click to Publish'}
+                      aria-label={m.isPublished ? 'Published — Click to make Draft' : 'Draft — Click to Publish'}
+                    >
+                      <Globe className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openEdit(m)}
+                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit MCQ"
+                      aria-label="Edit MCQ"
+                    >
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(m)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <button
+                      onClick={() => handleDelete(m)}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete MCQ"
+                      aria-label="Delete MCQ"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
