@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
 import Constants from "expo-constants";
 
@@ -164,22 +164,40 @@ export default function AboutScreen() {
           <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CONNECT</ThemedText>
           <View style={styles.socialRow}>
             <Pressable
-              style={[styles.socialButton, { backgroundColor: theme.glass }]}
-              onPress={() => handleOpenLink("https://twitter.com/maternalmind")}
+              style={({ pressed }) => [
+                styles.socialButton,
+                { backgroundColor: theme.glass, opacity: pressed ? 0.7 : 1 },
+              ]}
+              onPress={() => handleOpenLink("https://wa.me/923360830836")}
+              accessibilityRole="button"
+              accessibilityLabel="Connect on WhatsApp +923360830836"
+              accessibilityHint="Opens WhatsApp chat with Maternal Mind support"
             >
-              <Feather name="twitter" size={20} color={theme.text} />
+              <Ionicons name="logo-whatsapp" size={22} color="#25D366" />
             </Pressable>
             <Pressable
-              style={[styles.socialButton, { backgroundColor: theme.glass }]}
+              style={({ pressed }) => [
+                styles.socialButton,
+                { backgroundColor: theme.glass, opacity: pressed ? 0.7 : 1 },
+              ]}
               onPress={() =>
-                handleOpenLink("https://instagram.com/maternalmind")
+                handleOpenLink("mailto:maternalmind.help@gmail.com")
               }
+              accessibilityRole="button"
+              accessibilityLabel="Send email to maternalmind.help@gmail.com"
+              accessibilityHint="Opens email client to contact Maternal Mind support"
             >
-              <Feather name="instagram" size={20} color={theme.text} />
+              <Feather name="mail" size={20} color={theme.text} />
             </Pressable>
             <Pressable
-              style={[styles.socialButton, { backgroundColor: theme.glass }]}
-              onPress={() => handleOpenLink("https://maternalmind.com.pk")}
+              style={({ pressed }) => [
+                styles.socialButton,
+                { backgroundColor: theme.glass, opacity: pressed ? 0.7 : 1 },
+              ]}
+              onPress={() => handleOpenLink("https://maternalmind.com.pk/")}
+              accessibilityRole="button"
+              accessibilityLabel="Visit website https://maternalmind.com.pk/"
+              accessibilityHint="Opens Maternal Mind website in browser"
             >
               <Feather name="globe" size={20} color={theme.text} />
             </Pressable>
