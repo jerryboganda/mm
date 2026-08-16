@@ -91,7 +91,7 @@ export default function SubscriptionScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<SubscriptionScreenNavigationProp>();
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { refreshUser } = useAuth();
 
   const [couponCodeInput, setCouponCodeInput] = useState("");
@@ -155,6 +155,51 @@ export default function SubscriptionScreen() {
       } catch {}
       setCouponError(msg);
       setAppliedCoupon(null);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsValidatingCoupon(false);
+    }
+  };
+
+  const handleSendForVerification = async () => {
+    if (!couponCodeInput.trim()) return;
+    const code = couponCodeInput.trim().toUpperCase();
+
+    const targetPkg = packages[0];
+    const targetPrice = targetPkg?.prices?.[0];
+
+    setIsValidatingCoupon(true);
+    setCouponError(null);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    try {
+      const res = await apiRequest("POST", "/api/subscriptions/submit-coupon-proof", {
+        code,
+        packageId: targetPkg?.id,
+        priceId: targetPrice?.id,
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || "Failed to submit coupon for verification");
+      }
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      navigation.navigate("PendingApproval");
+    } catch (err: any) {
+      let msg = "Failed to submit coupon for verification";
+      try {
+        const raw = err.message || "";
+        const match = raw.match(/^(\d+):\s*([\s\S]*)$/);
+        const body = match ? match[2] : raw;
+        const parsed = JSON.parse(body);
+        if (parsed?.message) msg = parsed.message;
+      } catch {}
+      if (/already have a verification request/i.test(msg) || /awaiting review/i.test(msg)) {
+        navigation.navigate("PendingApproval");
+        return;
+      }
+      setCouponError(msg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsValidatingCoupon(false);
@@ -369,12 +414,14 @@ export default function SubscriptionScreen() {
                   style={[
                     styles.couponInput,
                     {
-                      backgroundColor: `${theme.text}08`,
+                      backgroundColor: isDark
+                        ? "rgba(255,255,255,0.06)"
+                        : "rgba(0,0,0,0.04)",
                       borderColor: couponError ? theme.error : theme.glassBorder,
                       color: theme.text,
                     },
                   ]}
-                  placeholder="Enter Promo Code"
+                  placeholder="Enter Coupon (XXXX-XXXX-XXXX)"
                   placeholderTextColor={theme.textMuted}
                   value={couponCodeInput}
                   onChangeText={(txt) => {
@@ -394,13 +441,17 @@ export default function SubscriptionScreen() {
                         : `${theme.primary}50`,
                     },
                   ]}
-                  onPress={handleApplyCoupon}
+                  onPress={handleSendForVerification}
                   disabled={!couponCodeInput.trim() || isValidatingCoupon}
+                  accessibilityRole="button"
+                  accessibilityLabel="Send coupon for verification"
                 >
                   {isValidatingCoupon ? (
                     <ActivityIndicator size="small" color="#fff" />
                   ) : (
-                    <ThemedText style={styles.applyButtonText}>Apply</ThemedText>
+                    <ThemedText style={styles.applyButtonText}>
+                      Send for Verification
+                    </ThemedText>
                   )}
                 </Pressable>
               </View>
