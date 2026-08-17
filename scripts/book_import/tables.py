@@ -8,7 +8,7 @@ from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, 
 
 from lxml import etree
 
-from .events import extract_events
+from .events import _select_alternate_content, extract_events
 from .model import DocumentNode, DrawingObject, TableCell, TableModel, TextEvent
 from .numbering import ListParagraph, NumberingResolver, build_list_tree, render_list_tree
 from .package import OFFICE_REL_NS, OOXMLPackage, WORD_NS
@@ -126,6 +126,7 @@ class ParsedRow:
     grid_after: int
     height_twips: Optional[int]
     height_rule: Optional[str]
+    height_source_path: Optional[str]
     cell_spacing: Optional[TableWidth]
     properties_xml: Optional[bytes]
 
@@ -147,6 +148,7 @@ class ParsedTable:
     style_id: Optional[str]
     look_attributes: Tuple[Tuple[str, str], ...]
     floating_attributes: Tuple[Tuple[str, str], ...]
+    floating_source_path: Optional[str]
     properties_xml: bytes
     canonical: TableModel
 
@@ -158,6 +160,21 @@ class ParsedTable:
             for cell in row.cells
             for event in cell.text_events
         )
+
+    @property
+    def text(self) -> str:
+        return "".join(
+            event.value
+            for event in self.text_events
+            if event.kind not in ("paragraph_boundary", "empty_paragraph")
+        )
+
+
+@dataclass(frozen=True)
+class RawPhysicalTableInventory:
+    table_count: int
+    row_count: int
+    cell_count: int
 
 
 @dataclass(frozen=True)
@@ -173,6 +190,12 @@ class TableInventory:
     caption_count: int
     drawing_count: int
     nested_table_count: int
+    eventless_table_count: int
+    floating_table_count: int
+    row_height_count: int
+    row_cell_spacing_count: int
+    grid_before_row_count: int
+    grid_after_row_count: int
 
 
 @dataclass
@@ -236,10 +259,21 @@ _HTML_BORDER_STYLES = {
     "thinThickLargeGap": "double", "thickThinLargeGap": "double",
     "thinThickThinLargeGap": "double",
 }
+_MARKUP_COMPATIBILITY_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+_FLOATING_DISTANCE_ATTRIBUTES = {
+    "leftFromText", "rightFromText", "topFromText", "bottomFromText"
+}
+_FLOATING_POSITION_ATTRIBUTES = {"tblpX", "tblpY"}
+_FLOATING_ENUM_ATTRIBUTES = {
+    "vertAnchor": {"margin", "page", "text"},
+    "horzAnchor": {"margin", "page", "text"},
+    "tblpXSpec": {"center", "inside", "left", "outside", "right"},
+    "tblpYSpec": {"bottom", "center", "inline", "inside", "outside", "top"},
+}
 
 
 def parse_tables(package: OOXMLPackage) -> Tuple[ParsedTable, ...]:
-    """Parse every physical w:tbl in document order, including empty/nested tables."""
+    """Parse tables in the exact final-display branches selected by Task 2."""
     extraction = extract_events(package)
     events_by_path: Dict[str, List[TextEvent]] = {}
     for event in extraction.visible_events:
@@ -253,13 +287,59 @@ def parse_tables(package: OOXMLPackage) -> Tuple[ParsedTable, ...]:
         cache={},
     )
     result = []
-    for element in package.document.iter(f"{{{WORD_NS}}}tbl"):
+    for element in _selected_tables(package):
         result.append(_parse_table(context, element))
     return tuple(result)
 
 
+def raw_physical_inventory(package: OOXMLPackage) -> RawPhysicalTableInventory:
+    """Count raw physical table nodes, including mutually exclusive fallbacks."""
+    tables = tuple(package.document.iter(f"{{{WORD_NS}}}tbl"))
+    return RawPhysicalTableInventory(
+        table_count=len(tables),
+        row_count=sum(len(table.findall(f"{{{WORD_NS}}}tr")) for table in tables),
+        cell_count=sum(
+            len(row.findall(f"{{{WORD_NS}}}tc"))
+            for table in tables
+            for row in table.findall(f"{{{WORD_NS}}}tr")
+        ),
+    )
+
+
+def _selected_tables(package: OOXMLPackage) -> Tuple[etree._Element, ...]:
+    return tuple(
+        element
+        for element in _iter_selected_elements(package, package.document)
+        if element.tag == f"{{{WORD_NS}}}tbl"
+    )
+
+
+def _iter_selected_elements(
+    package: OOXMLPackage,
+    parent: etree._Element,
+    *,
+    include_parent: bool = False,
+) -> Iterable[etree._Element]:
+    """Walk the same mutually exclusive branches as events.extract_events()."""
+    if include_parent:
+        yield parent
+    for child in parent:
+        if not isinstance(child.tag, str):
+            continue
+        qualified = etree.QName(child)
+        if (
+            qualified.namespace == _MARKUP_COMPATIBILITY_NS
+            and qualified.localname == "AlternateContent"
+        ):
+            selected = _select_alternate_content(package, child)
+            yield from _iter_selected_elements(package, selected)
+            continue
+        yield child
+        yield from _iter_selected_elements(package, child)
+
+
 def inventory(package: OOXMLPackage) -> TableInventory:
-    """Return structural counts from parsed tables, never from non-empty text."""
+    """Return selected final-display structural counts from canonical models."""
     tables = parse_tables(package)
     return TableInventory(
         table_count=len(tables),
@@ -298,6 +378,20 @@ def inventory(package: OOXMLPackage) -> TableInventory:
             for block in cell.blocks
             if block.kind == "table"
         ),
+        eventless_table_count=sum(1 for table in tables if not table.text_events),
+        floating_table_count=sum(1 for table in tables if table.floating_attributes),
+        row_height_count=sum(
+            1 for table in tables for row in table.rows if row.height_twips is not None
+        ),
+        row_cell_spacing_count=sum(
+            1 for table in tables for row in table.rows if row.cell_spacing is not None
+        ),
+        grid_before_row_count=sum(
+            1 for table in tables for row in table.rows if row.grid_before > 0
+        ),
+        grid_after_row_count=sum(
+            1 for table in tables for row in table.rows if row.grid_after > 0
+        ),
     )
 
 
@@ -308,6 +402,7 @@ def render_table(
 ) -> str:
     """Render one parsed table without flattening its semantic structure."""
     table_styles = ["border-collapse:collapse"]
+    floating = dict(table.floating_attributes)
     if table.width is not None:
         width = _css_width(table.width)
         if width is not None:
@@ -320,20 +415,23 @@ def render_table(
         table_styles.append(
             "table-layout:fixed" if table.layout == "fixed" else "table-layout:auto"
         )
-    if table.alignment == "center":
+    effective_alignment = table.alignment or floating.get("tblpXSpec")
+    if effective_alignment == "center":
         table_styles.extend(("margin-left:auto", "margin-right:auto"))
-    elif table.alignment == "right":
+    elif effective_alignment == "right":
         table_styles.append("margin-left:auto")
-    elif table.alignment not in (None, "left", "start", "end"):
+    elif effective_alignment not in (None, "left", "start", "end"):
         raise TableParsingError(
-            f"Unsupported table alignment {table.alignment} at {table.source_path}"
+            f"Unsupported responsive table alignment {effective_alignment} at "
+            f"{table.floating_source_path or table.source_path}"
         )
     if table.indent is not None:
         indent = _css_width(table.indent)
         if indent is not None:
             table_styles.append(f"margin-left:{indent}")
-    if table.cell_spacing is not None:
-        spacing = _css_width(table.cell_spacing)
+    effective_spacing = _effective_table_spacing(table)
+    if effective_spacing is not None:
+        spacing = _css_width(effective_spacing)
         if spacing is not None:
             table_styles.extend(("border-collapse:separate", f"border-spacing:{spacing}"))
     table_styles.extend(_border_css(table.borders.top, "top"))
@@ -356,6 +454,9 @@ def render_table(
                 )
             header_count += 1
         cells = []
+        offset_tag = "th" if row.is_header else "td"
+        if row.grid_before:
+            cells.append(_render_grid_offset(offset_tag, "before", row.grid_before))
         for cell in row.cells:
             if cell.is_vertical_merge_continuation:
                 continue
@@ -395,12 +496,23 @@ def render_table(
             attributes.append('style="' + ";".join(styles) + ';"')
             content = _render_blocks(cell.blocks, drawing_renderer)
             cells.append(f"<{tag} {' '.join(attributes)}>{content}</{tag}>")
-        row_html.append("<tr>" + "".join(cells) + "</tr>")
+        if row.grid_after:
+            cells.append(_render_grid_offset(offset_tag, "after", row.grid_after))
+        row_attributes = _render_row_attributes(row)
+        row_open = "<tr" + (" " + row_attributes if row_attributes else "") + ">"
+        row_html.append(row_open + "".join(cells) + "</tr>")
 
     head = "<thead>" + "".join(row_html[:header_count]) + "</thead>" if header_count else ""
     body = "<tbody>" + "".join(row_html[header_count:]) + "</tbody>"
     table_markup = table_open + "<colgroup>" + columns + "</colgroup>" + head + body + "</table>"
-    scroll = '<div class="mm-table-scroll" role="region" tabindex="0">' + table_markup + "</div>"
+    wrapper_class, wrapper_attributes = _floating_wrapper_attributes(table)
+    scroll = (
+        f'<div class="{wrapper_class}" role="region" tabindex="0"'
+        + wrapper_attributes
+        + ">"
+        + table_markup
+        + "</div>"
+    )
     if table.caption is None:
         return scroll
     return (
@@ -410,6 +522,115 @@ def render_table(
         + scroll
         + "</figure>"
     )
+
+
+def _effective_table_spacing(table: ParsedTable) -> Optional[TableWidth]:
+    row_values = [row.cell_spacing for row in table.rows if row.cell_spacing is not None]
+    if not row_values:
+        return table.cell_spacing
+    first = row_values[0]
+    if any((value.value, value.unit) != (first.value, first.unit) for value in row_values[1:]):
+        conflicting = next(
+            row for row in table.rows
+            if row.cell_spacing is not None
+            and (row.cell_spacing.value, row.cell_spacing.unit) != (first.value, first.unit)
+        )
+        raise TableParsingError(
+            f"Row cell spacing varies within one CSS table at {conflicting.cell_spacing.source_path}"
+        )
+    if table.cell_spacing is not None and (
+        table.cell_spacing.value, table.cell_spacing.unit
+    ) != (first.value, first.unit):
+        raise TableParsingError(
+            f"Row cell spacing conflicts with table spacing at {first.source_path}"
+        )
+    if table.cell_spacing is None and len(row_values) != len(table.rows):
+        missing = next(row for row in table.rows if row.cell_spacing is None)
+        raise TableParsingError(
+            f"Row-specific cell spacing cannot be applied to only part of a CSS table at "
+            f"{missing.source_path}"
+        )
+    return first
+
+
+def _render_row_attributes(row: ParsedRow) -> str:
+    attributes = []
+    styles = []
+    if row.height_twips is not None:
+        rule = row.height_rule or "auto"
+        attributes.extend(
+            (
+                f'data-mm-row-height-twips="{row.height_twips}"',
+                f'data-mm-row-height-rule="{rule}"',
+            )
+        )
+        if rule == "atLeast":
+            styles.append(f"height:{_points(row.height_twips)}pt")
+        elif rule == "exact":
+            raise TableParsingError(
+                f"Cannot preserve exact row height responsively without clipping content at "
+                f"{row.height_source_path or row.source_path}"
+            )
+        elif rule != "auto":
+            raise TableParsingError(
+                f"Unsupported row height rule {rule} at "
+                f"{row.height_source_path or row.source_path}"
+            )
+    if row.cell_spacing is not None:
+        attributes.extend(
+            (
+                f'data-mm-row-cell-spacing-twips="{row.cell_spacing.value}"',
+                f'data-mm-row-cell-spacing-unit="{escape(row.cell_spacing.unit, quote=True)}"',
+            )
+        )
+    if styles:
+        attributes.append('style="' + ";".join(styles) + ';"')
+    return " ".join(attributes)
+
+
+def _render_grid_offset(tag: str, position: str, span: int) -> str:
+    attributes = [
+        'class="mm-table-grid-offset"',
+        'aria-hidden="true"',
+        f'data-mm-grid-{position}="{span}"',
+    ]
+    if span > 1:
+        attributes.append(f'colspan="{span}"')
+    return f"<{tag} {' '.join(attributes)}></{tag}>"
+
+
+def _floating_wrapper_attributes(table: ParsedTable) -> Tuple[str, str]:
+    if not table.floating_attributes:
+        return "mm-table-scroll", ""
+    values = dict(table.floating_attributes)
+    attributes = []
+    name_map = {
+        "leftFromText": "left-from-text",
+        "rightFromText": "right-from-text",
+        "topFromText": "top-from-text",
+        "bottomFromText": "bottom-from-text",
+        "vertAnchor": "vert-anchor",
+        "horzAnchor": "horz-anchor",
+        "tblpXSpec": "x-spec",
+        "tblpYSpec": "y-spec",
+        "tblpX": "x",
+        "tblpY": "y",
+    }
+    for name, value in table.floating_attributes:
+        attributes.append(
+            f'data-mm-tblp-{name_map[name]}="{escape(value, quote=True)}"'
+        )
+    styles = ["clear:both"]
+    for name, css_name in (
+        ("leftFromText", "margin-left"),
+        ("rightFromText", "margin-right"),
+        ("topFromText", "margin-top"),
+        ("bottomFromText", "margin-bottom"),
+    ):
+        if name in values:
+            styles.append(f"{css_name}:{_points(int(values[name]))}pt")
+    attributes.append('style="' + ";".join(styles) + ';"')
+    return "mm-table-scroll mm-table-floating-reflow", " " + " ".join(attributes)
 
 
 def _parse_table(context: _ParseContext, table: etree._Element) -> ParsedTable:
@@ -449,7 +670,13 @@ def _parse_table(context: _ParseContext, table: etree._Element) -> ParsedTable:
     borders = _parse_borders(package, effective_properties.get("tblBorders"))
     margins = _parse_margins(package, effective_properties.get("tblCellMar"))
     look = _attributes(effective_properties.get("tblLook"))
-    floating = _attributes(effective_properties.get("tblpPr"))
+    floating_element = effective_properties.get("tblpPr")
+    if floating_element is not None and not isinstance(floating_element, etree._Element):
+        raise TableParsingError(f"Invalid floating table properties at {source_path}")
+    floating = _parse_floating_attributes(package, floating_element)
+    floating_source_path = (
+        package.source_path(floating_element) if floating_element is not None else None
+    )
 
     rows: List[ParsedRow] = []
     active_merges: Dict[int, _ActiveMerge] = {}
@@ -475,6 +702,10 @@ def _parse_table(context: _ParseContext, table: etree._Element) -> ParsedTable:
             if row_height is not None else None
         )
         height_rule = _optional_attribute(package, row_height, "hRule")
+        if height_rule not in (None, "auto", "atLeast", "exact"):
+            raise TableParsingError(
+                f"Unsupported row height rule {height_rule} at {package.source_path(row_height)}"
+            )
         row_spacing = _optional_width(
             package,
             _optional_child(package, row_properties, "tblCellSpacing"),
@@ -539,6 +770,9 @@ def _parse_table(context: _ParseContext, table: etree._Element) -> ParsedTable:
                 grid_after=grid_after,
                 height_twips=height_twips,
                 height_rule=height_rule,
+                height_source_path=(
+                    package.source_path(row_height) if row_height is not None else None
+                ),
                 cell_spacing=row_spacing,
                 properties_xml=(
                     etree.tostring(row_properties, with_tail=False)
@@ -582,6 +816,7 @@ def _parse_table(context: _ParseContext, table: etree._Element) -> ParsedTable:
         style_id=style_id,
         look_attributes=look,
         floating_attributes=floating,
+        floating_source_path=floating_source_path,
         properties_xml=etree.tostring(table_properties, with_tail=False),
         canonical=canonical,
     )
@@ -709,7 +944,9 @@ def _parse_paragraph_block(
     events: List[TextEvent] = []
     inline_order: List[Tuple[str, str]] = []
     drawing_nodes: List[DocumentNode] = []
-    for element in paragraph.iter():
+    for element in _iter_selected_elements(
+        package, paragraph, include_parent=True
+    ):
         if not isinstance(element.tag, str):
             continue
         path = package.source_path(element)
@@ -717,7 +954,9 @@ def _parse_paragraph_block(
         if local_name in ("drawing", "pict"):
             drawing_events = tuple(
                 event
-                for descendant in element.iter()
+                for descendant in _iter_selected_elements(
+                    package, element, include_parent=True
+                )
                 if isinstance(descendant.tag, str)
                 for event in context.events_by_path.get(package.source_path(descendant), ())
             )
@@ -756,7 +995,9 @@ def _drawing_object(
 ) -> DrawingObject:
     relationship_ids = {
         candidate.get(f"{{{OFFICE_REL_NS}}}embed")
-        for candidate in element.iter()
+        for candidate in _iter_selected_elements(
+            package, element, include_parent=True
+        )
         if isinstance(candidate.tag, str)
         and etree.QName(candidate).localname == "blip"
         and candidate.get(f"{{{OFFICE_REL_NS}}}embed") is not None
@@ -768,7 +1009,9 @@ def _drawing_object(
     doc_properties = next(
         (
             candidate
-            for candidate in element.iter()
+            for candidate in _iter_selected_elements(
+                package, element, include_parent=True
+            )
             if isinstance(candidate.tag, str)
             and etree.QName(candidate).localname == "docPr"
         ),
@@ -777,7 +1020,9 @@ def _drawing_object(
     extent = next(
         (
             candidate
-            for candidate in element.iter()
+            for candidate in _iter_selected_elements(
+                package, element, include_parent=True
+            )
             if isinstance(candidate.tag, str)
             and etree.QName(candidate).localname == "extent"
             and candidate.get("cx") is not None
@@ -1424,6 +1669,44 @@ def _attributes(element: Optional[etree._Element]) -> Tuple[Tuple[str, str], ...
     return tuple(
         (etree.QName(name).localname, value) for name, value in element.attrib.items()
     )
+
+
+def _parse_floating_attributes(
+    package: OOXMLPackage,
+    element: Optional[etree._Element],
+) -> Tuple[Tuple[str, str], ...]:
+    if element is None:
+        return ()
+    values = []
+    for raw_name, value in element.attrib.items():
+        qualified = etree.QName(raw_name)
+        name = qualified.localname
+        if qualified.namespace != WORD_NS:
+            raise TableParsingError(
+                f"Unsupported floating table attribute {raw_name} at {package.source_path(element)}"
+            )
+        if name in _FLOATING_DISTANCE_ATTRIBUTES:
+            parsed = _plain_integer(value, package.source_path(element), name)
+            if parsed < 0:
+                raise TableParsingError(
+                    f"Floating table distance {name} must be non-negative at "
+                    f"{package.source_path(element)}"
+                )
+        elif name in _FLOATING_POSITION_ATTRIBUTES:
+            _plain_integer(value, package.source_path(element), name)
+        elif name in _FLOATING_ENUM_ATTRIBUTES:
+            if value not in _FLOATING_ENUM_ATTRIBUTES[name]:
+                raise TableParsingError(
+                    f"Unsupported floating table {name} value {value} at "
+                    f"{package.source_path(element)}"
+                )
+        else:
+            raise TableParsingError(
+                f"Unsupported floating table attribute w:{name} at "
+                f"{package.source_path(element)}"
+            )
+        values.append((name, value))
+    return tuple(values)
 
 
 def _css_width(width: TableWidth) -> Optional[str]:

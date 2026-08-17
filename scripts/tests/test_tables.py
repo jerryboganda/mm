@@ -5,6 +5,7 @@ import unittest
 
 from scripts.book_import.constants import authoritative_source
 from scripts.book_import.package import OOXMLPackage
+from scripts.book_import import tables as table_module
 from scripts.book_import.tables import (
     TableParsingError,
     inventory,
@@ -112,6 +113,29 @@ MERGED_AND_STYLED_TABLE = """<w:tbl>
 
 
 class TableStructureTest(unittest.TestCase):
+    def test_alternate_content_emits_only_task_2_selected_choice_table(self):
+        alternate = f"""<mc:AlternateContent
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+          <mc:Choice Requires="wps"><w:tbl><w:tblPr/><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid>
+            <w:tr><w:tc><w:tcPr/><w:p><w:r><w:t>Selected choice</w:t></w:r></w:p></w:tc></w:tr>
+          </w:tbl></mc:Choice>
+          <mc:Fallback><w:tbl><w:tblPr/><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid>
+            <w:tr><w:tc><w:tcPr/><w:p><w:r><w:t>Fallback twin</w:t></w:r></w:p></w:tc></w:tr>
+          </w:tbl></mc:Fallback>
+        </mc:AlternateContent>"""
+        package = _package(alternate)
+
+        tables = parse_tables(package)
+        selected = inventory(package)
+        raw = table_module.raw_physical_inventory(package)
+
+        self.assertEqual(len(tables), 1)
+        self.assertEqual(tables[0].text, "Selected choice")
+        self.assertNotIn("Fallback twin", tables[0].text)
+        self.assertEqual((selected.table_count, selected.row_count, selected.cell_count), (1, 1, 1))
+        self.assertEqual((raw.table_count, raw.row_count, raw.cell_count), (2, 2, 2))
+
     def setUp(self):
         self.package = _package(MERGED_AND_STYLED_TABLE)
         self.table = parse_tables(self.package)[0]
@@ -205,6 +229,66 @@ class TableStructureTest(unittest.TestCase):
 
 
 class TableRenderingTest(unittest.TestCase):
+    def test_floating_table_reflows_in_place_and_retains_exact_source_geometry(self):
+        table_xml = f"""<w:tbl><w:tblPr><w:tblpPr w:leftFromText="120" w:rightFromText="240"
+          w:vertAnchor="text" w:horzAnchor="margin" w:tblpXSpec="center" w:tblpY="300"/></w:tblPr>
+          <w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid>
+          <w:tr><w:tc><w:tcPr/><w:p><w:r><w:t>Floated source</w:t></w:r></w:p></w:tc></w:tr>
+        </w:tbl>"""
+
+        html = render_table(parse_tables(_package(table_xml))[0])
+
+        self.assertIn('class="mm-table-scroll mm-table-floating-reflow"', html)
+        self.assertIn('data-mm-tblp-vert-anchor="text"', html)
+        self.assertIn('data-mm-tblp-y="300"', html)
+        self.assertIn('style="clear:both;margin-left:6pt;margin-right:12pt;"', html)
+        self.assertIn("Floated source", html)
+
+    def test_row_height_and_row_cell_spacing_render_without_dropping_rule_metadata(self):
+        table_xml = f"""<w:tbl><w:tblPr/><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid>
+          <w:tr><w:trPr><w:trHeight w:val="360" w:hRule="atLeast"/>
+            <w:tblCellSpacing w:w="20" w:type="dxa"/></w:trPr>
+            <w:tc><w:tcPr/><w:p><w:r><w:t>Geometry</w:t></w:r></w:p></w:tc></w:tr>
+        </w:tbl>"""
+        html = render_table(parse_tables(_package(table_xml))[0])
+
+        self.assertIn("border-spacing:1pt", html)
+        self.assertIn('data-mm-row-height-twips="360"', html)
+        self.assertIn('data-mm-row-height-rule="atLeast"', html)
+        self.assertIn('data-mm-row-cell-spacing-twips="20"', html)
+        self.assertIn('style="height:18pt;"', html)
+
+    def test_default_auto_row_height_is_retained_but_not_forced_and_exact_fails_closed(self):
+        auto_xml = f"""<w:tbl><w:tblPr/><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid>
+          <w:tr><w:trPr><w:trHeight w:val="300"/></w:trPr>
+            <w:tc><w:tcPr/><w:p><w:r><w:t>Auto</w:t></w:r></w:p></w:tc></w:tr></w:tbl>"""
+        auto_html = render_table(parse_tables(_package(auto_xml))[0])
+        self.assertIn('data-mm-row-height-rule="auto"', auto_html)
+        self.assertNotIn('style="height:15pt;"', auto_html)
+
+        exact_xml = auto_xml.replace(
+            '<w:trHeight w:val="300"/>',
+            '<w:trHeight w:val="300" w:hRule="exact"/>',
+        )
+        exact_table = parse_tables(_package(exact_xml))[0]
+        with self.assertRaisesRegex(TableParsingError, r"exact row height.*w:trHeight\[1\]"):
+            render_table(exact_table)
+
+    def test_grid_before_and_after_render_semantic_empty_offset_cells(self):
+        table_xml = f"""<w:tbl><w:tblPr/><w:tblGrid>
+          <w:gridCol w:w="1000"/><w:gridCol w:w="1000"/><w:gridCol w:w="1000"/>
+          </w:tblGrid><w:tr><w:trPr><w:gridBefore w:val="1"/><w:gridAfter w:val="1"/></w:trPr>
+            <w:tc><w:tcPr/><w:p><w:r><w:t>Middle</w:t></w:r></w:p></w:tc>
+          </w:tr></w:tbl>"""
+
+        html = render_table(parse_tables(_package(table_xml))[0])
+
+        before = '<td class="mm-table-grid-offset" aria-hidden="true" data-mm-grid-before="1"></td>'
+        after = '<td class="mm-table-grid-offset" aria-hidden="true" data-mm-grid-after="1"></td>'
+        self.assertIn(before + '<td style=', html)
+        self.assertIn("Middle</p></td>" + after, html)
+        self.assertEqual(parse_tables(_package(table_xml))[0].text, "Middle")
+
     def test_table_style_borders_cascade_per_side_before_direct_overrides(self):
         styles = f"""<w:styles xmlns:w="{W}"><w:style w:type="table" w:styleId="Grid">
           <w:tblPr><w:tblBorders>
@@ -311,22 +395,34 @@ class TableFailClosedTest(unittest.TestCase):
 
 
 class RealSourceTableInventoryTest(unittest.TestCase):
-    def test_authoritative_source_keeps_every_table_row_and_raw_cell(self):
+    def test_authoritative_source_separates_raw_physical_and_selected_display_inventory(self):
         source = authoritative_source(Path(__file__).resolve().parents[2])
-        result = inventory(OOXMLPackage.from_file(source))
+        package = OOXMLPackage.from_file(source)
+        raw = table_module.raw_physical_inventory(package)
+        result = inventory(package)
 
         self.assertEqual(
-            (result.table_count, result.row_count, result.cell_count),
+            (raw.table_count, raw.row_count, raw.cell_count),
             (139, 1_110, 4_615),
         )
+        self.assertEqual(
+            (result.table_count, result.row_count, result.cell_count),
+            (136, 1_097, 4_562),
+        )
         self.assertEqual(result.empty_table_count, 0)
-        self.assertEqual(result.horizontal_merged_cell_count, 485)
+        self.assertEqual(result.eventless_table_count, 0)
+        self.assertEqual(result.horizontal_merged_cell_count, 484)
         self.assertEqual(result.vertical_merge_start_count, 151)
         self.assertEqual(result.vertical_merge_continuation_count, 314)
         self.assertEqual(result.repeated_header_row_count, 2)
         self.assertEqual(result.caption_count, 0)
-        self.assertEqual(result.drawing_count, 325)
+        self.assertEqual(result.drawing_count, 170)
         self.assertEqual(result.nested_table_count, 0)
+        self.assertEqual(result.floating_table_count, 8)
+        self.assertEqual(result.row_height_count, 278)
+        self.assertEqual(result.row_cell_spacing_count, 6)
+        self.assertEqual(result.grid_before_row_count, 0)
+        self.assertEqual(result.grid_after_row_count, 4)
 
 
 if __name__ == "__main__":
