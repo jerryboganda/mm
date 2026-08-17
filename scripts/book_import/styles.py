@@ -88,26 +88,18 @@ class StyleResolver:
                     style.find(f"{{{WORD_NS}}}rPr"),
                     style_toggle=True,
                 )
-            if paragraph_properties is not None:
-                self._merge_run_properties(
-                    values, paragraph_properties.find(f"{{{WORD_NS}}}rPr")
-                )
 
         run_properties = run.find(f"{{{WORD_NS}}}rPr")
         character_style_id = _child_value(run_properties, "rStyle")
-        default_character_style = self._default_style_ids.get("character")
-        if default_character_style and default_character_style != character_style_id:
-            for style in self._style_chain(default_character_style, "character"):
-                self._merge_run_properties(
-                    values,
-                    style.find(f"{{{WORD_NS}}}rPr"),
-                    style_toggle=True,
-                )
-        for style in self._style_chain(character_style_id, "character"):
+        for style in self._character_style_chain(character_style_id):
             self._merge_run_properties(
                 values,
                 style.find(f"{{{WORD_NS}}}rPr"),
                 style_toggle=True,
+            )
+        if paragraph is not None and paragraph_properties is not None:
+            self._merge_run_properties(
+                values, paragraph_properties.find(f"{{{WORD_NS}}}rPr")
             )
         if run_properties is not None:
             self._merge_run_properties(values, run_properties)
@@ -140,28 +132,20 @@ class StyleResolver:
                     style.find(f"{{{WORD_NS}}}rPr"),
                     style_toggle=True,
                 )
-            if paragraph_properties is not None:
-                self._merge_visibility(
-                    values,
-                    paragraph_properties.find(f"{{{WORD_NS}}}rPr"),
-                    style_toggle=False,
-                )
 
         run_properties = run.find(f"{{{WORD_NS}}}rPr")
         character_style_id = _child_value(run_properties, "rStyle")
-        default_character_style = self._default_style_ids.get("character")
-        if default_character_style and default_character_style != character_style_id:
-            for style in self._style_chain(default_character_style, "character"):
-                self._merge_visibility(
-                    values,
-                    style.find(f"{{{WORD_NS}}}rPr"),
-                    style_toggle=True,
-                )
-        for style in self._style_chain(character_style_id, "character"):
+        for style in self._character_style_chain(character_style_id):
             self._merge_visibility(
                 values,
                 style.find(f"{{{WORD_NS}}}rPr"),
                 style_toggle=True,
+            )
+        if paragraph is not None and paragraph_properties is not None:
+            self._merge_visibility(
+                values,
+                paragraph_properties.find(f"{{{WORD_NS}}}rPr"),
+                style_toggle=False,
             )
         self._merge_visibility(values, run_properties, style_toggle=False)
         return values.get("vanish", False) or values.get("web_hidden", False)
@@ -203,6 +187,23 @@ class StyleResolver:
             current_id = _child_value(style, "basedOn")
         chain.reverse()
         return tuple(chain)
+
+    def _character_style_chain(
+        self, selected_style_id: Optional[str]
+    ) -> Tuple[etree._Element, ...]:
+        default_style_id = self._default_style_ids.get("character")
+        combined = (
+            *self._style_chain(default_style_id, "character"),
+            *self._style_chain(selected_style_id, "character"),
+        )
+        unique_chain: List[etree._Element] = []
+        seen_ids = set()
+        for style in combined:
+            style_id = style.get(f"{{{WORD_NS}}}styleId")
+            if style_id not in seen_ids:
+                seen_ids.add(style_id)
+                unique_chain.append(style)
+        return tuple(unique_chain)
 
     def _merge_paragraph_properties(
         self, values: Dict[str, object], properties: Optional[etree._Element]

@@ -15,7 +15,6 @@ WORD_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 OFFICE_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/main"
-XML_NS = "http://www.w3.org/XML/1998/namespace"
 
 NAMESPACES = {
     "w": WORD_NS,
@@ -23,16 +22,6 @@ NAMESPACES = {
     "a": DRAWING_NS,
     "pr": REL_NS,
 }
-
-XML_PARTS = (
-    "word/document.xml",
-    "word/styles.xml",
-    "word/numbering.xml",
-    "word/fontTable.xml",
-    "word/theme/theme1.xml",
-    "word/_rels/document.xml.rels",
-)
-
 
 class OOXMLPackageError(ValueError):
     """The DOCX package cannot be interpreted without guessing."""
@@ -103,6 +92,8 @@ class OOXMLPackage:
 
         if "word/document.xml" not in members:
             raise OOXMLPackageError("Missing required OOXML member word/document.xml")
+        if "[Content_Types].xml" not in members:
+            raise OOXMLPackageError("Missing required OOXML member [Content_Types].xml")
         if "word/_rels/document.xml.rels" not in members:
             raise OOXMLPackageError(
                 "Missing required OOXML member word/_rels/document.xml.rels"
@@ -110,9 +101,9 @@ class OOXMLPackage:
 
         roots: Dict[str, etree._Element] = {}
         paths: Dict[etree._Element, str] = {}
-        for member_name in XML_PARTS:
-            if member_name in members:
-                root = _parse_xml(member_name, members[member_name])
+        for member_name, contents in members.items():
+            if member_name.lower().endswith(".xml"):
+                root = _parse_xml(member_name, contents)
                 roots[member_name] = root
                 _index_paths(member_name, root, paths)
 
