@@ -524,7 +524,7 @@ def _render_block(block: ListBlock, parent_left_twips: int) -> str:
         marker = ""
         if block.explicit_marker:
             suffix_in_marker = " " if block.suffix == "space" else ""
-            marker = (
+            marker_span = (
                 '<span class="list-marker">'
                 + escape(item.marker_text + suffix_in_marker, quote=False)
                 + "</span>"
@@ -535,11 +535,16 @@ def _render_block(block: ListBlock, parent_left_twips: int) -> str:
                         f"Tab list suffix lacks hanging indentation at "
                         f"{item.paragraph.source_path}"
                     )
-                marker += (
-                    '<span class="list-tab" aria-hidden="true" '
-                    'data-list-suffix="tab" style="display:inline-block;'
-                    f'width:{_points(block.hanging_indent_twips)}pt;"></span>'
+                marker = (
+                    '<span class="list-prefix" style="display:inline-flex;'
+                    f'width:{_points(block.hanging_indent_twips)}pt;">'
+                    + marker_span
+                    + '<span class="list-tab" aria-hidden="true" '
+                    'data-list-suffix="tab" '
+                    'style="flex:1 1 auto;min-width:0;"></span></span>'
                 )
+            else:
+                marker = marker_span
         children = "".join(
             _render_block(child, absolute_left) for child in item.children
         )
