@@ -1,5 +1,6 @@
 from io import BytesIO
 from pathlib import Path
+import re
 from typing import Optional
 import unittest
 
@@ -52,6 +53,19 @@ def _package(
             )
         )
     )
+
+
+def _effective_table_css(html: str) -> dict:
+    match = re.search(r'<table class="mm-table" style="([^"]*)">', html)
+    if match is None:
+        raise AssertionError("Rendered HTML has no mm-table style attribute")
+    declarations = {}
+    for declaration in match.group(1).split(";"):
+        if not declaration:
+            continue
+        name, value = declaration.split(":", 1)
+        declarations[name] = value
+    return declarations
 
 
 MERGED_AND_STYLED_TABLE = """<w:tbl>
@@ -229,6 +243,28 @@ class TableStructureTest(unittest.TestCase):
 
 
 class TableRenderingTest(unittest.TestCase):
+    def test_floating_alignment_overrides_inherited_table_style_indent(self):
+        styles = f"""<w:styles xmlns:w="{W}"><w:style w:type="table" w:styleId="Indented">
+          <w:tblPr><w:tblInd w:w="720" w:type="dxa"/></w:tblPr>
+        </w:style></w:styles>"""
+        for alignment, expected in (
+            ("center", {"margin-left": "auto", "margin-right": "auto"}),
+            ("right", {"margin-left": "auto"}),
+        ):
+            with self.subTest(alignment=alignment):
+                table_xml = f"""<w:tbl><w:tblPr><w:tblStyle w:val="Indented"/>
+                  <w:tblpPr w:horzAnchor="margin" w:vertAnchor="text" w:tblpXSpec="{alignment}"/>
+                  </w:tblPr><w:tblGrid><w:gridCol w:w="1000"/></w:tblGrid>
+                  <w:tr><w:tc><w:tcPr/><w:p><w:r><w:t>Aligned</w:t></w:r></w:p></w:tc></w:tr>
+                </w:tbl>"""
+
+                css = _effective_table_css(
+                    render_table(parse_tables(_package(table_xml, styles_xml=styles))[0])
+                )
+
+                for property_name, value in expected.items():
+                    self.assertEqual(css[property_name], value)
+
     def test_floating_table_reflows_in_place_and_retains_exact_source_geometry(self):
         table_xml = f"""<w:tbl><w:tblPr><w:tblpPr w:leftFromText="120" w:rightFromText="240"
           w:vertAnchor="text" w:horzAnchor="margin" w:tblpXSpec="center" w:tblpY="300"/></w:tblPr>
@@ -395,6 +431,31 @@ class TableFailClosedTest(unittest.TestCase):
 
 
 class RealSourceTableInventoryTest(unittest.TestCase):
+    def test_authoritative_floating_center_tables_override_inherited_indent(self):
+        source = authoritative_source(Path(__file__).resolve().parents[2])
+        tables = parse_tables(OOXMLPackage.from_file(source))
+        expected_suffixes = (
+            "/w:body[1]/w:tbl[3]",
+            "/w:body[1]/w:tbl[8]",
+            "/w:body[1]/w:tbl[9]",
+        )
+
+        selected = {
+            suffix: next(table for table in tables if table.source_path.endswith(suffix))
+            for suffix in expected_suffixes
+        }
+
+        for suffix, table in selected.items():
+            with self.subTest(source_path=suffix):
+                css = _effective_table_css(
+                    render_table(
+                        table,
+                        drawing_renderer=lambda _node: '<svg aria-hidden="true"></svg>',
+                    )
+                )
+                self.assertEqual(css["margin-left"], "auto")
+                self.assertEqual(css["margin-right"], "auto")
+
     def test_authoritative_source_separates_raw_physical_and_selected_display_inventory(self):
         source = authoritative_source(Path(__file__).resolve().parents[2])
         package = OOXMLPackage.from_file(source)
