@@ -415,6 +415,10 @@ def render_table(
         table_styles.append(
             "table-layout:fixed" if table.layout == "fixed" else "table-layout:auto"
         )
+    if table.indent is not None:
+        indent = _css_width(table.indent)
+        if indent is not None:
+            table_styles.append(f"margin-left:{indent}")
     effective_alignment = table.alignment or floating.get("tblpXSpec")
     if effective_alignment == "center":
         table_styles.extend(("margin-left:auto", "margin-right:auto"))
@@ -425,10 +429,6 @@ def render_table(
             f"Unsupported responsive table alignment {effective_alignment} at "
             f"{table.floating_source_path or table.source_path}"
         )
-    if table.indent is not None:
-        indent = _css_width(table.indent)
-        if indent is not None:
-            table_styles.append(f"margin-left:{indent}")
     effective_spacing = _effective_table_spacing(table)
     if effective_spacing is not None:
         spacing = _css_width(effective_spacing)
