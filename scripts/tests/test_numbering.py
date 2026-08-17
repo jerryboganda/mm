@@ -2,6 +2,8 @@ from io import BytesIO
 from pathlib import Path
 import unittest
 
+from lxml import html as lxml_html
+
 from scripts.book_import.constants import authoritative_source
 from scripts.book_import.numbering import (
     ListParagraph,
@@ -28,12 +30,21 @@ def _level(
     left=720,
     hanging=360,
     restart=None,
+    marker_font=None,
+    legal=False,
 ):
     restart_xml = "" if restart is None else f'<w:lvlRestart w:val="{restart}"/>'
+    font_xml = (
+        ""
+        if marker_font is None
+        else f'<w:rPr><w:rFonts w:ascii="{marker_font}" w:hAnsi="{marker_font}"/></w:rPr>'
+    )
+    legal_xml = "<w:isLgl/>" if legal else ""
     return f"""<w:lvl w:ilvl="{ilvl}">
       <w:start w:val="{start}"/><w:numFmt w:val="{number_format}"/>
-      <w:lvlText w:val="{level_text}"/><w:suff w:val="{suffix}"/>{restart_xml}
+      <w:lvlText w:val="{level_text}"/><w:suff w:val="{suffix}"/>{restart_xml}{legal_xml}
       <w:pPr><w:ind w:left="{left}" w:hanging="{hanging}"/></w:pPr>
+      {font_xml}
     </w:lvl>"""
 
 
@@ -216,10 +227,33 @@ class ListTreeTest(unittest.TestCase):
         self.assertIn('style="list-style-type:decimal;', html)
 
     def test_num_id_change_does_not_invent_a_deeper_level(self):
-        html = render_numbering_fixture("same-level-new-num-id")
-        self.assertEqual(html.count("<ol"), 2)
-        self.assertNotIn("<ol><li><ol>", html)
-        self.assertIn('<ol start="4"', html)
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1">
+            {_level(0, 'decimal', '%1.')}{_level(1, 'lowerLetter', '%2)')}
+          </w:abstractNum>
+          <w:abstractNum w:abstractNumId="2">
+            {_level(1, 'lowerLetter', '%2)', start=4)}
+          </w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+          <w:num w:numId="2"><w:abstractNumId w:val="2"/></w:num>
+        </w:numbering>"""
+        package = _package(
+            (
+                _paragraph("Parent", num_id="1", ilvl=0),
+                _paragraph("First child list", num_id="1", ilvl=1),
+                _paragraph("Second child list", num_id="2", ilvl=1),
+            ),
+            numbering_xml=numbering,
+        )
+
+        rendered = render_list_tree(build_list_tree(_list_paragraphs(package)))
+        fragment = lxml_html.fragment_fromstring(rendered, create_parent="div")
+        child_lists = fragment.xpath("./ol/li/ol")
+
+        self.assertEqual(len(child_lists), 2)
+        self.assertEqual(child_lists[1].get("start"), "4")
+        self.assertFalse(child_lists[0].xpath("./li/ol"))
+        self.assertFalse(child_lists[1].xpath("./li/ol"))
 
     def test_start_override_and_new_num_id_are_an_explicit_restart(self):
         package = _package(
@@ -249,9 +283,71 @@ class ListTreeTest(unittest.TestCase):
         self.assertEqual(tree[0].items[0].marker_text, "•")
         self.assertEqual(tree[0].suffix, "tab")
         self.assertIn("<ul", html)
-        self.assertIn('class="list-marker">•\t</span>Care', html)
-        self.assertIn("margin-left:27pt", html)
+        self.assertIn('class="list-marker">•</span>', html)
+        self.assertIn(
+            'class="list-tab" aria-hidden="true" data-list-suffix="tab" '
+            'style="display:inline-block;width:9pt;"></span>Care',
+            html,
+        )
+        self.assertNotIn("\t", html)
+        self.assertIn("margin:0 0 0 27pt", html)
+        self.assertIn("padding:0", html)
         self.assertIn("text-indent:-9pt", html)
+
+    def test_nested_lists_use_source_relative_indent_and_neutralize_defaults(self):
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1">
+            {_level(0, 'decimal', '%1.', left=720, hanging=360)}
+            {_level(1, 'lowerLetter', '%2.', left=1440, hanging=360)}
+          </w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+        </w:numbering>"""
+        package = _package(
+            (
+                _paragraph("Parent", num_id="1", ilvl=0),
+                _paragraph("Child", num_id="1", ilvl=1),
+            ),
+            numbering_xml=numbering,
+        )
+
+        rendered = render_list_tree(build_list_tree(_list_paragraphs(package)))
+        fragment = lxml_html.fragment_fromstring(rendered, create_parent="div")
+        root, child = fragment.xpath(".//ol")
+
+        self.assertEqual(
+            root.get("style"),
+            "list-style-type:decimal;margin:0 0 0 36pt;padding:0;"
+            "text-indent:-18pt;",
+        )
+        self.assertEqual(
+            child.get("style"),
+            "list-style-type:lower-alpha;margin:0 0 0 36pt;padding:0;"
+            "text-indent:-18pt;",
+        )
+
+    def test_omitted_suffix_defaults_to_a_preserved_tab_stop_element(self):
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1"><w:lvl w:ilvl="0">
+            <w:start w:val="1"/><w:numFmt w:val="decimal"/>
+            <w:lvlText w:val="%1."/>
+            <w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr>
+          </w:lvl></w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+        </w:numbering>"""
+        package = _package(
+            (_paragraph("Default tab", num_id="1", ilvl=0),),
+            numbering_xml=numbering,
+        )
+
+        rendered = render_list_tree(build_list_tree(_list_paragraphs(package)))
+
+        self.assertIn('<span class="list-marker">1.</span>', rendered)
+        self.assertIn(
+            'class="list-tab" aria-hidden="true" data-list-suffix="tab" '
+            'style="display:inline-block;width:18pt;"></span>Default tab',
+            rendered,
+        )
+        self.assertNotIn("\t", rendered)
 
     def test_level_jump_creates_only_one_nested_list_and_retains_source_level(self):
         package = _package(
@@ -301,6 +397,118 @@ class ListTreeTest(unittest.TestCase):
 
         self.assertEqual(child_markers("1"), [1, 1])
         self.assertEqual(child_markers("2"), [1, 2])
+
+    def test_is_lgl_renders_every_placeholder_as_decimal(self):
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1">
+            {_level(0, 'upperRoman', '%1.')}
+            {_level(1, 'lowerLetter', '%1.%2)', legal=True)}
+          </w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+        </w:numbering>"""
+        package = _package(
+            (
+                _paragraph("Parent", num_id="1", ilvl=0),
+                _paragraph("Legal child", num_id="1", ilvl=1),
+            ),
+            numbering_xml=numbering,
+        )
+
+        tree = build_list_tree(_list_paragraphs(package))
+
+        self.assertTrue(tree[0].items[0].children[0].items[0].paragraph.numbering.legal_numbering)
+        self.assertEqual(tree[0].items[0].children[0].items[0].marker_text, "1.1)")
+
+
+class BulletFontTest(unittest.TestCase):
+    def test_all_documented_source_pua_pairs_decode_to_exact_unicode(self):
+        cases = (
+            ("Symbol", "\uf0ae", "→"),
+            ("Symbol", "\uf0b7", "•"),
+            ("Wingdings", "\uf076", "❖"),
+            ("Wingdings", "\uf0a7", "▪"),
+            ("Wingdings", "\uf0d8", "⮤"),
+            ("Wingdings", "\uf0e8", "\U0001f869"),
+            ("Wingdings", "\uf0f0", "⇨"),
+            ("Wingdings", "\uf0fc", "✓"),
+        )
+
+        for index, (font, raw_marker, portable_marker) in enumerate(cases, 1):
+            numbering = f"""<w:numbering xmlns:w="{W}">
+              <w:abstractNum w:abstractNumId="{index}">
+                {_level(0, 'bullet', raw_marker, marker_font=font)}
+              </w:abstractNum>
+              <w:num w:numId="{index}"><w:abstractNumId w:val="{index}"/></w:num>
+            </w:numbering>"""
+            package = _package(
+                (_paragraph("Mapped", num_id=str(index), ilvl=0),),
+                numbering_xml=numbering,
+            )
+
+            with self.subTest(font=font, raw_marker=f"U+{ord(raw_marker):04X}"):
+                resolved = NumberingResolver(package).resolve_paragraph(
+                    package.document.find(f".//{{{W}}}p")
+                )
+                self.assertEqual(resolved.display_level_text, portable_marker)
+
+    def test_symbol_and_wingdings_pua_markers_are_portable_and_retain_metadata(self):
+        symbol_bullet = "\uf0b7"
+        wingdings_arrow = "\uf0f0"
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1">
+            {_level(0, 'bullet', symbol_bullet, suffix='tab', marker_font='Symbol')}
+          </w:abstractNum>
+          <w:abstractNum w:abstractNumId="2">
+            {_level(0, 'bullet', wingdings_arrow, suffix='tab', marker_font='Wingdings')}
+          </w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+          <w:num w:numId="2"><w:abstractNumId w:val="2"/></w:num>
+        </w:numbering>"""
+        package = _package(
+            (
+                _paragraph("Symbol item", num_id="1", ilvl=0),
+                _paragraph("Wingdings item", num_id="2", ilvl=0),
+            ),
+            numbering_xml=numbering,
+        )
+
+        paragraphs = _list_paragraphs(package)
+        rendered = render_list_tree(build_list_tree(paragraphs))
+
+        self.assertEqual(paragraphs[0].numbering.level_text, "\uf0b7")
+        self.assertEqual(paragraphs[0].numbering.display_level_text, "•")
+        self.assertEqual(
+            paragraphs[0].numbering.marker_fonts,
+            (("ascii", "Symbol"), ("hAnsi", "Symbol")),
+        )
+        self.assertEqual(paragraphs[1].numbering.display_level_text, "⇨")
+        self.assertIn('data-source-marker-codepoints="U+F0B7"', rendered)
+        self.assertIn('data-source-marker-font="Symbol"', rendered)
+        self.assertIn('class="list-marker"', rendered)
+        self.assertIn(">•</span>", rendered)
+        self.assertIn(">⇨</span>", rendered)
+        self.assertNotIn("\uf0b7", rendered)
+        self.assertNotIn("\uf0f0", rendered)
+
+    def test_unknown_pua_font_pair_fails_closed_with_source_paths(self):
+        symbol_bullet = "\uf0b7"
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1">
+            {_level(0, 'bullet', symbol_bullet, marker_font='Calibri')}
+          </w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+        </w:numbering>"""
+
+        with self.assertRaisesRegex(
+            NumberingError,
+            r"U\+F0B7.*Calibri.*word/numbering\.xml/.*/w:lvlText\[1\].*w:rFonts\[1\]",
+        ):
+            NumberingResolver(
+                _package(
+                    (_paragraph("Unknown", num_id="1", ilvl=0),),
+                    numbering_xml=numbering,
+                )
+            )
 
 
 class NumberingFailureTest(unittest.TestCase):
@@ -359,6 +567,62 @@ class NumberingFailureTest(unittest.TestCase):
         with self.assertRaisesRegex(NumberingError, r"level 4.*w:lvlOverride\[1\]"):
             NumberingResolver(package)
 
+    def test_duplicate_singular_numbering_children_fail_with_second_source_path(self):
+        level = _level(0, "decimal", "%1.")
+        cases = (
+            (
+                f"""<w:numbering xmlns:w="{W}"><w:abstractNum w:abstractNumId="1">{level}</w:abstractNum>
+                <w:num w:numId="1"><w:abstractNumId w:val="1"/><w:abstractNumId w:val="1"/></w:num></w:numbering>""",
+                r"Duplicate w:abstractNumId.*w:num\[1\]/w:abstractNumId\[2\]",
+            ),
+            (
+                f"""<w:numbering xmlns:w="{W}"><w:abstractNum w:abstractNumId="1">{level}</w:abstractNum>
+                <w:num w:numId="1"><w:abstractNumId w:val="1"/><w:lvlOverride w:ilvl="0">
+                {level}{level}</w:lvlOverride></w:num></w:numbering>""",
+                r"Duplicate w:lvl.*w:lvlOverride\[1\]/w:lvl\[2\]",
+            ),
+            (
+                f"""<w:numbering xmlns:w="{W}"><w:abstractNum w:abstractNumId="1">{level}</w:abstractNum>
+                <w:num w:numId="1"><w:abstractNumId w:val="1"/><w:lvlOverride w:ilvl="0">
+                <w:startOverride w:val="2"/><w:startOverride w:val="3"/></w:lvlOverride></w:num></w:numbering>""",
+                r"Duplicate w:startOverride.*w:lvlOverride\[1\]/w:startOverride\[2\]",
+            ),
+            (
+                f"""<w:numbering xmlns:w="{W}"><w:abstractNum w:abstractNumId="1">
+                <w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/>
+                <w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl>
+                </w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num></w:numbering>""",
+                r"Duplicate w:numFmt.*w:lvl\[1\]/w:numFmt\[2\]",
+            ),
+        )
+
+        for numbering, message in cases:
+            with self.subTest(message=message):
+                with self.assertRaisesRegex(NumberingError, message):
+                    NumberingResolver(
+                        _package(
+                            (_paragraph("Duplicate", num_id="1", ilvl=0),),
+                            numbering_xml=numbering,
+                        )
+                    )
+
+    def test_unavailable_placeholder_failure_includes_lvl_text_source_path(self):
+        numbering = f"""<w:numbering xmlns:w="{W}">
+          <w:abstractNum w:abstractNumId="1">{_level(0, 'decimal', '%2.')}</w:abstractNum>
+          <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+        </w:numbering>"""
+
+        with self.assertRaisesRegex(
+            NumberingError,
+            r"unavailable level 1.*word/numbering\.xml/w:numbering\[1\]/w:abstractNum\[1\]/w:lvl\[1\]/w:lvlText\[1\]",
+        ):
+            NumberingResolver(
+                _package(
+                    (_paragraph("Unavailable", num_id="1", ilvl=0),),
+                    numbering_xml=numbering,
+                )
+            )
+
 
 class RealSourceNumberingInventoryTest(unittest.TestCase):
     def test_authoritative_source_has_ordered_and_unordered_format_inventory(self):
@@ -371,6 +635,10 @@ class RealSourceNumberingInventoryTest(unittest.TestCase):
             with self.subTest(number_format=number_format):
                 self.assertGreater(result.format_counts.get(number_format, 0), 0)
         self.assertTrue(all(0 <= level <= 8 for level in result.level_counts))
+        self.assertEqual(result.legacy_pua_bullet_count, 7055)
+        self.assertEqual(result.legal_numbered_paragraph_count, 65)
+        self.assertEqual(result.bullet_marker_counts.get("Symbol|U+F0B7"), 5562)
+        self.assertEqual(result.bullet_marker_counts.get("Wingdings|U+F0F0"), 1072)
 
 
 if __name__ == "__main__":
