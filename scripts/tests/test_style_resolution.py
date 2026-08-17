@@ -141,6 +141,53 @@ class StyleResolutionTest(unittest.TestCase):
 
         self.assertEqual(style.underline, "single")
 
+    def test_default_character_style_ancestor_toggle_applies_once(self):
+        styles = f"""<w:styles xmlns:w="{W}">
+          <w:style w:type="character" w:default="1" w:styleId="DefaultCharacter"><w:rPr><w:b/></w:rPr></w:style>
+          <w:style w:type="character" w:styleId="InheritedCharacter"><w:basedOn w:val="DefaultCharacter"/></w:style>
+        </w:styles>"""
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+          <w:rStyle w:val="InheritedCharacter"/>
+        </w:rPr><w:t>X</w:t></w:r></w:p></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document, styles_xml=styles)))
+        run = package.document.find(f".//{{{W}}}r")
+
+        style = StyleResolver(package).resolve_run(run)
+
+        self.assertTrue(style.bold)
+
+    def test_default_character_style_ancestor_visibility_applies_once(self):
+        styles = f"""<w:styles xmlns:w="{W}">
+          <w:style w:type="character" w:default="1" w:styleId="DefaultCharacter"><w:rPr><w:vanish/></w:rPr></w:style>
+          <w:style w:type="character" w:styleId="InheritedCharacter"><w:basedOn w:val="DefaultCharacter"/></w:style>
+        </w:styles>"""
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+          <w:rStyle w:val="InheritedCharacter"/>
+        </w:rPr><w:t>Hidden by ancestry</w:t></w:r></w:p></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document, styles_xml=styles)))
+        paragraph = package.document.find(f".//{{{W}}}p")
+        run = package.document.find(f".//{{{W}}}r")
+
+        hidden = StyleResolver(package).run_is_hidden(run, paragraph)
+
+        self.assertTrue(hidden)
+
+    def test_paragraph_run_properties_override_character_ancestry(self):
+        styles = f"""<w:styles xmlns:w="{W}">
+          <w:style w:type="character" w:styleId="BoldCharacter"><w:rPr><w:b/></w:rPr></w:style>
+        </w:styles>"""
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p>
+          <w:pPr><w:rPr><w:b w:val="0"/></w:rPr></w:pPr>
+          <w:r><w:rPr><w:rStyle w:val="BoldCharacter"/></w:rPr><w:t>X</w:t></w:r>
+        </w:p></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document, styles_xml=styles)))
+        paragraph = package.document.find(f".//{{{W}}}p")
+        run = package.document.find(f".//{{{W}}}r")
+
+        style = StyleResolver(package).resolve_run(run, paragraph)
+
+        self.assertFalse(style.bold)
+
     def test_style_ancestry_cycle_fails_closed_with_style_ids(self):
         styles = f"""<w:styles xmlns:w="{W}">
           <w:style w:type="paragraph" w:styleId="A"><w:basedOn w:val="B"/></w:style>

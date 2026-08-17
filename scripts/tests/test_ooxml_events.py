@@ -4,7 +4,6 @@ import unittest
 from scripts.book_import.events import EventExtractionError, extract_events
 from scripts.book_import.package import OOXMLPackage, OOXMLPackageError
 from scripts.tests.fixtures import (
-    CONTENT_TYPES_XML,
     EMPTY_DOCUMENT_RELS_XML,
     PACKAGE_RELS_XML,
     make_docx,
@@ -202,6 +201,37 @@ class OOXMLTextEventTest(unittest.TestCase):
         ):
             extract_events(package)
 
+    def test_deleted_table_row_fails_closed_at_structural_deletion_path(self):
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:tbl><w:tr>
+          <w:trPr><w:del w:id="7"/></w:trPr>
+          <w:tc><w:p><w:r><w:t>Deleted row</w:t></w:r></w:p></w:tc>
+        </w:tr></w:tbl></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document)))
+
+        with self.assertRaisesRegex(
+            EventExtractionError,
+            r"deleted table row.*word/document\.xml/w:document\[1\]/w:body\[1\]/w:tbl\[1\]/w:tr\[1\]/w:trPr\[1\]/w:del\[1\]",
+        ):
+            extract_events(package)
+
+    def test_column_break_has_exact_kind_without_becoming_line_break(self):
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r>
+          <w:t>Before</w:t><w:br w:type="column"/><w:t>After</w:t>
+        </w:r></w:p></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document)))
+
+        extracted = extract_events(package)
+
+        self.assertEqual(
+            [(event.kind, event.value) for event in extracted.visible_events],
+            [
+                ("text", "Before"),
+                ("column_break", ""),
+                ("text", "After"),
+                ("paragraph_boundary", "\n"),
+            ],
+        )
+
 
 class OOXMLPackageValidationTest(unittest.TestCase):
     def test_zip_member_path_traversal_is_rejected_without_extraction(self):
@@ -234,6 +264,34 @@ class OOXMLPackageValidationTest(unittest.TestCase):
     def test_malformed_xml_names_the_package_member(self):
         with self.assertRaisesRegex(OOXMLPackageError, "word/document.xml"):
             OOXMLPackage.from_file(BytesIO(make_docx("<w:document>")))
+
+    def test_malformed_non_document_xml_members_are_rejected(self):
+        valid_document = f"<w:document xmlns:w='{W}'><w:body/></w:document>"
+        cases = (
+            (
+                "[Content_Types].xml",
+                make_docx_members(
+                    (
+                        ("[Content_Types].xml", "<Types>"),
+                        ("_rels/.rels", PACKAGE_RELS_XML),
+                        ("word/document.xml", valid_document),
+                        ("word/_rels/document.xml.rels", EMPTY_DOCUMENT_RELS_XML),
+                    )
+                ),
+            ),
+            (
+                "customXml/item1.xml",
+                make_docx(
+                    valid_document,
+                    extra_members=(("customXml/item1.xml", "<medical-data>"),),
+                ),
+            ),
+        )
+
+        for member_name, archive in cases:
+            with self.subTest(member_name=member_name):
+                with self.assertRaisesRegex(OOXMLPackageError, member_name.replace("[", r"\[").replace("]", r"\]")):
+                    OOXMLPackage.from_file(BytesIO(archive))
 
 
 if __name__ == "__main__":

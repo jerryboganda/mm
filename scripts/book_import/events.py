@@ -50,10 +50,23 @@ _SUPPORTED_MARKUP_NAMESPACES = {
 def extract_events(package: OOXMLPackage) -> EventExtraction:
     """Return final-display events plus exact non-visible structural text."""
     for element in package.document.iter():
-        if etree.QName(element).localname in _AMBIGUOUS_REVISION_ELEMENTS:
+        local_name = etree.QName(element).localname
+        if local_name in _AMBIGUOUS_REVISION_ELEMENTS:
             raise EventExtractionError(
                 "Unsupported revision-display ambiguity at " + package.source_path(element)
             )
+        if local_name == "del":
+            parent = element.getparent()
+            grandparent = parent.getparent() if parent is not None else None
+            if (
+                parent is not None
+                and grandparent is not None
+                and etree.QName(parent).localname == "trPr"
+                and etree.QName(grandparent).localname == "tr"
+            ):
+                raise EventExtractionError(
+                    "Unsupported deleted table row at " + package.source_path(element)
+                )
 
     visible: List[TextEvent] = []
     diagnostics: List[TextEvent] = []
@@ -205,7 +218,16 @@ def _walk_paragraph(
 
         if local_name == "br":
             break_type = child.get(f"{{{WORD_NS}}}type")
-            kind, value = ("page_break", "\f") if break_type == "page" else ("line_break", "\n")
+            if break_type == "page":
+                kind, value = "page_break", "\f"
+            elif break_type == "column":
+                kind, value = "column_break", ""
+            elif break_type in (None, "textWrapping"):
+                kind, value = "line_break", "\n"
+            else:
+                raise EventExtractionError(
+                    f"Unsupported {break_type} break at {package.source_path(child)}"
+                )
             _append_visible_or_diagnostic(
                 package,
                 paragraph,
