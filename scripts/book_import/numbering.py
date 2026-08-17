@@ -40,6 +40,21 @@ _CSS_FORMATS = {
 }
 _PLACEHOLDER = re.compile(r"%([1-9])")
 
+# Adobe Symbol Encoding to Unicode:
+# https://www.unicode.org/Public/MAPPINGS/VENDORS/ADOBE/symbol.txt
+# Wingdings to Unicode mapping proposal:
+# https://www.unicode.org/L2/L2011/11344-wingdings.pdf
+_LEGACY_MARKER_MAP = {
+    ("symbol", 0xF0AE): "\u2192",
+    ("symbol", 0xF0B7): "\u2022",
+    ("wingdings", 0xF076): "\u2756",
+    ("wingdings", 0xF0A7): "\u25AA",
+    ("wingdings", 0xF0D8): "\u2BA4",
+    ("wingdings", 0xF0E8): "\U0001F869",
+    ("wingdings", 0xF0F0): "\u21E8",
+    ("wingdings", 0xF0FC): "\u2713",
+}
+
 
 @dataclass(frozen=True)
 class ResolvedNumberingLevel(NumberingLevel):
@@ -48,6 +63,9 @@ class ResolvedNumberingLevel(NumberingLevel):
     restart_after_level: Optional[int] = None
     level_formats: Tuple[Optional[str], ...] = ()
     legal_numbering: bool = False
+    display_level_text: Optional[str] = None
+    marker_fonts: Tuple[Tuple[str, str], ...] = ()
+    marker_font: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -61,6 +79,12 @@ class _LevelDefinition:
     hanging_indent_twips: Optional[int]
     restart_after_level: Optional[int]
     legal_numbering: bool
+    display_level_text: str
+    marker_fonts: Tuple[Tuple[str, str], ...]
+    marker_font: Optional[str]
+    marker_font_source_path: Optional[str]
+    level_text_source_path: str
+    number_format_source_path: str
 
 
 @dataclass(frozen=True)
@@ -102,6 +126,10 @@ class ListBlock:
 class NumberingInventory:
     format_counts: Mapping[str, int]
     level_counts: Mapping[int, int]
+    bullet_marker_counts: Mapping[str, int] = field(default_factory=dict)
+    portable_bullet_marker_counts: Mapping[str, int] = field(default_factory=dict)
+    legacy_pua_bullet_count: int = 0
+    legal_numbered_paragraph_count: int = 0
 
 
 class NumberingResolver:
@@ -148,13 +176,23 @@ class NumberingResolver:
             restart_after_level=selected.restart_after_level,
             level_formats=tuple(formats),
             legal_numbering=selected.legal_numbering,
+            display_level_text=selected.display_level_text,
+            marker_fonts=selected.marker_fonts,
+            marker_font=selected.marker_font,
         )
 
     def _paragraph_numbering(
         self, paragraph: etree._Element
     ) -> Tuple[Optional[str], int]:
         direct_properties = paragraph.find(f"{{{WORD_NS}}}pPr")
-        style_id = _child_value(direct_properties, "pStyle")
+        style_node = _optional_single(
+            self.package, direct_properties, "pStyle"
+        )
+        style_id = (
+            _required_attribute(self.package, style_node, "val")
+            if style_node is not None
+            else None
+        )
         effective_style_id = style_id or self._style_resolver._default_style_ids.get(
             "paragraph"
         )
@@ -165,7 +203,7 @@ class NumberingResolver:
             "pPrDefault", "pPr"
         )
         default_num_pr = (
-            default_properties.find(f"{{{WORD_NS}}}numPr")
+            _optional_single(self.package, default_properties, "numPr")
             if default_properties is not None
             else None
         )
@@ -186,7 +224,7 @@ class NumberingResolver:
         for style in style_chain:
             properties = style.find(f"{{{WORD_NS}}}pPr")
             num_pr = (
-                properties.find(f"{{{WORD_NS}}}numPr")
+                _optional_single(self.package, properties, "numPr")
                 if properties is not None
                 else None
             )
@@ -196,7 +234,7 @@ class NumberingResolver:
                     self.package, num_pr, num_id, raw_level
                 )
         direct_num_pr = (
-            direct_properties.find(f"{{{WORD_NS}}}numPr")
+            _optional_single(self.package, direct_properties, "numPr")
             if direct_properties is not None
             else None
         )
@@ -249,7 +287,9 @@ class NumberingResolver:
             num_id = _required_attribute(self.package, num, "numId")
             if num_id in definitions:
                 raise NumberingError(f"Duplicate numId {num_id}")
-            abstract_reference = num.find(f"{{{WORD_NS}}}abstractNumId")
+            abstract_reference = _optional_single(
+                self.package, num, "abstractNumId"
+            )
             if abstract_reference is None:
                 raise NumberingError(
                     f"numId {num_id} lacks abstractNumId at "
@@ -279,7 +319,7 @@ class NumberingResolver:
                         f"Override for unknown level {level} at "
                         f"{self.package.source_path(override)}"
                     )
-                replacement = override.find(f"{{{WORD_NS}}}lvl")
+                replacement = _optional_single(self.package, override, "lvl")
                 if replacement is not None:
                     replacement_level = _level_number(self.package, replacement)
                     if replacement_level != level:
@@ -291,7 +331,9 @@ class NumberingResolver:
                     levels[level] = _parse_level(
                         self.package, replacement, levels[level]
                     )
-                start_override = override.find(f"{{{WORD_NS}}}startOverride")
+                start_override = _optional_single(
+                    self.package, override, "startOverride"
+                )
                 if start_override is not None:
                     start = _required_integer(
                         self.package, start_override, "val", "startOverride"
@@ -307,6 +349,12 @@ class NumberingResolver:
                         hanging_indent_twips=current.hanging_indent_twips,
                         restart_after_level=current.restart_after_level,
                         legal_numbering=current.legal_numbering,
+                        display_level_text=current.display_level_text,
+                        marker_fonts=current.marker_fonts,
+                        marker_font=current.marker_font,
+                        marker_font_source_path=current.marker_font_source_path,
+                        level_text_source_path=current.level_text_source_path,
+                        number_format_source_path=current.number_format_source_path,
                     )
             for level, definition in levels.items():
                 for match in _PLACEHOLDER.finditer(definition.level_text):
@@ -315,7 +363,8 @@ class NumberingResolver:
                         raise NumberingError(
                             f"Level {level} marker {definition.level_text!r} "
                             "references "
-                            f"unavailable level {referenced_level} for numId {num_id}"
+                            f"unavailable level {referenced_level} for numId {num_id} "
+                            f"at {definition.level_text_source_path}"
                         )
             definitions[num_id] = _NumberingDefinition(num_id, levels)
         return definitions
@@ -326,12 +375,34 @@ def inventory(package: OOXMLPackage) -> NumberingInventory:
     resolver = NumberingResolver(package)
     formats: Counter[str] = Counter()
     levels: Counter[int] = Counter()
+    bullet_markers: Counter[str] = Counter()
+    portable_bullet_markers: Counter[str] = Counter()
+    legacy_pua_bullets = 0
+    legal_numbered_paragraphs = 0
     for paragraph in package.document.findall(f".//{{{WORD_NS}}}p"):
         resolved = resolver.resolve_paragraph(paragraph)
         if resolved is not None:
             formats[resolved.number_format] += 1
             levels[resolved.level] += 1
-    return NumberingInventory(dict(formats), dict(levels))
+            if resolved.legal_numbering:
+                legal_numbered_paragraphs += 1
+            if resolved.number_format == "bullet":
+                font = resolved.marker_font or "(none)"
+                raw_codepoints = _codepoints(resolved.level_text)
+                bullet_markers[f"{font}|{raw_codepoints}"] += 1
+                portable_bullet_markers[
+                    resolved.display_level_text or resolved.level_text
+                ] += 1
+                if any(_is_private_use(character) for character in resolved.level_text):
+                    legacy_pua_bullets += 1
+    return NumberingInventory(
+        dict(formats),
+        dict(levels),
+        dict(bullet_markers),
+        dict(portable_bullet_markers),
+        legacy_pua_bullets,
+        legal_numbered_paragraphs,
+    )
 
 
 def build_list_tree(paragraphs: Iterable[ListParagraph]) -> Tuple[ListBlock, ...]:
@@ -410,7 +481,7 @@ def build_list_tree(paragraphs: Iterable[ListParagraph]) -> Tuple[ListBlock, ...
 
 def render_list_tree(blocks: Iterable[ListBlock]) -> str:
     """Render list blocks as escaped semantic HTML without changing source text."""
-    return "".join(_render_block(block) for block in blocks)
+    return "".join(_render_block(block, 0) for block in blocks)
 
 
 def _new_block(
@@ -429,15 +500,21 @@ def _new_block(
     )
 
 
-def _render_block(block: ListBlock) -> str:
+def _render_block(block: ListBlock, parent_left_twips: int) -> str:
     tag = "ul" if block.number_format == "bullet" else "ol"
     attributes: List[str] = []
     if tag == "ol" and block.start != 1:
         attributes.append(f'start="{block.start}"')
     css_type = "none" if block.explicit_marker else _CSS_FORMATS[block.number_format]
     styles = [f"list-style-type:{css_type}"]
-    if block.left_indent_twips is not None:
-        styles.append(f"margin-left:{_points(block.left_indent_twips)}pt")
+    absolute_left = (
+        block.left_indent_twips
+        if block.left_indent_twips is not None
+        else parent_left_twips
+    )
+    relative_left = absolute_left - parent_left_twips
+    styles.append(f"margin:0 0 0 {_points(relative_left)}pt")
+    styles.append("padding:0")
     if block.hanging_indent_twips is not None:
         styles.append(f"text-indent:-{_points(block.hanging_indent_twips)}pt")
     attributes.append(f'style="{";".join(styles)};"')
@@ -446,14 +523,31 @@ def _render_block(block: ListBlock) -> str:
     for item in block.items:
         marker = ""
         if block.explicit_marker:
+            suffix_in_marker = " " if block.suffix == "space" else ""
             marker = (
                 '<span class="list-marker">'
-                + escape(item.marker_text + _suffix_text(block.suffix), quote=False)
+                + escape(item.marker_text + suffix_in_marker, quote=False)
                 + "</span>"
             )
-        children = "".join(_render_block(child) for child in item.children)
+            if block.suffix == "tab":
+                if block.hanging_indent_twips is None:
+                    raise NumberingError(
+                        f"Tab list suffix lacks hanging indentation at "
+                        f"{item.paragraph.source_path}"
+                    )
+                marker += (
+                    '<span class="list-tab" aria-hidden="true" '
+                    'data-list-suffix="tab" style="display:inline-block;'
+                    f'width:{_points(block.hanging_indent_twips)}pt;"></span>'
+                )
+        children = "".join(
+            _render_block(child, absolute_left) for child in item.children
+        )
+        source_attributes = _marker_source_attributes(item.paragraph.numbering)
         items.append(
-            "<li>"
+            "<li"
+            + source_attributes
+            + ">"
             + marker
             + escape(item.paragraph.text, quote=False)
             + children
@@ -468,7 +562,9 @@ def _marker_text(
     counters: Mapping[Tuple[str, int], int],
     source_path: str,
 ) -> str:
-    level_text = numbering.level_text
+    level_text = (
+        getattr(numbering, "display_level_text", None) or numbering.level_text
+    )
     if "%" in _PLACEHOLDER.sub("", level_text):
         raise NumberingError(
             f"Unsupported numbering placeholder in {level_text!r} at {source_path}"
@@ -551,13 +647,47 @@ def _roman(value: int, source_path: str) -> str:
 def _native_marker_can_represent(numbering: NumberingLevel, suffix: str) -> bool:
     if suffix != "space":
         return False
+    display_level_text = (
+        getattr(numbering, "display_level_text", None) or numbering.level_text
+    )
+    if display_level_text != numbering.level_text:
+        return False
     if numbering.number_format == "bullet":
-        return numbering.level_text == "•"
-    return numbering.level_text == f"%{numbering.level + 1}."
+        return display_level_text == "•"
+    return display_level_text == f"%{numbering.level + 1}."
 
 
-def _suffix_text(suffix: str) -> str:
-    return {"nothing": "", "space": " ", "tab": "\t"}[suffix]
+def _marker_source_attributes(numbering: NumberingLevel) -> str:
+    marker_fonts = getattr(numbering, "marker_fonts", ())
+    display_level_text = (
+        getattr(numbering, "display_level_text", None) or numbering.level_text
+    )
+    if not marker_fonts and display_level_text == numbering.level_text:
+        return ""
+    attributes = [
+        ' data-source-marker-codepoints="'
+        + escape(_codepoints(numbering.level_text), quote=True)
+        + '"'
+    ]
+    marker_font = getattr(numbering, "marker_font", None)
+    if marker_font:
+        attributes.append(
+            ' data-source-marker-font="' + escape(marker_font, quote=True) + '"'
+        )
+    return "".join(attributes)
+
+
+def _codepoints(value: str) -> str:
+    return " ".join(f"U+{ord(character):04X}" for character in value)
+
+
+def _is_private_use(character: str) -> bool:
+    codepoint = ord(character)
+    return (
+        0xE000 <= codepoint <= 0xF8FF
+        or 0xF0000 <= codepoint <= 0xFFFFD
+        or 0x100000 <= codepoint <= 0x10FFFD
+    )
 
 
 def _points(twips: int) -> str:
@@ -571,13 +701,21 @@ def _parse_level(
     base: Optional[_LevelDefinition],
 ) -> _LevelDefinition:
     level = _level_number(package, element)
-    start_node = element.find(f"{{{WORD_NS}}}start")
+    for singular_name in ("lvlJc", "pStyle"):
+        _optional_single(package, element, singular_name)
+    picture_bullet = _optional_single(package, element, "lvlPicBulletId")
+    if picture_bullet is not None:
+        raise NumberingError(
+            f"Unsupported picture bullet at {package.source_path(picture_bullet)}"
+        )
+
+    start_node = _optional_single(package, element, "start")
     start = (
         _required_integer(package, start_node, "val", "start")
         if start_node is not None
         else (base.start if base is not None else 1)
     )
-    format_node = element.find(f"{{{WORD_NS}}}numFmt")
+    format_node = _optional_single(package, element, "numFmt")
     number_format = (
         _required_attribute(package, format_node, "val")
         if format_node is not None
@@ -596,7 +734,12 @@ def _parse_level(
         raise NumberingError(
             f"Unsupported numbering format {number_format} at {path}"
         )
-    text_node = element.find(f"{{{WORD_NS}}}lvlText")
+    number_format_source_path = (
+        package.source_path(format_node)
+        if format_node is not None
+        else base.number_format_source_path
+    )
+    text_node = _optional_single(package, element, "lvlText")
     level_text = (
         _required_attribute(package, text_node, "val")
         if text_node is not None
@@ -615,7 +758,12 @@ def _parse_level(
         raise NumberingError(
             f"Unsupported numbering placeholder in {level_text!r} at {path}"
         )
-    suffix_node = element.find(f"{{{WORD_NS}}}suff")
+    level_text_source_path = (
+        package.source_path(text_node)
+        if text_node is not None
+        else base.level_text_source_path
+    )
+    suffix_node = _optional_single(package, element, "suff")
     suffix = (
         _required_attribute(package, suffix_node, "val")
         if suffix_node is not None
@@ -629,7 +777,7 @@ def _parse_level(
         )
         raise NumberingError(f"Unsupported numbering suffix {suffix} at {path}")
 
-    restart_node = element.find(f"{{{WORD_NS}}}lvlRestart")
+    restart_node = _optional_single(package, element, "lvlRestart")
     if restart_node is not None:
         restart_value = _required_integer(
             package, restart_node, "val", "lvlRestart"
@@ -645,7 +793,14 @@ def _parse_level(
     else:
         restart_after_level = level - 1 if level > 0 else None
 
-    indentation = element.find(f"{{{WORD_NS}}}pPr/{{{WORD_NS}}}ind")
+    paragraph_properties = _optional_single(package, element, "pPr")
+    indentation = (
+        _optional_single(package, paragraph_properties, "ind")
+        if paragraph_properties is not None
+        else None
+    )
+    if paragraph_properties is not None:
+        _optional_single(package, paragraph_properties, "tabs")
     left = base.left_indent_twips if base is not None else None
     hanging = base.hanging_indent_twips if base is not None else None
     if indentation is not None:
@@ -660,11 +815,52 @@ def _parse_level(
                 f"Unsupported firstLine numbering indentation at "
                 f"{package.source_path(indentation)}"
             )
-    legal_node = element.find(f"{{{WORD_NS}}}isLgl")
+    legal_node = _optional_single(package, element, "isLgl")
     legal = (
         _on_off(package, legal_node)
         if legal_node is not None
         else (base.legal_numbering if base is not None else False)
+    )
+
+    run_properties = _optional_single(package, element, "rPr")
+    fonts_node = (
+        _optional_single(package, run_properties, "rFonts")
+        if run_properties is not None
+        else None
+    )
+    if fonts_node is not None:
+        marker_fonts = tuple(
+            sorted(
+                (etree.QName(attribute).localname, value)
+                for attribute, value in fonts_node.attrib.items()
+                if etree.QName(attribute).namespace == WORD_NS
+            )
+        )
+        marker_font_source_path = package.source_path(fonts_node)
+    elif base is not None:
+        marker_fonts = base.marker_fonts
+        marker_font_source_path = base.marker_font_source_path
+    else:
+        marker_fonts = ()
+        marker_font_source_path = None
+    font_values = dict(marker_fonts)
+    explicit_marker_fonts = tuple(
+        font_values[name] for name in ("ascii", "hAnsi") if name in font_values
+    )
+    if (
+        any(_is_private_use(character) for character in level_text)
+        and len({font.casefold() for font in explicit_marker_fonts}) > 1
+    ):
+        raise NumberingError(
+            f"Conflicting legacy marker fonts {explicit_marker_fonts!r} at "
+            f"{marker_font_source_path} for {level_text_source_path}"
+        )
+    marker_font = explicit_marker_fonts[0] if explicit_marker_fonts else None
+    display_level_text = _portable_marker_text(
+        level_text,
+        marker_font,
+        level_text_source_path,
+        marker_font_source_path,
     )
     return _LevelDefinition(
         level,
@@ -676,6 +872,12 @@ def _parse_level(
         hanging,
         restart_after_level,
         legal,
+        display_level_text,
+        marker_fonts,
+        marker_font,
+        marker_font_source_path,
+        level_text_source_path,
+        number_format_source_path,
     )
 
 
@@ -685,8 +887,8 @@ def _merge_num_pr(
     num_id: Optional[str],
     raw_level: Optional[str],
 ) -> Tuple[Optional[str], Optional[str]]:
-    level_node = num_pr.find(f"{{{WORD_NS}}}ilvl")
-    num_node = num_pr.find(f"{{{WORD_NS}}}numId")
+    level_node = _optional_single(package, num_pr, "ilvl")
+    num_node = _optional_single(package, num_pr, "numId")
     if level_node is not None:
         raw_level = _required_attribute(package, level_node, "val")
     if num_node is not None:
@@ -740,11 +942,48 @@ def _integer(
         ) from error
 
 
-def _child_value(parent: Optional[etree._Element], local_name: str) -> Optional[str]:
+def _optional_single(
+    package: OOXMLPackage,
+    parent: Optional[etree._Element],
+    local_name: str,
+) -> Optional[etree._Element]:
     if parent is None:
         return None
-    child = parent.find(f"{{{WORD_NS}}}{local_name}")
-    return child.get(f"{{{WORD_NS}}}val") if child is not None else None
+    children = parent.findall(f"{{{WORD_NS}}}{local_name}")
+    if len(children) > 1:
+        raise NumberingError(
+            f"Duplicate w:{local_name} child at {package.source_path(children[1])}; "
+            f"first at {package.source_path(children[0])}"
+        )
+    return children[0] if children else None
+
+
+def _portable_marker_text(
+    raw_text: str,
+    marker_font: Optional[str],
+    text_source_path: str,
+    font_source_path: Optional[str],
+) -> str:
+    if not any(_is_private_use(character) for character in raw_text):
+        return raw_text
+    normalized_font = marker_font.casefold() if marker_font else ""
+    portable = []
+    for character in raw_text:
+        if not _is_private_use(character):
+            portable.append(character)
+            continue
+        key = (normalized_font, ord(character))
+        try:
+            portable.append(_LEGACY_MARKER_MAP[key])
+        except KeyError as error:
+            font_label = marker_font or "(missing font)"
+            font_location = font_source_path or "(missing w:rFonts)"
+            raise NumberingError(
+                f"Unknown legacy marker U+{ord(character):04X} with font "
+                f"{font_label} at {text_source_path}; font metadata at "
+                f"{font_location}"
+            ) from error
+    return "".join(portable)
 
 
 def _one_of_attributes(
