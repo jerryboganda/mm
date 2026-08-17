@@ -285,14 +285,36 @@ class ListTreeTest(unittest.TestCase):
         self.assertIn("<ul", html)
         self.assertIn('class="list-marker">•</span>', html)
         self.assertIn(
+            'class="list-prefix" style="display:inline-flex;width:9pt;">',
+            html,
+        )
+        self.assertIn(
             'class="list-tab" aria-hidden="true" data-list-suffix="tab" '
-            'style="display:inline-block;width:9pt;"></span>Care',
+            'style="flex:1 1 auto;min-width:0;"></span></span>Care',
             html,
         )
         self.assertNotIn("\t", html)
         self.assertIn("margin:0 0 0 27pt", html)
         self.assertIn("padding:0", html)
         self.assertIn("text-indent:-9pt", html)
+
+    def test_tab_marker_and_separator_share_one_exact_hanging_width_field(self):
+        package = _package((_paragraph("Aligned", num_id="22", ilvl=0),))
+
+        rendered = render_list_tree(build_list_tree(_list_paragraphs(package)))
+        fragment = lxml_html.fragment_fromstring(rendered, create_parent="div")
+        item = fragment.xpath(".//li")[0]
+        prefix = item.xpath("./span[@class='list-prefix']")[0]
+        marker, tab = prefix.xpath("./span")
+
+        # The list's -9pt text indent places this one 9pt-wide field at the
+        # marker origin; text in prefix.tail therefore begins exactly at left.
+        self.assertEqual(prefix.get("style"), "display:inline-flex;width:9pt;")
+        self.assertEqual(marker.get("class"), "list-marker")
+        self.assertIsNone(marker.get("style"))
+        self.assertEqual(tab.get("class"), "list-tab")
+        self.assertEqual(tab.get("style"), "flex:1 1 auto;min-width:0;")
+        self.assertEqual(prefix.tail, "Aligned")
 
     def test_nested_lists_use_source_relative_indent_and_neutralize_defaults(self):
         numbering = f"""<w:numbering xmlns:w="{W}">
@@ -343,8 +365,12 @@ class ListTreeTest(unittest.TestCase):
 
         self.assertIn('<span class="list-marker">1.</span>', rendered)
         self.assertIn(
+            'class="list-prefix" style="display:inline-flex;width:18pt;">',
+            rendered,
+        )
+        self.assertIn(
             'class="list-tab" aria-hidden="true" data-list-suffix="tab" '
-            'style="display:inline-block;width:18pt;"></span>Default tab',
+            'style="flex:1 1 auto;min-width:0;"></span></span>Default tab',
             rendered,
         )
         self.assertNotIn("\t", rendered)
