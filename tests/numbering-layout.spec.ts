@@ -49,7 +49,9 @@ test("tab suffix aligns item text at the source left indent", async ({
   page,
 }) => {
   const fixture = renderNumberingFixture();
-  const expectedLeftPx = (fixture.leftIndentTwips / 20) * (96 / 72);
+  // NUMBERING_XML defines numId 22 with w:left="540":
+  // 540 twips * 96 CSS px / 1440 twips = 36 CSS px.
+  const expectedLeftPx = 36;
 
   await page.setContent(`<!doctype html>
         <html>
@@ -102,6 +104,7 @@ test("tab suffix aligns item text at the source left indent", async ({
   expect(geometry.bodyMarginLeft).toBe("0px");
   expect(geometry.bodyPaddingLeft).toBe("0px");
   expect(geometry.markerGlyphWidth).toBeGreaterThan(0);
+  expect(fixture.leftIndentTwips).toBe(540);
   expect(fixture.hangingIndentTwips).toBeGreaterThan(0);
   expect(geometry.textLeft).toBeCloseTo(expectedLeftPx, 1);
 });
