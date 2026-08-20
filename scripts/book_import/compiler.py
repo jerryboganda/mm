@@ -234,7 +234,7 @@ def _generate_release_sql(topic_results: Sequence[TopicCompilationResult], *, so
             escaped_content = block.content.replace("'", "''")
             block_id = f"cb-book-{topic.topic_id}-{block.order}"
             lines.append(
-                f"INSERT INTO content_blocks (id, topic_id, type, content, `order`) "
+                f'INSERT INTO content_blocks (id, topic_id, type, content, "order") '
                 f"VALUES ('{block_id}', '{escaped_topic_id}', 'document_html', '{escaped_content}', {block.order});"
             )
         lines.append("")
