@@ -46,6 +46,16 @@ if [ -f "scripts/apply-book-content-release.mjs" ]; then
   "$NODE_PATH" scripts/apply-book-content-release.mjs || true
 fi
 
+if [ -f "scripts/sync-all-mysql-columns.mjs" ]; then
+  echo "Synchronizing MySQL columns & admin seeds..."
+  "$NODE_PATH" scripts/sync-all-mysql-columns.mjs
+fi
+
+if [ -f "scripts/set-admin-password.mjs" ]; then
+  echo "Setting verified admin password..."
+  "$NODE_PATH" scripts/set-admin-password.mjs
+fi
+
 if [ -f "scripts/verify-production.mjs" ]; then
   echo "Verifying production database and ensuring admin user..."
   "$NODE_PATH" scripts/verify-production.mjs
@@ -83,12 +93,22 @@ try {
 } catch (e) {}
 
 const logFile = path.join(__dirname, 'passenger_error.log');
+const origStdoutWrite = process.stdout.write.bind(process.stdout);
+const origStderrWrite = process.stderr.write.bind(process.stderr);
+
+process.stdout.write = function (chunk, encoding, cb) {
+  try { fs.appendFileSync(logFile, chunk); } catch (e) {}
+  return origStdoutWrite(chunk, encoding, cb);
+};
+
+process.stderr.write = function (chunk, encoding, cb) {
+  try { fs.appendFileSync(logFile, chunk); } catch (e) {}
+  return origStderrWrite(chunk, encoding, cb);
+};
+
 function log(msg) {
   const line = `[${new Date().toISOString()}] ${msg}\n`;
   console.log(msg);
-  try {
-    fs.appendFileSync(logFile, line);
-  } catch (e) {}
 }
 
 process.on('uncaughtException', (err) => {
@@ -163,6 +183,10 @@ mkdir -p tmp
 
 echo "Verifying the Node entrypoint can start before Passenger reload..."
 rm -f passenger_error.log
+fuser -k 5001/tcp 2>/dev/null || true
+pkill -9 -u u776151780 -f "server_dist/index.js" 2>/dev/null || true
+pkill -9 -u u776151780 -f "app.js" 2>/dev/null || true
+sleep 1
 set +e
 timeout 12 "$NODE_PATH" app.js > /tmp/maternal-mind-startup.log 2>&1
 STARTUP_STATUS=$?
@@ -183,15 +207,15 @@ for i in 1 2 3; do
   STATUS=$(curl -sS -k -o /tmp/maternal-mind-response.txt -w '%{http_code}' \
     "https://maternalmind.com.pk/api/auth/login" \
     -H "Content-Type: application/json" \
-    -d '{"email":"test@test.com","password":"test"}' || true)
+    -d '{"email":"drfarzanamuneer1@gmail.com","password":"Admin@123456"}' || true)
   cat /tmp/maternal-mind-response.txt
   echo "HTTP status: $STATUS"
-  if [ "$STATUS" = "401" ]; then
+  if [ "$STATUS" = "200" ]; then
     HEALTHY=1
     break
   fi
   echo ""
-  sleep 1
+  sleep 2
 done
 
 if [ -f "passenger_error.log" ]; then
