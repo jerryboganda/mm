@@ -222,7 +222,7 @@ def _generate_release_sql(topic_results: Sequence[TopicCompilationResult], *, so
         "-- Transactional book content release script",
         f"-- Source SHA-256: {source_sha256}",
         "-- Strictly scoped to content_blocks for the 285 Maternal Mind topics.",
-        "BEGIN;",
+        "START TRANSACTION;",
         "",
     ]
 
@@ -232,10 +232,10 @@ def _generate_release_sql(topic_results: Sequence[TopicCompilationResult], *, so
         lines.append(f"DELETE FROM content_blocks WHERE topic_id = '{escaped_topic_id}';")
         for block in topic.blocks:
             escaped_content = block.content.replace("'", "''")
-            escaped_digest = block.content_sha256.replace("'", "''")
+            block_id = f"cb-book-{topic.topic_id}-{block.order}"
             lines.append(
-                f"INSERT INTO content_blocks (topic_id, \"order\", content_type, content, content_sha256, source_sha256) "
-                f"VALUES ('{escaped_topic_id}', {block.order}, 'document_html', '{escaped_content}', '{escaped_digest}', '{source_sha256}');"
+                f"INSERT INTO content_blocks (id, topic_id, type, content, `order`) "
+                f"VALUES ('{block_id}', '{escaped_topic_id}', 'document_html', '{escaped_content}', {block.order});"
             )
         lines.append("")
 

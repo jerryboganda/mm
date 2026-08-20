@@ -67,7 +67,7 @@
       "topic_count": 6
     }
   ],
-  "compiled_at": "2026-08-20T14:33:38.441417+00:00",
+  "compiled_at": "2026-08-20T15:36:23.548640+00:00",
   "compiler_version": "1.0.0",
   "media": [
     {
@@ -1709,12 +1709,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "a0b2669d0ecee8b98eba9dff6d0fa5987b7106f1696e747b820cbdc1f0e20188"
+        "ede3bb08b4d7c746e5a99a5c5f1957fa5a0d2e664e249a49025413058cbefa3e"
       ],
       "book_id": "book-mm-01",
       "title": "2. UTERINE FIBROIDS:",
       "topic_id": "t-mm-01-002",
-      "total_utf8_bytes": 31517
+      "total_utf8_bytes": 31541
     },
     {
       "block_count": 1,
@@ -1839,12 +1839,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "498d5f60777a94025f780e6126126156439e3944509b58919357af88fe7963f0"
+        "2f58c7c4b405baaa76419ce036a4e61f8761e94122b04659c1db7defd43463cf"
       ],
       "book_id": "book-mm-01",
       "title": "15. INTER \u2013 SEX & KARYOTYPING:",
       "topic_id": "t-mm-01-015",
-      "total_utf8_bytes": 38298
+      "total_utf8_bytes": 38306
     },
     {
       "block_count": 1,
@@ -1931,13 +1931,13 @@
     {
       "block_count": 2,
       "block_digests": [
-        "694a0e85590c27081abfa97d3c2ab9403a545a822c53fe495865d67c9e821a74",
+        "7b1f95fea154617ffa992a7633bfacd5ab8846ad30724024489b78bb19cd25df",
         "0ff193d7d98a62e7e76eee8a91ea5241faedcd104311bbdd8ea09a2deb1c29c0"
       ],
       "book_id": "book-mm-01",
       "title": "23. PRECOCIOUS PUBERTY",
       "topic_id": "t-mm-01-024",
-      "total_utf8_bytes": 62427
+      "total_utf8_bytes": 62435
     },
     {
       "block_count": 1,
@@ -2012,13 +2012,13 @@
     {
       "block_count": 2,
       "block_digests": [
-        "21e27968ca22e598da585beaeef51426d27c78776a2d660d7c907762903af0a5",
+        "9ce65edd2b85be62bc40aa1112e24eb9abaef5def3a3fb11cc3a1d77b14dcfef",
         "532a641631d7295469ce07e714ef386652a3eeef5503186fd71db9c5143efbcd"
       ],
       "book_id": "book-mm-02",
       "title": "2.\tARTIFICIAL REPRODUCTIVE TECHNIQUE \u2013 PROCEDURE OVERVIEW:",
       "topic_id": "t-mm-02-008",
-      "total_utf8_bytes": 62168
+      "total_utf8_bytes": 62184
     },
     {
       "block_count": 1,
@@ -2219,12 +2219,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "5b134a48a9365295332a4c1f72229faaaba192210cbed643f85192c66a90ae30"
+        "a60c713da2a390040a9fafb7226186d96c34d052ba6f33bb5af0b0d12a8dce66"
       ],
       "book_id": "book-mm-03",
       "title": "11.\tCA ENDOMETRIUM",
       "topic_id": "t-mm-03-011",
-      "total_utf8_bytes": 30901
+      "total_utf8_bytes": 30909
     },
     {
       "block_count": 1,
@@ -2260,12 +2260,12 @@
       "block_count": 2,
       "block_digests": [
         "e425ac5eb014f3a0f3441c2644f5c71b1f0f51deb5c0f927f18258815aee9c5b",
-        "f177d4afba688bd05bf04e753ad7b127daa1de68aae839aa23ee71307772b2e2"
+        "86f705a60ab9710a2372e69dc41cf86f61aa10e76d194db33662bb42f339c3df"
       ],
       "book_id": "book-mm-03",
       "title": "15.\tPRE \u2013 MALIGNANT LESIONS OF CERVIX AND CERVICAL SCREENING PROGRAM",
       "topic_id": "t-mm-03-015",
-      "total_utf8_bytes": 89499
+      "total_utf8_bytes": 89523
     },
     {
       "block_count": 1,
@@ -2310,12 +2310,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "a3de28ef2bf2afc0f344d09721d4dcdaa3c246a140e509e8f837434ed49f127a"
+        "3607997e5ec4b7dbb68b06ab04a2a4fb9b5266366101c7c088e52f376a804422"
       ],
       "book_id": "book-mm-04",
       "title": "1.4.\tURODYNAMIC",
       "topic_id": "t-mm-04-005",
-      "total_utf8_bytes": 36007
+      "total_utf8_bytes": 36047
     },
     {
       "block_count": 1,
@@ -2440,12 +2440,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "5d4151d5dbe6bde21d8df0261a59f6d53c266f5e1aa5c8d5101ad2da89825267"
+        "430cccdc1be33d910fdf3505762ef29f1a2a3a3c1f29b1a9dcf90148ad05162e"
       ],
       "book_id": "book-mm-05",
       "title": "2.\tGENITAL INFECTIONS AND THEIR MANAGEMENTS:",
       "topic_id": "t-mm-05-002",
-      "total_utf8_bytes": 43321
+      "total_utf8_bytes": 43385
     },
     {
       "block_count": 1,
@@ -2460,12 +2460,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "bf7a524dd353dc6216acbcb25370467ca18d822cc3267cf7093f3fc012eb698a"
+        "c5ddebc04aff2aa0c850500caa6672d0c81a05befd81956b05a929925ef467f9"
       ],
       "book_id": "book-mm-05",
       "title": "4.\tGENITAL CONDITIONS AND MANAGEMENT:",
       "topic_id": "t-mm-05-004",
-      "total_utf8_bytes": 19490
+      "total_utf8_bytes": 19498
     },
     {
       "block_count": 2,
@@ -3009,13 +3009,13 @@
       "block_count": 3,
       "block_digests": [
         "9d4c484aa920a39902827947bb83e5aa467aeefb2829e6f2c130e0a21f4f15ea",
-        "8109511558cb9d780483787369bec45f2220dc30919a3154fb8c8415436e9919",
+        "d801ae341029c7b5bcb4147d9be8f4c9956446b8c40b44cf2bb9c820cdcbc53d",
         "8306323db64731c0fddc7dc798c5faadc1d6cec8969b5d4e60c15a6d18952f9a"
       ],
       "book_id": "book-mm-07",
       "title": "2. ECTOPIC PREGNANCY",
       "topic_id": "t-mm-07-002",
-      "total_utf8_bytes": 56849
+      "total_utf8_bytes": 57009
     },
     {
       "block_count": 1,
@@ -3052,12 +3052,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "37afb0dfb04b3c27d2e0800af7ea322944044bb304450756e7ed452b98d740d1"
+        "8a760171aa71b3eaf41c20da3ec2ccd88ff801c11d1104e9437912831db0807d"
       ],
       "book_id": "book-mm-07",
       "title": "6. EVOLUTION IN SCREENING FOR DOWN SYNDROME + CFFDNA:",
       "topic_id": "t-mm-07-006",
-      "total_utf8_bytes": 51468
+      "total_utf8_bytes": 51476
     },
     {
       "block_count": 1,
@@ -3116,12 +3116,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "e81c6ecfb11f7790442b83a3114d266be6b669dd7a8a60dc303c3a29d0b58a79"
+        "7885c20283d0c4a7e5e6a791d005d559a95edb50458dc4c7341718da451b957b"
       ],
       "book_id": "book-mm-08",
       "title": "5.\tRED CELL ANTIBODIES DURING PREGNANCY",
       "topic_id": "t-mm-08-005",
-      "total_utf8_bytes": 45432
+      "total_utf8_bytes": 45440
     },
     {
       "block_count": 1,
@@ -3147,12 +3147,12 @@
       "block_count": 2,
       "block_digests": [
         "1595c43662a65a954a9a6dea2689d4966b2c844ec738eecd6c2cf5ba984e0b07",
-        "a155eeb14381fa2d2dbd4a4280cb771df5ef568c26286cfe02f276f9a04dd1fc"
+        "d823b528bcfcc61eeaa240c4f00a62ac77865cf45adf5d8d28e0ff6a75333e4e"
       ],
       "book_id": "book-mm-08",
       "title": "8. HYPERTENTION IN PREGNANCY",
       "topic_id": "t-mm-08-008",
-      "total_utf8_bytes": 92755
+      "total_utf8_bytes": 92779
     },
     {
       "block_count": 1,
@@ -3348,12 +3348,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "34b54e04e67d9784aef92391991a3340306ff53e6ad533cd455a815289ecaf65"
+        "c9495b71842c8f7005d1384b51959ca8ca213d8f7fe58485a5283adae90b885b"
       ],
       "book_id": "book-mm-08",
       "title": "28. ACUTE KIDNEY INJURY IN PREGNANCY",
       "topic_id": "t-mm-08-028",
-      "total_utf8_bytes": 49382
+      "total_utf8_bytes": 49422
     },
     {
       "block_count": 1,
@@ -3408,13 +3408,13 @@
     {
       "block_count": 2,
       "block_digests": [
-        "5fcc77ec49e53dfd8aed7c4c81e359cb2d4daaf6009aa576887120046aeb94a5",
+        "8b57331606ca09e0966a5d3e18e78039381ef2f2b1d2e4bf13f8d0de38f6c9ea",
         "e0a4ec244429bacb809e55f6b514ae9744a41ab6951cda8fddd47c8a0505ce41"
       ],
       "book_id": "book-mm-08",
       "title": "34. PREGNANCY & SPINAL CORD INJURY:",
       "topic_id": "t-mm-08-034",
-      "total_utf8_bytes": 61561
+      "total_utf8_bytes": 61569
     },
     {
       "block_count": 1,
@@ -3499,23 +3499,23 @@
     {
       "block_count": 2,
       "block_digests": [
-        "4c10ecc62210137e3f26de5ebe4230327f5bbef547c5f108efec6232709393bf",
+        "18ed10941cb6b123719470c7b771b47d9cd23b1d5bdeffc9031c03684dff6082",
         "f41783a8573bd72910ae9a2330c94c1cca937d2b5b23d4135bf96734f9496a7c"
       ],
       "book_id": "book-mm-08",
       "title": "38. THYROID DISORDERS IN PREGNANCY AND POSTPARTUM",
       "topic_id": "t-mm-08-043",
-      "total_utf8_bytes": 72718
+      "total_utf8_bytes": 72886
     },
     {
       "block_count": 1,
       "block_digests": [
-        "2bd1187c2f19646eeec0636912b3144679072121de71eaae9735bd894c057c80"
+        "016a1b9a6f6ad09a7e09b7f9dbfa5672cd88407a9a8323c89d20dd75f81253a1"
       ],
       "book_id": "book-mm-08",
       "title": "38.1. MANAGEMENT OF HYPOTHYROIDISM AND RELATED DISORDERS",
       "topic_id": "t-mm-08-044",
-      "total_utf8_bytes": 40705
+      "total_utf8_bytes": 40737
     },
     {
       "block_count": 2,
@@ -3541,12 +3541,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "54937ae48ffdc00710c5baddf197afcc500a5509e6a900864c2676f17dd1515b"
+        "b162d708defb0abe1a53dac7ff527f0a4114ec4cfb22b1adb060505096331585"
       ],
       "book_id": "book-mm-08",
       "title": "38.4. POST \u2013 PARTUM THYROIDITIS PPT",
       "topic_id": "t-mm-08-047",
-      "total_utf8_bytes": 28883
+      "total_utf8_bytes": 28891
     },
     {
       "block_count": 1,
@@ -3716,12 +3716,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "341b0d401d64cf6b47018403030efdb39a4e38d4d984703f570ae41a959cb2ee"
+        "8a5dbdd684a62b89ee29db038af2428a1684e103e5f0ad9cef5ddf0ed1b539cd"
       ],
       "book_id": "book-mm-09",
       "title": "3.\tOBSTETRIC CHOLESTASIS:",
       "topic_id": "t-mm-09-016",
-      "total_utf8_bytes": 44608
+      "total_utf8_bytes": 44616
     },
     {
       "block_count": 1,
@@ -3737,13 +3737,13 @@
       "block_count": 3,
       "block_digests": [
         "bf3cad2d92d344b3b5e99a700f18792e391d86f9f8c27528488dfe750472d95c",
-        "b0735ff91ae7bd645e4e411ed2e57a4d1971aba2b6ac31c3bb4991681d7eaf37",
-        "e799a83fb497c1e9fe75633a4ba5d2990d228b74520dd7d1eb0c622b4cfc582c"
+        "19a8e59db6e0e2d9f7e8dbd23e3db154752055959a03f8f15e880b05fa7c2f7b",
+        "2cb8bae0b69c862550427365ea69754829ef2288263f5f7c5017eae942858d40"
       ],
       "book_id": "book-mm-09",
       "title": "5.\tSMALL FOR GESTATIONAL AGE:",
       "topic_id": "t-mm-09-018",
-      "total_utf8_bytes": 114969
+      "total_utf8_bytes": 115041
     },
     {
       "block_count": 2,
@@ -3831,12 +3831,12 @@
     {
       "block_count": 1,
       "block_digests": [
-        "39b1ce9eb8d5db3b7a919c6067eda2cae6b951ebc52d8ad844bf3e525cdcceeb"
+        "c65e8abd0e50819b04064d72dfa2fb6f387152a3551d801d2beb523e6e195218"
       ],
       "book_id": "book-mm-09",
       "title": "14.  ANC OF UNCOMPLICATED PREGNANCIES:",
       "topic_id": "t-mm-09-027",
-      "total_utf8_bytes": 32194
+      "total_utf8_bytes": 32234
     },
     {
       "block_count": 1,
@@ -3851,23 +3851,23 @@
     {
       "block_count": 1,
       "block_digests": [
-        "65c0f05cd760e689c4517d29def82bfe28e6d9ae8570ed1c9272a6cb2e79d9c0"
+        "8c3124631d49adfe347d907c4fffdafc82c54d11715bd43ee1a34f91de090186"
       ],
       "book_id": "book-mm-09",
       "title": "16. ANC OF SINGLETON PREGNANCY CONCEIVED USING ART:",
       "topic_id": "t-mm-09-029",
-      "total_utf8_bytes": 27886
+      "total_utf8_bytes": 27926
     },
     {
       "block_count": 2,
       "block_digests": [
-        "c4bdac3a8e4f15bd860a48403623ed7d205acec375c9b730321428eb7e6ca90f",
+        "3bbe006ec1db5189127a4f606aede8c4924edce54fb259a2fd82e14bb0dd93c3",
         "bf06bb7b87f1f2628e817637ff86f8d3f86add7295f23f6880d99b6567423ba9"
       ],
       "book_id": "book-mm-09",
       "title": "17.\tIMAGING IN PREGNANCY:",
       "topic_id": "t-mm-09-030",
-      "total_utf8_bytes": 53426
+      "total_utf8_bytes": 53466
     },
     {
       "block_count": 1,
@@ -3892,13 +3892,13 @@
     {
       "block_count": 2,
       "block_digests": [
-        "5efe9ea20f0a6172c93c50f60752d8dbfbe4fd92dab94a45f880203cd7a76c52",
-        "8b29be2ea6e6029e344146ff85fd7e02e723629c1d3e17c387e6f11e80f09663"
+        "4c94b8b0d44db2733063b48862b5241100cc8d7c8247fc2ac913f38b2459b925",
+        "a179e2ffea6ba291f0bdfa32486a0eeb88bc24ad62948ce36496de89a271fd79"
       ],
       "book_id": "book-mm-09",
       "title": "20. ANTENATAL CORTICOSTEROID:",
       "topic_id": "t-mm-09-033",
-      "total_utf8_bytes": 54062
+      "total_utf8_bytes": 54174
     },
     {
       "block_count": 2,
@@ -4026,14 +4026,14 @@
       "block_count": 4,
       "block_digests": [
         "69989d94c96bc7e2c27def4bbb29664a2e22a51c92eec39a0ae53c868cf0c603",
-        "b1b10d27d2b2a9514cfb2688a8814c927d5952dacbbad24a37f92e81c0fec4b3",
+        "6d42665ffead21b5bc0bdaff4df494fcc735bbd42573db17c2fcf3c1996e6fa4",
         "0e44237b279bd757e0e235ecb69eed11e522c387a5ea2acbedd5c6340e4f21c5",
         "0c501f0364accebc69e7fd7e4c7b3d8c4820e965347d6be70f061c5df26a9604"
       ],
       "book_id": "book-mm-10",
       "title": "3.1. HEART DISEASE",
       "topic_id": "t-mm-10-012",
-      "total_utf8_bytes": 144036
+      "total_utf8_bytes": 144044
     },
     {
       "block_count": 1,
@@ -4270,12 +4270,12 @@
       "block_count": 2,
       "block_digests": [
         "4c5310fcdf468c4d0871c02a9c1d6a64208f2befef9e1ba509ea866b9d13df6a",
-        "0cf067a59df3b2a3aaab2416590c09c65ce00e83ff1e4d86615d347262492769"
+        "eae1a5d4a5b3d13a42d1807d85029afb1036de78417e684f059986cad6ab0f6d"
       ],
       "book_id": "book-mm-10",
       "title": "12. ASSISTED VAGINAL BIRTH (AVB):",
       "topic_id": "t-mm-10-036",
-      "total_utf8_bytes": 88383
+      "total_utf8_bytes": 88391
     },
     {
       "block_count": 1,
@@ -4291,13 +4291,13 @@
       "block_count": 3,
       "block_digests": [
         "0832144c0ff173af5b669583fe45f94294832de0d7bdb418f143716ed39c8527",
-        "110c2243132574601341c21041906321422b7a039bb31d89be396548bc3f81ca",
+        "e5008666916799cdc0ea7b69e5870a1decc89da84c505e9a086775f6d21732ae",
         "c853a0db6f81d0879b5f55dd7000b3c843db0928ae03e4606fdc48d5eab2c37e"
       ],
       "book_id": "book-mm-10",
       "title": "14. MATERNAL COLLAPSE",
       "topic_id": "t-mm-10-038",
-      "total_utf8_bytes": 84337
+      "total_utf8_bytes": 84481
     },
     {
       "block_count": 1,
