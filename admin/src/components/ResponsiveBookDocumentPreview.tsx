@@ -57,21 +57,67 @@ export default function ResponsiveBookDocumentPreview({
         margin: 1.25em 0;
         border-radius: 6px;
         border: 1px solid ${borderColor};
-      }
       .mm-preview-root .mm-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.9em;
+        margin-left: 0 !important;
       }
       .mm-preview-root .mm-table th, .mm-preview-root .mm-table td {
         padding: 8px 12px;
-        border: 1px solid ${borderColor};
+        border: 1px solid ${borderColor} !important;
         vertical-align: top;
+        color: ${textColor};
       }
       .mm-preview-root .mm-table th {
         background-color: ${tableHeaderBg};
         font-weight: 600;
         color: ${headingColor};
+      }
+      .mm-preview-root .mm-table p, .mm-preview-root .mm-table span:not([style*="color:#FF0000"]):not([style*="color: #FF0000"]):not([style*="color:#ff0000"]):not([style*="color:#ff0000"]):not([style*="color:#C00000"]):not([style*="color: #C00000"]) {
+        color: ${textColor};
+      }
+      ${
+        isDark
+          ? `
+        .mm-preview-root .mm-table td, .mm-preview-root .mm-table th {
+          border-color: #374151 !important;
+        }
+        .mm-preview-root .mm-table td[style*="background-color"],
+        .mm-preview-root .mm-table th[style*="background-color"] {
+          background-color: #1E293B !important;
+          color: #F8FAFC !important;
+        }
+        .mm-preview-root .mm-table td[style*="background-color"] *,
+        .mm-preview-root .mm-table th[style*="background-color"] * {
+          color: #F8FAFC !important;
+        }
+        .mm-preview-root span[style*="color:#FF0000"],
+        .mm-preview-root span[style*="color: #FF0000"],
+        .mm-preview-root span[style*="color:#ff0000"],
+        .mm-preview-root span[style*="color: #ff0000"],
+        .mm-preview-root span[style*="color:#C00000"],
+        .mm-preview-root span[style*="color: #C00000"] {
+          color: #F87171 !important;
+        }
+        .mm-preview-root span[style*="color:#000000"],
+        .mm-preview-root span[style*="color: #000000"],
+        .mm-preview-root span[style*="color:#000"],
+        .mm-preview-root span[style*="color: #000"],
+        .mm-preview-root span[style*="color:black"],
+        .mm-preview-root span[style*="color: black"],
+        .mm-preview-root p[style*="color:#000000"],
+        .mm-preview-root p[style*="color: #000000"],
+        .mm-preview-root p[style*="color:black"] {
+          color: ${textColor} !important;
+        }
+      `
+          : `
+        .mm-preview-root .mm-table td[style*="background-color"] *,
+        .mm-preview-root .mm-table th[style*="background-color"] * {
+          color: #0F172A !important;
+        }
+      `
       }
       .mm-preview-root .mm-figure {
         margin: 1.5em 0;

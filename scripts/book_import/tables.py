@@ -415,7 +415,7 @@ def render_table(
         table_styles.append(
             "table-layout:fixed" if table.layout == "fixed" else "table-layout:auto"
         )
-    if table.indent is not None:
+    if table.indent is not None and table.indent.value > 0:
         indent = _css_width(table.indent)
         if indent is not None:
             table_styles.append(f"margin-left:{indent}")
@@ -1186,9 +1186,10 @@ def _render_event(event: TextEvent) -> str:
         chunk = f"<sub>{chunk}</sub>"
 
     inline_css: List[str] = []
-    if style.color and style.color.upper() not in ("AUTO", "000000"):
+    if style.color:
         clean_color = style.color.upper().lstrip("#")
-        inline_css.append(f"color:#{clean_color}")
+        if clean_color not in ("AUTO", "000000", "000", "BLACK", "DEFAULT", "WINDOWTEXT"):
+            inline_css.append(f"color:#{clean_color}")
     if style.font_family:
         inline_css.append(f'font-family:"{style.font_family}", sans-serif')
     if style.font_size_half_points:
