@@ -130,6 +130,10 @@ class OOXMLPackage:
     def theme(self) -> Optional[etree._Element]:
         return self._roots.get("word/theme/theme1.xml")
 
+    @property
+    def settings(self) -> Optional[etree._Element]:
+        return self._roots.get("word/settings.xml")
+
     def source_path(self, element: etree._Element) -> str:
         try:
             return self._paths[element]

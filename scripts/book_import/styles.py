@@ -36,6 +36,7 @@ class StyleResolver:
                 self._styles[key] = style
                 if _attribute_on(style, "default"):
                     self._default_style_ids[style_type] = style_id
+        self._theme_font_languages = self._read_theme_font_languages()
         self._theme_colors, self._theme_fonts = self._read_theme()
 
     def resolve_paragraph(self, paragraph: etree._Element) -> ParagraphStyle:
@@ -328,7 +329,12 @@ class StyleResolver:
                     ("asciiTheme", "hAnsiTheme", "eastAsiaTheme", "cstheme"),
                 )
                 if theme_font is not None:
-                    family = self._theme_fonts.get(theme_font, f"theme:{theme_font}")
+                    family = self._theme_fonts.get(theme_font)
+                    if family is None:
+                        raise StyleResolutionError(
+                            f"Unresolved theme font {theme_font!r} at "
+                            f"{self.package.source_path(fonts)}"
+                        )
             if family is not None:
                 values["font_family"] = family
 
@@ -447,10 +453,37 @@ class StyleResolver:
                 ):
                     node = group.find(f"{{{DRAWING_NS}}}{tag_name}")
                     typeface = node.get("typeface") if node is not None else None
+                    # Office themes commonly leave the East-Asian and complex
+                    # script slots blank.  Word uses the same theme family's
+                    # latin face in that case; emitting ``theme:*`` would be an
+                    # invalid CSS family and silently substitute a browser font.
+                    if not typeface and tag_name in {"ea", "cs"}:
+                        typeface = _script_font_for_language(
+                            group,
+                            self._theme_font_languages.get(
+                                "eastAsia" if tag_name == "ea" else "bidi"
+                            ),
+                        )
+                    if not typeface and tag_name in {"ea", "cs"}:
+                        typeface = fonts.get(f"{prefix}Ascii")
                     if typeface:
                         for suffix in suffixes:
                             fonts[f"{prefix}{suffix}"] = typeface
         return colors, fonts
+
+    def _read_theme_font_languages(self) -> Dict[str, str]:
+        settings = self.package.settings
+        if settings is None:
+            return {}
+        language = settings.find(f".//{{{WORD_NS}}}themeFontLang")
+        if language is None:
+            return {}
+        values: Dict[str, str] = {}
+        for slot, attribute in (("latin", "val"), ("eastAsia", "eastAsia"), ("bidi", "bidi")):
+            value = language.get(f"{{{WORD_NS}}}{attribute}")
+            if value:
+                values[slot] = value
+        return values
 
 
 def _child_value(parent: Optional[etree._Element], local_name: str) -> Optional[str]:
@@ -465,6 +498,38 @@ def _first_attribute(element: etree._Element, names: Iterable[str]) -> Optional[
         value = element.get(f"{{{WORD_NS}}}{name}")
         if value is not None:
             return value
+    return None
+
+
+def _script_font_for_language(
+    group: etree._Element, language: Optional[str]
+) -> Optional[str]:
+    """Resolve an optional theme script face selected by ``themeFontLang``.
+
+    Theme font groups use ISO-15924 script tags, while Word settings holds BCP-47
+    languages.  We deliberately use only unambiguous language families here;
+    unknown languages fall through to Word's documented latin-family fallback.
+    """
+    if not language:
+        return None
+    primary = language.lower().split("-", 1)[0]
+    script = {
+        "ar": "Arab",
+        "fa": "Arab",
+        "ur": "Arab",
+        "he": "Hebr",
+        "hi": "Deva",
+        "ja": "Jpan",
+        "ko": "Hang",
+        "th": "Thai",
+    }.get(primary)
+    if script is None:
+        return None
+    for node in group.findall(f"{{{DRAWING_NS}}}font"):
+        if node.get("script") == script:
+            typeface = node.get("typeface")
+            if typeface:
+                return typeface
     return None
 
 
