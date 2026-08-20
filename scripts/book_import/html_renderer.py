@@ -64,7 +64,8 @@ def _render_run_styles(events: Sequence[TextEvent]) -> str:
 
         inline_css: List[str] = []
         if style.color and style.color.upper() not in ("AUTO", "000000"):
-            inline_css.append(f"color: #{style.color.upper()}")
+            clean_color = style.color.upper().lstrip("#")
+            inline_css.append(f"color: #{clean_color}")
         if style.font_family:
             inline_css.append(f'font-family: "{style.font_family}", sans-serif')
         if style.font_size_half_points:
@@ -92,6 +93,7 @@ def _render_paragraph(node: DocumentNode) -> str:
     source_path = escape(node.source_path, quote=True)
 
     style = node.paragraph_style
+    numbering = node.numbering
     tag = "p"
     classes = ["mm-para"]
     inline_css: List[str] = []
@@ -120,16 +122,42 @@ def _render_paragraph(node: DocumentNode) -> str:
             tag = "h1"
             classes = ["mm-title"]
 
+        if style.shading:
+            classes.append("mm-header-banner")
+            inline_css.append(f"background-color: #{style.shading}")
+            inline_css.append("color: #FFFFFF")
+            inline_css.append("padding: 6px 12px")
+            inline_css.append("border-radius: 4px")
+            inline_css.append("font-weight: 700")
+
         if style.alignment and style.alignment != "left":
             inline_css.append(f"text-align: {style.alignment}")
         if style.space_before_twips:
             inline_css.append(f"margin-top: {style.space_before_twips / 20.0:g}pt")
         if style.space_after_twips:
             inline_css.append(f"margin-bottom: {style.space_after_twips / 20.0:g}pt")
-        if style.left_indent_twips:
+        if style.left_indent_twips and not numbering:
             inline_css.append(f"margin-left: {style.left_indent_twips / 20.0:g}pt")
         if style.right_indent_twips:
             inline_css.append(f"margin-right: {style.right_indent_twips / 20.0:g}pt")
+
+    if numbering:
+        classes.append("mm-list-item")
+        marker = numbering.display_level_text or ""
+        indent_twips = numbering.left_indent_twips or (style.left_indent_twips if style else 720) or 720
+        indent_pt = indent_twips / 20.0
+        inline_css.append(f"padding-left: {indent_pt:g}pt")
+
+        class_attr = " ".join(classes)
+        style_attr = f' style="{escape("; ".join(inline_css), quote=True)}"' if inline_css else ""
+        if not content:
+            content = "&nbsp;"
+        return (
+            f'<div class="{class_attr}" data-mm-source-path="{source_path}"{style_attr}>'
+            f'<span class="mm-list-marker" aria-hidden="true">{escape(marker, quote=False)}</span>'
+            f'<span class="mm-list-body">{content}</span>'
+            f'</div>'
+        )
 
     class_attr = " ".join(classes)
     style_attr = f' style="{escape("; ".join(inline_css), quote=True)}"' if inline_css else ""

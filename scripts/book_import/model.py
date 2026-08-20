@@ -41,6 +41,7 @@ class ParagraphStyle:
     keep_next: Optional[bool] = None
     keep_lines: Optional[bool] = None
     direction: Optional[str] = None
+    shading: Optional[str] = None
 
 
 @dataclass(frozen=True)

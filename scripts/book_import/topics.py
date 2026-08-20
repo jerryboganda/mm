@@ -11,7 +11,9 @@ from lxml import etree
 from .constants import BOOK_COUNT, EXPECTED_BOOK_IDS, TOPIC_COUNT, assert_compilation_invariants
 from .events import extract_events
 from .model import DocumentNode, TextEvent, TopicBoundary, TopicDocument
+from .numbering import NumberingResolver
 from .package import OOXMLPackage, WORD_NS
+from .styles import StyleResolver
 
 
 class TopicMappingError(ValueError):
@@ -128,13 +130,25 @@ def map_topic_documents(package: OOXMLPackage) -> TopicMappingResult:
             f"unowned={unowned}, multiply_owned={multiply_owned}"
         )
 
+    style_resolver = StyleResolver(package)
+    numbering_resolver = NumberingResolver(package)
+    nodes_by_topic: DefaultDict[int, List[DocumentNode]] = defaultdict(list)
+    for index in study_body_indices:
+        owner = owners[index]
+        if len(owner) == 1:
+            topic_number = owner[0]
+            node = _document_node(
+                package,
+                body_children[index],
+                events_by_body_node,
+                style_resolver=style_resolver,
+                numbering_resolver=numbering_resolver,
+            )
+            nodes_by_topic[topic_number].append(node)
+
     topics = []
     for topic_number, (entry, boundary) in enumerate(zip(scan.topics, boundaries)):
-        nodes = tuple(
-            _document_node(package, body_children[index], events_by_body_node)
-            for index in study_body_indices
-            if owners[index] == [topic_number]
-        )
+        nodes = tuple(nodes_by_topic[topic_number])
         topics.append(TopicDocument(boundary, nodes, titles[entry.anchor]))
 
     return TopicMappingResult(
@@ -345,11 +359,23 @@ def _document_node(
     package: OOXMLPackage,
     element: etree._Element,
     events_by_body_node: Dict[str, Tuple[TextEvent, ...]],
+    style_resolver: Optional[StyleResolver] = None,
+    numbering_resolver: Optional[NumberingResolver] = None,
 ) -> DocumentNode:
     source_path = package.source_path(element)
     local_name = etree.QName(element).localname
+    kind = _OWNABLE_BODY_ELEMENTS[local_name]
+    paragraph_style = None
+    numbering = None
+    if kind == "paragraph":
+        if style_resolver is not None:
+            paragraph_style = style_resolver.resolve_paragraph(element)
+        if numbering_resolver is not None:
+            numbering = numbering_resolver.resolve_paragraph(element)
     return DocumentNode(
-        kind=_OWNABLE_BODY_ELEMENTS[local_name],
+        kind=kind,
         source_path=source_path,
         text_events=events_by_body_node.get(source_path, ()),
+        paragraph_style=paragraph_style,
+        numbering=numbering,
     )
