@@ -78,16 +78,63 @@ export function ResponsiveBookDocument({
         border-collapse: collapse;
         font-size: 0.9em;
         line-height: 1.4;
+        margin-left: 0 !important;
       }
       .mm-table th, .mm-table td {
         padding: 8px 12px;
-        border: 1px solid var(--mm-border);
+        border: 1px solid var(--mm-border) !important;
         vertical-align: top;
+        color: var(--mm-text);
       }
       .mm-table th {
         background-color: var(--mm-table-header);
         font-weight: 600;
         color: var(--mm-heading);
+      }
+      .mm-table p, .mm-table span:not([style*="color:#FF0000"]):not([style*="color: #FF0000"]):not([style*="color:#ff0000"]):not([style*="color: #ff0000"]):not([style*="color:#C00000"]):not([style*="color: #C00000"]) {
+        color: var(--mm-text);
+      }
+      ${
+        isDark
+          ? `
+        .mm-table td, .mm-table th {
+          border-color: #374151 !important;
+        }
+        .mm-table td[style*="background-color"],
+        .mm-table th[style*="background-color"] {
+          background-color: #1E293B !important;
+          color: #F8FAFC !important;
+        }
+        .mm-table td[style*="background-color"] *,
+        .mm-table th[style*="background-color"] * {
+          color: #F8FAFC !important;
+        }
+        span[style*="color:#FF0000"],
+        span[style*="color: #FF0000"],
+        span[style*="color:#ff0000"],
+        span[style*="color: #ff0000"],
+        span[style*="color:#C00000"],
+        span[style*="color: #C00000"] {
+          color: #F87171 !important;
+        }
+        span[style*="color:#000000"],
+        span[style*="color: #000000"],
+        span[style*="color:#000"],
+        span[style*="color: #000"],
+        span[style*="color:black"],
+        span[style*="color: black"],
+        p[style*="color:#000000"],
+        p[style*="color: #000000"],
+        p[style*="color:black"] {
+          color: var(--mm-text) !important;
+        }
+      `
+          : `
+        .mm-table td[style*="background-color"] *,
+        .mm-table th[style*="background-color"] * {
+          color: #0F172A !important;
+        }
+      `
       }
       .mm-figure {
         margin: 1.5em 0;

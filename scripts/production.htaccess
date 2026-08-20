@@ -1,0 +1,39 @@
+PassengerAppRoot /home/u776151780/domains/maternalmind.com.pk/nodejs
+PassengerAppType node
+PassengerNodejs /opt/alt/alt-nodejs20/root/usr/bin/node
+PassengerStartupFile app.js
+PassengerBaseURI /
+PassengerRestartDir /home/u776151780/domains/maternalmind.com.pk/nodejs/tmp
+SetEnv LSNODE_CONSOLE_LOG console.log
+
+# Hostinger Single-Slot Architecture Configuration
+Options +FollowSymLinks -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Pass /api and /uploads to Node.js Passenger backend
+  RewriteRule ^api(/.*)?$ - [L]
+  RewriteRule ^uploads(/.*)?$ - [L]
+
+  # SPA Routing for Admin (/admin)
+  RewriteCond %{REQUEST_URI} ^/admin
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^admin(?:/.*)?$ admin/index.html [L]
+
+  # SPA Routing for User Panel (/app)
+  RewriteCond %{REQUEST_URI} ^/app
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^app(?:/.*)?$ app/index.html [L]
+
+  # SPA Routing for Marketing Website (/)
+  RewriteCond %{REQUEST_URI} !^/index\.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^/api
+  RewriteCond %{REQUEST_URI} !^/uploads
+  RewriteRule ^ index.html [L]
+</IfModule>
