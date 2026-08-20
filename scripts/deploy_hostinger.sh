@@ -10,8 +10,21 @@ cd "$NODE_ROOT"
 
 APP_ROOT=$(pwd -P)
 VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
-RAW_NODE="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
+ALT_NODE="/opt/alt/alt-nodejs20/root/usr/bin/node"
+SYS_NODE="$(which node 2>/dev/null || echo "/usr/bin/node")"
+
+if [ -n "$VENV_NODE" ] && [ -x "$VENV_NODE" ]; then
+  RAW_NODE="$VENV_NODE"
+elif [ -x "$ALT_NODE" ]; then
+  RAW_NODE="$ALT_NODE"
+elif [ -x "$SYS_NODE" ]; then
+  RAW_NODE="$SYS_NODE"
+else
+  RAW_NODE="/opt/alt/alt-nodejs20/root/usr/bin/node"
+fi
+
 NODE_PATH=$(readlink -f "$RAW_NODE" 2>/dev/null || echo "$RAW_NODE")
+export PATH="/opt/alt/alt-nodejs20/root/usr/bin:$PATH"
 
 echo "Canonical App Root: $APP_ROOT"
 echo "Canonical Node binary: $NODE_PATH"
