@@ -36,15 +36,20 @@ SESSION_SECRET=64H28SmybRTDp7iqXuv3UVJ1hsrt9KMxYZ5kNzLBWOlwcjno0CQgeIAfaPdEFG
 ALLOWED_ORIGIN=https://maternalmind.com.pk
 EOF
 
-if [ -f "scripts/maternal_mind_mysql.sql" ]; then
-  echo "Importing production database dump into Hostinger MySQL..."
-  mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
+if [ -f "scripts/init-mysql-schema.mjs" ]; then
+  echo "Initializing/verifying production MySQL schema & topology..."
+  "$NODE_PATH" scripts/init-mysql-schema.mjs
 fi
 
 if [ -f "scripts/apply-book-content-release.mjs" ]; then
   echo "Applying authoritative book content release..."
   "$NODE_PATH" scripts/apply-book-content-release.mjs || true
 fi
+
+if [ -f "scripts/verify-production.mjs" ]; then
+  echo "Verifying production database and ensuring admin user..."
+  "$NODE_PATH" scripts/verify-production.mjs
+fi || true
 
 echo "Organizing single-slot static frontends..."
 if [ -d "$NODE_ROOT/website_dist" ]; then
@@ -70,7 +75,11 @@ const fs = require('fs');
 const path = require('path');
 
 try {
-  require('dotenv').config();
+  process.chdir(__dirname);
+} catch (e) {}
+
+try {
+  require('dotenv').config({ path: path.join(__dirname, '.env') });
 } catch (e) {}
 
 const logFile = path.join(__dirname, 'passenger_error.log');
