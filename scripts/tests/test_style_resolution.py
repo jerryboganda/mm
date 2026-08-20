@@ -108,7 +108,7 @@ class StyleResolutionTest(unittest.TestCase):
 
         self.assertEqual(style.color, "#1A2B3C")
 
-    def test_unresolved_theme_font_is_preserved_without_inference(self):
+    def test_east_asian_theme_font_falls_back_to_its_theme_latin_face(self):
         document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
           <w:rFonts w:eastAsiaTheme="minorEastAsia"/>
         </w:rPr><w:t>X</w:t></w:r></w:p></w:body></w:document>"""
@@ -117,7 +117,85 @@ class StyleResolutionTest(unittest.TestCase):
 
         style = StyleResolver(package).resolve_run(run)
 
-        self.assertEqual(style.font_family, "theme:minorEastAsia")
+        self.assertEqual(style.font_family, "Minor Face")
+
+    def test_complex_script_theme_font_falls_back_to_its_theme_latin_face(self):
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+          <w:rFonts w:cstheme="majorBidi"/>
+        </w:rPr><w:t>X</w:t></w:r></w:p></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document, theme_xml=THEME_XML)))
+        run = package.document.find(f".//{{{W}}}r")
+
+        style = StyleResolver(package).resolve_run(run)
+
+        self.assertEqual(style.font_family, "Major Face")
+
+    def test_theme_font_language_selects_an_unambiguous_script_face(self):
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+          <w:rFonts w:cstheme="majorBidi"/>
+        </w:rPr><w:t>\u0627</w:t></w:r></w:p></w:body></w:document>"""
+        theme = f"""<a:theme xmlns:a="{A}" name="fixture"><a:themeElements>
+          <a:fontScheme name="fixture"><a:majorFont>
+            <a:latin typeface="Major Latin"/><a:cs typeface=""/>
+            <a:font script="Arab" typeface="Arabic Theme Face"/>
+          </a:majorFont></a:fontScheme>
+        </a:themeElements></a:theme>"""
+        settings = f"""<w:settings xmlns:w="{W}"><w:themeFontLang w:val="en-US" w:bidi="ar-SA"/></w:settings>"""
+        package = OOXMLPackage.from_file(
+            BytesIO(
+                make_docx(
+                    document,
+                    theme_xml=theme,
+                    extra_members=(("word/settings.xml", settings),),
+                )
+            )
+        )
+        run = package.document.find(f".//{{{W}}}r")
+
+        self.assertEqual(
+            StyleResolver(package).resolve_run(run).font_family, "Arabic Theme Face"
+        )
+
+    def test_each_ooxml_rfont_slot_resolves_to_a_literal_family(self):
+        cases = (
+            ("ascii", "ASCII Face"),
+            ("hAnsi", "High ANSI Face"),
+            ("eastAsia", "East Asian Face"),
+            ("cs", "Complex Script Face"),
+        )
+        for slot, expected in cases:
+            with self.subTest(slot=slot):
+                document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+                  <w:rFonts w:{slot}="{expected}" w:asciiTheme="majorAscii"/>
+                </w:rPr><w:t>X</w:t></w:r></w:p></w:body></w:document>"""
+                package = OOXMLPackage.from_file(
+                    BytesIO(make_docx(document, theme_xml=THEME_XML))
+                )
+                run = package.document.find(f".//{{{W}}}r")
+
+                self.assertEqual(StyleResolver(package).resolve_run(run).font_family, expected)
+
+    def test_direct_rfont_precedes_a_competing_theme_font(self):
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+          <w:rFonts w:ascii="Explicit Face" w:asciiTheme="majorAscii"/>
+        </w:rPr><w:t>X</w:t></w:r></w:p></w:body></w:document>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document, theme_xml=THEME_XML)))
+        run = package.document.find(f".//{{{W}}}r")
+
+        self.assertEqual(StyleResolver(package).resolve_run(run).font_family, "Explicit Face")
+
+    def test_unmapped_theme_font_fails_closed_instead_of_becoming_css_theme_text(self):
+        document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
+          <w:rFonts w:asciiTheme="majorAscii"/>
+        </w:rPr><w:t>X</w:t></w:r></w:p></w:body></w:document>"""
+        theme = f"""<a:theme xmlns:a="{A}" name="fixture"><a:themeElements>
+          <a:fontScheme name="fixture"><a:minorFont><a:latin typeface="Minor Face"/></a:minorFont></a:fontScheme>
+        </a:themeElements></a:theme>"""
+        package = OOXMLPackage.from_file(BytesIO(make_docx(document, theme_xml=theme)))
+        run = package.document.find(f".//{{{W}}}r")
+
+        with self.assertRaisesRegex(StyleResolutionError, "Unresolved theme font"):
+            StyleResolver(package).resolve_run(run)
 
     def test_word_theme_color_alias_resolves_to_drawing_scheme_slot(self):
         document = f"""<w:document xmlns:w="{W}"><w:body><w:p><w:r><w:rPr>
