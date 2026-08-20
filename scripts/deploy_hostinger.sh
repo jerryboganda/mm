@@ -20,6 +20,11 @@ if [ -f "scripts/maternal_mind_mysql.sql" ]; then
   mysql -u u776151780_mmuser -p'y!&rxCgt*4H' u776151780_maternalmind < scripts/maternal_mind_mysql.sql 2>/dev/null || true
 fi
 
+if [ -f "scripts/apply-book-content-release.mjs" ]; then
+  echo "Applying authoritative book content release..."
+  node scripts/apply-book-content-release.mjs || true
+fi
+
 echo "Organizing single-slot static frontends..."
 if [ -d "$NODE_ROOT/website_dist" ]; then
   echo "Deploying Marketing Website to $PUBLIC_ROOT..."

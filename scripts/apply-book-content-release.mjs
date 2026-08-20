@@ -59,21 +59,42 @@ async function main() {
     process.exit(1);
   }
 
-  const client = new pg.Client({ connectionString: databaseUrl });
-  await client.connect();
-
-  console.log("[*] Connected to database. Beginning atomic release transaction...");
-  try {
-    await client.query("BEGIN;");
-    await client.query(sqlContent);
-    await client.query("COMMIT;");
-    console.log(`[+] Successfully applied release ${SOURCE_SHA256} to production database!`);
-  } catch (err) {
-    await client.query("ROLLBACK;");
-    console.error("[-] Release transaction failed and was rolled back:", err);
-    process.exit(1);
-  } finally {
-    await client.end();
+  if (databaseUrl.startsWith("mysql")) {
+    const mysql = await import("mysql2/promise");
+    const connection = await mysql.default.createConnection({
+      uri: databaseUrl,
+      multipleStatements: true,
+    });
+    console.log("[*] Connected to MySQL database. Beginning atomic release transaction...");
+    try {
+      await connection.query("START TRANSACTION;");
+      await connection.query(sqlContent);
+      await connection.query("COMMIT;");
+      console.log(`[+] Successfully applied release ${SOURCE_SHA256} to production database!`);
+    } catch (err) {
+      await connection.query("ROLLBACK;");
+      console.error("[-] Release transaction failed and was rolled back:", err);
+      process.exit(1);
+    } finally {
+      await connection.end();
+    }
+  } else {
+    const pg = await import("pg");
+    const client = new pg.default.Client({ connectionString: databaseUrl });
+    await client.connect();
+    console.log("[*] Connected to PostgreSQL database. Beginning atomic release transaction...");
+    try {
+      await client.query("BEGIN;");
+      await client.query(sqlContent.replace(/`order`/g, '"order"'));
+      await client.query("COMMIT;");
+      console.log(`[+] Successfully applied release ${SOURCE_SHA256} to production database!`);
+    } catch (err) {
+      await client.query("ROLLBACK;");
+      console.error("[-] Release transaction failed and was rolled back:", err);
+      process.exit(1);
+    } finally {
+      await client.end();
+    }
   }
 }
 
