@@ -1070,19 +1070,13 @@ def _render_blocks(
                 candidate = blocks[index]
                 if candidate.kind != "paragraph" or candidate.canonical.numbering is None:
                     break
-                if candidate.canonical.children:
-                    if drawing_renderer is None:
-                        raise TableParsingError(
-                            f"Drawing renderer is required for {candidate.canonical.children[0].source_path}"
-                        )
-                    raise TableParsingError(
-                        f"Drawing inside a numbered table paragraph requires integrated inline rendering at "
-                        f"{candidate.canonical.children[0].source_path}"
-                    )
+                rendered_drawings = "".join(
+                    drawing_renderer(child) for child in candidate.canonical.children
+                ) if drawing_renderer else ""
                 list_paragraphs.append(
                     ListParagraph(
                         candidate.canonical.source_path,
-                        _event_text(candidate.canonical.text_events),
+                        _event_text(candidate.canonical.text_events) + rendered_drawings,
                         candidate.canonical.numbering,
                     )
                 )

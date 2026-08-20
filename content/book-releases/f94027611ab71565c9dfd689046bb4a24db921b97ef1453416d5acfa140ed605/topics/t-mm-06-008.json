@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-06-008",
+  "book_id": "book-mm-06",
+  "title": "8. SURGICAL SAFETY CHECK LIST:",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-06-008\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8577]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>8. </strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>SURGICAL SAFETY CHECK LIST:</strong></span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8578]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><em><strong>Sign in</strong></em></span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><em><strong>Time out</strong></em></span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-tab\" aria-hidden=\"true\">\t</span><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><em><strong>Sign out</strong></em></span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8579]\">\u00a0</p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8580]\">\u00a0</p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8581]\">\u00a0</p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8582]\">\u00a0</p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8583]\">\u00a0</p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8584]\">\u00a0</p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[8585]\">\u00a0</p>",
+      "content_sha256": "0586fbd4a6ec2365a3da2d2b5dadaf76cbc8731606c53a916a31eac8399150b9",
+      "block_type": "document_html"
+    }
+  ]
+}

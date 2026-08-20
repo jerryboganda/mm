@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-11-015",
+  "book_id": "book-mm-11",
+  "title": "6.9. SLEEP PROBLEMS",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-11-015\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23725]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 12pt'>6.9. </span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 12pt'>SLEEP PROBLEMS</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23726]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><strong>Discuss:</strong></span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23727]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Sleep hygiene</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23728]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Avoid caffeine </span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23729]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Reduce bedtime activity</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23730]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Healthy bed timing</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23731]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><strong>Medication:</strong></span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23732]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Promethazine in severe or chronic sleep problem</span></p>",
+      "content_sha256": "4f788bf5cd086d6fe7cc9b5bc4f0933e609451747a3e6c66582ace384aca21f7",
+      "block_type": "document_html"
+    }
+  ]
+}

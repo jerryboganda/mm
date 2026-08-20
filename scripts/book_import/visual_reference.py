@@ -2155,8 +2155,8 @@ def compare_pixels(
         raise VisualReferenceError(
             f"pixel dimensions differ: compiler={compiled.size}, reference={reference.size}"
         )
-    compiled_pixels = tuple(compiled.get_flattened_data())
-    reference_pixels = tuple(reference.get_flattened_data())
+    compiled_pixels = tuple(compiled.getdata())
+    reference_pixels = tuple(reference.getdata())
     width, height = compiled.size
     ownership = None
     if ownership_mask_png is not None:
@@ -2168,7 +2168,7 @@ def compare_pixels(
                     raise VisualReferenceError(
                         f"PDF ownership mask dimensions differ: {image.size} != {compiled.size}"
                     )
-                ownership = tuple(image.convert("L").get_flattened_data())
+                ownership = tuple(image.convert("L").getdata())
         except VisualReferenceError:
             raise
         except (UnidentifiedImageError, OSError, ValueError) as error:
@@ -2354,10 +2354,9 @@ def rasterize_svg_batch_with_chromium(
                 separators=(",", ":"),
             ),
             encoding="utf-8",
-            newline="\n",
         )
         if not harness.exists():
-            harness.write_text(_CHROMIUM_SVG_HARNESS, encoding="utf-8", newline="\n")
+            harness.write_text(_CHROMIUM_SVG_HARNESS, encoding="utf-8")
         completed = subprocess.run(
             [
                 str(renderer.node_executable),

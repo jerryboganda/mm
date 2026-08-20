@@ -213,6 +213,8 @@ class DrawingCompiler:
                 self._nested_drawings_by_shape[package.source_path(shape)].append(drawing)
         self._figures_by_topic: Dict[str, Tuple[FigureComposition, ...]] = {}
         self._figure_by_drawing_path: Dict[Tuple[str, str], FigureComposition] = {}
+        self._figure_by_member_path: Dict[str, FigureComposition] = {}
+        self._parsed_items_cache: Dict[Tuple[str, int], DrawingItem] = {}
 
     def figures(self, topic_id: str) -> Tuple[FigureComposition, ...]:
         cached = self._figures_by_topic.get(topic_id)
@@ -237,7 +239,9 @@ class DrawingCompiler:
             owners = set(drawings)
             for member, owner in self._top_drawing_by_member.items():
                 if owner in owners:
-                    self._figure_by_drawing_path[(topic_id, self.package.source_path(member))] = figure
+                    member_path = self.package.source_path(member)
+                    self._figure_by_drawing_path[(topic_id, member_path)] = figure
+                    self._figure_by_member_path[member_path] = figure
         result = tuple(figures)
         self._figures_by_topic[topic_id] = result
         return result
@@ -270,12 +274,11 @@ class DrawingCompiler:
         emitted: set[str] = set()
 
         def render(node: DocumentNode) -> str:
-            try:
-                figure = self._figure_by_drawing_path[(topic_id, node.source_path)]
-            except KeyError as error:
+            figure = self._figure_by_member_path.get(node.source_path) or self._figure_by_drawing_path.get((topic_id, node.source_path))
+            if figure is None:
                 raise UnsupportedDrawingError(
                     f"{topic_id}: drawing node has no complete composition at {node.source_path}"
-                ) from error
+                )
             if figure.figure_id not in emitted:
                 emitted.add(figure.figure_id)
                 return self.render_figure(figure)
@@ -332,6 +335,10 @@ class DrawingCompiler:
 
     def _parse_drawing(self, drawing: etree._Element, topic_id: str, order: int) -> DrawingItem:
         source_path = self.package.source_path(drawing)
+        cache_key = (source_path, order)
+        if cache_key in self._parsed_items_cache:
+            return self._parsed_items_cache[cache_key]
+
         wrappers = [
             child for child in drawing
             if isinstance(child.tag, str) and etree.QName(child).localname in ("anchor", "inline")
@@ -356,14 +363,18 @@ class DrawingCompiler:
         visual = visual_children[0]
         local = etree.QName(visual).localname
         if local == "wsp":
-            return self._parse_shape(visual, placement, z_order, topic_id)
-        if local == "pic":
-            return self._parse_picture(visual, placement, z_order, topic_id)
-        if local == "wgp":
-            return self._parse_group(visual, placement, z_order, topic_id)
-        raise UnsupportedDrawingError(
-            f"{topic_id}: unsupported graphicData object {local!r} at {self.package.source_path(visual)}"
-        )
+            item = self._parse_shape(visual, placement, z_order, topic_id)
+        elif local == "pic":
+            item = self._parse_picture(visual, placement, z_order, topic_id)
+        elif local == "wgp":
+            item = self._parse_group(visual, placement, z_order, topic_id)
+        else:
+            raise UnsupportedDrawingError(
+                f"{topic_id}: unsupported graphicData object {local!r} at {self.package.source_path(visual)}"
+            )
+
+        self._parsed_items_cache[cache_key] = item
+        return item
 
     def _parse_shape(
         self,

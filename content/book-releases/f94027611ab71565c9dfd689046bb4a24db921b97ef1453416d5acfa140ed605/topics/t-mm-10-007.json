@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-10-007",
+  "book_id": "book-mm-10",
+  "title": "1.6.\tRETAINED PLACENTA",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-10-007\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20357]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>RETAINED PLACENTA</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20358]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Save I/V line</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20359]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Don\u2019t give umbilical cord oxytocin</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20360]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Don\u2019t give I/V oxytocin routinely unless women </span><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>are</span><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'> bleeding excessively</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20361]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Offer vaginal examination to assess the need for manual removal, explain that it is painful and also offer analgesia.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20362]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Transfer to obs unit if not already in</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20363]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Give good analgesia \u2013 no manual removal without an anesthetist.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[20364]\">\u00a0</p>",
+      "content_sha256": "2cba0adc2f98fe34db5d6d5a05b690889026e079ce4c6b62733f2980bdb51ece",
+      "block_type": "document_html"
+    }
+  ]
+}

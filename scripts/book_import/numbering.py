@@ -585,22 +585,20 @@ def _marker_text(
         elif key in counters:
             value = counters[key]
         else:
-            raise NumberingError(
-                f"Numbering marker {level_text!r} references unavailable level "
-                f"{referenced_level} at {source_path}"
-            )
+            starts = getattr(numbering, "level_starts", ())
+            if referenced_level < len(starts) and starts[referenced_level] is not None:
+                value = starts[referenced_level]
+            else:
+                value = 1
         number_format = "decimal" if legal else (
             formats[referenced_level]
-            if referenced_level < len(formats)
+            if referenced_level < len(formats) and formats[referenced_level] is not None
             else None
         )
         if number_format is None and referenced_level == numbering.level:
             number_format = numbering.number_format
         if number_format is None:
-            raise NumberingError(
-                f"Numbering marker {level_text!r} lacks format for level "
-                f"{referenced_level} at {source_path}"
-            )
+            number_format = "decimal"
         return _format_number(value, number_format, source_path)
 
     return _PLACEHOLDER.sub(replace, level_text)

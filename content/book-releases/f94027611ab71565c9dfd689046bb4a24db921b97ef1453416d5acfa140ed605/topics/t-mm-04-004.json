@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-04-004",
+  "book_id": "book-mm-04",
+  "title": "1.3.\tPOST VOID VOLUME",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-04-004\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5387]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>POST VOID VOLUME</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5388]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>USG is preferred over Cather.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5389]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Detects Voiding problems.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5390]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Done in Recurrent UTI.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5391]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>If &gt;100ml \u2013 consider abnormal.</span></p>",
+      "content_sha256": "e76da03d64bc2bad0eeecafe02e1c8c9eca1dacb60d576bc6134961fdf251390",
+      "block_type": "document_html"
+    }
+  ]
+}

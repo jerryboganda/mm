@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-11-006",
+  "book_id": "book-mm-11",
+  "title": "6. MATERNAL MENTAL HEALTH",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-11-006\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23142]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>6. </strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>MATERNAL MENTAL HEALTH</strong></span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23143]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Direct cause of maternal mortality</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[23144]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Incidence = 1 in 10</span></p>",
+      "content_sha256": "b4bddf7da39810c83bc549e7f7915cd9603f1daff74dfee692cb22177f2f8435",
+      "block_type": "document_html"
+    }
+  ]
+}
