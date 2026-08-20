@@ -700,6 +700,13 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
         .json({ message: "topicId and orderedIds are required" });
     }
 
+    const existingBlocks = await adminGetContentBlocks(topicId);
+    if (existingBlocks.some(b => b.type === "document_html")) {
+      return res.status(403).json({
+        message: "This topic contains authoritative textbook content from the release pipeline and is locked against direct manual edits to maintain 100% textbook layout parity. Use the content compiler release pipeline to deploy updates."
+      });
+    }
+
     // Update each changed block
     const results = [];
     for (const block of blocks || []) {

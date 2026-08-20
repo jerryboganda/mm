@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-04-003",
+  "book_id": "book-mm-04",
+  "title": "1.2.\tBLADDER DIARY:",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-04-003\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5385]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>BLADDER DIARY:</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[5386]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><strong>For three days including </strong></span><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><strong>leisure</strong></span><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><strong> days + working days.</strong></span></p>",
+      "content_sha256": "a671b634ddeab5691b545a0b780888a8f85ce74435e7a2249c2672280e9d2acf",
+      "block_type": "document_html"
+    }
+  ]
+}

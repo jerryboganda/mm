@@ -28,7 +28,7 @@
     "ios": "expo run:ios",
     "test:book-import": "python -m unittest discover -s scripts/tests -p \"test_*.py\" -v",
     "test:book-document": "tsx --test tests/book-document-contract.test.ts",
-    "verify:book-release": "python scripts/compile_maternal_mind_book.py verify"
+    "verify:book-release": "python scripts/compile_maternal_mind_book.py --verify-only"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1106.0",

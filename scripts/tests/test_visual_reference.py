@@ -386,7 +386,6 @@ class ManifestReferenceTest(unittest.TestCase):
                 '<html><body><img src="second.png" name="Shape2" width="1" height="1">'
                 '<img src="first.png" name="Shape1" width="1" height="1"></body></html>',
                 encoding="utf-8",
-                newline="",
             )
 
             matches = match_libreoffice_html_export(package, figures, html_path)
@@ -455,7 +454,6 @@ class ManifestReferenceTest(unittest.TestCase):
                 '<html><body><img src="second.png" name="Shape2" width="1" height="1">'
                 '<img src="first.png" name="Shape1" width="1" height="1"></body></html>',
                 encoding="utf-8",
-                newline="",
             )
             matches = match_libreoffice_html_export(package, figures, html_path)
             reference = build_libreoffice_figure_references(
@@ -497,7 +495,6 @@ class ManifestReferenceTest(unittest.TestCase):
                 '<html><body><img src="second.png" name="Shape2" width="1" height="1">'
                 '<img src="first.png" name="Shape1" width="1" height="1"></body></html>',
                 encoding="utf-8",
-                newline="\n",
             )
             matches = match_libreoffice_html_export(package, figures, html_path)
             red_asset = next(
@@ -536,7 +533,6 @@ class LibreOfficeReferenceRendererTest(unittest.TestCase):
             source.write_text(
                 """<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><rect width="12" height="8" fill="#123456"/></svg>""",
                 encoding="utf-8",
-                newline="",
             )
             result = renderer.export(source, Path(directory) / "export", target="pdf")
 
@@ -578,7 +574,7 @@ class ChromiumSvgRendererTest(unittest.TestCase):
                 self.assertIsNotNone(thin.convert("RGBA").getbbox())
             with Image.open(BytesIO(rasters["transparent"])) as background:
                 self.assertEqual(
-                    set(background.convert("RGBA").get_flattened_data()),
+                    set(background.convert("RGBA").getdata()),
                     {(255, 255, 255, 255)},
                 )
             unchanged_reference = rasters["figure-a"]

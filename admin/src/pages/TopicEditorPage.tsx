@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import BlockEditor, { ContentBlock, normalizeBlockOrder } from "../components/BlockEditor";
+import ImportedDocumentBlock from "../components/ImportedDocumentBlock";
 import MobileContentPreview from "../components/MobileContentPreview";
 import {
   Save,
@@ -192,18 +193,20 @@ export default function TopicEditorPage() {
             {topic.isPaid ? "Make Free" : "Make Paid"}
           </button>
         )}
-        <button
-          onClick={saveAll}
-          disabled={saving}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-            saved
-              ? "bg-green-100 text-green-700"
-              : "bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
-          }`}
-        >
-          <Save className="w-4 h-4" />
-          {saving ? "Saving..." : saved ? "Saved" : "Save All"}
-        </button>
+        {!localBlocks.some((b) => (b.type as string) === "document_html") && (
+          <button
+            onClick={saveAll}
+            disabled={saving}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+              saved
+                ? "bg-green-100 text-green-700"
+                : "bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
+            }`}
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "Saving..." : saved ? "Saved" : "Save All"}
+          </button>
+        )}
       </div>
 
       {error && (
@@ -215,18 +218,30 @@ export default function TopicEditorPage() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* Content Blocks */}
         <div>
-          <BlockEditor
-            blocks={localBlocks}
-            onChange={setLocalBlocks}
-            uploadImage={uploadImage}
-            registerHtmlGetter={registerRichTextHtmlGetter}
-            onAddBlockRemote={async (type, insertIndex) =>
-              api.post("/admin/content/blocks", { topicId, type, content: "" })
-            }
-            onDeleteBlockRemote={async (id) =>
-              api.delete(`/admin/content/blocks/${id}`)
-            }
-          />
+          {localBlocks.some((b) => (b.type as string) === "document_html") ? (
+            <div className="space-y-4">
+              {localBlocks.map((block) => (
+                <ImportedDocumentBlock
+                  key={block.id}
+                  block={block}
+                  topicId={topicId || ""}
+                />
+              ))}
+            </div>
+          ) : (
+            <BlockEditor
+              blocks={localBlocks}
+              onChange={setLocalBlocks}
+              uploadImage={uploadImage}
+              registerHtmlGetter={registerRichTextHtmlGetter}
+              onAddBlockRemote={async (type, insertIndex) =>
+                api.post("/admin/content/blocks", { topicId, type, content: "" })
+              }
+              onDeleteBlockRemote={async (id) =>
+                api.delete(`/admin/content/blocks/${id}`)
+              }
+            />
+          )}
         </div>
         <div className="lg:sticky lg:top-6 lg:self-start">
           <MobileContentPreview

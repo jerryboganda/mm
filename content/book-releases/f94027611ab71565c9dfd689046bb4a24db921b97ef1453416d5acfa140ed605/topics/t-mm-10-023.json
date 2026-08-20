@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-10-023",
+  "book_id": "book-mm-10",
+  "title": "3.12.\tBREACH PRESENTATION IN LABOUR",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-10-023\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21035]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>BREACH PRESENTATION IN LABO</span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>U</span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>R</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21036]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'><strong>Discuss:</strong></span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21037]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Risks and benefits of vaginal birth vs C/S</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21038]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Serious risks to mother in C/S</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21039]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Serious risk to baby in vaginal birth</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21040]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Benefits of C/S in reducing the risk to baby are greater in early labor</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21041]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Empower her to make a choice between continuing labor and C/S</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[21042]\">\u00a0</p>",
+      "content_sha256": "d3a5e0617917281021b5235f03966798793160c8d73ee0a5e0fa3bc10b022899",
+      "block_type": "document_html"
+    }
+  ]
+}

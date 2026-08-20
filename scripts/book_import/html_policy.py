@@ -30,9 +30,13 @@ ALLOWED_TAGS: Set[str] = {
     "table",
     "thead",
     "tbody",
+    "tfoot",
     "tr",
     "th",
     "td",
+    "colgroup",
+    "col",
+    "caption",
     "figure",
     "figcaption",
     "svg",
@@ -43,6 +47,7 @@ ALLOWED_TAGS: Set[str] = {
     "tspan",
     "rect",
     "circle",
+    "ellipse",
     "line",
     "polyline",
     "polygon",
@@ -52,13 +57,29 @@ ALLOWED_TAGS: Set[str] = {
     "a",
     "strong",
     "em",
+    "b",
+    "i",
     "u",
     "s",
+    "strike",
+    "del",
+    "ins",
+    "small",
     "sub",
     "sup",
     "mark",
     "br",
     "wbr",
+    "hr",
+    "blockquote",
+    "clippath",
+    "mask",
+    "pattern",
+    "lineargradient",
+    "radialgradient",
+    "stop",
+    "symbol",
+    "marker",
 }
 
 ALLOWED_ATTRIBUTES: Set[str] = {
@@ -84,21 +105,38 @@ ALLOWED_ATTRIBUTES: Set[str] = {
     "xmlns",
     "colspan",
     "rowspan",
+    "span",
+    "headers",
+    "scope",
     "start",
     "type",
     "d",
     "fill",
     "fill-opacity",
+    "fill-rule",
     "stroke",
     "stroke-width",
     "stroke-opacity",
     "stroke-dasharray",
+    "stroke-dashoffset",
+    "stroke-linecap",
+    "stroke-linejoin",
+    "stroke-miterlimit",
+    "opacity",
+    "offset",
+    "stop-color",
+    "stop-opacity",
+    "clip-path",
+    "clip-rule",
+    "mask",
     "transform",
     "x",
     "y",
     "cx",
     "cy",
     "r",
+    "rx",
+    "ry",
     "x1",
     "y1",
     "x2",
@@ -107,10 +145,40 @@ ALLOWED_ATTRIBUTES: Set[str] = {
     "dx",
     "dy",
     "text-anchor",
+    "dominant-baseline",
+    "alignment-baseline",
+    "baseline-shift",
     "font-family",
     "font-size",
     "font-weight",
     "font-style",
+    "letter-spacing",
+    "word-spacing",
+    "marker-start",
+    "marker-mid",
+    "marker-end",
+    "markerunits",
+    "markerwidth",
+    "markerheight",
+    "refx",
+    "refy",
+    "orient",
+    "clippathunits",
+    "gradientunits",
+    "gradienttransform",
+    "patternunits",
+    "patterncontentunits",
+    "patterntransform",
+    "spreadmethod",
+    "fx",
+    "fy",
+    "fr",
+    "maskunits",
+    "maskcontentunits",
+    "vector-effect",
+    "shape-rendering",
+    "text-rendering",
+    "image-rendering",
 }
 
 FORBIDDEN_TAGS: Set[str] = {
@@ -145,8 +213,6 @@ def validate_html_policy(raw_html: str, topic_id: str = "t-mm-unknown") -> None:
         raise HTMLPolicyError(f"{topic_id}: javascript: URI scheme detected")
     if re.search(r"vbscript\s*:", raw_html, re.IGNORECASE):
         raise HTMLPolicyError(f"{topic_id}: vbscript: URI scheme detected")
-    if re.search(r"on\w+\s*=", raw_html, re.IGNORECASE):
-        raise HTMLPolicyError(f"{topic_id}: Inline event handler attribute detected")
     if re.search(r"expression\s*\(", raw_html, re.IGNORECASE):
         raise HTMLPolicyError(f"{topic_id}: CSS expression detected")
 
@@ -169,7 +235,14 @@ def validate_html_policy(raw_html: str, topic_id: str = "t-mm-unknown") -> None:
 
         for attr, value in element.attrib.items():
             attr_lower = attr.lower()
-            if attr_lower.startswith("data-mm-"):
+            if attr_lower.startswith("on"):
+                raise HTMLPolicyError(f"{topic_id}: Inline event handler attribute {attr!r} detected")
+            if (
+                attr_lower.startswith("data-")
+                or attr_lower.startswith("xml:")
+                or attr_lower.startswith("xmlns")
+                or attr_lower.startswith("xlink:")
+            ):
                 continue
             if attr_lower not in ALLOWED_ATTRIBUTES:
                 raise HTMLPolicyError(f"{topic_id}: Disallowed attribute {attr!r} on <{tag_lower}>")

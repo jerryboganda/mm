@@ -18,6 +18,7 @@ import TableRenderer, { tableModel } from "@native-html/table-plugin";
 import WebView from "react-native-webview";
 import { SvgXml } from "react-native-svg";
 import { MermaidDiagram } from "@/components/MermaidDiagram";
+import { ResponsiveBookDocument } from "@/components/ResponsiveBookDocument";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -550,7 +551,15 @@ export default function TopicReaderScreen() {
   });
 
   const renderBlock = (block: ContentBlock) => {
-    switch (block.type) {
+    switch (block.type as string) {
+      case "document_html":
+        return (
+          <ResponsiveBookDocument
+            key={block.id}
+            content={block.content}
+            topicId={topicId}
+          />
+        );
       case "heading":
         return (
           <ThemedText key={block.id} type="h3" style={styles.heading}>

@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-06-025",
+  "book_id": "book-mm-06",
+  "title": "17.9. VISCERAL INJURIES:",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-06-025\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[9259]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>17.9. </span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>VISCERAL INJURIES:</span></p>",
+      "content_sha256": "720dc07f5ef529caedb37a7965a4614df01dbb52d08d73cdb560798e86cf119e",
+      "block_type": "document_html"
+    }
+  ]
+}

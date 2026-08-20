@@ -176,7 +176,7 @@ class TopicHtmlRenderer:
                 else:
                     blocks.append(f'<div class="mm-table-placeholder" data-mm-source-path="{escape(node.source_path, quote=True)}"></div>')
             elif node.kind == "drawing":
-                figure = self.drawing_compiler._figure_by_drawing_path.get((topic_id, node.source_path))
+                figure = self.drawing_compiler._figure_by_member_path.get(node.source_path) or self.drawing_compiler._figure_by_drawing_path.get((topic_id, node.source_path))
                 if figure:
                     blocks.append(self.drawing_compiler.render_figure(figure))
                 else:

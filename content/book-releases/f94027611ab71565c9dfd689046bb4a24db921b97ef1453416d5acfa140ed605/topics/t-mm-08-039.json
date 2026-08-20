@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-08-039",
+  "book_id": "book-mm-08",
+  "title": "35.4. D \u2013 PANCREATITIS",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-08-039\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[14931]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>3</span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>5</span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 14pt'>.4. D \u2013 PANCREATITIS</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[14932]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Rare 3/19000.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[14933]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>70% due to gall stones.</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[14934]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'>Lipase more sensitive for diagnosis than amylase</span></p>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[14935]\"><span class=\"mm-run\" style='font-family: \"Calibri\", sans-serif; font-size: 12pt'> surgical inputs.</span></p>",
+      "content_sha256": "32dc4324f0b104df7d9fa2a11d3089adb3c498db202d892d0dbf1f317f3ea11c",
+      "block_type": "document_html"
+    }
+  ]
+}

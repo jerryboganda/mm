@@ -1,0 +1,15 @@
+{
+  "topic_id": "t-mm-01-016",
+  "book_id": "book-mm-01",
+  "title": "16.CONGENITAL UTERINE",
+  "source_sha256": "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605",
+  "block_count": 1,
+  "blocks": [
+    {
+      "order": 0,
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-01-016\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[1305]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>1</strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>6</strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>.</strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>CONGENITAL UTERINE</strong></span></p>",
+      "content_sha256": "c4cd5d8924f91afcd273cbe9b4255af3a46570f0e56c158aaff0096da87417ee",
+      "block_type": "document_html"
+    }
+  ]
+}
