@@ -1151,21 +1151,57 @@ def _render_paragraph(
 
 
 def _render_event(event: TextEvent) -> str:
-    if event.kind in ("text", "no_break_hyphen", "soft_hyphen"):
-        return escape(event.value, quote=False)
     if event.kind == "tab":
-        return '<span class="mm-tab">\t</span>'
+        return '<span class="mm-tab" aria-hidden="true">&#9;</span>'
     if event.kind == "line_break":
-        return "<br>"
+        return "<br/>"
     if event.kind == "page_break":
         return '<span class="mm-page-break">\f</span>'
     if event.kind == "column_break":
         return '<span class="mm-column-break"></span>'
     if event.kind in ("empty_paragraph", "paragraph_boundary"):
         return ""
-    raise TableParsingError(
-        f"Unsupported text event {event.kind} at {event.source_path}"
-    )
+    if event.kind not in ("text", "no_break_hyphen", "soft_hyphen"):
+        raise TableParsingError(
+            f"Unsupported text event {event.kind} at {event.source_path}"
+        )
+
+    text_content = escape(event.value, quote=False)
+    style = event.run_style
+    if not style:
+        return text_content
+
+    chunk = text_content
+    if style.bold:
+        chunk = f"<strong>{chunk}</strong>"
+    if style.italic:
+        chunk = f"<em>{chunk}</em>"
+    if style.underline and style.underline not in ("none", "nil"):
+        chunk = f"<u>{chunk}</u>"
+    if style.strike:
+        chunk = f"<s>{chunk}</s>"
+    if style.vertical_align == "superscript":
+        chunk = f"<sup>{chunk}</sup>"
+    elif style.vertical_align == "subscript":
+        chunk = f"<sub>{chunk}</sub>"
+
+    inline_css: List[str] = []
+    if style.color and style.color.upper() not in ("AUTO", "000000"):
+        clean_color = style.color.upper().lstrip("#")
+        inline_css.append(f"color:#{clean_color}")
+    if style.font_family:
+        inline_css.append(f'font-family:"{style.font_family}", sans-serif')
+    if style.font_size_half_points:
+        pt = style.font_size_half_points / 2.0
+        inline_css.append(f"font-size:{pt:g}pt")
+    if style.highlight:
+        inline_css.append(f"background-color:{style.highlight}")
+
+    if inline_css:
+        css_str = escape(";".join(inline_css), quote=True)
+        chunk = f'<span class="mm-run" style="{css_str}">{chunk}</span>'
+
+    return chunk
 
 
 def _event_text(events: Iterable[TextEvent]) -> str:

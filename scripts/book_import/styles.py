@@ -260,6 +260,12 @@ class StyleResolver:
         if text_direction is not None:
             values["direction"] = text_direction
 
+        shd = properties.find(f"{{{WORD_NS}}}shd")
+        if shd is not None:
+            fill = _first_attribute(shd, ("fill",))
+            if fill and fill.lower() not in ("auto", "none", "ffffff", "null"):
+                values["shading"] = fill.upper().lstrip("#")
+
     def _set_int_attribute(
         self,
         values: Dict[str, object],

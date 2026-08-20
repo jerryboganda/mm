@@ -7,8 +7,8 @@
   "blocks": [
     {
       "order": 0,
-      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-01-016\" hidden></div>\n<p class=\"mm-para\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[1305]\"><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>1</strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>6</strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>.</strong></span><span class=\"mm-run\" style='color: ##FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>CONGENITAL UTERINE</strong></span></p>",
-      "content_sha256": "c4cd5d8924f91afcd273cbe9b4255af3a46570f0e56c158aaff0096da87417ee",
+      "content": "<div class=\"mm-release-marker\" data-mm-release=\"f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605\" data-mm-topic=\"t-mm-01-016\" hidden></div>\n<h2 class=\"mm-heading mm-h2 mm-header-banner\" data-mm-source-path=\"word/document.xml/w:document[1]/w:body[1]/w:p[1305]\" style=\"background-color: #2F5496; color: #FFFFFF; padding: 6px 12px; border-radius: 4px; font-weight: 700; margin-top: 8pt; margin-bottom: 4pt\"><span class=\"mm-run\" style='color: #FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>1</strong></span><span class=\"mm-run\" style='color: #FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>6</strong></span><span class=\"mm-run\" style='color: #FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>.</strong></span><span class=\"mm-run\" style='color: #FFFFFF; font-family: \"Calibri Light\", sans-serif; font-size: 16pt'><strong>CONGENITAL UTERINE</strong></span></h2>",
+      "content_sha256": "be3d7b7f0799e67ef2478f96891b60d5bef617158af9ab4409e517cbb1a26fc4",
       "block_type": "document_html"
     }
   ]

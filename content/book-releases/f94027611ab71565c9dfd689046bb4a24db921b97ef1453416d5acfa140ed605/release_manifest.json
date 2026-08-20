@@ -67,7 +67,7 @@
       "topic_count": 6
     }
   ],
-  "compiled_at": "2026-08-20T15:36:23.548640+00:00",
+  "compiled_at": "2026-08-20T19:22:48.321053+00:00",
   "compiler_version": "1.0.0",
   "media": [
     {
@@ -1696,2923 +1696,2972 @@
   "topic_count": 285,
   "topics": [
     {
-      "block_count": 2,
+      "block_count": 3,
       "block_digests": [
-        "9d1f603fb1cfb4eaa819ee97b692d59befae59ed1bd17e9ed925119f7d44fe92",
-        "a956596bc776e7d7b7ff53054e602feda1cb59673a3dc97adf90b6f0144e3631"
+        "bd2fc4b3bff75a34fe41f4314176b6dad191fbc14ad8389ae71e983d080642c9",
+        "1557e2008f267d39434311239f6c19f93b067c69a6b149cc80213ca171c67abb",
+        "214c67114b47e09adfe3eebd599c974e6d6742b1840730f34b7434e3c97bead6"
       ],
       "book_id": "book-mm-01",
       "title": "1. HEAVY MENSTRUAL BLEEDING:",
       "topic_id": "t-mm-01-001",
-      "total_utf8_bytes": 84916
+      "total_utf8_bytes": 108447
     },
     {
       "block_count": 1,
       "block_digests": [
-        "ede3bb08b4d7c746e5a99a5c5f1957fa5a0d2e664e249a49025413058cbefa3e"
+        "f99c6067d68e59b39b851bf1004864180a2529c140cb4f7b94c5eb84175e93da"
       ],
       "book_id": "book-mm-01",
       "title": "2. UTERINE FIBROIDS:",
       "topic_id": "t-mm-01-002",
-      "total_utf8_bytes": 31541
+      "total_utf8_bytes": 43009
     },
     {
       "block_count": 1,
       "block_digests": [
-        "ab1d01c77ff3a3094b9c7ee976446f28220a814a8de7884cdd3681feb23d5d6d"
+        "52e6f08764ae6555c505feee49576100bdeeb5a60d88392c0557607a82ca8e8d"
       ],
       "book_id": "book-mm-01",
       "title": "3. UTERINE ARTERY EMBOLIZATION:",
       "topic_id": "t-mm-01-003",
-      "total_utf8_bytes": 25798
+      "total_utf8_bytes": 33558
     },
     {
       "block_count": 1,
       "block_digests": [
-        "793ece8c6ed6fb209ea0e46100f1a75d11dbcc17f2e62dc3daf8a9c70de352ce"
+        "f53b95e4cb4836405f16fb2ef71fec99391ef56939c13070449b7e0e86912e49"
       ],
       "book_id": "book-mm-01",
       "title": "4. SURGICAL TREATMENT OF FIBROID:",
       "topic_id": "t-mm-01-004",
-      "total_utf8_bytes": 10612
+      "total_utf8_bytes": 12401
     },
     {
       "block_count": 1,
       "block_digests": [
-        "c26283342ecb1f34e420fe0edbb87f844ed0674b0815996e72c36ca3d3fff749"
+        "54ceeafd952bebf586aad403de76160e482cde6b25e0067f52c6911e0406a54a"
       ],
       "book_id": "book-mm-01",
       "title": "5. FIBROID IN PREGNANCY:",
       "topic_id": "t-mm-01-005",
-      "total_utf8_bytes": 36598
+      "total_utf8_bytes": 43941
     },
     {
-      "block_count": 1,
+      "block_count": 2,
       "block_digests": [
-        "e97e65c773c676b4d0f0aa6f2b6f71fcf8598194a65db5131e09534196051059"
+        "c8c9f4b01d18d8e04a32e233e8954295debb306d5fec0f3d5fd322737b53242e",
+        "c69e7204b91d885a63073e4f00a3a146728fa4a0daeeb1e73d9aa9061b9d4816"
       ],
       "book_id": "book-mm-01",
       "title": "6. MENOPAUSE AND MANAGEMENT:",
       "topic_id": "t-mm-01-006",
-      "total_utf8_bytes": 46869
+      "total_utf8_bytes": 58718
     },
     {
       "block_count": 1,
       "block_digests": [
-        "3d422cf610e0ef1875da338b74a527be35a53d211101cc31aa5ea40297f2960b"
+        "5cfb31d5979a69c6c0bc17fd00edca2e9e75bac9dbbde85eadd8ea6d7b82bb3d"
       ],
       "book_id": "book-mm-01",
       "title": "7. HRT:",
       "topic_id": "t-mm-01-007",
-      "total_utf8_bytes": 25626
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "aaeeea13ce3a1a36ee1d8eeed3f7136d50700970b14d4436071ddc43da83363e"
-      ],
-      "book_id": "book-mm-01",
-      "title": "8. HRT AFTER GYNAECOLOGICAL MALIGNANCY:",
-      "topic_id": "t-mm-01-008",
-      "total_utf8_bytes": 6420
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3bab719d31b68961d3bdad1711ace8f93af81c2857c4af4cc9080092bc40a4da"
-      ],
-      "book_id": "book-mm-01",
-      "title": "9. UNSHEDULED BLEEDING ON HRT",
-      "topic_id": "t-mm-01-009",
-      "total_utf8_bytes": 14487
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "1a88bc021a28dafbe1419a0f143aa0b8eda1904c9be0c8239fcb6a25f7b7e4cd"
-      ],
-      "book_id": "book-mm-01",
-      "title": "10. POST MENOPAUSAL BLEEDING:",
-      "topic_id": "t-mm-01-010",
-      "total_utf8_bytes": 7431
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "8fb06a53d295eecedded9540f39bdbe552a12a705472e9d3fca22891eea43352"
-      ],
-      "book_id": "book-mm-01",
-      "title": "11. CHRONIC PELVIC PAIN:",
-      "topic_id": "t-mm-01-011",
-      "total_utf8_bytes": 17854
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e805d08d985369ec2d12a850595667bc307220aaa3180864740ac2641e076886"
-      ],
-      "book_id": "book-mm-01",
-      "title": "12. PMS:",
-      "topic_id": "t-mm-01-012",
-      "total_utf8_bytes": 43538
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d0468bc6003e94b2d86f6cebc4fcaddf53be7d511f0d969fc9a12b75b4732551"
-      ],
-      "book_id": "book-mm-01",
-      "title": "13. PRIMARY AMENORRHEA:",
-      "topic_id": "t-mm-01-013",
-      "total_utf8_bytes": 17181
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d64b438529bc6d3744fbaf07f9d655b4d828ef2a8896401234cb3871e49fed61"
-      ],
-      "book_id": "book-mm-01",
-      "title": "14. SECONDARY AMENORRHEA:",
-      "topic_id": "t-mm-01-014",
-      "total_utf8_bytes": 9415
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2f58c7c4b405baaa76419ce036a4e61f8761e94122b04659c1db7defd43463cf"
-      ],
-      "book_id": "book-mm-01",
-      "title": "15. INTER \u2013 SEX & KARYOTYPING:",
-      "topic_id": "t-mm-01-015",
-      "total_utf8_bytes": 38306
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c4cd5d8924f91afcd273cbe9b4255af3a46570f0e56c158aaff0096da87417ee"
-      ],
-      "book_id": "book-mm-01",
-      "title": "16.CONGENITAL UTERINE",
-      "topic_id": "t-mm-01-016",
-      "total_utf8_bytes": 826
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b9ebd96ae997b65c04f0e0f6e56e24e277806750ca462ae9ed1a445cf187866d"
-      ],
-      "book_id": "book-mm-01",
-      "title": "ANOMALIES (CUA)",
-      "topic_id": "t-mm-01-017",
-      "total_utf8_bytes": 27398
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e2b184cb84f23de295b5c3267331ae32cb845fb0b4fa55e5843163ad1f08acbf"
-      ],
-      "book_id": "book-mm-01",
-      "title": "17. OUTFLOW TRACK DISORDERS OF VAGINA:",
-      "topic_id": "t-mm-01-018",
-      "total_utf8_bytes": 15601
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c651af6f6828b824415b3c9083317eac210765d1df40fda0a456073343a8a46b"
-      ],
-      "book_id": "book-mm-01",
-      "title": "18. MRKH:",
-      "topic_id": "t-mm-01-019",
-      "total_utf8_bytes": 24544
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2e0027208dceb609524700727225821d87d229009b61647c5495fb4c49445231"
-      ],
-      "book_id": "book-mm-01",
-      "title": "19. DYSMENORRHEA:",
-      "topic_id": "t-mm-01-020",
-      "total_utf8_bytes": 21753
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "5daf1261d19489bd56a9565312f3466d7e46b265f9b94872f52afc5358876fc6",
-        "462eadf87568fd44f81c2ddb5ffe13812b694eb899925c06b82aa35d8546b1d2"
-      ],
-      "book_id": "book-mm-01",
-      "title": "20. FEMALE GENITAL MUTILATION (FGM):",
-      "topic_id": "t-mm-01-021",
-      "total_utf8_bytes": 53771
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "0d9779d9861a60a597a03793d25f072b3a42d0ed248f354412c96f05e27b71e7",
-        "ebc6d52e8228435924acf67257339a84c74c4c37ea89bb1d5f318603ac89849a"
-      ],
-      "book_id": "book-mm-01",
-      "title": "21. HIRSUTISM IN YOUNG WOMEN:",
-      "topic_id": "t-mm-01-022",
-      "total_utf8_bytes": 57626
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "5a560af2006ced299ea3563b2b7d4ef8832bb863b35e3631d3abae17a9c3e90b"
-      ],
-      "book_id": "book-mm-01",
-      "title": "22. HMB IN ADOLESCENCE:",
-      "topic_id": "t-mm-01-023",
-      "total_utf8_bytes": 25710
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "7b1f95fea154617ffa992a7633bfacd5ab8846ad30724024489b78bb19cd25df",
-        "0ff193d7d98a62e7e76eee8a91ea5241faedcd104311bbdd8ea09a2deb1c29c0"
-      ],
-      "book_id": "book-mm-01",
-      "title": "23. PRECOCIOUS PUBERTY",
-      "topic_id": "t-mm-01-024",
-      "total_utf8_bytes": 62435
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "781b4149cf4450f6adea5fdd2be7e09c71572dbba8d77f67183dafe018e57b90"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1. FERTILITY PROBLEMS, ASSESSMENT & TREATMENT",
-      "topic_id": "t-mm-02-001",
-      "total_utf8_bytes": 21181
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "925af8f707013176fa603fccdb6d8bae777e4971fbc47d4282295858107c8e47"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1.1.\tASSESSMENT OF MALE PARTNER:",
-      "topic_id": "t-mm-02-002",
-      "total_utf8_bytes": 6202
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e1d849fb50c5e0478d361f4d835227a3940f1a7ba66b8e642f9c8e72a1d710b2"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1.2.\tASSESSMENT OF FEMALE PARTNER",
-      "topic_id": "t-mm-02-003",
-      "total_utf8_bytes": 27986
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2faeab7454433104a433bfa748d22a8f95dc9890538126d545f5ed30d224e96e"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1.3.\tMANAGEMENT OF MALE PARTNER",
-      "topic_id": "t-mm-02-004",
-      "total_utf8_bytes": 7264
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "fa419e1c882744cd5b03ae223987895b77c5033cdf9725207aa52acd33566d74"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1.4.\tMANAGEMENT OF FEMALE PARTNER:",
-      "topic_id": "t-mm-02-005",
-      "total_utf8_bytes": 15601
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3c0baee98bf595f25ee80ff16de67ac461bb37d4c8dee4e322ec9aa8802b696a"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1.5.\tIUI:",
-      "topic_id": "t-mm-02-006",
-      "total_utf8_bytes": 15301
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c424e607bde8f1705926b9f115881c97009018ccc7457731abb187ae384abb9d"
-      ],
-      "book_id": "book-mm-02",
-      "title": "1.6.\tIVF:",
-      "topic_id": "t-mm-02-007",
-      "total_utf8_bytes": 11034
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "9ce65edd2b85be62bc40aa1112e24eb9abaef5def3a3fb11cc3a1d77b14dcfef",
-        "532a641631d7295469ce07e714ef386652a3eeef5503186fd71db9c5143efbcd"
-      ],
-      "book_id": "book-mm-02",
-      "title": "2.\tARTIFICIAL REPRODUCTIVE TECHNIQUE \u2013 PROCEDURE OVERVIEW:",
-      "topic_id": "t-mm-02-008",
-      "total_utf8_bytes": 62184
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9ee55d256f8ce19f651f80e896a2a8939114dc5ff6adc613809e282902cd9d3b"
-      ],
-      "book_id": "book-mm-02",
-      "title": "3. FERTILITY PRESERVATION",
-      "topic_id": "t-mm-02-009",
-      "total_utf8_bytes": 18231
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "f5bea30ac14b920b908ae596b32ceeb15cca8c2a17166a41eb0fe4f24f54a6af",
-        "701db9fe62edc672ee80fb49ce07f77fe6d4a4b3dad2bb9413418cef9611b27e"
-      ],
-      "book_id": "book-mm-02",
-      "title": "4. ASSESSMENT OF INFERTILE MALE",
-      "topic_id": "t-mm-02-010",
-      "total_utf8_bytes": 55828
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b03b7b9844b2a21fbca38b157bc8b3e075f78fd9e486f06a12f72f08e945c4de"
-      ],
-      "book_id": "book-mm-02",
-      "title": "5. UN EXPLAINED SUBFERTILITY",
-      "topic_id": "t-mm-02-011",
-      "total_utf8_bytes": 27919
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "318c9a7403daf805d9e5ce34b584fda9743a02448b680cdf1b67484e5301a741"
-      ],
-      "book_id": "book-mm-02",
-      "title": "6. TUBAL TESTS AND TUBAL SURGERY",
-      "topic_id": "t-mm-02-012",
-      "total_utf8_bytes": 40663
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "db61334615e9ca430272861f405f8715b8cb290639d4799ad9a2d4e051744b05"
-      ],
-      "book_id": "book-mm-02",
-      "title": "7. MANAGEMENT OF INFERTILE COUPLE",
-      "topic_id": "t-mm-02-013",
-      "total_utf8_bytes": 17023
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "5d19d536a8b8ce0f92e5b806cf109e13fa468c2ce690981c0728e3b213f97de6"
-      ],
-      "book_id": "book-mm-02",
-      "title": "8. EARLY OVARIAN AGING:",
-      "topic_id": "t-mm-02-014",
-      "total_utf8_bytes": 12898
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "06fdfd7685308f008208d466e7c385d3b1c6a55e2d15982588de188535b4c383"
-      ],
-      "book_id": "book-mm-02",
-      "title": "9. LONG TERM CONSEQUENCES OF PCOD:",
-      "topic_id": "t-mm-02-015",
-      "total_utf8_bytes": 46949
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "dd436ed87595bc51cec28ae7b6f5e504aed97ff36a3f991ac067ce3fffe759f2",
-        "3731fa71f4b670834c448af334c9441265e8b44234c9dcf005b6495951f6fda3"
-      ],
-      "book_id": "book-mm-02",
-      "title": "10.  OHSS:",
-      "topic_id": "t-mm-02-016",
-      "total_utf8_bytes": 57355
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "85ff53739fbedb7fc1f775fc017a7ba352dc032a8496981ec71fd3931e6f737a",
-        "87c2acea3e121ccf4f18c2a2b92840caaee041abb97816f7bfb8b77b5b1f2f93"
-      ],
-      "book_id": "book-mm-02",
-      "title": "11.\tENDOMETRIOSIS:",
-      "topic_id": "t-mm-02-017",
-      "total_utf8_bytes": 69675
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "28eb25750e425bf54393b702b25df94c4dd8cfdd64bb31d37a89e843ffffb941"
-      ],
-      "book_id": "book-mm-03",
-      "title": "1.\tTUMOR MAKERS",
-      "topic_id": "t-mm-03-001",
-      "total_utf8_bytes": 9953
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ea2b1d46f4f95e6167aeefe3731c29c58523307dc0ace379d4469d28a6a8c1f1"
-      ],
-      "book_id": "book-mm-03",
-      "title": "2.\tULTRASOUND APPEARACE OF DIFFERENT CYST",
-      "topic_id": "t-mm-03-002",
-      "total_utf8_bytes": 10249
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "0fadce96b344866bdd0747233d6469a67efd13365f8867a6d3f169e9dc691516",
-        "de2159084d1877bb7ad1cd447f78a730c183c26d50d9b39d1a168a1e6997231c"
-      ],
-      "book_id": "book-mm-03",
-      "title": "3.\tSUSPECTED OVARIAN MASSES IN PRE \u2013 MENOPAUSAL WOMEN:",
-      "topic_id": "t-mm-03-003",
-      "total_utf8_bytes": 52846
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "a8cf3e6ab3f3c913c9ee0a2b183d51c15671a289f51c72fa85406015e1162e25",
-        "ffdeb56deca1d9764e255d49c90e05309b949304605a185b603dd6fd6de5f395"
-      ],
-      "book_id": "book-mm-03",
-      "title": "4.\tOVARIAN CYST IN POST-MENOPAUSAL WOMEN:",
-      "topic_id": "t-mm-03-004",
-      "total_utf8_bytes": 56507
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "0784d78c73fd0d508daef0df8e8193133d8a7cae6f91d6ee0673e60aaa9c3cc2"
-      ],
-      "book_id": "book-mm-03",
-      "title": "5. OVARIAN CYST IN CHILDREN AND ADOLESANTS (TEENS 13 \u2013 15 YEARS).",
-      "topic_id": "t-mm-03-005",
-      "total_utf8_bytes": 47196
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3d8b794af5ee2cd8baa6a0548f7aa8fedc259ad6a8013bafb40a3d90d4560a00"
-      ],
-      "book_id": "book-mm-03",
-      "title": "6.\tADNEXAL MASSES IN PREGNANCY",
-      "topic_id": "t-mm-03-006",
-      "total_utf8_bytes": 7846
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d9f0bb943fe9dadb39ce17b5b05068b70aa9f432b0364de8c8b38b9a364675ad"
-      ],
-      "book_id": "book-mm-03",
-      "title": "7.\tBORDERLINE OVARIAN TUMORS (BOT)",
-      "topic_id": "t-mm-03-007",
-      "total_utf8_bytes": 32131
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a3bc0e2cabeff14dbd5f30f7320cadcc7cc98b2df11092b6eeb590dda68daa59"
-      ],
-      "book_id": "book-mm-03",
-      "title": "8.\tRISK REDUCING SURGERY FOR WOMEN @ RISK OF EPITHELIAL TUMOR",
-      "topic_id": "t-mm-03-008",
-      "total_utf8_bytes": 38388
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "04f90ae1dbc9f4ebdbe8a591af634944ac58436e5cd0d051410c98e25b67f468",
-        "a3124a4e0c618a5445411394f25f5f90b92207241ecb67fb9e5b09b4a6c45e57"
-      ],
-      "book_id": "book-mm-03",
-      "title": "9.\tOVARIAN CANCER",
-      "topic_id": "t-mm-03-009",
-      "total_utf8_bytes": 72759
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "8254f1ee8420b5a0f4c83838f453b2a04275be66c68415b9924c9bb85eb89b2a"
-      ],
-      "book_id": "book-mm-03",
-      "title": "10.\tENDOMETRIAL HYPERPLASIA EH:",
-      "topic_id": "t-mm-03-010",
-      "total_utf8_bytes": 46830
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a60c713da2a390040a9fafb7226186d96c34d052ba6f33bb5af0b0d12a8dce66"
-      ],
-      "book_id": "book-mm-03",
-      "title": "11.\tCA ENDOMETRIUM",
-      "topic_id": "t-mm-03-011",
-      "total_utf8_bytes": 30909
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9dd8d4f149bbb3746a5a0fec6e18bea35a44e3ecf2d0b33ff55962505d45cb64"
-      ],
-      "book_id": "book-mm-03",
-      "title": "12.\tCA CERVIX:",
-      "topic_id": "t-mm-03-012",
-      "total_utf8_bytes": 33511
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e86cf1522cf4d7fd3c5efcc56163ba216ff2fd14bff5f1aa14a08cd37fba6ecd"
-      ],
-      "book_id": "book-mm-03",
-      "title": "13.\tPRE \u2013 MALIGNANT LESION OF VULVA:",
-      "topic_id": "t-mm-03-013",
-      "total_utf8_bytes": 41817
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3061701d92e6a97a7ece6fafd9ce7697c3825f5ce37659a7d398a84bd7aa80d5"
-      ],
-      "book_id": "book-mm-03",
-      "title": "14.\tCA \u2013 VULVA:",
-      "topic_id": "t-mm-03-014",
-      "total_utf8_bytes": 36823
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "e425ac5eb014f3a0f3441c2644f5c71b1f0f51deb5c0f927f18258815aee9c5b",
-        "86f705a60ab9710a2372e69dc41cf86f61aa10e76d194db33662bb42f339c3df"
-      ],
-      "book_id": "book-mm-03",
-      "title": "15.\tPRE \u2013 MALIGNANT LESIONS OF CERVIX AND CERVICAL SCREENING PROGRAM",
-      "topic_id": "t-mm-03-015",
-      "total_utf8_bytes": 89523
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "76fa713cc0b4c9c27e440dfb2c00bf3fc9da8610a1d633f3b32d5be3d40082b6"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1. TYPES OF INONTINENCE AND EVALUATION",
-      "topic_id": "t-mm-04-001",
-      "total_utf8_bytes": 7460
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c6d2971a11628e0a3d905e8acc6c62d2c4c48ecf29955d1fd24ce74fdececea9"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1.1.\tMSU",
-      "topic_id": "t-mm-04-002",
-      "total_utf8_bytes": 3882
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a671b634ddeab5691b545a0b780888a8f85ce74435e7a2249c2672280e9d2acf"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1.2.\tBLADDER DIARY:",
-      "topic_id": "t-mm-04-003",
-      "total_utf8_bytes": 884
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e76da03d64bc2bad0eeecafe02e1c8c9eca1dacb60d576bc6134961fdf251390"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1.3.\tPOST VOID VOLUME",
-      "topic_id": "t-mm-04-004",
-      "total_utf8_bytes": 1285
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3607997e5ec4b7dbb68b06ab04a2a4fb9b5266366101c7c088e52f376a804422"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1.4.\tURODYNAMIC",
-      "topic_id": "t-mm-04-005",
-      "total_utf8_bytes": 36047
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "70df6ba02dbd52c31ff70bc7a8fbd3b456c77a69d5950126b0963c69572fdd8e"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1.5.\tPAD TEST:",
-      "topic_id": "t-mm-04-006",
-      "total_utf8_bytes": 1922
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a583321a9cff7de0f6cc467d2cd1b511a1160e8bda0ba12174163ff0f95b2454"
-      ],
-      "book_id": "book-mm-04",
-      "title": "1.6. VIDEOCYSTOMETRY:",
-      "topic_id": "t-mm-04-007",
-      "total_utf8_bytes": 2152
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ad25ffb1e518b3062ef2f129b7b47483fbcc71f6e601652bf0790d8f42435d46"
-      ],
-      "book_id": "book-mm-04",
-      "title": "2.\tOVER ACTIVE BLADDER TREATMENT",
-      "topic_id": "t-mm-04-008",
-      "total_utf8_bytes": 39748
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d6d19ba76e97bc2761e1d998149501334d0761742fb58c2dfdf9a4890e87365b"
-      ],
-      "book_id": "book-mm-04",
-      "title": "3.\tSENSORY URGENCY",
-      "topic_id": "t-mm-04-009",
-      "total_utf8_bytes": 3286
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "4c06225a57d62e2e73cdc01600f783ca9ca234d6afebf3ef043cc3d86d9338f6"
-      ],
-      "book_id": "book-mm-04",
-      "title": "4.\tSUI - STRESS URINARY INCONTINENCE & ITS STEP WISE MANAGEMENT",
-      "topic_id": "t-mm-04-010",
-      "total_utf8_bytes": 17144
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9c5f64d918cea83da83f0dbd2f6fba933c0046753619f9edf2a14faf151d6a8a"
-      ],
-      "book_id": "book-mm-04",
-      "title": "5.\tURINARY RETENTION",
-      "topic_id": "t-mm-04-011",
-      "total_utf8_bytes": 5314
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "daf65c4bd5474cd7901c83e8730569e7075e6eaf0e2ab066ada400df15888ca6"
-      ],
-      "book_id": "book-mm-04",
-      "title": "6.\tBLADDER PAIN SYNDROME",
-      "topic_id": "t-mm-04-012",
-      "total_utf8_bytes": 43584
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "0aa93a7d45b9f6ebc2c777accca8e54ea350e5b17a780b528b232bde734326ea"
-      ],
-      "book_id": "book-mm-04",
-      "title": "7.\tURETHRAL DIVERTICULA",
-      "topic_id": "t-mm-04-013",
-      "total_utf8_bytes": 26164
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "5aee8e52632b88d83a8887324e98511a7bb10898f61c8cbca6724eff70eae2de"
-      ],
-      "book_id": "book-mm-04",
-      "title": "8.\tRECURRENT UTI",
-      "topic_id": "t-mm-04-014",
-      "total_utf8_bytes": 10005
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3b59736cf4a1260eef6411cbc22c9ad12219c1a6a006715551547067e1fa6207"
-      ],
-      "book_id": "book-mm-04",
-      "title": "9.\tPELVIC ORGAN PROLAPSE",
-      "topic_id": "t-mm-04-015",
-      "total_utf8_bytes": 28465
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "df362d5cd74ddd38e30c00194b62aedce7cf7204fc38cba2e4033ecd726a8b73"
-      ],
-      "book_id": "book-mm-04",
-      "title": "10.\tVAULT PROLAPSE:",
-      "topic_id": "t-mm-04-016",
-      "total_utf8_bytes": 36833
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9d9aeefd33eaa7f7efdeca1a4217b0ca34c633ee8a690e753af36a6ba77eae45"
-      ],
-      "book_id": "book-mm-05",
-      "title": "1. VAGINAL DISCHARGE",
-      "topic_id": "t-mm-05-001",
-      "total_utf8_bytes": 17157
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "430cccdc1be33d910fdf3505762ef29f1a2a3a3c1f29b1a9dcf90148ad05162e"
-      ],
-      "book_id": "book-mm-05",
-      "title": "2.\tGENITAL INFECTIONS AND THEIR MANAGEMENTS:",
-      "topic_id": "t-mm-05-002",
-      "total_utf8_bytes": 43385
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e0808726c5b94106dfaf382f0a6bc2e48bdb9d389d178c9cb55526f48424553f"
-      ],
-      "book_id": "book-mm-05",
-      "title": "3.\tPID",
-      "topic_id": "t-mm-05-003",
-      "total_utf8_bytes": 31255
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c5ddebc04aff2aa0c850500caa6672d0c81a05befd81956b05a929925ef467f9"
-      ],
-      "book_id": "book-mm-05",
-      "title": "4.\tGENITAL CONDITIONS AND MANAGEMENT:",
-      "topic_id": "t-mm-05-004",
-      "total_utf8_bytes": 19498
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "8397f6a6a07863287f7e32043cea83d0a98352c21113e7a8d2b85b1997c5739f",
-        "0be64b6916d78858eb69676b10c78c4478a8a1aae5459a51496d6d4cfc891eae"
-      ],
-      "book_id": "book-mm-05",
-      "title": "5.\tANOGENITAL WARTS",
-      "topic_id": "t-mm-05-005",
-      "total_utf8_bytes": 65376
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b4aeb4686b5b3a5faa2395d743266c3f593fd0cdb13795b5992e8e8661b5ce55"
-      ],
-      "book_id": "book-mm-05",
-      "title": "7. ABORTION CLAUSES",
-      "topic_id": "t-mm-05-006",
-      "total_utf8_bytes": 15981
-    },
-    {
-      "block_count": 9,
-      "block_digests": [
-        "bf28d13993f05ce909b644dedebd59295604fde1460e2282f2150b720cb4410e",
-        "23fa5348e16dde12de19dd1e06538b18a301632d2ebb9b25fd0984375bd9d82c",
-        "7b5fc8a0ddcdd7f802c8357d761e8de51abf1640e6bfa05da21576e1586c9854",
-        "e153f9d0e73bf0a334ee8cd6362f3984cc0764b3776c6444b25126485531dc7d",
-        "d3d0c7a2b87738a508872b1622708e68a117154c59a3cceb6246e3873e6f6a71",
-        "441c47e3ee1e54dfc9d31022f3b01da83541feacf60b9981cea122269cbf1b49",
-        "3901766307dead9298e3273d97d8b4598bbdb062f4cc5671f53bc1efe27199ea",
-        "7c882823fbfb1efb9696a49268606531cf2dcbe2df0e143783d62e160b9b7257",
-        "593143522bd728758e18fccdefcbfe5fac8681fcf806224e38fccd382f76189c"
-      ],
-      "book_id": "book-mm-05",
-      "title": "8. UK MEDICAL ELIGIBILITY CRITERIA (UKMEC)",
-      "topic_id": "t-mm-05-007",
-      "total_utf8_bytes": 375830
-    },
-    {
-      "block_count": 3,
-      "block_digests": [
-        "bd04e75cd535462e16e99077351ec7d9e521578d42d0b488f6a5cd4e98259189",
-        "4d672ef9cd9769044fff37428390e595e57f9d65f2a31945581a911c2e317e14",
-        "f5de8e816d9f21b404530baaaab7b13754cd7f9900e662a0e2f81d9399543ae0"
-      ],
-      "book_id": "book-mm-05",
-      "title": "9. COMBINED HORMONAL CONTRACEPTION",
-      "topic_id": "t-mm-05-008",
-      "total_utf8_bytes": 100251
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "243e8d09f1317c39e38796c3131deb5d86c8ce312b11f25b4a5647dc19c43c15"
-      ],
-      "book_id": "book-mm-05",
-      "title": "11.\tPROGESTOGEN-ONLY PILL",
-      "topic_id": "t-mm-05-009",
-      "total_utf8_bytes": 45387
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "7e3859c0e09fc9c5a9330c65c84ac690393cef0e1646aa1bd3c332ed7f5023ee"
-      ],
-      "book_id": "book-mm-05",
-      "title": "11. PROGESTOGEN-ONLY INJECTABLE CONTRACEPTION",
-      "topic_id": "t-mm-05-010",
-      "total_utf8_bytes": 25098
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ad8fd76b4484c299cd2bd7a13c31526a7a0584afd54b871520332964817e0da8"
-      ],
-      "book_id": "book-mm-05",
-      "title": "12. PROGESTOGEN-ONLY IMPLANT:",
-      "topic_id": "t-mm-05-011",
-      "total_utf8_bytes": 43171
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "90984db4641c176aa8f67b3ddb0ca15d36c8e73f6133d9254e657d5c3d0fe289"
-      ],
-      "book_id": "book-mm-05",
-      "title": "13. EMERGENCY CONTRACEPTION",
-      "topic_id": "t-mm-05-012",
-      "total_utf8_bytes": 49452
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "453b9d86a141ec673d420bc2ea985e03094e4bd1eddb68433dfd42aad888716f",
-        "7b6b7ce65a0647ad04dac3856c62a0d9995d82c2f263649aa487bc72e6bee503"
-      ],
-      "book_id": "book-mm-05",
-      "title": "14.\tDRUG INTERACTIONS WITH HORMONAL CONTRACEPTION:",
-      "topic_id": "t-mm-05-013",
-      "total_utf8_bytes": 54922
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "daa40c744e7cbad5505d14362442a02f73a97a3438b62b54aa4211bf892c9a49",
-        "8517bbcb1b2eb92df49a0c89ab06e2c401dd6a724d846a795e6b4f6ba416c4c7"
-      ],
-      "book_id": "book-mm-05",
-      "title": "15. PROBLEMATIC BLEEDING WITH HORMONAL CONTRACEPTION",
-      "topic_id": "t-mm-05-014",
-      "total_utf8_bytes": 57827
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2c915ed9848c0b04cf94d1e110594115ac97db264402858471c3407253c6e9d7"
-      ],
-      "book_id": "book-mm-05",
-      "title": "16. BARRIER METHODS FOR CONTRACEPTION AND STI PREVENTION",
-      "topic_id": "t-mm-05-015",
-      "total_utf8_bytes": 18141
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "bf8d6537bbc325f932d89f3cb8b432c5cd5bba3643d5b5ab3170a1e730752f14",
-        "6ef755313107c547e3dd7fdf4e3cf51743d8d2e06ae460d33a2f0c58939f0911"
-      ],
-      "book_id": "book-mm-05",
-      "title": "17. INTRAUTERINE CONTRACEPTION",
-      "topic_id": "t-mm-05-016",
-      "total_utf8_bytes": 57052
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2f0a9958108624844629d966a2289134b89ad4c04f8e4804e2a962227a9f25c2"
-      ],
-      "book_id": "book-mm-05",
-      "title": "18. MALE AND FEMALE STERILISATION",
-      "topic_id": "t-mm-05-017",
-      "total_utf8_bytes": 45513
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "78168a85e6b0e34c6db63ab47746753519e7993646526fb6ed1d350d94ce8f94"
-      ],
-      "book_id": "book-mm-05",
-      "title": "19.\tQUICK STARTING CONTRACEPTION",
-      "topic_id": "t-mm-05-018",
-      "total_utf8_bytes": 20823
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "36ba7080ddd9fa21d841fa206fa4afd74f37e7899e2a0ca9321807c6588be79a"
-      ],
-      "book_id": "book-mm-05",
-      "title": "20.\tCONTRACEPTION FOR WOMEN ABOVE 40 YEARS OF AGE:",
-      "topic_id": "t-mm-05-019",
-      "total_utf8_bytes": 20433
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "6d1c39692154a4518576b92ae59f417b960ae32aab649f5730b8e4ff9ea6ebdf"
-      ],
-      "book_id": "book-mm-05",
-      "title": "21. CONTRACEPTON FOR YOUNG POPULATION:",
-      "topic_id": "t-mm-05-020",
-      "total_utf8_bytes": 23428
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "1a278244e7cfe1de5aa034ed2635df35184f449eac485747ab4cb1d0ca490a0b"
-      ],
-      "book_id": "book-mm-05",
-      "title": "22.\tCONTRACEPTION IN OVER WEIGHT AND OBESE PEOPLE:",
-      "topic_id": "t-mm-05-021",
-      "total_utf8_bytes": 40647
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "13dbfffa715cc13cc1d208672837eb39b6222ac6f2b36784a5cfb59b3bbe5020"
-      ],
-      "book_id": "book-mm-05",
-      "title": "23.\tCONTRACEPTIVE FAILURE:",
-      "topic_id": "t-mm-05-022",
-      "total_utf8_bytes": 30272
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "eed3ae362f449f57fec46c1077ba28c82eb97e3a3ed3d3e5da548c5314b5eb15",
-        "bba17790e269f18aa8f3fb950003b1eb12c61b94703786328edc67cbdd602434"
-      ],
-      "book_id": "book-mm-06",
-      "title": "1. OBTAINING VALID CONSENT:",
-      "topic_id": "t-mm-06-001",
-      "total_utf8_bytes": 56311
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "0eaf86451740e672147b06f3c1baddb5aa27e5af6138bdfb0941687b73dcf9ed",
-        "6232a504d58930cc474d83b66d003ff254c5362995f6cc60a0abcf09baf3ee36"
-      ],
-      "book_id": "book-mm-06",
-      "title": "2. CAESAREAN SECTION:",
-      "topic_id": "t-mm-06-002",
-      "total_utf8_bytes": 57301
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "6a85817af2d2765eddb6e2d5b3a7f049a1cb4e692268d1ae434822d21dac6f61"
-      ],
-      "book_id": "book-mm-06",
-      "title": "3. PREVENTING ENTRY RELATED GYAECOLOGICAL LAPROSCOPIC INJURIES:",
-      "topic_id": "t-mm-06-003",
-      "total_utf8_bytes": 28613
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "7ac7cf386a96cfaf21a309d9180ad6b1b7a16210f00e25836407d46fe04e57b4",
-        "186db28071bd3fd0faaadcebe4df676a0e57c171a693371697568f197d9a4f94"
-      ],
-      "book_id": "book-mm-06",
-      "title": "4. URINARY TRACK INJURIES DURING LAPROSCOPY AND THEIR PREVENTION.",
-      "topic_id": "t-mm-06-004",
-      "total_utf8_bytes": 52382
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3dbb6fc211d445b74ca120eab3cf00a8b2ed143af65b9d8af55fb8682fc675b2"
-      ],
-      "book_id": "book-mm-06",
-      "title": "5. SURGICAL NERVE INJURIES:",
-      "topic_id": "t-mm-06-005",
-      "total_utf8_bytes": 27143
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "75739aaa045332e5f98dcc5ac56306ad23d1102f9a9214eb90e5313059f3caf2"
-      ],
-      "book_id": "book-mm-06",
-      "title": "6. VASCULAR INJURIES DURING SURGERY:",
-      "topic_id": "t-mm-06-006",
-      "total_utf8_bytes": 28579
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "60816718aace01ede49693bd85a686025af4a0dc399b2ce881a84cd99b1bf0bb"
-      ],
-      "book_id": "book-mm-06",
-      "title": "7. UTERINE PREFORATION:",
-      "topic_id": "t-mm-06-007",
-      "total_utf8_bytes": 16571
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "0586fbd4a6ec2365a3da2d2b5dadaf76cbc8731606c53a916a31eac8399150b9"
-      ],
-      "book_id": "book-mm-06",
-      "title": "8. SURGICAL SAFETY CHECK LIST:",
-      "topic_id": "t-mm-06-008",
-      "total_utf8_bytes": 2341
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "645cd9d9cb075832221fea9ce74504f22d719fb468e7cded9b7b762b3da7627c"
-      ],
-      "book_id": "book-mm-06",
-      "title": ". OUT PATIENT HYSTERSCOPY:",
-      "topic_id": "t-mm-06-009",
-      "total_utf8_bytes": 25392
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "6d8fd00ee3c3ecc1f746c00c37be77b0a4ae76e22c6b2fea7f15063104a7b20e"
-      ],
-      "book_id": "book-mm-06",
-      "title": "10. STEPS OF ABDOMINAL HYSTRECTOMY",
-      "topic_id": "t-mm-06-010",
-      "total_utf8_bytes": 7942
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "8992fffcb512a6a0a5b9bc3ed6e5acbe3ff26f2295c2cd15f968329505c0eb73"
-      ],
-      "book_id": "book-mm-06",
-      "title": "11. STEPS OF VAGINAL HYSTERECTOMY",
-      "topic_id": "t-mm-06-011",
-      "total_utf8_bytes": 5433
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "0f97494d5fb155ccefdf64b3e3ebcd9242cc2e77c531b352474cd3237f1b8595"
-      ],
-      "book_id": "book-mm-06",
-      "title": "12. STEPS OF EVACUATION",
-      "topic_id": "t-mm-06-012",
-      "total_utf8_bytes": 19842
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "da38e001612c2ac6b396f2d4eca4adf4e82f200b0dc1812c605011ed6838a466"
-      ],
-      "book_id": "book-mm-06",
-      "title": "13. MVA:",
-      "topic_id": "t-mm-06-013",
-      "total_utf8_bytes": 7318
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2a5b97d1d0ded6402947583cf73699562b23b8f8c90ebbd904d553ad98256d4d"
-      ],
-      "book_id": "book-mm-06",
-      "title": "14. STEPS OF ANTERIOR REPAIR:",
-      "topic_id": "t-mm-06-014",
-      "total_utf8_bytes": 8040
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "72a8cf0b5e5f3bb5cfaf65f3d51e2a1ba73cfe4cfdebd73d1120f3efbadaf23b"
-      ],
-      "book_id": "book-mm-06",
-      "title": "15. STEPS OF POSTERIOR REPAIR:",
-      "topic_id": "t-mm-06-015",
-      "total_utf8_bytes": 13967
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e3188a6764baaa0598c3c075ca476edb4b271fdd38a231f34e950d1da5e88b67"
-      ],
-      "book_id": "book-mm-06",
-      "title": "16.THE USE OF SURGICAL DRAINS:",
-      "topic_id": "t-mm-06-016",
-      "total_utf8_bytes": 11588
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2ada84f87f4b4bc952d4c453e3dc8964db3c11cf405757ab9b32f27910562eb6"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17. POST OP COMPLICATIONS:",
-      "topic_id": "t-mm-06-017",
-      "total_utf8_bytes": 555
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "4c6dab22e898cc02c7bee10cb2741fa1c77e87493bd705db0c444ddddb43a02d"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.1. HAEMORRHAGE",
-      "topic_id": "t-mm-06-018",
-      "total_utf8_bytes": 19584
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3c6347c458d7e26521e63dbe42eb44fec4b4aa9c86b6356f98a620218560249c"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.2. HAEMATOMAS:",
-      "topic_id": "t-mm-06-019",
-      "total_utf8_bytes": 16215
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e5c12be355e4b506e22107d4fffa4c74afe08093d6f500f348c3e54ff6baf225"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.3. WOUND DEHISCENCE:",
-      "topic_id": "t-mm-06-020",
-      "total_utf8_bytes": 10653
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ae0c785c9b1e452787cbfd6a408c421d1ca7003c2b9462ecd2073033c5058124"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.4. THROMBOPHYLAXIS IN GYNAECOLOGICAL SURGERIES",
-      "topic_id": "t-mm-06-021",
-      "total_utf8_bytes": 5603
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c1e146f65144079321810dae1dbed21ac0b458f363091ea2cf246aea4f2c2331"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.5. DEEP VEIN THROMBOSIS:",
-      "topic_id": "t-mm-06-022",
-      "total_utf8_bytes": 23374
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "7a0b93f54f78f73495bd6c96d55eaae6034dbdd8f89e8675006a37b724b25f92"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.7. PELVIC ABSCESS:",
-      "topic_id": "t-mm-06-023",
-      "total_utf8_bytes": 6609
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "988c9d041168b504aeac91bd8d757527aa2ab4d60e817e5fe122efd01606dcd6"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.8. ANAESTHESIA COMPLICATION:",
-      "topic_id": "t-mm-06-024",
-      "total_utf8_bytes": 1901
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "720dc07f5ef529caedb37a7965a4614df01dbb52d08d73cdb560798e86cf119e"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.9. VISCERAL INJURIES:",
-      "topic_id": "t-mm-06-025",
-      "total_utf8_bytes": 519
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "5be85cb64c61452b43a1f7d0c3fe62a8e984751ea8ecd3677fa807f89f4ef308"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.9.1. URINARY TRACT:",
-      "topic_id": "t-mm-06-026",
-      "total_utf8_bytes": 10551
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9fa418231ffb667b56d1eee8f70444b4b6a324a55ea7c1f34a86dd9898fd1f21"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.9.2. Bowel complications:",
-      "topic_id": "t-mm-06-027",
-      "total_utf8_bytes": 13745
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3f970eb7b2b494945e1f4d28e274294eaace0c3ed0996635250141fd2a308230"
-      ],
-      "book_id": "book-mm-06",
-      "title": "17.9.4. ACUTE COLONIC PSEUDO \u2013 OBSTRUCTION (ACPO) AFTER C/S:",
-      "topic_id": "t-mm-06-028",
-      "total_utf8_bytes": 36893
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ac6968e9d1325c87abaebb077fd1cc74ee5a98b1d8e0c730000038db3dbcceb0"
-      ],
-      "book_id": "book-mm-06",
-      "title": "18. LAPAROSCOPIC MYOMECTOMY:",
-      "topic_id": "t-mm-06-029",
-      "total_utf8_bytes": 5390
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "274f6d660d6b7d5279b3ee82b20761f454aca049100797527b50bb795ab91920"
-      ],
-      "book_id": "book-mm-06",
-      "title": "19. LAPROSCOPY IN PREGNANCY:",
-      "topic_id": "t-mm-06-030",
-      "total_utf8_bytes": 14863
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e541414ce75fc067a504939a10ca392e9459fc936215cbecc1ec5164d5152ce3"
-      ],
-      "book_id": "book-mm-06",
-      "title": "20. ISSUES AROUND VAGINAL VAULT CLOSURE:",
-      "topic_id": "t-mm-06-031",
-      "total_utf8_bytes": 12315
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "adc70b26ceb1f97a0aba161453bf202fb385cb1e9ea69c9b2f409069bebba628"
-      ],
-      "book_id": "book-mm-06",
-      "title": "21. LAPAROSCOPY IN UROGYNAECOLOGY",
-      "topic_id": "t-mm-06-032",
-      "total_utf8_bytes": 6099
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "462a2446acb32a6056180559db265864eb43a3a390f5e06b718b63727e6c4cef"
-      ],
-      "book_id": "book-mm-06",
-      "title": "22. SURGICAL\u00a0SMOKE",
-      "topic_id": "t-mm-06-033",
-      "total_utf8_bytes": 23348
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "db5983cb5bb73a698308d277827bbc7acb1fd10b903a2a03d4af80fd4bfbbfe7",
-        "460db4534b4e1551792a8caf30d57ce8c5a6909d6b2e1ae114194498788e9de7"
-      ],
-      "book_id": "book-mm-07",
-      "title": "1. RECURRENT PREGNANCY LOSS",
-      "topic_id": "t-mm-07-001",
-      "total_utf8_bytes": 64610
-    },
-    {
-      "block_count": 3,
-      "block_digests": [
-        "9d4c484aa920a39902827947bb83e5aa467aeefb2829e6f2c130e0a21f4f15ea",
-        "d801ae341029c7b5bcb4147d9be8f4c9956446b8c40b44cf2bb9c820cdcbc53d",
-        "8306323db64731c0fddc7dc798c5faadc1d6cec8969b5d4e60c15a6d18952f9a"
-      ],
-      "book_id": "book-mm-07",
-      "title": "2. ECTOPIC PREGNANCY",
-      "topic_id": "t-mm-07-002",
-      "total_utf8_bytes": 57009
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "41f7dca32c17fea27846154a76cf8d38b9493666d36b1b89c90b3d4361ecd4d1"
-      ],
-      "book_id": "book-mm-07",
-      "title": "3. DIAGNOSIS OF INTRAUTERINE & ECTOPIC PREGNANCY:",
-      "topic_id": "t-mm-07-003",
-      "total_utf8_bytes": 38878
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "68b5e0af7064031623689ec3d9a9fe29162cbb29a44183a289ef38ee92a1e0e7",
-        "e76d888e2e7ad70df259c343a640dfadc587460c5dd60c2ef716c5ece0089209"
-      ],
-      "book_id": "book-mm-07",
-      "title": "4. GESTATIONAL TROPHOBLASTIC DISEASES (GTD):",
-      "topic_id": "t-mm-07-004",
-      "total_utf8_bytes": 90088
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "bb1b78ddb7886e084104aa80ab7ea2169b5f4ef4c5addddd14162c9e819c7dec",
-        "d3bb111625eb1b574ad103d77e841f3c602313d47a5f19dd7e478d348500d327"
-      ],
-      "book_id": "book-mm-07",
-      "title": "5. MANAGEMENT OF NAUSEA AND VOMITING IN PREGNANCY AND HYPEREMESIS GRAVIDARUM:",
-      "topic_id": "t-mm-07-005",
-      "total_utf8_bytes": 57479
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "8a760171aa71b3eaf41c20da3ec2ccd88ff801c11d1104e9437912831db0807d"
-      ],
-      "book_id": "book-mm-07",
-      "title": "6. EVOLUTION IN SCREENING FOR DOWN SYNDROME + CFFDNA:",
-      "topic_id": "t-mm-07-006",
-      "total_utf8_bytes": 51476
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "fa22899420a67494737db1d83af067159bd77f422e37671cae1361a22b8ae1cd"
-      ],
-      "book_id": "book-mm-07",
-      "title": "7.  AMNIOCENTESIS & CVS:",
-      "topic_id": "t-mm-07-007",
-      "total_utf8_bytes": 43070
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "57434703a4dccc5d7e787744efdde4fd6da5f8b55335a887fa8803c31219afe0",
-        "71fba7e3bf00100ef1a30fe8e20bf4cf32781375bd45da46f757781ed6a737df"
-      ],
-      "book_id": "book-mm-08",
-      "title": "1. \u03b2\u2013 THALASSEMIA",
-      "topic_id": "t-mm-08-001",
-      "total_utf8_bytes": 58444
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "dd8249e0c1915ce9a41cd089817bb4737baee053659f01c6e879ae91bdce40ec",
-        "39cb1178f56a40ac5f405b79a19089a1e94411a01d9b8635329f65ee1a8d0c9e"
-      ],
-      "book_id": "book-mm-08",
-      "title": "2. SCD \u2013 SICKLE CELL DISEASES",
-      "topic_id": "t-mm-08-002",
-      "total_utf8_bytes": 56520
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "f6ab98272bd4fde857a4514ad3b2cc356b4205d5a680b9db3c0c88632cd22d04",
-        "773d478663d69cab7cd6b792e7718c48470c1570b9ad8cd0da912d287e69550a"
-      ],
-      "book_id": "book-mm-08",
-      "title": "3. REDUCING RISK OF VTE",
-      "topic_id": "t-mm-08-003",
-      "total_utf8_bytes": 77015
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "8cbfdfb623405f5727b1ed206723df7529c9ba4e99701953653e42f2b0a56611",
-        "fb899bae19228f7509f488479a17c9bd27ee60e92a232d2c4c97219f4fc79f26"
-      ],
-      "book_id": "book-mm-08",
-      "title": "4. VTE IN PREGNANCY & PUERPERIUM",
-      "topic_id": "t-mm-08-004",
-      "total_utf8_bytes": 56454
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "7885c20283d0c4a7e5e6a791d005d559a95edb50458dc4c7341718da451b957b"
-      ],
-      "book_id": "book-mm-08",
-      "title": "5.\tRED CELL ANTIBODIES DURING PREGNANCY",
-      "topic_id": "t-mm-08-005",
-      "total_utf8_bytes": 45440
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "dcc53e043f04f112006db52287cb36d5762db8c87f159d1fa8f0728f6d751e06"
-      ],
-      "book_id": "book-mm-08",
-      "title": "6.\tANTI D PROPHYLAXIS BCSH",
-      "topic_id": "t-mm-08-006",
-      "total_utf8_bytes": 23371
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "4686d1f80102fb77e8201f876a0d30bd52b2204069e7a3bfa1fffcec37478a87"
-      ],
-      "book_id": "book-mm-08",
-      "title": "7.\tIRON DEFICIENCY",
-      "topic_id": "t-mm-08-007",
-      "total_utf8_bytes": 35178
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "1595c43662a65a954a9a6dea2689d4966b2c844ec738eecd6c2cf5ba984e0b07",
-        "d823b528bcfcc61eeaa240c4f00a62ac77865cf45adf5d8d28e0ff6a75333e4e"
-      ],
-      "book_id": "book-mm-08",
-      "title": "8. HYPERTENTION IN PREGNANCY",
-      "topic_id": "t-mm-08-008",
-      "total_utf8_bytes": 92779
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "96e1155573e33b02b86ded9bc7bafb8636c4be81ad0ace77a7cfcb4ea568db81"
-      ],
-      "book_id": "book-mm-08",
-      "title": "9.\tLOW DOSE ASPIRIN + CALCIUM SUPPLEMENTATION FOR PREVENTION OF PRE \u2013 ECLAMPSIA:",
-      "topic_id": "t-mm-08-009",
-      "total_utf8_bytes": 18069
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b8c1186315a6a58bcfecfe8f4eefffc70d9aa0f4c6b1979bc78ec077887c46e3"
-      ],
-      "book_id": "book-mm-08",
-      "title": "10.\tHEMOPHILIA",
-      "topic_id": "t-mm-08-010",
-      "total_utf8_bytes": 47567
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "7691b46d1a00c4093934bb8d2be2021fa87f308ac6e5e676ee920df9afac0cb2"
-      ],
-      "book_id": "book-mm-08",
-      "title": "11.\tVWD",
-      "topic_id": "t-mm-08-011",
-      "total_utf8_bytes": 38025
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b7fb13c24fccb99754f78712acbaa95e82842252ca95ecccae39cfa16c12260a"
-      ],
-      "book_id": "book-mm-08",
-      "title": "12.\tFACTOR XI DEFICIENCY:",
-      "topic_id": "t-mm-08-012",
-      "total_utf8_bytes": 16210
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ca0fc77ba0fc8aba1bf048b8bd72add82c849ceff576d02bd09f873e55f6e3d1"
-      ],
-      "book_id": "book-mm-08",
-      "title": "13.\tFIBRINOGEN DISORDERS",
-      "topic_id": "t-mm-08-013",
-      "total_utf8_bytes": 8582
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9c5a6fda618739b7e6c3a52255ac36d4627f3d0b79f8621a36904862571d884a"
-      ],
-      "book_id": "book-mm-08",
-      "title": "14.\tPLT FUNCTION DISORDERS",
-      "topic_id": "t-mm-08-014",
-      "total_utf8_bytes": 18338
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "f9840ac95c4f9fedced5992050da09364aa7aeb934c25ed3efe1ab886d149af9"
-      ],
-      "book_id": "book-mm-08",
-      "title": "15.\tMYOCARDIAL INFARCTION IN PREGNANCY",
-      "topic_id": "t-mm-08-015",
-      "total_utf8_bytes": 27775
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "1b5917513c3637d440eb48be16e48012387be654c38ee66118968c7d6bfb4eda"
-      ],
-      "book_id": "book-mm-08",
-      "title": "16.\tDERMATOLOGICAL CONDITIONS OF PREGNANCY",
-      "topic_id": "t-mm-08-016",
-      "total_utf8_bytes": 18501
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "920c35f604ebd97673e34469f9b23bdaffa2851eec476c6aa1d65d1904bdef50"
-      ],
-      "book_id": "book-mm-08",
-      "title": "17.\tSLE IN PREGNANCY",
-      "topic_id": "t-mm-08-017",
-      "total_utf8_bytes": 32206
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "8e69ad4eb5323c305be7759442e0cee31d4867da5ecca12dceb2f1ecde6a2db0"
-      ],
-      "book_id": "book-mm-08",
-      "title": "18.\tAPPENDICITIS IN PREGNANCY",
-      "topic_id": "t-mm-08-018",
-      "total_utf8_bytes": 20831
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "02f77ee176c28214dbf62b5c33acb9c3e5f60356caae9f9da6f67a7046232eb7"
-      ],
-      "book_id": "book-mm-08",
-      "title": "19.\tPKU - PHENYLKETONURIA",
-      "topic_id": "t-mm-08-019",
-      "total_utf8_bytes": 22500
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a5dc31f21ed8adebd08369d420b26dbaa1e69ff18dd1f23c11543e76d0aa0dee"
-      ],
-      "book_id": "book-mm-08",
-      "title": "20.\tIBD \u2013 INFLAMMATORY BOWEL DISEASE",
-      "topic_id": "t-mm-08-020",
-      "total_utf8_bytes": 17928
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "40a0366654198b303e90585c45a03c984a91411801425ab50f35965cc1e07c45"
-      ],
-      "book_id": "book-mm-08",
-      "title": "21.\tEPILEPSY",
-      "topic_id": "t-mm-08-021",
-      "total_utf8_bytes": 44407
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "24bb5904803e630e61b27d8cfee8b145a0de2beab2be2ee3e5622b3858be4707"
-      ],
-      "book_id": "book-mm-08",
-      "title": "22.\tCA BREAST IN PREGNANCY AND PREGNANCY FOLLOWING CA BREAST",
-      "topic_id": "t-mm-08-022",
-      "total_utf8_bytes": 34987
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "da09b98d88b29a9fd620fc81c2a35105b1d654f5f60d57e846ba0a0ebadee237",
-        "fed0e73815283e4dc867421e9f4af006c78c967747bcc70abe933a9b3c95cf61"
-      ],
-      "book_id": "book-mm-08",
-      "title": "23.\tDIABETES IN PREGNANCY",
-      "topic_id": "t-mm-08-023",
-      "total_utf8_bytes": 72595
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d77218ca8d7a4c5a07e93a579406e1bc32b174c67e35e0e9d6235cc47bbc1425"
-      ],
-      "book_id": "book-mm-08",
-      "title": "24.\tDKA IN PREGNANCY",
-      "topic_id": "t-mm-08-024",
-      "total_utf8_bytes": 27219
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "aa095069bd8c19eecee54d697930386b02f7f0b184e59dc80debb68cbba1c01a"
-      ],
-      "book_id": "book-mm-08",
-      "title": "25.\tOBESITY IN PREGNANCY",
-      "topic_id": "t-mm-08-025",
-      "total_utf8_bytes": 47462
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "228cd6f5cbe7acfb410cb12f97cff129bb8406328fadb367a6f85b643915c158"
-      ],
-      "book_id": "book-mm-08",
-      "title": "26.\tHEADACHE IN PREGNANCY",
-      "topic_id": "t-mm-08-026",
-      "total_utf8_bytes": 47409
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "4ec4c4c4140323ee9608a173c95e7c5017d3709ef8dceba60204d177e0d6c816"
-      ],
-      "book_id": "book-mm-08",
-      "title": "27.\tLIVER MASSES IN PREGNANCY",
-      "topic_id": "t-mm-08-027",
-      "total_utf8_bytes": 17453
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c9495b71842c8f7005d1384b51959ca8ca213d8f7fe58485a5283adae90b885b"
-      ],
-      "book_id": "book-mm-08",
-      "title": "28. ACUTE KIDNEY INJURY IN PREGNANCY",
-      "topic_id": "t-mm-08-028",
-      "total_utf8_bytes": 49422
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "dc6ac652468ad9f20d591c944e253f27d472f9ecf65bdba4f2f0521549f63d9b"
-      ],
-      "book_id": "book-mm-08",
-      "title": "29.\tASTHMA IN PREGNANCY",
-      "topic_id": "t-mm-08-029",
-      "total_utf8_bytes": 34584
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a196c4b688fa89c1f49465c5c9d868cd721beb36b2bf4672355598f59cc6a0ee"
-      ],
-      "book_id": "book-mm-08",
-      "title": "30.\tCONSTIPATION IN PREGNANCY",
-      "topic_id": "t-mm-08-030",
-      "total_utf8_bytes": 16956
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "483c8a8dc2e9da9be86f8eb9a5a668ed8225b6d41854ea316dcb7690f3be4340"
-      ],
-      "book_id": "book-mm-08",
-      "title": "31. CYSTIC FIBROSIS",
-      "topic_id": "t-mm-08-031",
-      "total_utf8_bytes": 23400
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ab095a5834ca809f34425999af2f4f3b2853a51b5b67c73702ccef4161caea68"
-      ],
-      "book_id": "book-mm-08",
-      "title": "32. DIABETES INSIPIDUS",
-      "topic_id": "t-mm-08-032",
-      "total_utf8_bytes": 22186
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "81d36071b79933ad57fc3182328202d8f94db61a00239dbd215be5d832bba1dd"
-      ],
-      "book_id": "book-mm-08",
-      "title": "33. MULTIPLE SCLEROSIS",
-      "topic_id": "t-mm-08-033",
-      "total_utf8_bytes": 38465
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "8b57331606ca09e0966a5d3e18e78039381ef2f2b1d2e4bf13f8d0de38f6c9ea",
-        "e0a4ec244429bacb809e55f6b514ae9744a41ab6951cda8fddd47c8a0505ce41"
-      ],
-      "book_id": "book-mm-08",
-      "title": "34. PREGNANCY & SPINAL CORD INJURY:",
-      "topic_id": "t-mm-08-034",
-      "total_utf8_bytes": 61569
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "9b934435cecdfe776210f6c0e2a48e3a2af0aa3340d4fe93f9b6abbfa16679b1"
-      ],
-      "book_id": "book-mm-08",
-      "title": "35. SURGICAL CAUSES OF ACUTE ABDOMINAL PAIN IN PREGNANCY:",
-      "topic_id": "t-mm-08-035",
-      "total_utf8_bytes": 38349
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "5f90cb1c2c29d615e7fc11c47394473dca7ff9d0d2afa3712d298cb04d97bd31"
-      ],
-      "book_id": "book-mm-08",
-      "title": "35.1. A \u2013 APPENDICITIS",
-      "topic_id": "t-mm-08-036",
-      "total_utf8_bytes": 23775
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "1d0ae7ae1234e16fe325d7712d029ab4f7bbc2e52dc48e802d5e45cc728ced0c"
-      ],
-      "book_id": "book-mm-08",
-      "title": "35.2. B \u2013 BILIARY COLIC/ CHOLECYSTITIS",
-      "topic_id": "t-mm-08-037",
-      "total_utf8_bytes": 7144
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "fa0ee41787ff7c3f41f77855ae9b5eac7c0159b21f421eda379c3b8cd61f8041"
-      ],
-      "book_id": "book-mm-08",
-      "title": "35.3. C \u2013 BOWEL OBSTRUCTION",
-      "topic_id": "t-mm-08-038",
-      "total_utf8_bytes": 4658
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "32dc4324f0b104df7d9fa2a11d3089adb3c498db202d892d0dbf1f317f3ea11c"
-      ],
-      "book_id": "book-mm-08",
-      "title": "35.4. D \u2013 PANCREATITIS",
-      "topic_id": "t-mm-08-039",
-      "total_utf8_bytes": 1530
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "80d348ec82b0665c8751dd34af532d60653180c1c8712406dd46029bcd4d962d"
-      ],
-      "book_id": "book-mm-08",
-      "title": "35.5. E \u2013 URETERIC OBSTRUCTION & PYELONEPHRITIS",
-      "topic_id": "t-mm-08-040",
-      "total_utf8_bytes": 4106
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "26b1d4da5d3240301018cadcd0e23fc21cd8776fbe51fc9809057c9887046768"
-      ],
-      "book_id": "book-mm-08",
-      "title": "36. AIR TRAVEL IN PREGNANCY",
-      "topic_id": "t-mm-08-041",
-      "total_utf8_bytes": 15202
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "53666f4a67909138c436be01bbda4d1f452fd1a6efeb02f50110b95e55293850"
-      ],
-      "book_id": "book-mm-08",
-      "title": "37. ACUTE PANCREATITIS IN PREGNANCY",
-      "topic_id": "t-mm-08-042",
-      "total_utf8_bytes": 18458
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "18ed10941cb6b123719470c7b771b47d9cd23b1d5bdeffc9031c03684dff6082",
-        "f41783a8573bd72910ae9a2330c94c1cca937d2b5b23d4135bf96734f9496a7c"
-      ],
-      "book_id": "book-mm-08",
-      "title": "38. THYROID DISORDERS IN PREGNANCY AND POSTPARTUM",
-      "topic_id": "t-mm-08-043",
-      "total_utf8_bytes": 72886
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "016a1b9a6f6ad09a7e09b7f9dbfa5672cd88407a9a8323c89d20dd75f81253a1"
-      ],
-      "book_id": "book-mm-08",
-      "title": "38.1. MANAGEMENT OF HYPOTHYROIDISM AND RELATED DISORDERS",
-      "topic_id": "t-mm-08-044",
-      "total_utf8_bytes": 40737
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "8d7c24828e3d1b566039fb0f14bd84dc97757b87c31152622ee204f4606fef8a",
-        "220a3df994cedc0989abd3b181989905199514ed38d540af2cc7ad081775187c"
-      ],
-      "book_id": "book-mm-08",
-      "title": "38.2. HYPERTHYROIDISM AND THYROTOXICOSIS",
-      "topic_id": "t-mm-08-045",
-      "total_utf8_bytes": 57405
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "81525a172ba0d4cd31f87c26e915d5424fe9b6d9fac7350f7fca2c6ce4edd921"
-      ],
-      "book_id": "book-mm-08",
-      "title": "38.3. THYROID NODULE AND THYROID CANCER",
-      "topic_id": "t-mm-08-046",
-      "total_utf8_bytes": 5847
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b162d708defb0abe1a53dac7ff527f0a4114ec4cfb22b1adb060505096331585"
-      ],
-      "book_id": "book-mm-08",
-      "title": "38.4. POST \u2013 PARTUM THYROIDITIS PPT",
-      "topic_id": "t-mm-08-047",
-      "total_utf8_bytes": 28891
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "70fbe64a275925c9428133e944d576904e4ca3f579bc9b13fcaca1168af1adda"
-      ],
-      "book_id": "book-mm-08",
-      "title": "39. VITAMIN D IN PREGNANCY",
-      "topic_id": "t-mm-08-048",
-      "total_utf8_bytes": 31248
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "f3ac12526508d33d0b8d0f2ab5f6298138aea5aa01bad9bd7963a65df9ef2860"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1. PERINATAL INFECTIONS:",
-      "topic_id": "t-mm-09-001",
-      "total_utf8_bytes": 8597
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "3f424e4c539742019c883a82cea0ef647548f5eaeb9bf55fdc458f3e43b8cc44"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.1.\tGBS IN PREGNANCY:",
-      "topic_id": "t-mm-09-002",
-      "total_utf8_bytes": 25373
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b08cabb5636370acc13fd5de27f17e4be08213d0b0e1a2d8dd41b037ceb0f509"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.2.\tCHICKEN POX IN PREGNANCY:",
-      "topic_id": "t-mm-09-003",
-      "total_utf8_bytes": 31145
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "8d8b0b759d89a910506cfc6742d5b297652f45cf4841d96bbfb9667ca73bc5fa",
-        "a0e8d22aac8989ec306f7ef08b58a83de46a74eb01dd8df968061d0941350264"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.3. \tHIV IN PREGNANCY:",
-      "topic_id": "t-mm-09-004",
-      "total_utf8_bytes": 72023
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "2d9c14b6665649bff5d9680b65d25dcec614596f18776ee309885c1fe658e882"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.4. HERPS IN PREGNANCY + NEONATAL CARE:",
-      "topic_id": "t-mm-09-005",
-      "total_utf8_bytes": 22010
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "79819c20a8ddcf8f0e36054f44f68cd0dcd0fc9f8ef2d9333db0dea5c560614a",
-        "fb8de03e3fc905813221556ab0fa495ce299fb44ce68a5c15d0d915b25113494"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.5. MALARIA IN PREGNANCY",
-      "topic_id": "t-mm-09-006",
-      "total_utf8_bytes": 75246
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "921d038e92d82d440e17539823605a83136b11ec67b7821772f8ac42b08d061f"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.6. COVID \u2013 19 IN PREGNANCY:",
-      "topic_id": "t-mm-09-007",
-      "total_utf8_bytes": 45796
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "6e4834c7b71061bd457bb05b0c2399c0520bc15a7b464afc4604f4a8b3a5298e"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.7.\tCYTOMEGALOVIRUS",
-      "topic_id": "t-mm-09-008",
-      "total_utf8_bytes": 26465
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d2ca93e172f74ff088ae2e3ac220256792ca1f593ef86e90106aff3d2953f1bc"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.8.\tLISTERIA",
-      "topic_id": "t-mm-09-009",
-      "total_utf8_bytes": 12970
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d91a76b1defb4a5412bacee867bbda3ad9b13df89f075527158228b63f199fa5"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.9.\tTOXOPLASMOSIS",
-      "topic_id": "t-mm-09-010",
-      "total_utf8_bytes": 13865
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b1162758734bc3005e90366f847c9589049a93392954e419f75a373a400c99a7"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.10.\tRUBELLA",
-      "topic_id": "t-mm-09-011",
-      "total_utf8_bytes": 6200
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b70a1ae6d398e8c6cb1ab77665c461dfd04e28b96a328fef5fe5345d0e3df595"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.11.\tSYPHILIS",
-      "topic_id": "t-mm-09-012",
-      "total_utf8_bytes": 24410
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "e3b13813972c276b8edc79bbe6d15fa9b832af7074e812c442fa1b2feab5f112"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.12.\tPARVOVIRUS",
-      "topic_id": "t-mm-09-013",
-      "total_utf8_bytes": 27949
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "db4e192076e9a23617f835631c3182820a0d0dfc90e94239c693849633b7e555"
-      ],
-      "book_id": "book-mm-09",
-      "title": "1.13.\tHEMOPHILUS INFLUENZAE",
-      "topic_id": "t-mm-09-014",
-      "total_utf8_bytes": 21245
-    },
-    {
-      "block_count": 4,
-      "block_digests": [
-        "5f315bfdc38198cceaa7f8dd8d30d866504a4e59e851089bbd591872cb9e9bd5",
-        "eb5117a7d735a9c21763e92895376671e7659a813ed64f1e54c7bfb57822a529",
-        "9df6fd6b439fa0f605c2e781d8c1b36df6a38e540879255b1f1c7dbd11df415b",
-        "04cdebaa54c771b718455b1cb632bae3356b2eca96551cc1ab8cb5c5f28c36c9"
-      ],
-      "book_id": "book-mm-09",
-      "title": "2.\tMATERNAL SEPSIS DURING & FOLLOWING PREGNANCY",
-      "topic_id": "t-mm-09-015",
-      "total_utf8_bytes": 153141
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "8a5dbdd684a62b89ee29db038af2428a1684e103e5f0ad9cef5ddf0ed1b539cd"
-      ],
-      "book_id": "book-mm-09",
-      "title": "3.\tOBSTETRIC CHOLESTASIS:",
-      "topic_id": "t-mm-09-016",
-      "total_utf8_bytes": 44616
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "6957e807e404e117da19cd094abf7535b6b846f65fe2e62ed6dc0ad7ee49df09"
-      ],
-      "book_id": "book-mm-09",
-      "title": "3.\tREDUCED FETAL MOVEMENTS:",
-      "topic_id": "t-mm-09-017",
-      "total_utf8_bytes": 12196
-    },
-    {
-      "block_count": 3,
-      "block_digests": [
-        "bf3cad2d92d344b3b5e99a700f18792e391d86f9f8c27528488dfe750472d95c",
-        "19a8e59db6e0e2d9f7e8dbd23e3db154752055959a03f8f15e880b05fa7c2f7b",
-        "2cb8bae0b69c862550427365ea69754829ef2288263f5f7c5017eae942858d40"
-      ],
-      "book_id": "book-mm-09",
-      "title": "5.\tSMALL FOR GESTATIONAL AGE:",
-      "topic_id": "t-mm-09-018",
-      "total_utf8_bytes": 115041
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "0c3b8aa4f44fabc87fa2d4353657f3e061c308cfd87ef579c089b2c69ee025a3",
-        "0d73791021e526cbf8f0aa827bdfcfa249290db79bf1bb576907ca421e56833f"
-      ],
-      "book_id": "book-mm-09",
-      "title": "6. CARE OF LATE INTRAUTERINE FETAL DEATH AND STILL BIRTH:",
-      "topic_id": "t-mm-09-019",
-      "total_utf8_bytes": 84160
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "7b5a5fbdb8b077bcb9d11626eaf218837b0b68c881b5a6428d93bb315ea0a9dc",
-        "4c8b05ec2b82cc2b015935711ae418107665b756a2aea6f9ebfeaf0b102c5a9f"
-      ],
-      "book_id": "book-mm-09",
-      "title": "7. PLACENTA PREVIA, ACCRETA:",
-      "topic_id": "t-mm-09-020",
-      "total_utf8_bytes": 61573
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "02398f38e728616c31c67f44f519c5f5f5b160ce4a3d0f2014ad47b6f22d34f5"
-      ],
-      "book_id": "book-mm-09",
-      "title": "8.\tBLOOD TRANSFUSION IN OBSTETRIC:",
-      "topic_id": "t-mm-09-021",
-      "total_utf8_bytes": 33611
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "4373f61186ae2dba91f1d60be99c311c0dafea972eb03e20966dc00091551c96"
-      ],
-      "book_id": "book-mm-09",
-      "title": "9.\tMULTIPLE PREGNANCY:",
-      "topic_id": "t-mm-09-022",
-      "total_utf8_bytes": 37154
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "22a5868934e571f6d135623a059a65ff0dc1a06de3cef3fbc37a4bf66c67546f"
-      ],
-      "book_id": "book-mm-09",
-      "title": "10.\tMONOCHOROINIC TWINS:",
-      "topic_id": "t-mm-09-023",
-      "total_utf8_bytes": 44092
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "4e463d3d0d335d64765f176d49534c53b646353bb62f6116ca1161c1da7e9ff0"
-      ],
-      "book_id": "book-mm-09",
-      "title": "11. POLYHYDRAMNIOS IN SINGLETON",
-      "topic_id": "t-mm-09-024",
-      "total_utf8_bytes": 19739
-    },
-    {
-      "block_count": 2,
-      "block_digests": [
-        "dddcfd6572f3918feffc856a675a46016a7a3ebac664a65e5e27fd2b8f2f7b54",
-        "c20b63eff844d59d0a1dd932150fa93e855290f34f442ae361b9be79ae8a2377"
-      ],
-      "book_id": "book-mm-09",
-      "title": "12. ANTEPARTUM HAEMORRHAGE",
-      "topic_id": "t-mm-09-025",
-      "total_utf8_bytes": 62229
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "0efdce8a40e15c37201289f8fe2ab23cae7a21746a802f282877b9ff6554f07c"
-      ],
-      "book_id": "book-mm-09",
-      "title": "13. VASA PREVIA:",
-      "topic_id": "t-mm-09-026",
-      "total_utf8_bytes": 11961
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c65e8abd0e50819b04064d72dfa2fb6f387152a3551d801d2beb523e6e195218"
-      ],
-      "book_id": "book-mm-09",
-      "title": "14.  ANC OF UNCOMPLICATED PREGNANCIES:",
-      "topic_id": "t-mm-09-027",
       "total_utf8_bytes": 32234
     },
     {
       "block_count": 1,
       "block_digests": [
-        "1addeaffaf935148210e7317def0e1769c61e69a7853848d645091efccf8591b"
+        "7d1a22f420903bd8e55e02b63df4d624751642807ac6ebf884f08ac83343fa4c"
       ],
-      "book_id": "book-mm-09",
-      "title": "15. VACCINATION IN PREGNANCY:",
-      "topic_id": "t-mm-09-028",
-      "total_utf8_bytes": 31428
+      "book_id": "book-mm-01",
+      "title": "8. HRT AFTER GYNAECOLOGICAL MALIGNANCY:",
+      "topic_id": "t-mm-01-008",
+      "total_utf8_bytes": 8101
     },
     {
       "block_count": 1,
       "block_digests": [
-        "8c3124631d49adfe347d907c4fffdafc82c54d11715bd43ee1a34f91de090186"
+        "b685d7c669e361f81d090f5a736b882f5b4ae96ded8db39c2d12f0a66183b64e"
       ],
-      "book_id": "book-mm-09",
-      "title": "16. ANC OF SINGLETON PREGNANCY CONCEIVED USING ART:",
-      "topic_id": "t-mm-09-029",
-      "total_utf8_bytes": 27926
+      "book_id": "book-mm-01",
+      "title": "9. UNSHEDULED BLEEDING ON HRT",
+      "topic_id": "t-mm-01-009",
+      "total_utf8_bytes": 17012
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "29530d3d196679be6572148826e909a4d8f299a93dd09f03a18a36a7d0c98574"
+      ],
+      "book_id": "book-mm-01",
+      "title": "10. POST MENOPAUSAL BLEEDING:",
+      "topic_id": "t-mm-01-010",
+      "total_utf8_bytes": 10527
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "9e75364e46e3fb41fd028c580ee68bc25d2acefcc291d8b9139953e0a85d4029"
+      ],
+      "book_id": "book-mm-01",
+      "title": "11. CHRONIC PELVIC PAIN:",
+      "topic_id": "t-mm-01-011",
+      "total_utf8_bytes": 22764
     },
     {
       "block_count": 2,
       "block_digests": [
-        "3bbe006ec1db5189127a4f606aede8c4924edce54fb259a2fd82e14bb0dd93c3",
-        "bf06bb7b87f1f2628e817637ff86f8d3f86add7295f23f6880d99b6567423ba9"
+        "86731927558f7785c88774d9453caab69c43479aee2c68c10b7e486275c8c74c",
+        "a7440884e5a03e5be897c641140cbb44457472c75bac98d3e3a681599a719779"
       ],
-      "book_id": "book-mm-09",
-      "title": "17.\tIMAGING IN PREGNANCY:",
-      "topic_id": "t-mm-09-030",
-      "total_utf8_bytes": 53466
+      "book_id": "book-mm-01",
+      "title": "12. PMS:",
+      "topic_id": "t-mm-01-012",
+      "total_utf8_bytes": 55221
     },
     {
       "block_count": 1,
       "block_digests": [
-        "cf2829ff0fa035474fca5b6581d6bb203f00bfe2ab97ed9eed81d18151846181"
+        "d0ec92a72b5c3af265a8728a34fcfaf79a0d1347580b6410405a0b7fb3e0059e"
       ],
-      "book_id": "book-mm-09",
-      "title": "18.\tMANAGEMENT OF PREGNANCY AFTER TRACHYLECTOMY:",
-      "topic_id": "t-mm-09-031",
-      "total_utf8_bytes": 13947
+      "book_id": "book-mm-01",
+      "title": "13. PRIMARY AMENORRHEA:",
+      "topic_id": "t-mm-01-013",
+      "total_utf8_bytes": 17395
     },
     {
       "block_count": 1,
       "block_digests": [
-        "3ae5cfb8d89e5eec10be3afde946869b804feff95b65f5e616f64a019e77bdf0"
+        "13c8a626e62d771d84caf66a3874d03246478df8ccac53279d018f9b05fdf1d5"
       ],
-      "book_id": "book-mm-09",
-      "title": "19.\tMULTIFETAL PREGNANCY REDUCTION (MFPR) & SELECTIVE TERMINATION (ST):",
-      "topic_id": "t-mm-09-032",
-      "total_utf8_bytes": 25373
+      "book_id": "book-mm-01",
+      "title": "14. SECONDARY AMENORRHEA:",
+      "topic_id": "t-mm-01-014",
+      "total_utf8_bytes": 11477
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "7792a393e929472eaab33e1b91ba2ebd3629c7a9d0ec0ac2d43ffed0c8564525"
+      ],
+      "book_id": "book-mm-01",
+      "title": "15. INTER \u2013 SEX & KARYOTYPING:",
+      "topic_id": "t-mm-01-015",
+      "total_utf8_bytes": 49654
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "be3d7b7f0799e67ef2478f96891b60d5bef617158af9ab4409e517cbb1a26fc4"
+      ],
+      "book_id": "book-mm-01",
+      "title": "16.CONGENITAL UTERINE",
+      "topic_id": "t-mm-01-016",
+      "total_utf8_bytes": 994
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "d2fa495980597345668267fd7bc13b0a51327f4b22d6073c2d3ee8482e651a58"
+      ],
+      "book_id": "book-mm-01",
+      "title": "ANOMALIES (CUA)",
+      "topic_id": "t-mm-01-017",
+      "total_utf8_bytes": 35777
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "726e025d1d7ba22a4e8cdf29e138bf8584206ce8f5c0ab455e722b4eba2781f4"
+      ],
+      "book_id": "book-mm-01",
+      "title": "17. OUTFLOW TRACK DISORDERS OF VAGINA:",
+      "topic_id": "t-mm-01-018",
+      "total_utf8_bytes": 19553
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "09dc7a103f1389a3a39b12601c81678aa785b791c28c508a6fca6e2a37ddaa17"
+      ],
+      "book_id": "book-mm-01",
+      "title": "18. MRKH:",
+      "topic_id": "t-mm-01-019",
+      "total_utf8_bytes": 34262
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "72f2e4e53ca99d7170ca8f166e3a4cc1917818409904e166c45715a10bdc74e3"
+      ],
+      "book_id": "book-mm-01",
+      "title": "19. DYSMENORRHEA:",
+      "topic_id": "t-mm-01-020",
+      "total_utf8_bytes": 25411
     },
     {
       "block_count": 2,
       "block_digests": [
-        "4c94b8b0d44db2733063b48862b5241100cc8d7c8247fc2ac913f38b2459b925",
-        "a179e2ffea6ba291f0bdfa32486a0eeb88bc24ad62948ce36496de89a271fd79"
+        "ff8338d4abb9039b9c1488a506319936a3884b9c4215960edacf2cadb8ef0ae9",
+        "c048d23f887b7db63b7d269a5a36a5baced9dd8627454c129fdcfdeb2f840807"
       ],
-      "book_id": "book-mm-09",
-      "title": "20. ANTENATAL CORTICOSTEROID:",
-      "topic_id": "t-mm-09-033",
-      "total_utf8_bytes": 54174
+      "book_id": "book-mm-01",
+      "title": "20. FEMALE GENITAL MUTILATION (FGM):",
+      "topic_id": "t-mm-01-021",
+      "total_utf8_bytes": 69939
     },
     {
       "block_count": 2,
       "block_digests": [
-        "453dd63f7125e4d555df25731b08f7ba4c51014905eef637013a533c24958fa6",
-        "5b2dedfe6d800568e393bfe50ad0864892b460a614322046c3529bfb606fc980"
+        "dc00bf1100dfa8c8a08fb3e3b5add8960d2c009fb90f856bd09307f9eeed3563",
+        "ef3449f71b80d442dbc4a4ac5ab885acb8ce3d78256cd787134f0af03f68fcbd"
       ],
-      "book_id": "book-mm-09",
-      "title": "21. CERVICAL CERCLAGE",
-      "topic_id": "t-mm-09-034",
-      "total_utf8_bytes": 68888
+      "book_id": "book-mm-01",
+      "title": "21. HIRSUTISM IN YOUNG WOMEN:",
+      "topic_id": "t-mm-01-022",
+      "total_utf8_bytes": 74904
     },
     {
       "block_count": 1,
       "block_digests": [
-        "3a7f2926a3a5b94a46761e2190ff54453c6ed4741d92f8379e392674c97be7b3"
+        "9188075875522a31aad043c5bbfbe935e0c53009a9d1b2dd30e616ef0587a956"
       ],
-      "book_id": "book-mm-10",
-      "title": "1. INTRAPARTUM CARE OF HEALTHY NORMAL PREGNANCIE",
-      "topic_id": "t-mm-10-001",
-      "total_utf8_bytes": 4068
+      "book_id": "book-mm-01",
+      "title": "22. HMB IN ADOLESCENCE:",
+      "topic_id": "t-mm-01-023",
+      "total_utf8_bytes": 36903
     },
     {
       "block_count": 2,
       "block_digests": [
-        "0d04629a35653c2cf31699ae9f5b5d0a963f14f338ebce7393710be1fabf103f",
-        "108dc0d865e2b26f1076f9e789d0fa3146591f614e10debbac977e43394ca41f"
+        "2b8dfb3393256f106e271fb60ef46fc3163ae217fe4a2a46dbd472417baeef74",
+        "94a4200450bd08b88362e6dcef1d13ec881f19a9bfd87fe9a1e4793baaf5666e"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.1.\tTYPES OF BIRTH SETTING",
-      "topic_id": "t-mm-10-002",
-      "total_utf8_bytes": 62011
+      "book_id": "book-mm-01",
+      "title": "23. PRECOCIOUS PUBERTY",
+      "topic_id": "t-mm-01-024",
+      "total_utf8_bytes": 78862
     },
     {
       "block_count": 1,
       "block_digests": [
-        "9b109f5bae5685cf844a2a8aa26999fe275df2ad7d07658e89758863d33a0bca"
+        "1421d68580672e0f8ef8de98a395a245edc51daf3eebb0684cda228d22691613"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.2.\tPAIN RELIEF DURING LABOR:",
-      "topic_id": "t-mm-10-003",
-      "total_utf8_bytes": 48060
+      "book_id": "book-mm-02",
+      "title": "1. FERTILITY PROBLEMS, ASSESSMENT & TREATMENT",
+      "topic_id": "t-mm-02-001",
+      "total_utf8_bytes": 30248
     },
     {
       "block_count": 1,
       "block_digests": [
-        "ffa962a9ac1a07d4c5993f3a429ee36eda683b139a3f4f9b11f283c626e15c12"
+        "11a9e27b6f45fee0503c8c4fb2d11a1788433dcb1ff7a6a4f7eb0261f04c7fab"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.3.\t1ST STAGE OF LABOR:",
-      "topic_id": "t-mm-10-004",
-      "total_utf8_bytes": 32846
+      "book_id": "book-mm-02",
+      "title": "1.1.\tASSESSMENT OF MALE PARTNER:",
+      "topic_id": "t-mm-02-002",
+      "total_utf8_bytes": 8627
     },
     {
       "block_count": 1,
       "block_digests": [
-        "7c8a0c1b184d11c6b840c6c55d9ce79023da6f879b3f245ca28fb648b2778603"
+        "390376513f5d63929a6a4ae8c433d22a9705d010cc43528629e91595676dd8ba"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.4.\t2ND STAGE OF LABOR",
-      "topic_id": "t-mm-10-005",
-      "total_utf8_bytes": 39886
+      "book_id": "book-mm-02",
+      "title": "1.2.\tASSESSMENT OF FEMALE PARTNER",
+      "topic_id": "t-mm-02-003",
+      "total_utf8_bytes": 35978
     },
     {
       "block_count": 1,
       "block_digests": [
-        "6cdd1f7070ddb36ef7cfa1be21796773228b6339eb1f1fae73becba6a0914e6c"
+        "a8051787278531c2827ee40f0a0d08cf65c897eee6c0b9e5135c50aa04c66921"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.5.\t3RD STAGE OF LABOR:",
-      "topic_id": "t-mm-10-006",
-      "total_utf8_bytes": 31008
+      "book_id": "book-mm-02",
+      "title": "1.3.\tMANAGEMENT OF MALE PARTNER",
+      "topic_id": "t-mm-02-004",
+      "total_utf8_bytes": 8093
     },
     {
       "block_count": 1,
       "block_digests": [
-        "2cba0adc2f98fe34db5d6d5a05b690889026e079ce4c6b62733f2980bdb51ece"
+        "f46b00874d0055ec90d7f9ca3c3d7fb562b42dc679e965f3539606a62187a955"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.6.\tRETAINED PLACENTA",
-      "topic_id": "t-mm-10-007",
-      "total_utf8_bytes": 2217
+      "book_id": "book-mm-02",
+      "title": "1.4.\tMANAGEMENT OF FEMALE PARTNER:",
+      "topic_id": "t-mm-02-005",
+      "total_utf8_bytes": 16636
     },
     {
       "block_count": 1,
       "block_digests": [
-        "9c9bb861801650608bd351ab16ddd1d4a9003d0299ce8f828099ffa842cd036e"
+        "c969e007539a35a75106d00abdc46b394ff821a4633acd5abcbeeadfde09c4e8"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.7.\tPOSTPARTUM HEMORRHAGE",
-      "topic_id": "t-mm-10-008",
-      "total_utf8_bytes": 21411
+      "book_id": "book-mm-02",
+      "title": "1.5.\tIUI:",
+      "topic_id": "t-mm-02-006",
+      "total_utf8_bytes": 20498
     },
     {
       "block_count": 1,
       "block_digests": [
-        "70dec5dd07e2a6c2b38023473599f3c25a52cec11d3378a081a3765010c694c8"
+        "3cc4e842e721d617c495569f10116610dedecd28f9e8ca7083ef8dd3c890b827"
       ],
-      "book_id": "book-mm-10",
-      "title": "1.8. CARE OF THE WOMEN AFTER BIRTH",
-      "topic_id": "t-mm-10-009",
-      "total_utf8_bytes": 5137
+      "book_id": "book-mm-02",
+      "title": "1.6.\tIVF:",
+      "topic_id": "t-mm-02-007",
+      "total_utf8_bytes": 12988
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "76d40368d9e268e36170d55a013372137a1968725cb2dac65e1e1c7451d02dc7",
+        "020f036c28e44708ced33d5a83d380a372bb32542afec0aab5c83575a2d996d6"
+      ],
+      "book_id": "book-mm-02",
+      "title": "2.\tARTIFICIAL REPRODUCTIVE TECHNIQUE \u2013 PROCEDURE OVERVIEW:",
+      "topic_id": "t-mm-02-008",
+      "total_utf8_bytes": 81247
     },
     {
       "block_count": 1,
       "block_digests": [
-        "eb241da786074d7ea8e6d4a57b9ca503da3e9e7d84074f93606945f037789970"
+        "790061f9aea7bbe3f0428d136fc99a653416fffd5cd0b94fc6b5d51d72a889d2"
       ],
-      "book_id": "book-mm-10",
-      "title": "2.\tNEONATAL CARE AND RESUSCITATION:",
-      "topic_id": "t-mm-10-010",
-      "total_utf8_bytes": 24277
+      "book_id": "book-mm-02",
+      "title": "3. FERTILITY PRESERVATION",
+      "topic_id": "t-mm-02-009",
+      "total_utf8_bytes": 25421
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "7b8caeff67bea17451cf3f9c2bb130f2f07f2ae06bf94e867ed887c668c1e2cd",
+        "8a76c8e1f2b3ffab23272eed5718e66b03a74a518ac9f94624b3e0b27be54b49"
+      ],
+      "book_id": "book-mm-02",
+      "title": "4. ASSESSMENT OF INFERTILE MALE",
+      "topic_id": "t-mm-02-010",
+      "total_utf8_bytes": 72432
     },
     {
       "block_count": 1,
       "block_digests": [
-        "96455cca01e0d7a84482baf4b8ea361d9627e3d01154e2f293cd568b0d5feab2"
+        "53ba890cd9a6eea3503e95df7348c1ac14381c76d6501364fd65c76c2355780d"
       ],
-      "book_id": "book-mm-10",
-      "title": "3.\tINTRAPARTUM CARE OF WOMAN WITH EXISTING MEDICAL CONDITIONS AND OBSTETRIC COMPLICATIONS",
-      "topic_id": "t-mm-10-011",
-      "total_utf8_bytes": 4473
+      "book_id": "book-mm-02",
+      "title": "5. UN EXPLAINED SUBFERTILITY",
+      "topic_id": "t-mm-02-011",
+      "total_utf8_bytes": 38648
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "751ad39bb9bd5cfb22a3e4cab4214a375490b6d37a9207a2e4ee5309b6c4901f",
+        "719dcd8bcbbc0a11a7f12746b08f2657687f5c2766ffadecabaced2085d76cf8"
+      ],
+      "book_id": "book-mm-02",
+      "title": "6. TUBAL TESTS AND TUBAL SURGERY",
+      "topic_id": "t-mm-02-012",
+      "total_utf8_bytes": 56958
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "434eebf27af5c8128844c7f4315cbb352f5025f15d20998db155a9c0a455dc62"
+      ],
+      "book_id": "book-mm-02",
+      "title": "7. MANAGEMENT OF INFERTILE COUPLE",
+      "topic_id": "t-mm-02-013",
+      "total_utf8_bytes": 18589
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f8023265fdd7615283ba3764cc80d83411b88521f79dc664411a720d3ec47ca5"
+      ],
+      "book_id": "book-mm-02",
+      "title": "8. EARLY OVARIAN AGING:",
+      "topic_id": "t-mm-02-014",
+      "total_utf8_bytes": 18370
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "a7a4425bce6d51861027a25307a75bd83e8108b239f0c1feac7f8596ea3f5c14",
+        "894acdd30d58a5c5327e8b6c24d6f75fd5b180d1d6290068e560e48587f1bda8"
+      ],
+      "book_id": "book-mm-02",
+      "title": "9. LONG TERM CONSEQUENCES OF PCOD:",
+      "topic_id": "t-mm-02-015",
+      "total_utf8_bytes": 56091
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "bfc2a822b66a1442c5dfb1cf09b4410e1d04694f036cd349bafde84a12e9e777",
+        "07e3a46a837d22290b18e3dffada356b0287131704143f030eba77421db663a8"
+      ],
+      "book_id": "book-mm-02",
+      "title": "10.  OHSS:",
+      "topic_id": "t-mm-02-016",
+      "total_utf8_bytes": 76431
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "b53bc0524a6b198d17c6f246182244136d6aa840549e6e64026abece7aeedf62",
+        "a197b666c8081276bbb35cc6b59cb4c59ab1366e27085ada2c9d99ad1b247116"
+      ],
+      "book_id": "book-mm-02",
+      "title": "11.\tENDOMETRIOSIS:",
+      "topic_id": "t-mm-02-017",
+      "total_utf8_bytes": 87635
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "1ce0e726ad529452bad0588c22a2eec4f287a50efbea369e89939f26993beddb"
+      ],
+      "book_id": "book-mm-03",
+      "title": "1.\tTUMOR MAKERS",
+      "topic_id": "t-mm-03-001",
+      "total_utf8_bytes": 11393
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "3502f294e4ce1b173627747cc3b8fac114ea87203424e502d3ac193dd368367b"
+      ],
+      "book_id": "book-mm-03",
+      "title": "2.\tULTRASOUND APPEARACE OF DIFFERENT CYST",
+      "topic_id": "t-mm-03-002",
+      "total_utf8_bytes": 12367
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "db563d50d038715d9b8a2c19d2301b2e63018edcd4e220253f2c77774bb58332",
+        "266b41eab9b78bd505c1a1e311c3a0427cda7008c719fc5d8d8db626b0c2961c"
+      ],
+      "book_id": "book-mm-03",
+      "title": "3.\tSUSPECTED OVARIAN MASSES IN PRE \u2013 MENOPAUSAL WOMEN:",
+      "topic_id": "t-mm-03-003",
+      "total_utf8_bytes": 74915
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "fb809abe0bd6826b21c4169ea737ed5ea82b8e54146ac00850f4fee647080f1f",
+        "6f69016c18e490a6aaa55e56c9af9070c3e4d87b0f45d26121aa7b2df8af53ab"
+      ],
+      "book_id": "book-mm-03",
+      "title": "4.\tOVARIAN CYST IN POST-MENOPAUSAL WOMEN:",
+      "topic_id": "t-mm-03-004",
+      "total_utf8_bytes": 70955
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "046ed9866aa2857b93e3b5439bd53992329425272c0469af4adb28ca6e87d8ab",
+        "d05ba3fe1c069c5e8673a0f552ba895ab6b602ed878cda63cbb97b084910cfcd"
+      ],
+      "book_id": "book-mm-03",
+      "title": "5. OVARIAN CYST IN CHILDREN AND ADOLESANTS (TEENS 13 \u2013 15 YEARS).",
+      "topic_id": "t-mm-03-005",
+      "total_utf8_bytes": 62084
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e648b7a2419aef1efcd60b19f52eef25b68e07f48189efa2ed7c95409f533880"
+      ],
+      "book_id": "book-mm-03",
+      "title": "6.\tADNEXAL MASSES IN PREGNANCY",
+      "topic_id": "t-mm-03-006",
+      "total_utf8_bytes": 9593
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "00d7cd82f88da749682e7bcb3aebae77b3820958f0fd115c87a534e3a293f60b"
+      ],
+      "book_id": "book-mm-03",
+      "title": "7.\tBORDERLINE OVARIAN TUMORS (BOT)",
+      "topic_id": "t-mm-03-007",
+      "total_utf8_bytes": 40830
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "4ed2b4e3edabb5db18461e3cb8436eb395f55bb73aabe9c2484d2f30bfbfe061",
+        "1c1027c52d05160fdd3f9d30c60b00c1b6693d4082ab4f50305da30d6f528bdb"
+      ],
+      "book_id": "book-mm-03",
+      "title": "8.\tRISK REDUCING SURGERY FOR WOMEN @ RISK OF EPITHELIAL TUMOR",
+      "topic_id": "t-mm-03-008",
+      "total_utf8_bytes": 51474
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "8ffb7d20b34b2dbc572ec39780ecb1100b110f0e0a040deae9f49f9179e6ec89",
+        "6148b2d6f20557189de0fa22f62e2791d5612b0ae71c1ee534ab1a23e7c132db",
+        "367f7fa0750235e26437bc27f35c3391ac6528cd07c56620f835eadcd1175769"
+      ],
+      "book_id": "book-mm-03",
+      "title": "9.\tOVARIAN CANCER",
+      "topic_id": "t-mm-03-009",
+      "total_utf8_bytes": 98771
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "15f0611f255622473893ae1eb9e04881315a1e66d73bc64be0b96c13e21c0644",
+        "f91a43f02ad4f38f6bcb8bc0964ff5673409d2268b389eb674569b5c44dd05b2"
+      ],
+      "book_id": "book-mm-03",
+      "title": "10.\tENDOMETRIAL HYPERPLASIA EH:",
+      "topic_id": "t-mm-03-010",
+      "total_utf8_bytes": 59924
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "750ba287274af7d733a9fb5ccb8a7359de0a317d66ba34bd45adddf7964fab6e"
+      ],
+      "book_id": "book-mm-03",
+      "title": "11.\tCA ENDOMETRIUM",
+      "topic_id": "t-mm-03-011",
+      "total_utf8_bytes": 43560
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "51e2a44a71acbaad68b25df6bd5845ac3a2fa1d265dc8b344bf404f05da87fa4"
+      ],
+      "book_id": "book-mm-03",
+      "title": "12.\tCA CERVIX:",
+      "topic_id": "t-mm-03-012",
+      "total_utf8_bytes": 44996
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "d416a31b705d73f123864e1a3106f2fd3d10a574784e0e875b650da40870e065",
+        "f788dfdc8eb731d4226e72430b3125488cf3bd4b084b8e8a3cf6838f275cb5bc"
+      ],
+      "book_id": "book-mm-03",
+      "title": "13.\tPRE \u2013 MALIGNANT LESION OF VULVA:",
+      "topic_id": "t-mm-03-013",
+      "total_utf8_bytes": 54753
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "5845e460fdeb572daea4b94aa8fd790ac2a1609828cc1c052cf303ef6a3ffcd9",
+        "1284ffcb3f7bfad750127b773ac403d7cdec9973d53fa69a070fd171b98b0268"
+      ],
+      "book_id": "book-mm-03",
+      "title": "14.\tCA \u2013 VULVA:",
+      "topic_id": "t-mm-03-014",
+      "total_utf8_bytes": 52574
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "08c52a525063ac7b0dc4c4c9a9c021bacda21daf4ecc4feba709b41da967374b",
+        "024e91f63d31ba0f2937814b46703b282967069d1f381858254a8b37aff9fdb6",
+        "25f60efde281fe7ec0210195f1514d8f9f52d4cea14ce398e6ce726733d8891a"
+      ],
+      "book_id": "book-mm-03",
+      "title": "15.\tPRE \u2013 MALIGNANT LESIONS OF CERVIX AND CERVICAL SCREENING PROGRAM",
+      "topic_id": "t-mm-03-015",
+      "total_utf8_bytes": 105009
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "fb1831b74648e1462e440888a317bbe3fcf6db8a711b28858d8cc67e13ce3075"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1. TYPES OF INONTINENCE AND EVALUATION",
+      "topic_id": "t-mm-04-001",
+      "total_utf8_bytes": 7940
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4cfcab1b34f51c8c05f6d1ec85a1719ca1ef3c57dee9ff21136239d6c45f0b5c"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1.1.\tMSU",
+      "topic_id": "t-mm-04-002",
+      "total_utf8_bytes": 4654
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "d27366af2e1332d617665069df97107617288b94b7598d39e5b362931592947e"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1.2.\tBLADDER DIARY:",
+      "topic_id": "t-mm-04-003",
+      "total_utf8_bytes": 1335
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "fcc4cf1f784cfd4c09f28d287449b034c2ebfa7af2d3c9d42b9efb8a11dbea60"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1.3.\tPOST VOID VOLUME",
+      "topic_id": "t-mm-04-004",
+      "total_utf8_bytes": 2202
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "b6f966a473c25dcf161b7e6fa10c709ec155c111ac952256962d5000cb52a9a9"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1.4.\tURODYNAMIC",
+      "topic_id": "t-mm-04-005",
+      "total_utf8_bytes": 49187
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "90b3f9485f7f64089a7868638234d49399d8410c161fbf5001157c92b7194cdb"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1.5.\tPAD TEST:",
+      "topic_id": "t-mm-04-006",
+      "total_utf8_bytes": 2487
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "498369cecc10a6f59864e071fa849214259c5f240f3a5930d3560cbaec5cac20"
+      ],
+      "book_id": "book-mm-04",
+      "title": "1.6. VIDEOCYSTOMETRY:",
+      "topic_id": "t-mm-04-007",
+      "total_utf8_bytes": 2992
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e250c0bc90ef02bb05fc65fb0208369c19b57b2407216b3f5c40ea30944ec6c6"
+      ],
+      "book_id": "book-mm-04",
+      "title": "2.\tOVER ACTIVE BLADDER TREATMENT",
+      "topic_id": "t-mm-04-008",
+      "total_utf8_bytes": 48576
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "7bbbd54210bece177714965428ed6749f21f89d730d5a741342c297b1e0ba465"
+      ],
+      "book_id": "book-mm-04",
+      "title": "3.\tSENSORY URGENCY",
+      "topic_id": "t-mm-04-009",
+      "total_utf8_bytes": 4263
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "1762ec07c822be2fc89a5e394afed6bc717b8a820d201466de37b586f73e2f96"
+      ],
+      "book_id": "book-mm-04",
+      "title": "4.\tSUI - STRESS URINARY INCONTINENCE & ITS STEP WISE MANAGEMENT",
+      "topic_id": "t-mm-04-010",
+      "total_utf8_bytes": 20425
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "17ee58cbc8ff614df600e5662999870a4bb40d08748c0205b7b80e609b0d1dc1"
+      ],
+      "book_id": "book-mm-04",
+      "title": "5.\tURINARY RETENTION",
+      "topic_id": "t-mm-04-011",
+      "total_utf8_bytes": 6715
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "7a972acb08c8a722a8c6c87bf9748e2d95d2c4640427a6eac55a94387f30c29a",
+        "c063a6f1279be5fae2baa922212c9b0254f190604d4d1967f8ff1277d970e260"
+      ],
+      "book_id": "book-mm-04",
+      "title": "6.\tBLADDER PAIN SYNDROME",
+      "topic_id": "t-mm-04-012",
+      "total_utf8_bytes": 54887
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "eecd526c33bcc627cb9180203e34e475d2693c7ac714e1520489fbe443ab4553"
+      ],
+      "book_id": "book-mm-04",
+      "title": "7.\tURETHRAL DIVERTICULA",
+      "topic_id": "t-mm-04-013",
+      "total_utf8_bytes": 32221
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e56c62c81f0393f6859cd5aebe388d389cfa7b4886ec1768255ca7fd91acf5af"
+      ],
+      "book_id": "book-mm-04",
+      "title": "8.\tRECURRENT UTI",
+      "topic_id": "t-mm-04-014",
+      "total_utf8_bytes": 10864
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "17de90c1f474dab26b9c7fa261f7c79eb177840282f07729b13e56d18d100a12"
+      ],
+      "book_id": "book-mm-04",
+      "title": "9.\tPELVIC ORGAN PROLAPSE",
+      "topic_id": "t-mm-04-015",
+      "total_utf8_bytes": 37612
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "8768d6a06d6a799fbb1bd10102ff244be8c35231fea2df517eee6dad023c4ded"
+      ],
+      "book_id": "book-mm-04",
+      "title": "10.\tVAULT PROLAPSE:",
+      "topic_id": "t-mm-04-016",
+      "total_utf8_bytes": 41319
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "443b285cf897e37d60e8023f4dcd10ebf88a4a224e38a35000e497ef34f3fa76"
+      ],
+      "book_id": "book-mm-05",
+      "title": "1. VAGINAL DISCHARGE",
+      "topic_id": "t-mm-05-001",
+      "total_utf8_bytes": 20550
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "83098b43553bdea7edd3dbf811ab019e0f9b3fec362f7fa7dd11bb3e93c4ec84",
+        "9ba5b285aa54ac2d41f7e4b242b49040b64ab93a0bc2d1d942f8b4cf74da6bc8"
+      ],
+      "book_id": "book-mm-05",
+      "title": "2.\tGENITAL INFECTIONS AND THEIR MANAGEMENTS:",
+      "topic_id": "t-mm-05-002",
+      "total_utf8_bytes": 88746
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e177f60b5e7696744901a836fd79f2f8ca800a2fca92bb01c867438d8a990eb4"
+      ],
+      "book_id": "book-mm-05",
+      "title": "3.\tPID",
+      "topic_id": "t-mm-05-003",
+      "total_utf8_bytes": 44737
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "7c6edee65a2499233c8e3095842b572bd3e02deb802ed8690c61ae5374213d90"
+      ],
+      "book_id": "book-mm-05",
+      "title": "4.\tGENITAL CONDITIONS AND MANAGEMENT:",
+      "topic_id": "t-mm-05-004",
+      "total_utf8_bytes": 29501
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "23bab873677cb5e0695b6be4f3721952aa8d22f14feece50ea3c24bdc69a57fe",
+        "7a3983873c471c6d1135ae838a5a837c732bb37aa23e5ff49ce210afbc6eb948"
+      ],
+      "book_id": "book-mm-05",
+      "title": "5.\tANOGENITAL WARTS",
+      "topic_id": "t-mm-05-005",
+      "total_utf8_bytes": 91542
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f9a83e13158ca3aca7e7fe9fea29475b428602d01f70ffdc8222e4758eda1291"
+      ],
+      "book_id": "book-mm-05",
+      "title": "7. ABORTION CLAUSES",
+      "topic_id": "t-mm-05-006",
+      "total_utf8_bytes": 22190
+    },
+    {
+      "block_count": 10,
+      "block_digests": [
+        "b98a033dee093c1cc8ef6e0b65c60fd9fdb78f64bbb47f4c8ce68fd97ad6bb7c",
+        "0d1da5d7b3e3b70cc335a0d7d97d2aa66ea164b0d15c262c9b468e998b5c7611",
+        "fc182089823925752f512a6c61ec4aad2d5962d8b2468942799c2fbe26492d64",
+        "da915319f082646829d29add38edffddea9aaa4cd79da92f95a060bdf6c93cf4",
+        "81d64260b59c161cb25c02fe4d7fd8d28ef0df505652de282ae93861c29e14c0",
+        "e10873b2fad8068d108032df9867df418773b35bcab1a81f52f7cc01b2a4b02b",
+        "f18ea59c52369a810b8f24df8894fffe5d836d9fb1ac62a1604092778df7fbd4",
+        "100ab44337449be46390d7ea50d4c15f9ec959fe7980589504d10d841d4e6ffb",
+        "a39ac9c38ab9fb99aeba5536be199cc340ca7a2294741316f0deecc98bde58ce",
+        "4131766b6b20833c927db2cb64e9cf1a761ba429038afb6b15620a135dc01a57"
+      ],
+      "book_id": "book-mm-05",
+      "title": "8. UK MEDICAL ELIGIBILITY CRITERIA (UKMEC)",
+      "topic_id": "t-mm-05-007",
+      "total_utf8_bytes": 473863
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "c715e1c36400af0b19d038fe7b05e46706a31d2a6fd195c2bdecbb406437e277",
+        "a5ccf3c94e8d6d5f5aac21c5c9a79a5b1421182673bcfeb31a187cbc9108e04f",
+        "ee6c7befe2951ac10e3f3a22598e2927f4411544783f5c5a4e84c3ade5ffbdef"
+      ],
+      "book_id": "book-mm-05",
+      "title": "9. COMBINED HORMONAL CONTRACEPTION",
+      "topic_id": "t-mm-05-008",
+      "total_utf8_bytes": 125288
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "091ab1f582cf5c088101f9fce9bc51bf65b0791e9bbb15ebe202e1e7cbf17c7d",
+        "0870c058732193f918a9487c19f249c64bedf9aa3276c40cacd3d4ca64827580"
+      ],
+      "book_id": "book-mm-05",
+      "title": "11.\tPROGESTOGEN-ONLY PILL",
+      "topic_id": "t-mm-05-009",
+      "total_utf8_bytes": 57682
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "5575aba6b01c2584aa299084c94d6e3b61df51d014f4d9b32150e03567ccc8f1"
+      ],
+      "book_id": "book-mm-05",
+      "title": "11. PROGESTOGEN-ONLY INJECTABLE CONTRACEPTION",
+      "topic_id": "t-mm-05-010",
+      "total_utf8_bytes": 32089
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "514a0de216c296d6e3e1c3f8e05ff6c53b541e0603e094f3cc6ae7f5667e1fe0",
+        "505f02b153e0703983c0025a0239a03c3a6a30373144204df5d225a64b331fbe"
+      ],
+      "book_id": "book-mm-05",
+      "title": "12. PROGESTOGEN-ONLY IMPLANT:",
+      "topic_id": "t-mm-05-011",
+      "total_utf8_bytes": 57595
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "7101de12dfa5198247f99557b63ec34438f74c2c953f3ddfc3f3c686a891f012",
+        "3bc18f4f84ffc14ca4e538f1ae10035177185ecba0bfe2cca390b852def70201"
+      ],
+      "book_id": "book-mm-05",
+      "title": "13. EMERGENCY CONTRACEPTION",
+      "topic_id": "t-mm-05-012",
+      "total_utf8_bytes": 61387
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "7c75afb875e5afd4344929854a8a73ae46043f745a98f066bbe65298890d7f13",
+        "f7d35f43b75d24de87a3357ca243664158955a8a4f43722b4b8c0c47386227b7"
+      ],
+      "book_id": "book-mm-05",
+      "title": "14.\tDRUG INTERACTIONS WITH HORMONAL CONTRACEPTION:",
+      "topic_id": "t-mm-05-013",
+      "total_utf8_bytes": 80043
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "e81c766e0283e8958a56401264e99f7d09f29cf65c25be88081813446c98c4da",
+        "17d6f3192e12d981abadd2ad0e0fb479694388fba6b90001832c08d6fa7abc42"
+      ],
+      "book_id": "book-mm-05",
+      "title": "15. PROBLEMATIC BLEEDING WITH HORMONAL CONTRACEPTION",
+      "topic_id": "t-mm-05-014",
+      "total_utf8_bytes": 65221
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "398ec9f158a6e7296262fa16782b298a253a1157c8bf721035462c48eeb0c461"
+      ],
+      "book_id": "book-mm-05",
+      "title": "16. BARRIER METHODS FOR CONTRACEPTION AND STI PREVENTION",
+      "topic_id": "t-mm-05-015",
+      "total_utf8_bytes": 24721
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "89f8a2cd410be5c0f1655e6744afd245a7bdc67aaf3a8c14577752e088626010",
+        "2f51b1536f8087895562be0c11a5c31c459acf08758415d8324866745d97c31a"
+      ],
+      "book_id": "book-mm-05",
+      "title": "17. INTRAUTERINE CONTRACEPTION",
+      "topic_id": "t-mm-05-016",
+      "total_utf8_bytes": 73920
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "d276b4566508f226fb7e7616f0ede53dea884e0be0751ec4a3f780532c7d3d5f",
+        "412fc869c96286b9ccd17c77185bf3c1a9074cf681d1c7567858ad67a81a98aa"
+      ],
+      "book_id": "book-mm-05",
+      "title": "18. MALE AND FEMALE STERILISATION",
+      "topic_id": "t-mm-05-017",
+      "total_utf8_bytes": 56464
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "b6a3392ff7fcc402dcf5d0c36d9889c2580e4b38c3361db1d16b4f5da05ac27e"
+      ],
+      "book_id": "book-mm-05",
+      "title": "19.\tQUICK STARTING CONTRACEPTION",
+      "topic_id": "t-mm-05-018",
+      "total_utf8_bytes": 27058
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "7f93fb0dca2cd34b2644e35af25a341ce778f890aff531e138b1ce4208c29796"
+      ],
+      "book_id": "book-mm-05",
+      "title": "20.\tCONTRACEPTION FOR WOMEN ABOVE 40 YEARS OF AGE:",
+      "topic_id": "t-mm-05-019",
+      "total_utf8_bytes": 26972
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4626e8586b0089b9125e55bb693be4bbffe487cb95aa550855db5bf2b9580c7d"
+      ],
+      "book_id": "book-mm-05",
+      "title": "21. CONTRACEPTON FOR YOUNG POPULATION:",
+      "topic_id": "t-mm-05-020",
+      "total_utf8_bytes": 29467
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "dc51d79a149517f805260ac684d6515cab19649eb159360c33a106d3219d0008",
+        "64c19eda7477d78e9db7024172839f4e02c176d594d9762f43429f6834e64c34"
+      ],
+      "book_id": "book-mm-05",
+      "title": "22.\tCONTRACEPTION IN OVER WEIGHT AND OBESE PEOPLE:",
+      "topic_id": "t-mm-05-021",
+      "total_utf8_bytes": 54179
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "2a9604d56302b806d505f8467c2d19476d85cee6d9a1a7df442448e1fbc83145"
+      ],
+      "book_id": "book-mm-05",
+      "title": "23.\tCONTRACEPTIVE FAILURE:",
+      "topic_id": "t-mm-05-022",
+      "total_utf8_bytes": 43245
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "db24f82cc5e0f984a969f23548fbb3b97979aebadc238487ad56c27272baf985",
+        "69d703dceea9ee2866cae21d2cf1a070c49ea45199508c1c1e296b294e07de3c"
+      ],
+      "book_id": "book-mm-06",
+      "title": "1. OBTAINING VALID CONSENT:",
+      "topic_id": "t-mm-06-001",
+      "total_utf8_bytes": 74687
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "ace090c570a7e12583c959ff9848dfa6553fb32961abaa14cf04c4abdb3b2a7f",
+        "83b56047034912dddc390118b71ed6f8f7eb2e91b958ebb50590eeb0d966aff2"
+      ],
+      "book_id": "book-mm-06",
+      "title": "2. CAESAREAN SECTION:",
+      "topic_id": "t-mm-06-002",
+      "total_utf8_bytes": 78964
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "02fff208a837bf5db1cfb7538a15694bcfb6d5ad6bea673cfb3736422d15cdef"
+      ],
+      "book_id": "book-mm-06",
+      "title": "3. PREVENTING ENTRY RELATED GYAECOLOGICAL LAPROSCOPIC INJURIES:",
+      "topic_id": "t-mm-06-003",
+      "total_utf8_bytes": 35984
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "a17cb785857f7e1a29f69b89238556fe36f4c3f05def8476f8e90bebc94642bf",
+        "c32dc2382ea2ecd7c565bbfe1cf3a9260b44d9623cb910ac4dcafaf3b0102c87"
+      ],
+      "book_id": "book-mm-06",
+      "title": "4. URINARY TRACK INJURIES DURING LAPROSCOPY AND THEIR PREVENTION.",
+      "topic_id": "t-mm-06-004",
+      "total_utf8_bytes": 67357
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "596078b321ea7504fa62af874993aee727a163217062a02fa871fbd516851edd"
+      ],
+      "book_id": "book-mm-06",
+      "title": "5. SURGICAL NERVE INJURIES:",
+      "topic_id": "t-mm-06-005",
+      "total_utf8_bytes": 37287
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "b70d72885d3d596c33e1107a78bf208b4ac2bb400dcfe5866be1f98bf681a2f1"
+      ],
+      "book_id": "book-mm-06",
+      "title": "6. VASCULAR INJURIES DURING SURGERY:",
+      "topic_id": "t-mm-06-006",
+      "total_utf8_bytes": 43026
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "97f75d0ca2a11a63e40b8733b798fac2ac4e8f3d2fd59a0a817ce78a33312791"
+      ],
+      "book_id": "book-mm-06",
+      "title": "7. UTERINE PREFORATION:",
+      "topic_id": "t-mm-06-007",
+      "total_utf8_bytes": 20650
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "72d2ead7df447d6a1c145727fb925a5f85d8cf8d9200fd3d48e23958d5e00229"
+      ],
+      "book_id": "book-mm-06",
+      "title": "8. SURGICAL SAFETY CHECK LIST:",
+      "topic_id": "t-mm-06-008",
+      "total_utf8_bytes": 2727
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e330485b8b2236649fc50ed2b9e42bf45e79a5c6b2ffe906e576efc4b579aac5"
+      ],
+      "book_id": "book-mm-06",
+      "title": ". OUT PATIENT HYSTERSCOPY:",
+      "topic_id": "t-mm-06-009",
+      "total_utf8_bytes": 37378
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "59d155b8574acdefd49fd766849d33504b9bb20629328864cdd03d16579bea0d"
+      ],
+      "book_id": "book-mm-06",
+      "title": "10. STEPS OF ABDOMINAL HYSTRECTOMY",
+      "topic_id": "t-mm-06-010",
+      "total_utf8_bytes": 10818
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "237e94fe1517c40060a09762b4ddbf1860ad207e928601dd5e3449802b211dfc"
+      ],
+      "book_id": "book-mm-06",
+      "title": "11. STEPS OF VAGINAL HYSTERECTOMY",
+      "topic_id": "t-mm-06-011",
+      "total_utf8_bytes": 6069
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "626002a837ebf7ecd2542e3d300d4c7ef74db466de9ee3f74cdcd4fc269b5ff5"
+      ],
+      "book_id": "book-mm-06",
+      "title": "12. STEPS OF EVACUATION",
+      "topic_id": "t-mm-06-012",
+      "total_utf8_bytes": 24931
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "cb7c99455a6f4d3efd82dc5e322e3c214f9ace59766b487b10753477ef10d140"
+      ],
+      "book_id": "book-mm-06",
+      "title": "13. MVA:",
+      "topic_id": "t-mm-06-013",
+      "total_utf8_bytes": 8423
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "d76b6d1ca9065e27de7a5862caa8dc2afb10ed7c96acbf1fdb0fa0a10cb70eb0"
+      ],
+      "book_id": "book-mm-06",
+      "title": "14. STEPS OF ANTERIOR REPAIR:",
+      "topic_id": "t-mm-06-014",
+      "total_utf8_bytes": 10366
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "18e2e69e3449cb38b1e1b31f6ea90f5f9b06f2bfa63a637a89d8ab4fdeb2b5a3"
+      ],
+      "book_id": "book-mm-06",
+      "title": "15. STEPS OF POSTERIOR REPAIR:",
+      "topic_id": "t-mm-06-015",
+      "total_utf8_bytes": 16381
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "16fdeae2ece919e0a960e9d52cd2f5e3798d09e5a59854089e94281877d682e5"
+      ],
+      "book_id": "book-mm-06",
+      "title": "16.THE USE OF SURGICAL DRAINS:",
+      "topic_id": "t-mm-06-016",
+      "total_utf8_bytes": 14132
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "2cb9098adac339c75682c10b423eb8d4f2a22ce1211a630bd38e0c237fb80e51"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17. POST OP COMPLICATIONS:",
+      "topic_id": "t-mm-06-017",
+      "total_utf8_bytes": 725
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "113d81eb3c31f16cd8ee2ea4222523d905054de17f54a3090faa9a146708a940"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.1. HAEMORRHAGE",
+      "topic_id": "t-mm-06-018",
+      "total_utf8_bytes": 27963
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "b226ae2f2f771b3095e2475be0de6317cb275fa803c2b10d7e11f9a3850a41b4"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.2. HAEMATOMAS:",
+      "topic_id": "t-mm-06-019",
+      "total_utf8_bytes": 23490
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "18ee6fae7d7a444732f368581f56b01ec915e25dea4b37d6210fc87c27fa01cb"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.3. WOUND DEHISCENCE:",
+      "topic_id": "t-mm-06-020",
+      "total_utf8_bytes": 15167
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "3e50e12860b3fc7285d8b722db7a9e050264073c03d2ef731041e05b03ce9df5"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.4. THROMBOPHYLAXIS IN GYNAECOLOGICAL SURGERIES",
+      "topic_id": "t-mm-06-021",
+      "total_utf8_bytes": 6899
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "60848bf6490e743b52a6d1bd1b165ce9908c85c739eb94f4c78c37c9bc280ad8"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.5. DEEP VEIN THROMBOSIS:",
+      "topic_id": "t-mm-06-022",
+      "total_utf8_bytes": 28015
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "20e417d77b72a3fb966ab17cb3f3dea063648f180cf9d631c8646386fe99191c"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.7. PELVIC ABSCESS:",
+      "topic_id": "t-mm-06-023",
+      "total_utf8_bytes": 8031
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "633c61ac047692a71bd1d3db8af7f7c49722e300848b5d04f158e645dafc4dad"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.8. ANAESTHESIA COMPLICATION:",
+      "topic_id": "t-mm-06-024",
+      "total_utf8_bytes": 2299
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "160a99ecf577f3ecb76294b616a74aa45d18d01bbdd8de62062697c7efc4a53b"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.9. VISCERAL INJURIES:",
+      "topic_id": "t-mm-06-025",
+      "total_utf8_bytes": 689
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "5de409a1a771c0eecbb872d908c0a44cd030e7fcced53bca747675d789dd2486"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.9.1. URINARY TRACT:",
+      "topic_id": "t-mm-06-026",
+      "total_utf8_bytes": 14321
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "6537623564f2eb62aadde4e0a2364f59bb2e212b250d28b0c60393a969464631"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.9.2. Bowel complications:",
+      "topic_id": "t-mm-06-027",
+      "total_utf8_bytes": 15699
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "c6badb5be25971d7ad36f1a04a60e079243056058f94b95877a6b18c4b52df5e"
+      ],
+      "book_id": "book-mm-06",
+      "title": "17.9.4. ACUTE COLONIC PSEUDO \u2013 OBSTRUCTION (ACPO) AFTER C/S:",
+      "topic_id": "t-mm-06-028",
+      "total_utf8_bytes": 45663
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "5e8f1f56ebf8ebb15883e36c11681598bb5d02838975f746c57cf316f9b5a710"
+      ],
+      "book_id": "book-mm-06",
+      "title": "18. LAPAROSCOPIC MYOMECTOMY:",
+      "topic_id": "t-mm-06-029",
+      "total_utf8_bytes": 7370
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "41e5a2e82147fe01acb46fb44c8de39906b54fcadd1901481443a277bd3b7f46"
+      ],
+      "book_id": "book-mm-06",
+      "title": "19. LAPROSCOPY IN PREGNANCY:",
+      "topic_id": "t-mm-06-030",
+      "total_utf8_bytes": 19960
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "fc75e46475f95091b7e7f356cf731ac36d35611383fe00e38792474c8a570b63"
+      ],
+      "book_id": "book-mm-06",
+      "title": "20. ISSUES AROUND VAGINAL VAULT CLOSURE:",
+      "topic_id": "t-mm-06-031",
+      "total_utf8_bytes": 17358
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "8d0fe0f5fd07904892a3623fb3825e87e9d56600cf36e11fa580e0be0399d139"
+      ],
+      "book_id": "book-mm-06",
+      "title": "21. LAPAROSCOPY IN UROGYNAECOLOGY",
+      "topic_id": "t-mm-06-032",
+      "total_utf8_bytes": 8612
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "999db5e8cf3ee9eca2538b5b4dea19276b4008ebab08ed43fd22d83c14c3aa76"
+      ],
+      "book_id": "book-mm-06",
+      "title": "22. SURGICAL\u00a0SMOKE",
+      "topic_id": "t-mm-06-033",
+      "total_utf8_bytes": 31736
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "a548ed510d7ad2798947daf6aaf071ed93ecae0f65442795f13b8c9bc33aceb8",
+        "adb7c1967f14333380891c69826141f80225ba97c783e512d859f472c2dcfa19"
+      ],
+      "book_id": "book-mm-07",
+      "title": "1. RECURRENT PREGNANCY LOSS",
+      "topic_id": "t-mm-07-001",
+      "total_utf8_bytes": 80797
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "705d97f096b578c7f2e05da8de5702b99e2631963bf2a767ba4404d6bf904fb0",
+        "57fbf878480b476de6beff3d562e5770bf600c2a172d364f7d325a530c6679a9",
+        "fdd463f3b10d36911b5cf7a1c82e47921bcf9d622390015a68208de17c2d2679"
+      ],
+      "book_id": "book-mm-07",
+      "title": "2. ECTOPIC PREGNANCY",
+      "topic_id": "t-mm-07-002",
+      "total_utf8_bytes": 106812
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "18d10de4149b6f1795ab20afa0f80eb7f565f3b11268ced8f317990b87614432"
+      ],
+      "book_id": "book-mm-07",
+      "title": "3. DIAGNOSIS OF INTRAUTERINE & ECTOPIC PREGNANCY:",
+      "topic_id": "t-mm-07-003",
+      "total_utf8_bytes": 43697
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "18753e0866f18a1bc328340085c6d50d217e963f293076335a59e717a04082e2",
+        "a28de18f7124a4e125f701c49e25ecd1a44b5425174a923fca913eaba041bf14",
+        "61a697af054d7e953242d61667087d9f02a4a4df0747a6a8ec7fd7a632902698"
+      ],
+      "book_id": "book-mm-07",
+      "title": "4. GESTATIONAL TROPHOBLASTIC DISEASES (GTD):",
+      "topic_id": "t-mm-07-004",
+      "total_utf8_bytes": 112948
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "fa8918430667bf4eef4090733227e98f1ef093ec64ddcdefcd107b8fca4815ec",
+        "7a5f08a6fed520d1c69a0ad48ac9673bf47675789a65706dec6d3ec2f3154a3d"
+      ],
+      "book_id": "book-mm-07",
+      "title": "5. MANAGEMENT OF NAUSEA AND VOMITING IN PREGNANCY AND HYPEREMESIS GRAVIDARUM:",
+      "topic_id": "t-mm-07-005",
+      "total_utf8_bytes": 73322
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "55d636fcc051d5d5d1df46c45cfc3a20f0cea39ef1dc56535cc605f32d09004f",
+        "4332253df9393405d523d04b9f44da7565e876458c9a325be7b5587f5e4954a7"
+      ],
+      "book_id": "book-mm-07",
+      "title": "6. EVOLUTION IN SCREENING FOR DOWN SYNDROME + CFFDNA:",
+      "topic_id": "t-mm-07-006",
+      "total_utf8_bytes": 64329
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "8254b7b2f18545f3e4638f1953cb451f5638fe0104ef718669e23e9d9b44f020",
+        "6aa6cdb8d8ab44a77f60355be223b03e3492f021f996e1030be3c8a9f82574f2"
+      ],
+      "book_id": "book-mm-07",
+      "title": "7.  AMNIOCENTESIS & CVS:",
+      "topic_id": "t-mm-07-007",
+      "total_utf8_bytes": 61992
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "a48398654f6524772a2698f8f7ee5a7213782322ec82770bc7a6ffad31b5331c",
+        "3e466e4676db9f3461cf4d99b7c1996b836739e1f3019c59f4c4856fe21874b8"
+      ],
+      "book_id": "book-mm-08",
+      "title": "1. \u03b2\u2013 THALASSEMIA",
+      "topic_id": "t-mm-08-001",
+      "total_utf8_bytes": 74330
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "c65b3997f587105d0f0e56fc46c002437bc799df5086e5e8fd4f4fbd5bec18df",
+        "c5d205769d3ad2c62b51ab11e7545a8b3f46b5931da41fbe344c7c8afaee1b2c"
+      ],
+      "book_id": "book-mm-08",
+      "title": "2. SCD \u2013 SICKLE CELL DISEASES",
+      "topic_id": "t-mm-08-002",
+      "total_utf8_bytes": 72332
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "79897be62c778c5bf10d941e28e62d6dac8d8405c6f6fc4a363263b24105ab9e",
+        "25ed0cfba9635a45c4fbcc1b3f7a19cadee343078f74dd3947ed655b858cdf8d"
+      ],
+      "book_id": "book-mm-08",
+      "title": "3. REDUCING RISK OF VTE",
+      "topic_id": "t-mm-08-003",
+      "total_utf8_bytes": 96632
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "accfbf18a704375a3f49941137c75f524a27413a9239100752ed731e2b1dbfe3",
+        "a7841b8935216e0a69e5d74cd3c609dcdd6e5a6cf0d91d9e3139d5558a655923"
+      ],
+      "book_id": "book-mm-08",
+      "title": "4. VTE IN PREGNANCY & PUERPERIUM",
+      "topic_id": "t-mm-08-004",
+      "total_utf8_bytes": 72407
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "f44ed1de50fa8ff36d0f9847ee8734e271fbac0da370f25df7fff626a5260c74",
+        "780935021f8e69f5baab95a49d5de6c4ce7473afffb01ad69bda42451f9d839a"
+      ],
+      "book_id": "book-mm-08",
+      "title": "5.\tRED CELL ANTIBODIES DURING PREGNANCY",
+      "topic_id": "t-mm-08-005",
+      "total_utf8_bytes": 55692
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "c71c24e7dbc226b46dab289ae5987ad64520cb4b59ee61f011c5bc7b90df9329"
+      ],
+      "book_id": "book-mm-08",
+      "title": "6.\tANTI D PROPHYLAXIS BCSH",
+      "topic_id": "t-mm-08-006",
+      "total_utf8_bytes": 28342
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "21693f29d875633f6ae1b9d6c91fdfb461f5f5bba9c1f903cf1b89862695027f"
+      ],
+      "book_id": "book-mm-08",
+      "title": "7.\tIRON DEFICIENCY",
+      "topic_id": "t-mm-08-007",
+      "total_utf8_bytes": 47206
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "ee855d876ff5a361307f66413986af31784b0fd1c249d0223e1cf795985614c1",
+        "6d2e26c721673fbddc9d81103a170214544cc3b9eded39c3bce8f098fa2e5e60",
+        "3a06b37eb284be28c160f7791608a2b28614078aacf99212f2e953aa3be31b40"
+      ],
+      "book_id": "book-mm-08",
+      "title": "8. HYPERTENTION IN PREGNANCY",
+      "topic_id": "t-mm-08-008",
+      "total_utf8_bytes": 119470
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "04b2f4993525931aaf1069f6132e465a24ecf1c9a98f3195ba1517013693ca12"
+      ],
+      "book_id": "book-mm-08",
+      "title": "9.\tLOW DOSE ASPIRIN + CALCIUM SUPPLEMENTATION FOR PREVENTION OF PRE \u2013 ECLAMPSIA:",
+      "topic_id": "t-mm-08-009",
+      "total_utf8_bytes": 23376
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "4cd2e07e0549407b657c5161c6ecfb0de2eed964e36ddfcf0b8abe3f6aa05065",
+        "ae717d44d604c6357e09d7ae4e03f64290444fe94a6dd5382911ea9504f2246f"
+      ],
+      "book_id": "book-mm-08",
+      "title": "10.\tHEMOPHILIA",
+      "topic_id": "t-mm-08-010",
+      "total_utf8_bytes": 62356
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "35daf81cdd22bc3df2e8a10634f745f2aa0a160ba30a9083a2b7731bff9b8902",
+        "25b9ed04bd038b5c20b942fe13adf7f50e9ed076be028239ec33eda7acb3aeea"
+      ],
+      "book_id": "book-mm-08",
+      "title": "11.\tVWD",
+      "topic_id": "t-mm-08-011",
+      "total_utf8_bytes": 51551
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "587dcbeeaebc6d749cc28232738b1fa1ee3699ce10df9b02e92e4f97c9a960ea"
+      ],
+      "book_id": "book-mm-08",
+      "title": "12.\tFACTOR XI DEFICIENCY:",
+      "topic_id": "t-mm-08-012",
+      "total_utf8_bytes": 22817
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "65d2ddb577094bd53d4a3889577b02f7aec4166d02b35dc933702c5f1b99f01d"
+      ],
+      "book_id": "book-mm-08",
+      "title": "13.\tFIBRINOGEN DISORDERS",
+      "topic_id": "t-mm-08-013",
+      "total_utf8_bytes": 11391
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "7269e6b628d77f3d0d7254b2a2f72346f9dcd39760a00a5e704159e52c3b4d2d"
+      ],
+      "book_id": "book-mm-08",
+      "title": "14.\tPLT FUNCTION DISORDERS",
+      "topic_id": "t-mm-08-014",
+      "total_utf8_bytes": 23648
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f3b4087c3f9feadda360f48da1bb2a419a15c62bc588cc0066fba06754335ca9"
+      ],
+      "book_id": "book-mm-08",
+      "title": "15.\tMYOCARDIAL INFARCTION IN PREGNANCY",
+      "topic_id": "t-mm-08-015",
+      "total_utf8_bytes": 38390
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "a608d65770cec73fbad4b0fc758b367ff89cc8249506130535f6e14a1bed662b"
+      ],
+      "book_id": "book-mm-08",
+      "title": "16.\tDERMATOLOGICAL CONDITIONS OF PREGNANCY",
+      "topic_id": "t-mm-08-016",
+      "total_utf8_bytes": 36553
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "387a5c0eaa757adf0efe2795af739458b8940ad05c607d87d0405ad7eec8c1a2"
+      ],
+      "book_id": "book-mm-08",
+      "title": "17.\tSLE IN PREGNANCY",
+      "topic_id": "t-mm-08-017",
+      "total_utf8_bytes": 41185
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "14baeb1e032191d2785764faa826a9c35e34fadc2b01322db70962f9378b8a89"
+      ],
+      "book_id": "book-mm-08",
+      "title": "18.\tAPPENDICITIS IN PREGNANCY",
+      "topic_id": "t-mm-08-018",
+      "total_utf8_bytes": 29881
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "fa878d9819a44c90b7aea988a4c08ddf369b0281b4a513b9214dc653ae2d153a"
+      ],
+      "book_id": "book-mm-08",
+      "title": "19.\tPKU - PHENYLKETONURIA",
+      "topic_id": "t-mm-08-019",
+      "total_utf8_bytes": 30173
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "71a7014f90e96452e14ca331ef6d79808becd3df590b3f37abebb6602b441feb"
+      ],
+      "book_id": "book-mm-08",
+      "title": "20.\tIBD \u2013 INFLAMMATORY BOWEL DISEASE",
+      "topic_id": "t-mm-08-020",
+      "total_utf8_bytes": 24327
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "709ff28c14b3c73813890d55ddd699de0a72cee83ea2e900a9753f4fcc824771",
+        "50ae143c056dafc58e842004fcc5e389052b9e9a4c34f084cb55972d45279978"
+      ],
+      "book_id": "book-mm-08",
+      "title": "21.\tEPILEPSY",
+      "topic_id": "t-mm-08-021",
+      "total_utf8_bytes": 59959
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "5876927a61a5864b20a98e8282176c0634db6a1a57b3f60f8585e2a07a0a4a1f"
+      ],
+      "book_id": "book-mm-08",
+      "title": "22.\tCA BREAST IN PREGNANCY AND PREGNANCY FOLLOWING CA BREAST",
+      "topic_id": "t-mm-08-022",
+      "total_utf8_bytes": 47501
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "8fb2dc6ca2e0778ebfb6ea4b7f31db59bea292b7d12b537012117c872823a457",
+        "9ed8f2821aeaefc1015c1919d3f429c1ae22e270090f8f2abafa2e4b0d63644d"
+      ],
+      "book_id": "book-mm-08",
+      "title": "23.\tDIABETES IN PREGNANCY",
+      "topic_id": "t-mm-08-023",
+      "total_utf8_bytes": 95633
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "8d172f14c69bfad56d8076630ca01e5e957cd8f65292edf4a95588d7c48dff3a"
+      ],
+      "book_id": "book-mm-08",
+      "title": "24.\tDKA IN PREGNANCY",
+      "topic_id": "t-mm-08-024",
+      "total_utf8_bytes": 36478
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "3734c5028ace4455ccdd6501593f121d5a66a0521f6c33dc70e77d859f3c77a7",
+        "83900734275abedbccb9f664a119045a4f2608faf7d8aad64ec0609462812e1a"
+      ],
+      "book_id": "book-mm-08",
+      "title": "25.\tOBESITY IN PREGNANCY",
+      "topic_id": "t-mm-08-025",
+      "total_utf8_bytes": 68667
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "7fd5bf57fd2b5c6443f47c4db976f1c6b6b892b39531c9daac84abc7f7ec6adc",
+        "7a91d86aa3a89cb52589d7a4622fc643cdc72ad54e0a0ea69371729f74541756"
+      ],
+      "book_id": "book-mm-08",
+      "title": "26.\tHEADACHE IN PREGNANCY",
+      "topic_id": "t-mm-08-026",
+      "total_utf8_bytes": 66825
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "a641e5cf2d298d0c4e2329cbec758bcbae2c301588150ef489ddd690f039b47c"
+      ],
+      "book_id": "book-mm-08",
+      "title": "27.\tLIVER MASSES IN PREGNANCY",
+      "topic_id": "t-mm-08-027",
+      "total_utf8_bytes": 23531
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "84262c22532142a692d72608835eaf2d342a1945a9de025cd9b98c26bdfcebab",
+        "4b21def00489f2ace6dd3a88626c4e2748ed1d13f006026895c65948625e83a2"
+      ],
+      "book_id": "book-mm-08",
+      "title": "28. ACUTE KIDNEY INJURY IN PREGNANCY",
+      "topic_id": "t-mm-08-028",
+      "total_utf8_bytes": 68142
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "656089a71f462ede745903d164af53cf7b1f9424300ca37406996c2fc562302f"
+      ],
+      "book_id": "book-mm-08",
+      "title": "29.\tASTHMA IN PREGNANCY",
+      "topic_id": "t-mm-08-029",
+      "total_utf8_bytes": 47348
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "d631134341fb0185b11f800d5ea69547b96bd13642d23dac909486ce4684c31e"
+      ],
+      "book_id": "book-mm-08",
+      "title": "30.\tCONSTIPATION IN PREGNANCY",
+      "topic_id": "t-mm-08-030",
+      "total_utf8_bytes": 20411
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "df348342868419338a773938327b5bb9a971c4befed0a77669c34b76b2472761"
+      ],
+      "book_id": "book-mm-08",
+      "title": "31. CYSTIC FIBROSIS",
+      "topic_id": "t-mm-08-031",
+      "total_utf8_bytes": 33744
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f8382ad08aa814d2acc34368a077ed6b2c803363a8842b1dc495eae1e108e2df"
+      ],
+      "book_id": "book-mm-08",
+      "title": "32. DIABETES INSIPIDUS",
+      "topic_id": "t-mm-08-032",
+      "total_utf8_bytes": 31894
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "051936918f7c3780683b789bcfbba49998c71af894dab118f29488a0632050bc",
+        "d1384b395ae4ca3e2b52534822f2f710b6e62e8df8bc8722f0cd36a3a28aeb13"
+      ],
+      "book_id": "book-mm-08",
+      "title": "33. MULTIPLE SCLEROSIS",
+      "topic_id": "t-mm-08-033",
+      "total_utf8_bytes": 52399
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "55d6e40865c2b20ca44a0e3e3f0ac391fcc4ac8a9f34305acc8b4beff149dc9b",
+        "346d1cd2a5429e4814c45724c9af8d9675610029a248037d81358389a56e5791"
+      ],
+      "book_id": "book-mm-08",
+      "title": "34. PREGNANCY & SPINAL CORD INJURY:",
+      "topic_id": "t-mm-08-034",
+      "total_utf8_bytes": 81887
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "c10a13f480b39a00ffcaca75eba16b89572648115073b6971411845dc2852bd0",
+        "17383264ab75c26e1d794faa6e56612ed213319b66eaae66f0fb9d30f98a1a32"
+      ],
+      "book_id": "book-mm-08",
+      "title": "35. SURGICAL CAUSES OF ACUTE ABDOMINAL PAIN IN PREGNANCY:",
+      "topic_id": "t-mm-08-035",
+      "total_utf8_bytes": 53779
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "6479da9e5e767d5512541166c0500f74d4532532328088df9f1c35add478a562"
+      ],
+      "book_id": "book-mm-08",
+      "title": "35.1. A \u2013 APPENDICITIS",
+      "topic_id": "t-mm-08-036",
+      "total_utf8_bytes": 33725
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "2fa9791619505b9f093b316925b398902f18b4a57f1c9a8faec06c29ab15e232"
+      ],
+      "book_id": "book-mm-08",
+      "title": "35.2. B \u2013 BILIARY COLIC/ CHOLECYSTITIS",
+      "topic_id": "t-mm-08-037",
+      "total_utf8_bytes": 9533
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "bf026254955eb3eddd7a58f30a1baa97f7615388202d4342708927f4e257f4b2"
+      ],
+      "book_id": "book-mm-08",
+      "title": "35.3. C \u2013 BOWEL OBSTRUCTION",
+      "topic_id": "t-mm-08-038",
+      "total_utf8_bytes": 6623
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "14925239b360485599ce33b6e793a87cd2093ec9dc723d2dc60dcbc4f8e0fbd5"
+      ],
+      "book_id": "book-mm-08",
+      "title": "35.4. D \u2013 PANCREATITIS",
+      "topic_id": "t-mm-08-039",
+      "total_utf8_bytes": 2323
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "8aa0d0ed322d9e98a847d635ac3852531cde0aeef37acb0bc726ba07c769f3a0"
+      ],
+      "book_id": "book-mm-08",
+      "title": "35.5. E \u2013 URETERIC OBSTRUCTION & PYELONEPHRITIS",
+      "topic_id": "t-mm-08-040",
+      "total_utf8_bytes": 4704
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4b98b2e59f9d429cc75b6a9da790dbe4e424f4abe22fd7106ce31e0730522771"
+      ],
+      "book_id": "book-mm-08",
+      "title": "36. AIR TRAVEL IN PREGNANCY",
+      "topic_id": "t-mm-08-041",
+      "total_utf8_bytes": 20131
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "010cbb8ab1310312308c36bdbffc6988bf180a92ae2b2bd8b107f1680a20346e"
+      ],
+      "book_id": "book-mm-08",
+      "title": "37. ACUTE PANCREATITIS IN PREGNANCY",
+      "topic_id": "t-mm-08-042",
+      "total_utf8_bytes": 24790
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "985fe3b1ef424f60c7b1e158664279c5f0bf8365f69e3dbc0a2d192196b74301",
+        "fb21e2a844d86f2b2f71628a4af934a6e1093c28505939532c968feda81ed5d7",
+        "03663346bfece819d61a24ec9e89b3d5f800a468fe99df839c745fa1b9ed58ae"
+      ],
+      "book_id": "book-mm-08",
+      "title": "38. THYROID DISORDERS IN PREGNANCY AND POSTPARTUM",
+      "topic_id": "t-mm-08-043",
+      "total_utf8_bytes": 98507
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "32396f9e9ac90b6f3558b51d2d384d49ac109241d00a35ab2fac7eba72aa1325"
+      ],
+      "book_id": "book-mm-08",
+      "title": "38.1. MANAGEMENT OF HYPOTHYROIDISM AND RELATED DISORDERS",
+      "topic_id": "t-mm-08-044",
+      "total_utf8_bytes": 46226
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "909dbb3111c7fa308fddaca9c1aec186b450787d1b9f2e5b5a923632c1007cbe",
+        "f892966630053fdcc25e5a4c8d3aa9fa126478372c7b7d9aee2a27270ad58ed9"
+      ],
+      "book_id": "book-mm-08",
+      "title": "38.2. HYPERTHYROIDISM AND THYROTOXICOSIS",
+      "topic_id": "t-mm-08-045",
+      "total_utf8_bytes": 76588
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e99fd56c7c583fdb1f212ffe4b024585952fa80b6b3e31312465ddba0d676eba"
+      ],
+      "book_id": "book-mm-08",
+      "title": "38.3. THYROID NODULE AND THYROID CANCER",
+      "topic_id": "t-mm-08-046",
+      "total_utf8_bytes": 8638
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "31b08b852edbc4ff1f8e4f818b2e9ba351374699750d55b398312a4c997b21ef"
+      ],
+      "book_id": "book-mm-08",
+      "title": "38.4. POST \u2013 PARTUM THYROIDITIS PPT",
+      "topic_id": "t-mm-08-047",
+      "total_utf8_bytes": 36893
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "c7cbb972a948972d4c4d4aa41a46b58e8e949a25415e794a269b1bc15fb9c85f"
+      ],
+      "book_id": "book-mm-08",
+      "title": "39. VITAMIN D IN PREGNANCY",
+      "topic_id": "t-mm-08-048",
+      "total_utf8_bytes": 45018
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "89d1f2a11e279d6deea8907d8765e229801c7c84961adec56c6cc1804f3d85ca"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1. PERINATAL INFECTIONS:",
+      "topic_id": "t-mm-09-001",
+      "total_utf8_bytes": 11932
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "9606986c2ca68e73fe2b488818fd55098e580dac5ef6fd6cfeedb5548d37e366"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.1.\tGBS IN PREGNANCY:",
+      "topic_id": "t-mm-09-002",
+      "total_utf8_bytes": 34529
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "bd650ff6dc6d1c3f745e91f9670f7d1770ab72e527d4b25a0904585f9665d4fb"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.2.\tCHICKEN POX IN PREGNANCY:",
+      "topic_id": "t-mm-09-003",
+      "total_utf8_bytes": 36944
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "dd388c34b8a73f83e2589db37c6920fcfa482a7b800e69df51b305d0a8aee50b",
+        "0315411da6236c1c7bac1764e6c56d9299ff81a982a3aa4eee68b9ea6e9be45b"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.3. \tHIV IN PREGNANCY:",
+      "topic_id": "t-mm-09-004",
+      "total_utf8_bytes": 96763
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "9e80cb349afa5bbd0fdce940e9e141bf77ca4e9fb4dc33e99e19c270ffda56e0"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.4. HERPS IN PREGNANCY + NEONATAL CARE:",
+      "topic_id": "t-mm-09-005",
+      "total_utf8_bytes": 25629
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "dd6a018142b8b3defcd7220e6eb26a227560a60ad10649e6dd7e1748c65c3de0",
+        "b727363a53fce0f336426d4beaf5a5c8e668a076101b09cdac1741204cfa1e7f"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.5. MALARIA IN PREGNANCY",
+      "topic_id": "t-mm-09-006",
+      "total_utf8_bytes": 99232
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "9d59d4b79e0f7fbf23475fdad0fcfc00b4a2e78e705899f330d3af14dab8b96b",
+        "5148b9d3410bf0f176c0582632f95358f9085f81c1ca2dfabbcecc404fe759d4"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.6. COVID \u2013 19 IN PREGNANCY:",
+      "topic_id": "t-mm-09-007",
+      "total_utf8_bytes": 65318
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "51f8d7d8d2e2f4eb532b06587b03403be8b7ab1cefecd55046049b08ed014022"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.7.\tCYTOMEGALOVIRUS",
+      "topic_id": "t-mm-09-008",
+      "total_utf8_bytes": 35958
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "01c3f5681376d25a6f395b5eb815cce2aae062b2beb9c1d91a57512ac7cf8c2c"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.8.\tLISTERIA",
+      "topic_id": "t-mm-09-009",
+      "total_utf8_bytes": 19529
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "9dde4d4a83aecfef3cf3aca55b4eb63205155182206fec5a100945af35e7ebb8"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.9.\tTOXOPLASMOSIS",
+      "topic_id": "t-mm-09-010",
+      "total_utf8_bytes": 19921
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "9d10a35b12b26522d594c74b7dbfd240176abc8aa70b409d94d71f1c9a50dae0"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.10.\tRUBELLA",
+      "topic_id": "t-mm-09-011",
+      "total_utf8_bytes": 9198
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "acfe427dc83f04e5d079f9d37008a5aaac901d5aecf5539a032329bf10d7fefb"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.11.\tSYPHILIS",
+      "topic_id": "t-mm-09-012",
+      "total_utf8_bytes": 36298
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "ba9680284c46eea4d6cfdbb0f01c5d2939abac9ff13716288ed075e22b5b3410"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.12.\tPARVOVIRUS",
+      "topic_id": "t-mm-09-013",
+      "total_utf8_bytes": 36268
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "168c8365c768c5093231a95c3cd278dfaabbc464c82f0c33cc951d70d57c79a5"
+      ],
+      "book_id": "book-mm-09",
+      "title": "1.13.\tHEMOPHILUS INFLUENZAE",
+      "topic_id": "t-mm-09-014",
+      "total_utf8_bytes": 25926
     },
     {
       "block_count": 4,
       "block_digests": [
-        "69989d94c96bc7e2c27def4bbb29664a2e22a51c92eec39a0ae53c868cf0c603",
-        "6d42665ffead21b5bc0bdaff4df494fcc735bbd42573db17c2fcf3c1996e6fa4",
-        "0e44237b279bd757e0e235ecb69eed11e522c387a5ea2acbedd5c6340e4f21c5",
-        "0c501f0364accebc69e7fd7e4c7b3d8c4820e965347d6be70f061c5df26a9604"
+        "1be60592cee68500b2bbf3449ca2d00da4825fcadd768c97a437982fac964eab",
+        "5b279e8473482ddde93dac21734f6cb7d045521c737afbda44e64ee00685063f",
+        "a1c6c9c0865399dcbcd204bc1a140cb9bebe7bccfb6647f63a05367efee574fa",
+        "a63091e4489ae9ad9850a386591b3690a2dc86eb24f7c87388771dd405787b2a"
+      ],
+      "book_id": "book-mm-09",
+      "title": "2.\tMATERNAL SEPSIS DURING & FOLLOWING PREGNANCY",
+      "topic_id": "t-mm-09-015",
+      "total_utf8_bytes": 188836
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "02bfca3cb178fd0135f041952a47ba797061065b699ee7d1860fee2dd3726871",
+        "96e8038f0f34515a8fa0aebb3a19b17df36b449de982ac44b01ab4e22a716908"
+      ],
+      "book_id": "book-mm-09",
+      "title": "3.\tOBSTETRIC CHOLESTASIS:",
+      "topic_id": "t-mm-09-016",
+      "total_utf8_bytes": 60870
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "ecbe151d05c154021e015ed2428830d95e4238b7b9c50620a1d3f8cf437c4c5f"
+      ],
+      "book_id": "book-mm-09",
+      "title": "3.\tREDUCED FETAL MOVEMENTS:",
+      "topic_id": "t-mm-09-017",
+      "total_utf8_bytes": 13520
+    },
+    {
+      "block_count": 4,
+      "block_digests": [
+        "39e95d2732c5208ccc868c0aadefce1d8337a890889df9c1bc9a6d500225bbac",
+        "775b0587bf92f1f2062ba21455efa3dde5c323ba3c0f457183f7fdd6630e306d",
+        "3242966a435bf422fef11b2e93ab94d3b61be99f51077717754b9d31514ec886",
+        "4e46373a899a0784f2b514745198668feb1b8c403468309fe4ff480acfe62864"
+      ],
+      "book_id": "book-mm-09",
+      "title": "5.\tSMALL FOR GESTATIONAL AGE:",
+      "topic_id": "t-mm-09-018",
+      "total_utf8_bytes": 154611
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "5af5117479ae83f81355fa99852230dd22c73b43040076cdbd0589f73f1e1de9",
+        "a609149132ac7a6a3dc9818af0ebcc8bbf30f4431cbc559ed23c8cd3f7e1893d",
+        "2e3d7645c0501e5af04c1c7e9f0b9518edc8a78d1c626187d6f73f99b15c32c7"
+      ],
+      "book_id": "book-mm-09",
+      "title": "6. CARE OF LATE INTRAUTERINE FETAL DEATH AND STILL BIRTH:",
+      "topic_id": "t-mm-09-019",
+      "total_utf8_bytes": 121555
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "f9b7099f2c71a26364fd302f4df6ab4607b10ddb93ef17b70e5023aa53b353d6",
+        "c4e7d3e3d1580c8fbd4c2eb09a1f0b4b1897ffb524c8a832ca482494fede6ead"
+      ],
+      "book_id": "book-mm-09",
+      "title": "7. PLACENTA PREVIA, ACCRETA:",
+      "topic_id": "t-mm-09-020",
+      "total_utf8_bytes": 81192
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "9a3fb74f4a98a0aa5bff12d93ab9685e1a2b6540125bd4de64f56aa43a8b2155"
+      ],
+      "book_id": "book-mm-09",
+      "title": "8.\tBLOOD TRANSFUSION IN OBSTETRIC:",
+      "topic_id": "t-mm-09-021",
+      "total_utf8_bytes": 45063
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "2a5b7a0f23b5d2e86f46edc21719188dba845308ea237ab2e2fad67ee63be7f5"
+      ],
+      "book_id": "book-mm-09",
+      "title": "9.\tMULTIPLE PREGNANCY:",
+      "topic_id": "t-mm-09-022",
+      "total_utf8_bytes": 45619
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "581ab7bf32b18f7b7574dec1d9404828fb626dbd7722db3063d90dca0d2a111c",
+        "97263991041ff3ed5f6b38db8bdf10ae6fa638cc93b3ff191bcc9c0b4d75e181"
+      ],
+      "book_id": "book-mm-09",
+      "title": "10.\tMONOCHOROINIC TWINS:",
+      "topic_id": "t-mm-09-023",
+      "total_utf8_bytes": 52823
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "66257a155c5566885140b5915251f2f72e5d77ba0527b5fcd60ae36571d459b3"
+      ],
+      "book_id": "book-mm-09",
+      "title": "11. POLYHYDRAMNIOS IN SINGLETON",
+      "topic_id": "t-mm-09-024",
+      "total_utf8_bytes": 23253
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "05dea48b1bf7bbd7446bf1db7f2ae8116a1ba2a42b618b2e5dd0d0a6975f3359",
+        "f540ee28593f6c4e121e554639e7286d4b6394d3163fc829d8444ae24b61c778"
+      ],
+      "book_id": "book-mm-09",
+      "title": "12. ANTEPARTUM HAEMORRHAGE",
+      "topic_id": "t-mm-09-025",
+      "total_utf8_bytes": 80583
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4a28e253cfff0bb94244595625ffb1ccc2c3af0dd7c7621242a5255fd102d859"
+      ],
+      "book_id": "book-mm-09",
+      "title": "13. VASA PREVIA:",
+      "topic_id": "t-mm-09-026",
+      "total_utf8_bytes": 16093
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "bcc295705999d42df99abf65a6c0a06d41e6624a6ca6f5b15177b96f545d897e"
+      ],
+      "book_id": "book-mm-09",
+      "title": "14.  ANC OF UNCOMPLICATED PREGNANCIES:",
+      "topic_id": "t-mm-09-027",
+      "total_utf8_bytes": 47820
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f6af52ee4c6cbafb9d3fc9a11165bed6ae2cc252e93cd08812d60f08a377a014"
+      ],
+      "book_id": "book-mm-09",
+      "title": "15. VACCINATION IN PREGNANCY:",
+      "topic_id": "t-mm-09-028",
+      "total_utf8_bytes": 41140
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "2c5092a267fdeb1e5b139d7c1670cfccfcf07116fb083204b3d1a9f3ea110962"
+      ],
+      "book_id": "book-mm-09",
+      "title": "16. ANC OF SINGLETON PREGNANCY CONCEIVED USING ART:",
+      "topic_id": "t-mm-09-029",
+      "total_utf8_bytes": 35151
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "111d6e19156977aeb6b253c5a73e8e5784672a5843876fa12c4e59623d9e0d7d",
+        "5a4d3098cecff79a6c45725da3a1b98ab60f515d553e9981665a2198050ea901"
+      ],
+      "book_id": "book-mm-09",
+      "title": "17.\tIMAGING IN PREGNANCY:",
+      "topic_id": "t-mm-09-030",
+      "total_utf8_bytes": 69491
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "e19ee4e2cf4865b3d841e2f86c3eb8528e8f7a123136d6277d9cbbeba9bb32ae"
+      ],
+      "book_id": "book-mm-09",
+      "title": "18.\tMANAGEMENT OF PREGNANCY AFTER TRACHYLECTOMY:",
+      "topic_id": "t-mm-09-031",
+      "total_utf8_bytes": 19114
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f906fbb49e64ba12ac46294a1521c845b499ea1bf215c7fb07450f7eca9fe620"
+      ],
+      "book_id": "book-mm-09",
+      "title": "19.\tMULTIFETAL PREGNANCY REDUCTION (MFPR) & SELECTIVE TERMINATION (ST):",
+      "topic_id": "t-mm-09-032",
+      "total_utf8_bytes": 32909
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "0ac6a6bcdae0217da633fbe6e6c32dc9dd647ade836cec8be874a421fefae598",
+        "12b7ec62736b464e91988ab56302ebeb2d3aacac4690b16cd077169ddb689c4c"
+      ],
+      "book_id": "book-mm-09",
+      "title": "20. ANTENATAL CORTICOSTEROID:",
+      "topic_id": "t-mm-09-033",
+      "total_utf8_bytes": 62935
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "74e3727229f708dd902264f0a973228850ecd9579b559fe243da78d15230dc96",
+        "ef9ed979f1d0a09de516d362eafa178394c775d2b68cd5023bae568bdc8f2af8"
+      ],
+      "book_id": "book-mm-09",
+      "title": "21. CERVICAL CERCLAGE",
+      "topic_id": "t-mm-09-034",
+      "total_utf8_bytes": 87898
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "f1d5feeb3919c922152b47e9bb38a8634a1b4c3fc530384262bc2f5e79ff8f19"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1. INTRAPARTUM CARE OF HEALTHY NORMAL PREGNANCIE",
+      "topic_id": "t-mm-10-001",
+      "total_utf8_bytes": 5733
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "0532187cae4b13d576c914adfdb45223790a8dfb092e3adb6febec70d3e95d7f",
+        "e11ca3c5aaae9cdc6ab0f9b4a670cf652807f3f602da0abd4b1523c6e2124f13",
+        "4eb27d1d3f5d533a733f94e54d89d380be2d6f63f2195a3d4e38fdc17e765c1f"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.1.\tTYPES OF BIRTH SETTING",
+      "topic_id": "t-mm-10-002",
+      "total_utf8_bytes": 106731
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "464a5fe2bbdf5c4d5cccc67743af03193c6e400f5171bf8b8178affac5888b6a",
+        "52905d28bf3a974f479aad51814cdee80bcd6791983373be6fed14bf3efbd2cd"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.2.\tPAIN RELIEF DURING LABOR:",
+      "topic_id": "t-mm-10-003",
+      "total_utf8_bytes": 69604
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "ea335aff958e665b433590a974f677c756b9452f801ad75b3f79bb8f22480236"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.3.\t1ST STAGE OF LABOR:",
+      "topic_id": "t-mm-10-004",
+      "total_utf8_bytes": 40141
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "8fcbd2ba5da251549c4f390b60640ec2c1f0dcfef838fb417c322d9dd47a45a3",
+        "06ec78e5a491e9e5dc683f9223b6322d0e800d98353fb8528f3c9be11624d9d7"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.4.\t2ND STAGE OF LABOR",
+      "topic_id": "t-mm-10-005",
+      "total_utf8_bytes": 51834
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "1d03c80e6cd11a2918184136efe2d7d173afdf4ef4afb84cf6d77bb1f4696b98"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.5.\t3RD STAGE OF LABOR:",
+      "topic_id": "t-mm-10-006",
+      "total_utf8_bytes": 39950
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "2545f6a08b9c723fa2dd10451cd46a315c1bd3559fe42d7893dd52a5aa07f22c"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.6.\tRETAINED PLACENTA",
+      "topic_id": "t-mm-10-007",
+      "total_utf8_bytes": 3496
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "70dd6c0379c7ee916aa89399e6debcdbe1add09c09a34258afa8458ac0f4fe17",
+        "ea0014eeaf182952121b125931e030b3c260ae9fbfd8bc1394709289daf400a0"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.7.\tPOSTPARTUM HEMORRHAGE",
+      "topic_id": "t-mm-10-008",
+      "total_utf8_bytes": 54435
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "38e4f23807e3eae10f7ece19098e475af48adeb1a34cf82db78c153133be9464"
+      ],
+      "book_id": "book-mm-10",
+      "title": "1.8. CARE OF THE WOMEN AFTER BIRTH",
+      "topic_id": "t-mm-10-009",
+      "total_utf8_bytes": 6847
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "b124b836dd195b83d8adc1c62d982e6c81511b1c3ee5f882b4f47b933d8801cb"
+      ],
+      "book_id": "book-mm-10",
+      "title": "2.\tNEONATAL CARE AND RESUSCITATION:",
+      "topic_id": "t-mm-10-010",
+      "total_utf8_bytes": 33563
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "a7633c028979f266d6b154e267eb5755a36b1067be8b68c9922d0aa9d49426d6"
+      ],
+      "book_id": "book-mm-10",
+      "title": "3.\tINTRAPARTUM CARE OF WOMAN WITH EXISTING MEDICAL CONDITIONS AND OBSTETRIC COMPLICATIONS",
+      "topic_id": "t-mm-10-011",
+      "total_utf8_bytes": 5698
+    },
+    {
+      "block_count": 4,
+      "block_digests": [
+        "2a4435afbf74012941662013899ec4695ebb2ab00d0d18917aaf02bae98aaa25",
+        "46dd4c75120644303aed9a40a78fcec9615fc255dd8c4e29c37f3cd701786c60",
+        "1d8748cdc1ed701d4ce317db77f80f3dfefebc79b70552121f49ed724e8b54c5",
+        "ad8aa1dff6b459d080c1c19a5933f209eaf6756294a7ad7b80b1af294b42ea2b"
       ],
       "book_id": "book-mm-10",
       "title": "3.1. HEART DISEASE",
       "topic_id": "t-mm-10-012",
-      "total_utf8_bytes": 144044
+      "total_utf8_bytes": 232361
     },
     {
       "block_count": 1,
       "block_digests": [
-        "c322898c2b60ec05470796d12262bc3fb328592f798ac43996ff8933184a51dd"
+        "59d5fc35455b06bbc6a79705afdcfc1bc987de68d8d3585617da23d29efcf60b"
       ],
       "book_id": "book-mm-10",
       "title": "3.2.\tASTHMA",
       "topic_id": "t-mm-10-013",
-      "total_utf8_bytes": 3027
+      "total_utf8_bytes": 3579
     },
     {
       "block_count": 1,
       "block_digests": [
-        "d68009897d82b4d1d480e02ada1c2119594b6bfcdeccf04331c32629f277c094"
+        "4e8b8af9b8cc086fac2779c32895867012b3b49fb811271237fe62bdc730d760"
       ],
       "book_id": "book-mm-10",
       "title": "3.3.\tWOMAN ON LONG TERM SYSTEMIC STEROIDS",
       "topic_id": "t-mm-10-014",
-      "total_utf8_bytes": 5100
+      "total_utf8_bytes": 7384
     },
     {
       "block_count": 1,
       "block_digests": [
-        "c5148a4e639c42e428997d63ae551e046339b45e0f44ad2bf7cb09d685e3ea1b"
+        "28db7aa23d03633d4851e43d1e887fd7c22884c8a7999290b0407df49613c516"
       ],
       "book_id": "book-mm-10",
       "title": "3.4.\tBLEEDING DISORDERS:",
       "topic_id": "t-mm-10-015",
-      "total_utf8_bytes": 18365
+      "total_utf8_bytes": 25087
     },
     {
       "block_count": 1,
       "block_digests": [
-        "782117f7736b1e0a62f70005b6a1159e860d2e3647afaa5585545e2c60763e72"
+        "b30310195cce7913693359f7a27c17dd15376929fcab39eb2841dab43154628c"
       ],
       "book_id": "book-mm-10",
       "title": "3.5.\tSUB ARACHNOID HAEMORRHAGE OR AV MALFORMATIONS OF THE BRAIN",
       "topic_id": "t-mm-10-016",
-      "total_utf8_bytes": 7185
+      "total_utf8_bytes": 9643
     },
     {
       "block_count": 1,
       "block_digests": [
-        "cb6dac347c0cbdf77776f7f163622270af6efb6cc8e5652cb8a579152f885ca8"
+        "eadc14a1b11815cb153a0a24174f472ae173fc6feb8351c9313c3ead849c89e1"
       ],
       "book_id": "book-mm-10",
       "title": "3.6.\tRENAL DISEASE",
       "topic_id": "t-mm-10-017",
-      "total_utf8_bytes": 15919
+      "total_utf8_bytes": 20310
     },
     {
       "block_count": 1,
       "block_digests": [
-        "140cb8b052f7da1296cdb1b6507f3a41a1af446896adf7857afd2a1c794b92c4"
+        "577c499a72573c7275fed75bdcea731590324ec9e6315e7bbdfb98f7d8e96a69"
       ],
       "book_id": "book-mm-10",
       "title": "3.7.\tOBESITY",
       "topic_id": "t-mm-10-018",
-      "total_utf8_bytes": 9212
+      "total_utf8_bytes": 12467
     },
     {
       "block_count": 1,
       "block_digests": [
-        "02c5813e7dda9e1e132e0cd4fbf08db1e24e33359e8fb0552c9234de222c46ad"
+        "ff1723640fb5c71e2f5137803f9dae44413d7a769ad519da872cb65fbda4694a"
       ],
       "book_id": "book-mm-10",
       "title": "3.8.\tWOMAN WITH OBSTETRIC COMPLICATIONS OR NO ANTENATAL CARE",
       "topic_id": "t-mm-10-019",
-      "total_utf8_bytes": 22730
+      "total_utf8_bytes": 39053
     },
     {
       "block_count": 1,
       "block_digests": [
-        "d75a06163b9d4cccbc2cfe6a18e042c92de628f543819d395d1982e0f46186df"
+        "cee6cb9dc91766c6a0c8521c12b4b14c16c22e1ef5ffd98992ba5fddea0e89f5"
       ],
       "book_id": "book-mm-10",
       "title": "3.9.\tPYREXIA",
       "topic_id": "t-mm-10-020",
-      "total_utf8_bytes": 1368
+      "total_utf8_bytes": 1848
     },
     {
       "block_count": 1,
       "block_digests": [
-        "7d80fbf906ee306eac705fd57bc1156d813ab9e2896ca2671bf00c3c81d5af9e"
+        "c7582214999fa4cfbf65e91b78cd1298854dab605a7b00d89bbb015246cf1a4f"
       ],
       "book_id": "book-mm-10",
       "title": "3.10.\tSEPSIS",
       "topic_id": "t-mm-10-021",
-      "total_utf8_bytes": 14638
+      "total_utf8_bytes": 19748
     },
     {
       "block_count": 1,
       "block_digests": [
-        "0dc4c5d41e9eaf71940830f4d4afa6b639fe849e9bc740644caf6117e3556529"
+        "013469df0c005f62c1aa435c8962ed952e34a485e466765157ce2bffe9f3992e"
       ],
       "book_id": "book-mm-10",
       "title": "3.11.\tINTRA \u2013 PARTUM HAEMORRHAGE:",
       "topic_id": "t-mm-10-022",
-      "total_utf8_bytes": 11435
+      "total_utf8_bytes": 15240
     },
     {
       "block_count": 1,
       "block_digests": [
-        "d3a5e0617917281021b5235f03966798793160c8d73ee0a5e0fa3bc10b022899"
+        "578cacad04b7972ca92044ee89317847538e27c9106938e85cf4b39e6dbcbedf"
       ],
       "book_id": "book-mm-10",
       "title": "3.12.\tBREACH PRESENTATION IN LABOUR",
       "topic_id": "t-mm-10-023",
-      "total_utf8_bytes": 2199
+      "total_utf8_bytes": 3351
     },
     {
       "block_count": 1,
       "block_digests": [
-        "f8b49d54dbc5d06ba27c3a76081c31ca02d4b280ac85addf54f2208ae36aec7c"
+        "f4cbfa6798848c85d1e6413210fa6e976d859b292e1df336514b751c549e533d"
       ],
       "book_id": "book-mm-10",
       "title": "3.13.\tLARGE FOR GESTATIONAL AGE BABIES",
       "topic_id": "t-mm-10-024",
-      "total_utf8_bytes": 2276
+      "total_utf8_bytes": 3589
     },
     {
       "block_count": 1,
       "block_digests": [
-        "6ddbb7143dd9dd2d27b9efec30d8c5bcb7f0fa13dfd576eff49fa28051148919"
+        "1a100906333b800b130e729a4658cf78f137cabf86a272d80b2ba561e4d7ce5d"
       ],
       "book_id": "book-mm-10",
       "title": "3.14.\tWOMEN WITH NO ANTENATAL CARE",
       "topic_id": "t-mm-10-025",
-      "total_utf8_bytes": 10336
+      "total_utf8_bytes": 14703
     },
     {
       "block_count": 1,
       "block_digests": [
-        "26df8467f8eb232cc9214638fb7c1a526f6ad3aa0cfefb0b40d8d1a2c7d99efb"
+        "fe0137d2437bb5a6a89780c86d88b0be22c72ba6981de25a1719eb567911aa05"
       ],
       "book_id": "book-mm-10",
       "title": "3.15.  PREVIOUS C/S",
       "topic_id": "t-mm-10-026",
-      "total_utf8_bytes": 2907
+      "total_utf8_bytes": 4295
     },
     {
       "block_count": 1,
       "block_digests": [
-        "088ad9c2b3f11cdf478e51c2ce4ee504ab4b123832f8e839c1f141542b70d619"
+        "2e1215ab263b4128e4d16d659a05715b0ce96170282064d04231a0a6ced38e35"
       ],
       "book_id": "book-mm-10",
       "title": "3.16. LABOR AFTER 42 WEEKS OF PREGNANCY:",
       "topic_id": "t-mm-10-027",
-      "total_utf8_bytes": 1392
+      "total_utf8_bytes": 1984
     },
     {
       "block_count": 2,
       "block_digests": [
-        "34ffd7cd0ba53d8f68c110e653ecf478f2475e74c95411e62809012e35ca9ed8",
-        "24f0c6fe9e4b28427feae8cdbf2664cbddcbe1770d059128cbfbe678345532c4"
+        "4a8989cf75ea5a78ce221aeae194394e30b350fbe8dc1482b8f469f3bded9a40",
+        "3a5c09b9d97f4a98eeb5f53e74bc126e4b494a773e8f7b32cdf8bc2c7e59e09f"
       ],
       "book_id": "book-mm-10",
       "title": "4. FETAL MONITORING DURING LABOUR",
       "topic_id": "t-mm-10-028",
-      "total_utf8_bytes": 62431
+      "total_utf8_bytes": 81679
     },
     {
       "block_count": 1,
       "block_digests": [
-        "fc7ffdd2fe6ac032dbc0ed1581155c86111e215f3ea98d37a74009569b7dbe72"
+        "c25b13988e01f54cbaafd0360b305b7825c035ed71d2fc2c8cb367cf7d66fc16"
       ],
       "book_id": "book-mm-10",
       "title": "5. ECV",
       "topic_id": "t-mm-10-029",
-      "total_utf8_bytes": 21112
+      "total_utf8_bytes": 27674
     },
     {
       "block_count": 1,
       "block_digests": [
-        "676ccd01c8d93ccc122521aa315687e66769c33654af1295ab27e4d1086074a1"
+        "7671d149ed6e2d14051905dd5b6e28b94d2c8f26f1ac3f4814fe279917e2eec5"
       ],
       "book_id": "book-mm-10",
       "title": "6.BREECH PRESENTATION:",
       "topic_id": "t-mm-10-030",
-      "total_utf8_bytes": 22396
+      "total_utf8_bytes": 29603
     },
     {
       "block_count": 1,
       "block_digests": [
-        "9378430a867672c68fa3a11e50f9386641ef81c57f4e8fb99a6d10232904552e"
+        "a8b42ead80ccdf8cadf712fba2f48df2e63c8e9b2ca3fbeda031f4148f3c49f7"
       ],
       "book_id": "book-mm-10",
       "title": "7.PRE TERM LABOUR",
       "topic_id": "t-mm-10-031",
-      "total_utf8_bytes": 36146
+      "total_utf8_bytes": 43802
     },
     {
       "block_count": 1,
       "block_digests": [
-        "d74568aaf6cf483de4fdef675760307f377e107ae13cd7ba93c2de3ae58442a1"
+        "ba0ca16c403006d59f2cb2b5f167b9dd1c04e8c541d669514323c0d03b58e7ff"
       ],
       "book_id": "book-mm-10",
       "title": "8.PPROM",
       "topic_id": "t-mm-10-032",
-      "total_utf8_bytes": 18816
+      "total_utf8_bytes": 25387
     },
     {
-      "block_count": 1,
+      "block_count": 2,
       "block_digests": [
-        "08920b473f86dd961875c5b54cf014ec633be58d2cfde3b9a2e85c9db0711cf9"
+        "7c4795e9091d435dac995a924f2776ec3bb499aa6108a324310f7ac0081944d7",
+        "23872ef887db833b1e18312d74b55bd264ff5562fad5e3283855a671ca01e660"
       ],
       "book_id": "book-mm-10",
       "title": "9.VBAC",
       "topic_id": "t-mm-10-033",
-      "total_utf8_bytes": 46746
+      "total_utf8_bytes": 62491
     },
     {
       "block_count": 1,
       "block_digests": [
-        "005e536fe3c32842452ea03e1cf01ee94babd2dac86b2683575f876e29a9a332"
+        "7d8994ca1c905be99a2ce46282e2d42b9454ece0151b11162cc8bfedcafd8f1d"
       ],
       "book_id": "book-mm-10",
       "title": "10. SHOULDER DYSTOCIA (SD)",
       "topic_id": "t-mm-10-034",
-      "total_utf8_bytes": 27814
+      "total_utf8_bytes": 32997
     },
     {
       "block_count": 1,
       "block_digests": [
-        "f404bce64017608c51452ffeb60f12b87b16f658eb9477f1954010cc6a555d65"
+        "8241061d149b85f661606394591cd51055a5a193971605ef1b6601da73fae602"
       ],
       "book_id": "book-mm-10",
       "title": "11. CORD PROLAPSE",
       "topic_id": "t-mm-10-035",
-      "total_utf8_bytes": 24348
+      "total_utf8_bytes": 27395
     },
     {
-      "block_count": 2,
+      "block_count": 3,
       "block_digests": [
-        "4c5310fcdf468c4d0871c02a9c1d6a64208f2befef9e1ba509ea866b9d13df6a",
-        "eae1a5d4a5b3d13a42d1807d85029afb1036de78417e684f059986cad6ab0f6d"
+        "150abbb241bc7ad04cbc4bf72ec4a78a843d7ea10d5cbfe265f6dbc08a8c5dd8",
+        "09b3f5e0c9faaf27c9a10b2a26485cd77be8713e0fdccef0d4396cd8833283ff",
+        "21443307422e7fadaefec03fe565ad41c0235facb267efa3541ec8eccfc56977"
       ],
       "book_id": "book-mm-10",
       "title": "12. ASSISTED VAGINAL BIRTH (AVB):",
       "topic_id": "t-mm-10-036",
-      "total_utf8_bytes": 88391
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "da398dee9aa74cccd3d1ab8f9d02ed7d91dfdfcc07c171796655c8c3136f7143"
-      ],
-      "book_id": "book-mm-10",
-      "title": "13. INDUCTION OF LABOUR : IOL",
-      "topic_id": "t-mm-10-037",
-      "total_utf8_bytes": 49176
-    },
-    {
-      "block_count": 3,
-      "block_digests": [
-        "0832144c0ff173af5b669583fe45f94294832de0d7bdb418f143716ed39c8527",
-        "e5008666916799cdc0ea7b69e5870a1decc89da84c505e9a086775f6d21732ae",
-        "c853a0db6f81d0879b5f55dd7000b3c843db0928ae03e4606fdc48d5eab2c37e"
-      ],
-      "book_id": "book-mm-10",
-      "title": "14. MATERNAL COLLAPSE",
-      "topic_id": "t-mm-10-038",
-      "total_utf8_bytes": 84481
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "13f7ffa466be15330f61d8754395693040c53f6ee80da84cc04ea92153b20349"
-      ],
-      "book_id": "book-mm-10",
-      "title": "15.\tPERIMORTEM C/S",
-      "topic_id": "t-mm-10-039",
-      "total_utf8_bytes": 43709
+      "total_utf8_bytes": 103886
     },
     {
       "block_count": 2,
       "block_digests": [
-        "3e532a85d4df69e5ef31305215f53c4522e4b1b0bd2b98f3d4d1624f01948b6d",
-        "c015d0cfa54bd7ae374b9fe33ebc51c9e5021a2a11f0bdf587ea595fa00b7ed8"
+        "371e4d233a32b5535c260535a1f23e264b1807311aeb0ee21810a3e1666b2637",
+        "03b46ba1ff61afa4ffd0be421639e43d49ebd85a20e4924fdec5f31b2683df8a"
       ],
-      "book_id": "book-mm-11",
-      "title": "1.POST PARTUM HAEMORRHAGE; PPH",
-      "topic_id": "t-mm-11-001",
-      "total_utf8_bytes": 98012
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "03005d87be9ba561d5860566f2fcac3fac119f6a1710e0615c1e7b416ddc268a"
-      ],
-      "book_id": "book-mm-11",
-      "title": "2. 3RD AND 4TH DEGREE PERINEAL TEAR",
-      "topic_id": "t-mm-11-002",
-      "total_utf8_bytes": 27406
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "c6e2dcf6642ebfd4f5f0af5a5c7bb641d246519a2e94c8580d1b8569e891b849"
-      ],
-      "book_id": "book-mm-11",
-      "title": "3. VULVAL HAEMATOMA:",
-      "topic_id": "t-mm-11-003",
-      "total_utf8_bytes": 25876
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "a917155865a252708ee036817f22a9a9784eae7988bc8df08b6fef967f00f41f"
-      ],
-      "book_id": "book-mm-11",
-      "title": "4. POST PARTUM MASTITIS",
-      "topic_id": "t-mm-11-004",
-      "total_utf8_bytes": 13523
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "d35d8d4aafc9a2239313b5d617075c872d3b2e17565278600fe428e24f398044"
-      ],
-      "book_id": "book-mm-11",
-      "title": "5. POST PARTUM URINARY RETENTION: PUR",
-      "topic_id": "t-mm-11-005",
-      "total_utf8_bytes": 11773
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "b4bddf7da39810c83bc549e7f7915cd9603f1daff74dfee692cb22177f2f8435"
-      ],
-      "book_id": "book-mm-11",
-      "title": "6. MATERNAL MENTAL HEALTH",
-      "topic_id": "t-mm-11-006",
-      "total_utf8_bytes": 1002
-    },
-    {
-      "block_count": 1,
-      "block_digests": [
-        "ebb8f9ed1cb97e5442674aa73094fb31243965d5c5221006207d6b33516cde19"
-      ],
-      "book_id": "book-mm-11",
-      "title": "6.1.\tMENTAL HEALTH SCREENING",
-      "topic_id": "t-mm-11-007",
-      "total_utf8_bytes": 25145
+      "book_id": "book-mm-10",
+      "title": "13. INDUCTION OF LABOUR : IOL",
+      "topic_id": "t-mm-10-037",
+      "total_utf8_bytes": 62806
     },
     {
       "block_count": 3,
       "block_digests": [
-        "414b72d078ec0b82485b1b67ca141df1644b6b42915013bea749be8bf0368cfb",
-        "bd2f8aa8b8e58296276701035afeb3fa4d840596cb9b7865c22ba9170115462c",
-        "eac21cd32a0fff87aea738fa1be35caf7e135e33ad7b621fdab1f8b3d96bf9a7"
+        "71bccc9b376112b94b3d3b176057342226abb8d6594ff1ae50a7b8cc8e2ed380",
+        "46f89fb026f0d9c9cb39e4b0c107296abb719af2c4b7cea3f7b7301c91830c00",
+        "aabb1196486185523e8f3d10ef7a527e22ceb6286e0fe9d4ca2c2155d5d64b03"
+      ],
+      "book_id": "book-mm-10",
+      "title": "14. MATERNAL COLLAPSE",
+      "topic_id": "t-mm-10-038",
+      "total_utf8_bytes": 102040
+    },
+    {
+      "block_count": 2,
+      "block_digests": [
+        "da0abe9a64b32244786807d0c62c7f0ffa79706df2994f6df03306f0a5cdb336",
+        "8daefcf9d68d4ab85de5732ae6968b486277a93f25f80e21f47330de7255d4dd"
+      ],
+      "book_id": "book-mm-10",
+      "title": "15.\tPERIMORTEM C/S",
+      "topic_id": "t-mm-10-039",
+      "total_utf8_bytes": 53310
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "e0ff88c8497d7455322019068d09f6ce71dde906a40c7ebfd25de2d79b34066f",
+        "8b32f76194fd853d92f06e0d7c8c2164e25ed0be79eaef50a7eb2ee70cfa8277",
+        "0ceb1de6edbde2774e1500eecc6216952a1eab6d96f825c7b29800ef1fcef034"
+      ],
+      "book_id": "book-mm-11",
+      "title": "1.POST PARTUM HAEMORRHAGE; PPH",
+      "topic_id": "t-mm-11-001",
+      "total_utf8_bytes": 119333
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "785a921d3a68c905d3c9d47c508052257878dcf7991e386c5ee2ad3395c7b2e2"
+      ],
+      "book_id": "book-mm-11",
+      "title": "2. 3RD AND 4TH DEGREE PERINEAL TEAR",
+      "topic_id": "t-mm-11-002",
+      "total_utf8_bytes": 34934
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "150c2a814632d2327a5c9fcad0c33ac3f1cf623430bdb5585bc4f71e60f122cf"
+      ],
+      "book_id": "book-mm-11",
+      "title": "3. VULVAL HAEMATOMA:",
+      "topic_id": "t-mm-11-003",
+      "total_utf8_bytes": 33474
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4946b0cd57b292e1a437104202e763869930b79c66f84d90bc1d0afa34090b3d"
+      ],
+      "book_id": "book-mm-11",
+      "title": "4. POST PARTUM MASTITIS",
+      "topic_id": "t-mm-11-004",
+      "total_utf8_bytes": 18621
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4cf1de35ff9b2f1ebb86095e0bd8c507ba025800fb27b2ccdcaba2225eb986bd"
+      ],
+      "book_id": "book-mm-11",
+      "title": "5. POST PARTUM URINARY RETENTION: PUR",
+      "topic_id": "t-mm-11-005",
+      "total_utf8_bytes": 13761
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "c7a07bf1a5efe282a04ab586a459ac94880fa35b8f2a9c4fe78d6d119ab5c4ea"
+      ],
+      "book_id": "book-mm-11",
+      "title": "6. MATERNAL MENTAL HEALTH",
+      "topic_id": "t-mm-11-006",
+      "total_utf8_bytes": 1283
+    },
+    {
+      "block_count": 1,
+      "block_digests": [
+        "4d5291795059033533baa018a6e34c62636c612eb9021b0e191c6be0f147a457"
+      ],
+      "book_id": "book-mm-11",
+      "title": "6.1.\tMENTAL HEALTH SCREENING",
+      "topic_id": "t-mm-11-007",
+      "total_utf8_bytes": 33710
+    },
+    {
+      "block_count": 3,
+      "block_digests": [
+        "9fe771dcdef0ba0b00bf7bcc9d303bee19caec140096e6e74149463c5b4e8235",
+        "3e2c9d42d56e5e89b57ddc6ed3ccfbc7f3b7c368515bfbcffc8a4b10cd11c50e",
+        "ad00fe1106466af96ac78d3a6a2430fae8f743a44a916fe0e181f8be576b7ecb"
       ],
       "book_id": "book-mm-11",
       "title": "6.2.\tPERINATAL MENTAL HEALTH SERVICES",
       "topic_id": "t-mm-11-008",
-      "total_utf8_bytes": 139200
+      "total_utf8_bytes": 148085
     },
     {
       "block_count": 1,
       "block_digests": [
-        "a2f486bbe1289c5de00ef2b7713d1640d109b1c292035e88f1c70404b598bd02"
+        "3e227f65ed7cd9354143ea3065514dc2dfdff87586d95c80261ad3b60a3c861d"
       ],
       "book_id": "book-mm-11",
       "title": "6.3.\tBABY BLUES",
       "topic_id": "t-mm-11-009",
-      "total_utf8_bytes": 5371
+      "total_utf8_bytes": 7612
     },
     {
-      "block_count": 1,
+      "block_count": 2,
       "block_digests": [
-        "8d340f34029100f6e17d8b133bc46bd82cb3fd8dcc568d33858c674ca6bf57fa"
+        "be9eebe99a9ebcbdc99392b425ad3c964fe6aff40a8fcf7832f482822b8dc728",
+        "11b90dab588d0a60cfc692016d159402bd91aefc48ecc964c67b1538957660e4"
       ],
       "book_id": "book-mm-11",
       "title": "6.4.\tDEPRESSION",
       "topic_id": "t-mm-11-010",
-      "total_utf8_bytes": 38765
+      "total_utf8_bytes": 51792
     },
     {
       "block_count": 1,
       "block_digests": [
-        "84e4d793b958c5a44d2877c4d2e79d9d18bcccda304bb113eb21fcbfefdf11ac"
+        "ee6b43cf2921858681713203a6bd48669699c4f113d0701679bd88b1e115845a"
       ],
       "book_id": "book-mm-11",
       "title": "6.5.\tANXIETY",
       "topic_id": "t-mm-11-011",
-      "total_utf8_bytes": 30480
+      "total_utf8_bytes": 39864
     },
     {
       "block_count": 1,
       "block_digests": [
-        "843864765af73b8a62e56d38002fc5cda52e2902c48faa535ce4df62cf2961e1"
+        "fc8ba9846c6f8e82df1474e8f9f6d93e3246b95197d1955bf1a3a8bfa0c07905"
       ],
       "book_id": "book-mm-11",
       "title": "6.6.\tPSYCHOSIS",
       "topic_id": "t-mm-11-012",
-      "total_utf8_bytes": 34705
+      "total_utf8_bytes": 45182
     },
     {
       "block_count": 1,
       "block_digests": [
-        "d901a2dfd94916f1d56d34d58e5dfced3bf171a157a3d29b5f38b98a115b078a"
+        "e231b3493c6277d747c9532190d5a1a191876d3b9a06180d952fb115449ce5a9"
       ],
       "book_id": "book-mm-11",
       "title": "6.7 PSYCHOTROPIC DRUGS AND THEIR EFFECTS ON PREGNANCY AND LACTATION",
       "topic_id": "t-mm-11-013",
-      "total_utf8_bytes": 8755
+      "total_utf8_bytes": 10951
     },
     {
       "block_count": 1,
       "block_digests": [
-        "cad0ae9519c2ad9d65acad65ee9ff22be90825ecfe8534487e00d1b774d61b92"
+        "32f759e9b2ecf9f71ec8e203151dc449a04d544a8c01b825357dc36510cac40b"
       ],
       "book_id": "book-mm-11",
       "title": "6.8. EATING DISORDERS:",
       "topic_id": "t-mm-11-014",
-      "total_utf8_bytes": 3425
+      "total_utf8_bytes": 4742
     },
     {
       "block_count": 1,
       "block_digests": [
-        "4f788bf5cd086d6fe7cc9b5bc4f0933e609451747a3e6c66582ace384aca21f7"
+        "d3fe9171080f3252f4383d3899efbee4f1796f059694659ee9ee2d555316b329"
       ],
       "book_id": "book-mm-11",
       "title": "6.9. SLEEP PROBLEMS",
       "topic_id": "t-mm-11-015",
-      "total_utf8_bytes": 2063
+      "total_utf8_bytes": 2469
     },
     {
       "block_count": 1,
       "block_digests": [
-        "a68c2a6c7412acbece5558728f2353d9266fb8f5f99112aad8850a2dd034baf5"
+        "b530d2afea2f1af5bf3771bbf30c83f7c0dde3100c552207dbddde0c3f3d2d32"
       ],
       "book_id": "book-mm-11",
       "title": "6.10.\tDRUG MISUSE:",
       "topic_id": "t-mm-11-016",
-      "total_utf8_bytes": 3588
+      "total_utf8_bytes": 5032
     },
     {
       "block_count": 1,
       "block_digests": [
-        "1398016791043e56610874a914e53129de2072f15a9d9a2cd102b8be520d77b9"
+        "f94850f6407bf06cbcea223c0f356ad9324762332968cc1ee1504e3287accbc8"
       ],
       "book_id": "book-mm-11",
       "title": "7.\tPOST PARTUM CONTRACEPTION",
       "topic_id": "t-mm-11-017",
-      "total_utf8_bytes": 8243
+      "total_utf8_bytes": 11511
     },
     {
       "block_count": 1,
       "block_digests": [
-        "176033bad369a967bc5b540dcb35172d34e2971e908f140656da25d7b0e2d267"
+        "8e9221fbce14cb4061b0359db8d39056d9118f96d0139ef1487fdc85adfd89b7"
       ],
       "book_id": "book-mm-11",
       "title": "8.\tMATERNAL MORTALITY",
       "topic_id": "t-mm-11-018",
-      "total_utf8_bytes": 11947
+      "total_utf8_bytes": 13302
     },
     {
       "block_count": 1,
       "block_digests": [
-        "dd95f9f41a047832a2d3d9094a376ecf2a1a3f6a8170231a3ffc341ad510106c"
+        "5b96774d6ec20f7d2c6d809f8199893f8b8abf8c9217826cabe755c463e6adb5"
       ],
       "book_id": "book-mm-11",
       "title": "9.\tMBRRACE 2024:",
       "topic_id": "t-mm-11-019",
-      "total_utf8_bytes": 36902
+      "total_utf8_bytes": 48425
     },
     {
       "block_count": 1,
       "block_digests": [
-        "7afb341a32f16351dfaab6b933b5f81cd874fd0863845e7f99902430c75beeda"
+        "290b5a1f5c837a2449ceedddfaf97bad437cc97063ad2fdf7fc86c20d6fd8c2d"
       ],
       "book_id": "book-mm-12",
       "title": "2. INDUCTION INTERVIEW /APPRAISAL",
       "topic_id": "t-mm-12-001",
-      "total_utf8_bytes": 8499
+      "total_utf8_bytes": 12729
     },
     {
       "block_count": 1,
       "block_digests": [
-        "3746da05e8fd482e73dd4950ecc0dfdde2c18b96a4d969a2c10c3141faa60c78"
+        "284ff9639282282f6cb2adf35ae0130ba2d6c36359ac86401d1a021cd9a06292"
       ],
       "book_id": "book-mm-12",
       "title": "3.WORK BASE ASSESSMENT TOOL",
       "topic_id": "t-mm-12-002",
-      "total_utf8_bytes": 17255
+      "total_utf8_bytes": 22591
     },
     {
       "block_count": 1,
       "block_digests": [
-        "fa5f8b47ba2b5f6bfc1d225880cf93e0744f33e6e22a8ffa816c0c42fbcaa27b"
+        "afca4026ef63b6965bd92b5ef5bffb2218c552a4d18b121c761cff46d55ed502"
       ],
       "book_id": "book-mm-12",
       "title": "4. ARCP",
       "topic_id": "t-mm-12-003",
-      "total_utf8_bytes": 7343
+      "total_utf8_bytes": 9182
     },
     {
       "block_count": 1,
       "block_digests": [
-        "b820da816fb0e27513bb7657cbab6c6494a8d998c1274bd702a8432612f221fe"
+        "b2910a16513210a6768e588e7f7eeecc18ad1b612e746763e351ec8c825e43c9"
       ],
       "book_id": "book-mm-12",
       "title": "5.\tAPPRAISAL AND REVALIDATION",
       "topic_id": "t-mm-12-004",
-      "total_utf8_bytes": 13996
+      "total_utf8_bytes": 17541
     },
     {
       "block_count": 1,
       "block_digests": [
-        "bb8e1be83182ce0bf2396506f895759dc00fd031f5fb1604e5b949ffbf3c95c5"
+        "5e4e8b0c11770689c3cf8d78e6dd9bc960b60bc5fd729c8e1a6ef22dba285609"
       ],
       "book_id": "book-mm-12",
       "title": "6.\tREFLECTION",
       "topic_id": "t-mm-12-005",
-      "total_utf8_bytes": 18928
+      "total_utf8_bytes": 21494
     },
     {
       "block_count": 1,
       "block_digests": [
-        "ce867b5826520e0a6f2a152bb2b81efedce463746076fa47c4d05b18e37adead"
+        "59a033ffdc0e1be6ef46ffd5324fdf5d805b9cfcdaefde9782ff700d0f6e1462"
       ],
       "book_id": "book-mm-13",
       "title": "1. WHAT IS CLINICAL GOVERNANCE?",
       "topic_id": "t-mm-13-001",
-      "total_utf8_bytes": 3840
+      "total_utf8_bytes": 5244
     },
     {
       "block_count": 1,
       "block_digests": [
-        "09dd735570d85f027c76de278531bcfc474b27cd9f0c321b07eedb10b245b704"
+        "b80f529c37024c36e9e3bb3449b26ae48ee3d0fa8d7f88362697fdc60307423a"
       ],
       "book_id": "book-mm-13",
       "title": "2. CLINICAL EFFECTIVENESS",
       "topic_id": "t-mm-13-002",
-      "total_utf8_bytes": 9756
+      "total_utf8_bytes": 12193
     },
     {
       "block_count": 1,
       "block_digests": [
-        "a13c5d476ae3831a06bd90f9e5100f2fadd368e80cba2fe5c44340b85d303184"
+        "2051318c160dbe957544a211894e4674bddc04cc03eecba8fd6b7c3b86599cdb"
       ],
       "book_id": "book-mm-13",
       "title": "3. CLINICAL AUDIT",
       "topic_id": "t-mm-13-003",
-      "total_utf8_bytes": 7697
+      "total_utf8_bytes": 8928
     },
     {
       "block_count": 1,
       "block_digests": [
-        "a0e5122c1ee4eb335756700e225a9482693164e5a202742985b6d15b7159c209"
+        "5e91e084ae29fed2a02d7d71c8627c61e96a2a1cf1c2cef55299c3a6b4d94d33"
       ],
       "book_id": "book-mm-13",
       "title": "4. RISK MANAGEMENT:",
       "topic_id": "t-mm-13-004",
-      "total_utf8_bytes": 17410
+      "total_utf8_bytes": 20976
     },
     {
       "block_count": 1,
       "block_digests": [
-        "dfccc8dc689a53959d20bdc9aa91ebf9fe7a8bfbcf92cbb84a482a2eaab5b1b9"
+        "3ee8074364c159077ff6ca1fb6d84aafe733dfb56d286a2387c5dcd59d2cdfd1"
       ],
       "book_id": "book-mm-13",
       "title": "5. PATIENT AND PUBLIC INVOLVEMENT",
       "topic_id": "t-mm-13-005",
-      "total_utf8_bytes": 10942
+      "total_utf8_bytes": 14537
     },
     {
       "block_count": 1,
       "block_digests": [
-        "06f142afb3fccc24b491c6dab43b5ff772d0eb6af417ce65b7ed54d210340bf9"
+        "6c4179cb72a42f272b37b7c6c83b6eaf0cee9c5ff971e428b035310855626c99"
       ],
       "book_id": "book-mm-13",
       "title": "6. MATERNITY DASHBOARD:",
       "topic_id": "t-mm-13-006",
-      "total_utf8_bytes": 10026
+      "total_utf8_bytes": 11448
     }
   ],
-  "total_block_count": 352,
+  "total_block_count": 401,
   "total_media_count": 162
 }

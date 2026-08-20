@@ -112,6 +112,37 @@ export function ResponsiveBookDocument({
       .mm-list li {
         margin-bottom: 0.35em;
       }
+      .mm-header-banner {
+        display: block;
+        background-color: #2F5496;
+        color: #FFFFFF !important;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-weight: 700;
+        margin-top: 1.2em;
+        margin-bottom: 0.8em;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .mm-header-banner * {
+        color: #FFFFFF !important;
+      }
+      .mm-list-item {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 0.4em;
+        line-height: 1.5;
+      }
+      .mm-list-marker {
+        display: inline-block;
+        min-width: 1.5em;
+        margin-right: 0.5em;
+        font-weight: 600;
+        flex-shrink: 0;
+        color: var(--mm-text);
+      }
+      .mm-list-body {
+        flex: 1;
+      }
       .mm-release-marker {
         display: none !important;
       }

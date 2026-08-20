@@ -139,6 +139,7 @@ class NumberingResolver:
         self.package = package
         self._style_resolver = StyleResolver(package)
         self._definitions = self._read_numbering()
+        self._counters: Dict[Tuple[str, int], int] = {}
 
     def resolve_paragraph(
         self, paragraph: etree._Element
@@ -164,6 +165,24 @@ class NumberingResolver:
         formats: List[Optional[str]] = [None] * 9
         for level_number, candidate in definition.levels.items():
             formats[level_number] = candidate.number_format
+
+        display_marker = selected.display_level_text
+        if selected.number_format != "bullet":
+            prev_val = self._counters.get((num_id, level), selected.start - 1)
+            curr_val = prev_val + 1
+            self._counters[(num_id, level)] = curr_val
+            for lvl_idx in range(level + 1, 9):
+                self._counters.pop((num_id, lvl_idx), None)
+            try:
+                display_marker = _expand_marker(
+                    selected,
+                    curr_val,
+                    self._counters,
+                    self.package.source_path(paragraph),
+                )
+            except Exception:
+                display_marker = f"{curr_val}."
+
         return ResolvedNumberingLevel(
             num_id=num_id,
             level=level,
@@ -176,7 +195,7 @@ class NumberingResolver:
             restart_after_level=selected.restart_after_level,
             level_formats=tuple(formats),
             legal_numbering=selected.legal_numbering,
-            display_level_text=selected.display_level_text,
+            display_level_text=display_marker,
             marker_fonts=selected.marker_fonts,
             marker_font=selected.marker_font,
         )
