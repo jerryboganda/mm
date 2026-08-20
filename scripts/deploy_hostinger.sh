@@ -8,6 +8,14 @@ PUBLIC_ROOT="$DOMAIN_ROOT/public_html"
 mkdir -p "$NODE_ROOT" "$PUBLIC_ROOT"
 cd "$NODE_ROOT"
 
+APP_ROOT=$(pwd -P)
+VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
+RAW_NODE="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
+NODE_PATH=$(readlink -f "$RAW_NODE" 2>/dev/null || echo "$RAW_NODE")
+
+echo "Canonical App Root: $APP_ROOT"
+echo "Canonical Node binary: $NODE_PATH"
+
 cat << 'EOF' > .env
 NODE_ENV=production
 DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@localhost:3306/u776151780_maternalmind
@@ -22,7 +30,7 @@ fi
 
 if [ -f "scripts/apply-book-content-release.mjs" ]; then
   echo "Applying authoritative book content release..."
-  node scripts/apply-book-content-release.mjs || true
+  "$NODE_PATH" scripts/apply-book-content-release.mjs || true
 fi
 
 echo "Organizing single-slot static frontends..."
@@ -42,14 +50,6 @@ if [ -d "$NODE_ROOT/web_dist" ]; then
   mkdir -p "$PUBLIC_ROOT/app"
   cp -rf "$NODE_ROOT/web_dist/"* "$PUBLIC_ROOT/app/"
 fi
-
-APP_ROOT=$(pwd -P)
-VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
-RAW_NODE="${VENV_NODE:-$(which node 2>/dev/null || echo "/usr/bin/node")}"
-NODE_PATH=$(readlink -f "$RAW_NODE" 2>/dev/null || echo "$RAW_NODE")
-
-echo "Canonical App Root: $APP_ROOT"
-echo "Canonical Node binary: $NODE_PATH"
 
 echo "Creating Hostinger Phusion Passenger app.js entrypoint..."
 cat << 'EOF' > app.js
@@ -128,9 +128,11 @@ EOF
 
 echo "Setting directory and file permissions for Hostinger LiteSpeed..."
 chmod 755 "$NODE_ROOT" "$PUBLIC_ROOT"
-find "$NODE_ROOT" "$PUBLIC_ROOT" -type d -exec chmod 755 {} +
-find "$NODE_ROOT" "$PUBLIC_ROOT" -type f -exec chmod 644 {} +
-chmod 644 "$PUBLIC_ROOT/.htaccess"
+find "$PUBLIC_ROOT" -type d -exec chmod 755 {} + 2>/dev/null || true
+find "$PUBLIC_ROOT" -type f -exec chmod 644 {} + 2>/dev/null || true
+find "$NODE_ROOT/server_dist" "$NODE_ROOT/scripts" "$NODE_ROOT/content" "$NODE_ROOT/uploads" -type d -exec chmod 755 {} + 2>/dev/null || true
+find "$NODE_ROOT/server_dist" "$NODE_ROOT/scripts" "$NODE_ROOT/content" "$NODE_ROOT/uploads" -type f -exec chmod 644 {} + 2>/dev/null || true
+chmod 644 "$PUBLIC_ROOT/.htaccess" 2>/dev/null || true
 
 echo "Contents of .htaccess:"
 cat "$PUBLIC_ROOT/.htaccess"
