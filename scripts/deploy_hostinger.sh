@@ -31,7 +31,7 @@ echo "Canonical Node binary: $NODE_PATH"
 
 cat << 'EOF' > .env
 NODE_ENV=production
-DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@localhost:3306/u776151780_maternalmind
+DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_maternalmind
 SESSION_SECRET=64H28SmybRTDp7iqXuv3UVJ1hsrt9KMxYZ5kNzLBWOlwcjno0CQgeIAfaPdEFG
 ALLOWED_ORIGIN=https://maternalmind.com.pk
 EOF
