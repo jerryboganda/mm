@@ -179,6 +179,8 @@ ALLOWED_ATTRIBUTES: Set[str] = {
     "shape-rendering",
     "text-rendering",
     "image-rendering",
+    "text-decoration",
+    "xml:space",
 }
 
 FORBIDDEN_TAGS: Set[str] = {

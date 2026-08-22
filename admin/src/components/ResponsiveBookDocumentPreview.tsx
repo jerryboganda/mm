@@ -124,12 +124,59 @@ export default function ResponsiveBookDocumentPreview({
         text-align: center;
         width: 100%;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+        padding: 8px 0;
       }
       .mm-preview-root .mm-figure svg {
         max-width: 100%;
+        min-width: 650px;
         height: auto;
-        display: block;
+        display: inline-block;
         margin: 0 auto;
+      }
+      ${
+        isDark
+          ? `
+        .mm-preview-root .mm-figure path[fill="#FFFFFF"],
+        .mm-preview-root .mm-figure path[fill="#ffffff"] {
+          fill: #1E293B !important;
+          stroke: #475569 !important;
+        }
+        .mm-preview-root .mm-figure path[fill="#DAE3F3"],
+        .mm-preview-root .mm-figure path[fill="#dae3f3"] {
+          fill: #1E3A8A !important;
+          stroke: #60A5FA !important;
+        }
+        .mm-preview-root .mm-figure rect[fill="#9CC2E5"],
+        .mm-preview-root .mm-figure rect[fill="#9cc2e5"] {
+          fill: #334155 !important;
+        }
+        .mm-preview-root .mm-figure line[stroke="#000000"],
+        .mm-preview-root .mm-figure line[stroke="#000"],
+        .mm-preview-root .mm-figure path[stroke="#000000"],
+        .mm-preview-root .mm-figure path[stroke="#000"] {
+          stroke: #94A3B8 !important;
+        }
+        .mm-preview-root .mm-figure text,
+        .mm-preview-root .mm-figure tspan {
+          fill: ${textColor} !important;
+        }
+        .mm-preview-root .mm-figure tspan[fill="#FF0000"],
+        .mm-preview-root .mm-figure tspan[fill="#ff0000"] {
+          fill: #F87171 !important;
+        }
+      `
+          : `
+        .mm-preview-root .mm-figure text,
+        .mm-preview-root .mm-figure tspan {
+          fill: #0F172A !important;
+        }
+        .mm-preview-root .mm-figure tspan[fill="#FF0000"],
+        .mm-preview-root .mm-figure tspan[fill="#ff0000"] {
+          fill: #DC2626 !important;
+        }
+      `
       }
       .mm-preview-root .mm-link {
         color: #4F46E5;

@@ -194,9 +194,29 @@ class TopicHtmlRenderer:
 
         table_renderer_fn = self.drawing_compiler.table_renderer(topic_id)
 
+        figures = self.drawing_compiler.figures(topic_id)
+        figures_by_host = {f.source_path: f for f in figures}
+
         for node in topic.nodes:
             if node.kind == "paragraph":
-                blocks.append(_render_paragraph(node))
+                figure = figures_by_host.get(node.source_path)
+                if figure:
+                    direct_events = [
+                        e for e in node.text_events
+                        if "wsp" not in e.source_path and "txbx" not in e.source_path and "drawing" not in e.source_path
+                    ]
+                    if direct_events and any(e.value.strip() for e in direct_events):
+                        node_without_drawings = DocumentNode(
+                            kind="paragraph",
+                            source_path=node.source_path,
+                            text_events=tuple(direct_events),
+                            paragraph_style=node.paragraph_style,
+                            numbering=node.numbering,
+                        )
+                        blocks.append(_render_paragraph(node_without_drawings))
+                    blocks.append(self.drawing_compiler.render_figure(figure))
+                else:
+                    blocks.append(_render_paragraph(node))
             elif node.kind == "table":
                 parsed_table = self.parsed_tables.get(node.source_path)
                 if parsed_table:
@@ -209,7 +229,6 @@ class TopicHtmlRenderer:
                 if figure:
                     blocks.append(self.drawing_compiler.render_figure(figure))
                 else:
-                    figures = self.drawing_compiler.figures(topic_id)
                     matched = next((f for f in figures if any(obj.source_path == node.source_path for obj in f.objects)), None)
                     if matched:
                         blocks.append(self.drawing_compiler.render_figure(matched))
