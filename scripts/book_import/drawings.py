@@ -1405,14 +1405,14 @@ def _render_textbox_paragraph(
         elif anchor == "end":
             text_x += max(line_width - first_indent, 0)
         attributes = [
-            f'x="{_n(text_x)}"',
-            f'y="{_n(baseline)}"',
+            f'x="{_n(text_x / 12700)}"',
+            f'y="{_n(baseline / 12700)}"',
             f'text-anchor="{anchor}"',
         ]
-        attributes.extend(_svg_run_style_attributes(first_style, default_font_size))
+        attributes.extend(_svg_run_style_attributes(first_style, default_font_size / 12700))
         return (
-            f'<text {" ".join(attributes)} xml:space="preserve">'
-            f'{escape(text, quote=False)}</text>',
+            f'<g transform="scale(12700)"><text {" ".join(attributes)} xml:space="preserve">'
+            f'{escape(text, quote=False)}</text></g>',
             default_font_size,
         )
 
@@ -1434,14 +1434,14 @@ def _render_textbox_paragraph(
         elif anchor == "end":
             text_x += effective_width
         tspans = "".join(
-            f'<tspan {" ".join(_svg_run_style_attributes(run_style, default_font_size))}>'
+            f'<tspan {" ".join(_svg_run_style_attributes(run_style, default_font_size / 12700))}>'
             f'{escape(value, quote=False)}</tspan>'
             for run_style, value in line
         )
         markup.append(
-            f'<text data-mm-wrapped-line="{line_index}" x="{_n(text_x)}" '
-            f'y="{_n(cursor_y)}" text-anchor="{anchor}" xml:space="preserve">'
-            f"{tspans}</text>"
+            f'<g transform="scale(12700)"><text data-mm-wrapped-line="{line_index}" x="{_n(text_x / 12700)}" '
+            f'y="{_n(cursor_y / 12700)}" text-anchor="{anchor}" xml:space="preserve">'
+            f"{tspans}</text></g>"
         )
         cursor_y += line_height - line_font_size
     return "".join(markup), max(cursor_y - y, default_font_size)
@@ -1788,7 +1788,7 @@ def _render_svg_event_runs(
                 first_on_line = True
             if not fragment and fragment_index < len(fragments) - 1:
                 continue
-            attributes = _svg_run_style_attributes(style, default_font_size)
+            attributes = _svg_run_style_attributes(style, default_font_size / 12700)
             if table_event_provenance:
                 attributes.extend(
                     (
@@ -1798,23 +1798,23 @@ def _render_svg_event_runs(
                 )
             if first_on_line:
                 attributes.extend(
-                    (f'x="{_n(x)}"', f'dy="{_n(0 if line_index == 0 else default_font_size * 1.15)}"')
+                    (f'x="{_n(x / 12700)}"', f'dy="{_n((0 if line_index == 0 else default_font_size * 1.15) / 12700)}"')
                 )
                 first_on_line = False
             tspans.append(
                 f'<tspan {" ".join(attributes)}>{escape(fragment, quote=False)}</tspan>'
             )
     return (
-        f'<text x="{_n(x)}" y="{_n(y)}" text-anchor="{anchor}" '
-        f'xml:space="preserve">{"".join(tspans)}</text>'
+        f'<g transform="scale(12700)"><text x="{_n(x / 12700)}" y="{_n(y / 12700)}" text-anchor="{anchor}" '
+        f'xml:space="preserve">{"".join(tspans)}</text></g>'
     )
 
 
 def _svg_run_style_attributes(
-    style: Optional[RunStyle], default_font_size: int
+    style: Optional[RunStyle], default_font_size: float
 ) -> List[str]:
     font_size = (
-        round(style.font_size_half_points / 2 * 12700)
+        round(style.font_size_half_points / 2)
         if style is not None and style.font_size_half_points
         else default_font_size
     )
