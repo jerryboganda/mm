@@ -191,7 +191,12 @@ class DrawingCompiler:
         self.media_hrefs = dict(media_hrefs or {})
         extraction = extract_events(package)
         self._events = extraction.visible_events
-        self._event_paths = [event.source_path for event in self._events]
+        self._events_by_paragraph: DefaultDict[str, List[TextEvent]] = defaultdict(list)
+        for event in self._events:
+            match = list(re.finditer(r'/w:p\[\d+\]', event.source_path))
+            if match:
+                para_path = event.source_path[:match[-1].end()]
+                self._events_by_paragraph[para_path].append(event)
         self._styles = StyleResolver(package)
         self._text_tables_by_path = {
             table.source_path: table for table in parse_tables(package)
@@ -395,12 +400,7 @@ class DrawingCompiler:
         paragraphs = []
         for paragraph in shape.findall(f".//{{{W}}}txbxContent/{{{W}}}p"):
             paragraph_path = self.package.source_path(paragraph)
-            start = bisect.bisect_left(self._event_paths, paragraph_path)
-            end = bisect.bisect_left(self._event_paths, paragraph_path + "0")
-            paragraph_events = tuple(
-                event for event in self._events[start:end]
-                if event.source_path == paragraph_path or event.source_path.startswith(paragraph_path + "/")
-            )
+            paragraph_events = tuple(self._events_by_paragraph.get(paragraph_path, ()))
             paragraphs.append(
                 DrawingTextParagraph(
                     paragraph_path,
@@ -1825,10 +1825,10 @@ def _svg_run_style_attributes(
         result.append('font-weight="700"')
     if style.italic:
         result.append('font-style="italic"')
-    if style.font_family:
-        result.append(f'font-family="{escape(style.font_family, quote=True)}"')
-    if style.color and style.color != "auto":
-        result.append(f'fill="{style.color}"')
+    if style.color and style.color.upper() != "AUTO":
+        clean_color = style.color.upper().lstrip("#")
+        if clean_color not in ("000000", "000", "BLACK", "AUTO", "DEFAULT", "WINDOWTEXT"):
+            result.append(f'fill="#{clean_color}"')
     if style.underline:
         result.append('text-decoration="underline"')
     if style.strike:

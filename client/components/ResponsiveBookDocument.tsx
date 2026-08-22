@@ -141,12 +141,59 @@ export function ResponsiveBookDocument({
         text-align: center;
         width: 100%;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+        padding: 8px 0;
       }
       .mm-figure svg {
         max-width: 100%;
+        min-width: 650px;
         height: auto;
-        display: block;
+        display: inline-block;
         margin: 0 auto;
+      }
+      ${
+        isDark
+          ? `
+        .mm-figure path[fill="#FFFFFF"],
+        .mm-figure path[fill="#ffffff"] {
+          fill: #1E293B !important;
+          stroke: #475569 !important;
+        }
+        .mm-figure path[fill="#DAE3F3"],
+        .mm-figure path[fill="#dae3f3"] {
+          fill: #1E3A8A !important;
+          stroke: #60A5FA !important;
+        }
+        .mm-figure rect[fill="#9CC2E5"],
+        .mm-figure rect[fill="#9cc2e5"] {
+          fill: #334155 !important;
+        }
+        .mm-figure line[stroke="#000000"],
+        .mm-figure line[stroke="#000"],
+        .mm-figure path[stroke="#000000"],
+        .mm-figure path[stroke="#000"] {
+          stroke: #94A3B8 !important;
+        }
+        .mm-figure text,
+        .mm-figure tspan {
+          fill: var(--mm-text) !important;
+        }
+        .mm-figure tspan[fill="#FF0000"],
+        .mm-figure tspan[fill="#ff0000"] {
+          fill: #F87171 !important;
+        }
+      `
+          : `
+        .mm-figure text,
+        .mm-figure tspan {
+          fill: #0F172A !important;
+        }
+        .mm-figure tspan[fill="#FF0000"],
+        .mm-figure tspan[fill="#ff0000"] {
+          fill: #DC2626 !important;
+        }
+      `
       }
       .mm-link {
         color: var(--mm-link);
