@@ -139,7 +139,9 @@ export default function ResponsiveBookDocumentPreview({
         isDark
           ? `
         .mm-preview-root .mm-figure path[fill="#FFFFFF"],
-        .mm-preview-root .mm-figure path[fill="#ffffff"] {
+        .mm-preview-root .mm-figure path[fill="#ffffff"],
+        .mm-preview-root .mm-figure rect[fill="#FFFFFF"],
+        .mm-preview-root .mm-figure rect[fill="#ffffff"] {
           fill: #1E293B !important;
           stroke: #475569 !important;
         }
