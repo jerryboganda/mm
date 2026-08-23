@@ -67,7 +67,7 @@
       "topic_count": 6
     }
   ],
-  "compiled_at": "2026-08-23T00:13:34.467629+00:00",
+  "compiled_at": "2026-08-23T13:11:32.025782+00:00",
   "compiler_version": "1.0.0",
   "media": [
     {
@@ -1823,12 +1823,12 @@
       "block_count": 2,
       "block_digests": [
         "1501ee36d609aeb4ca65e3f39428175eba4ed1c04c70c074a1991306dda7ed02",
-        "e899b2fabc8cc967017c0c2051312ad665d1637e6e014c36c60964cd57395727"
+        "6ea7a45ca6039ef993e320b43794d8b8aece01f561aee2eccb9a871afa5509d2"
       ],
       "book_id": "book-mm-01",
       "title": "13. PRIMARY AMENORRHEA:",
       "topic_id": "t-mm-01-013",
-      "total_utf8_bytes": 55586
+      "total_utf8_bytes": 55544
     },
     {
       "block_count": 1,
