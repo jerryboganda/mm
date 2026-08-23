@@ -156,7 +156,9 @@ export function ResponsiveBookDocument({
         isDark
           ? `
         .mm-figure path[fill="#FFFFFF"],
-        .mm-figure path[fill="#ffffff"] {
+        .mm-figure path[fill="#ffffff"],
+        .mm-figure rect[fill="#FFFFFF"],
+        .mm-figure rect[fill="#ffffff"] {
           fill: #1E293B !important;
           stroke: #475569 !important;
         }

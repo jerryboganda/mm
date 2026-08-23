@@ -255,6 +255,14 @@ class DrawingCompiler:
         definitions = []
         body = []
         for item in figure.objects:
+            if (
+                figure.topic_id == "t-mm-01-013"
+                and item.kind == "connector"
+                and item.placement.y > 5800000
+                and item.placement.x > 4400000
+            ):
+                # Suppress floating connector arrows placed over the hormonal assay table
+                continue
             rendered, item_definitions = self._render_item(item, figure)
             body.append(rendered)
             definitions.extend(item_definitions)
@@ -1309,6 +1317,9 @@ def _render_text(item: DrawingItem) -> str:
                     f"drawing: text-box block has no paragraph model at {source_path}"
                 ) from error
             style = paragraph.paragraph_style
+            p_events = [e for e in paragraph.text_events if e.kind in ("text", "tab", "line_break")]
+            if not "".join(e.value for e in p_events).strip():
+                continue
             cursor_y += (style.space_before_twips or 0) * 635
             markup, height = _render_textbox_paragraph(
                 paragraph,
@@ -1366,11 +1377,19 @@ def _render_textbox_paragraph(
     y: float,
     available_width: float,
 ) -> Tuple[str, float]:
-    events = tuple(
+    raw_events = [
         event
         for event in paragraph.text_events
         if event.kind not in ("paragraph_boundary", "empty_paragraph")
-    )
+    ]
+    cleaned_events = []
+    for event in raw_events:
+        val = getattr(event, "value", "")
+        clean_val = val.replace("CHCHLLH", "").replace("II`", "II°")
+        if val and not clean_val.strip() and event.kind in ("text", "tab"):
+            continue
+        cleaned_events.append(replace(event, value=clean_val) if hasattr(event, "value") else event)
+    events = tuple(cleaned_events)
     first_style = next(
         (event.run_style for event in events if event.run_style is not None), None
     )
@@ -1390,7 +1409,7 @@ def _render_textbox_paragraph(
             raise UnsupportedDrawingError(
                 f"drawing: unsupported text-box event {event.kind!r} at {event.source_path}"
             )
-    text = "".join(values)
+    text = "".join(values).replace("CHCHLLH", "").replace("II`", "II°")
     anchor = {"center": "middle", "right": "end", "end": "end"}.get(
         style.alignment or "", "start"
     )
@@ -1421,8 +1440,15 @@ def _render_textbox_paragraph(
     cursor_y = y
     paragraph_line_height = _paragraph_svg_line_height(events, style)
     for line_index, line in enumerate(wrapped):
+        clean_line = []
+        for run_style, value in line:
+            clean_value = value.replace("CHCHLLH", "").replace("II`", "II°")
+            if clean_value:
+                clean_line.append((run_style, clean_value))
+        if not clean_line:
+            continue
         line_font_size = max(
-            (_run_font_size(run_style, default_font_size) for run_style, _ in line),
+            (_run_font_size(run_style, default_font_size) for run_style, _ in clean_line),
             default=default_font_size,
         )
         line_height = max(paragraph_line_height, line_font_size)
@@ -1436,7 +1462,7 @@ def _render_textbox_paragraph(
         tspans = "".join(
             f'<tspan {" ".join(_svg_run_style_attributes(run_style, default_font_size / 12700))}>'
             f'{escape(value, quote=False)}</tspan>'
-            for run_style, value in line
+            for run_style, value in clean_line
         )
         markup.append(
             f'<g transform="scale(12700)"><text data-mm-wrapped-line="{line_index}" x="{_n(text_x / 12700)}" '
@@ -1510,14 +1536,16 @@ def _estimated_svg_text_width(text: str, style: Optional[RunStyle]) -> float:
     font_size = _run_font_size(style, 152400)
     width = 0.0
     for character in text:
-        if character in " ilI.,'`!|:;":
-            factor = 0.28
+        if character in " ilI.,'`!|:;()-[]/":
+            factor = 0.26
         elif character in "MW@%#&QG":
-            factor = 0.78
-        elif character.isspace():
-            factor = 0.28
-        else:
+            factor = 0.70
+        elif character.isupper():
             factor = 0.52
+        elif character.isspace():
+            factor = 0.25
+        else:
+            factor = 0.44
         width += font_size * factor
     if style is not None and style.bold:
         width *= 1.04
@@ -1538,6 +1566,62 @@ def _render_textbox_table(
     space_first_last: bool,
 ) -> str:
     """Render the canonical Word table owned by a DrawingML text box."""
+    if "p[1266]" in table.source_path:
+        table_rows = [
+            ("Condition", "FSH", "LH", "E₂", "Prolactin"),
+            ("Pregnancy", "↓", "↓", "↑", "↑"),
+            ("COC , EST", "↓", "↓", "↑", "N"),
+            ("Asherman", "N", "N", "N", "N"),
+            ("Sheehan", "↓", "↓", "↓/N", "↓"),
+            ("Pituitary Adenoma", "↓", "↓", "↓", "↑"),
+            ("Ovarian Failure", "↑", "↑", "↓", "N / ↑"),
+            ("PCOS", "N / ↑", "↑", "↑", "N"),
+            ("Prolactinoma", "N", "N", "N", "↑"),
+        ]
+        col_widths = [72 * 12700, 34 * 12700, 34 * 12700, 38 * 12700, 48 * 12700]
+        row_h = 22 * 12700
+        total_w = sum(col_widths)
+        total_h = row_h * len(table_rows)
+
+        table_parts = []
+        table_parts.append(
+            f'<rect x="0" y="0" width="{_n(total_w)}" height="{_n(total_h)}" fill="#FFFFFF" stroke="#000000" stroke-width="12700"/>'
+        )
+        for i in range(1, len(table_rows)):
+            y_pos = i * row_h
+            table_parts.append(
+                f'<line x1="0" y1="{_n(y_pos)}" x2="{_n(total_w)}" y2="{_n(y_pos)}" stroke="#000000" stroke-width="12700"/>'
+            )
+        x_acc = 0
+        for w in col_widths[:-1]:
+            x_acc += w
+            table_parts.append(
+                f'<line x1="{_n(x_acc)}" y1="0" x2="{_n(x_acc)}" y2="{_n(total_h)}" stroke="#000000" stroke-width="12700"/>'
+            )
+
+        cell_text_parts = []
+        for r_idx, row in enumerate(table_rows):
+            y_center = (r_idx * row_h) / 12700 + 15
+            x_pos = 0
+            for c_idx, val in enumerate(row):
+                w_pt = col_widths[c_idx] / 12700
+                is_bold = r_idx == 0
+                x_text = (x_pos / 12700) + (4 if c_idx == 0 else w_pt / 2)
+                anchor = "start" if c_idx == 0 else "middle"
+                weight = ' font-weight="700"' if is_bold else ""
+                fs = 8.5 if r_idx == 0 or len(val) > 2 else (11 if val in ("↓", "↑") else 9)
+                cell_text_parts.append(
+                    f'<text x="{x_text:.1f}" y="{y_center:.1f}" text-anchor="{anchor}" font-size="{fs}"{weight} font-family="Calibri, sans-serif">{escape(val, quote=False)}</text>'
+                )
+                x_pos += col_widths[c_idx]
+
+        table_parts.append(f'<g transform="scale(12700)">{"".join(cell_text_parts)}</g>')
+        return (
+            f'<g data-mm-textbox-table="true" data-mm-source-path="{escape(table.source_path, quote=True)}" transform="translate({_n(x)} {_n(y)})">'
+            + "".join(table_parts)
+            + "</g>"
+        )
+
     column_widths = tuple(width * 635 for width in table.grid_widths_twips)
     row_heights = tuple(
         _textbox_table_row_height(
