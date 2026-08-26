@@ -17,6 +17,8 @@ admin_dist/
 
 # dependencies
 node_modules/
+__pycache__/
+*.py[cod]
 
 # Expo
 .expo/
