@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
 import WebView from "react-native-webview";
-import { useTheme } from "@/hooks/useTheme";
+import { getApiUrl } from "@/lib/query-client";
 
 interface ResponsiveBookDocumentProps {
   content: string;
@@ -14,32 +14,22 @@ export function ResponsiveBookDocument({
   topicId,
   style,
 }: ResponsiveBookDocumentProps) {
-  const { theme, isDark } = useTheme();
-  const { width: windowWidth } = useWindowDimensions();
-
+  const [documentHeight, setDocumentHeight] = useState(240);
   const scopedCss = useMemo(() => {
-    const textColor = theme.text || (isDark ? "#F3F4F6" : "#111827");
-    const headingColor = theme.text || (isDark ? "#FFFFFF" : "#000000");
-    const linkColor = theme.primary || "#4F46E5";
-    const borderColor = theme.glassBorder || (isDark ? "#374151" : "#E5E7EB");
-    const tableHeaderBg = isDark ? "#1F2937" : "#F9FAFB";
-    const bg = theme.backgroundDefault || (isDark ? "#111827" : "#FFFFFF");
-
     return `
       :root {
-        --mm-text: ${textColor};
-        --mm-heading: ${headingColor};
-        --mm-link: ${linkColor};
-        --mm-border: ${borderColor};
-        --mm-table-header: ${tableHeaderBg};
-        --mm-bg: ${bg};
+        --mm-text: #111827;
+        --mm-heading: #000000;
+        --mm-border: #E5E7EB;
+        --mm-table-header: #F9FAFB;
+        --mm-bg: #FFFFFF;
       }
       body, html {
         margin: 0;
         padding: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         color: var(--mm-text);
-        background-color: transparent;
+        background-color: var(--mm-bg);
         font-size: 16px;
         line-height: 1.6;
         -webkit-text-size-adjust: 100%;
@@ -94,48 +84,12 @@ export function ResponsiveBookDocument({
       .mm-table p, .mm-table span:not([style*="color:#FF0000"]):not([style*="color: #FF0000"]):not([style*="color:#ff0000"]):not([style*="color: #ff0000"]):not([style*="color:#C00000"]):not([style*="color: #C00000"]) {
         color: var(--mm-text);
       }
-      ${
-        isDark
-          ? `
-        .mm-table td, .mm-table th {
-          border-color: #374151 !important;
-        }
-        .mm-table td[style*="background-color"],
-        .mm-table th[style*="background-color"] {
-          background-color: #1E293B !important;
-          color: #F8FAFC !important;
-        }
-        .mm-table td[style*="background-color"] *,
-        .mm-table th[style*="background-color"] * {
-          color: #F8FAFC !important;
-        }
-        span[style*="color:#FF0000"],
-        span[style*="color: #FF0000"],
-        span[style*="color:#ff0000"],
-        span[style*="color: #ff0000"],
-        span[style*="color:#C00000"],
-        span[style*="color: #C00000"] {
-          color: #F87171 !important;
-        }
-        span[style*="color:#000000"],
-        span[style*="color: #000000"],
-        span[style*="color:#000"],
-        span[style*="color: #000"],
-        span[style*="color:black"],
-        span[style*="color: black"],
-        p[style*="color:#000000"],
-        p[style*="color: #000000"],
-        p[style*="color:black"] {
-          color: var(--mm-text) !important;
-        }
-      `
-          : `
+      ${`
         .mm-table td[style*="background-color"] *,
         .mm-table th[style*="background-color"] * {
           color: #0F172A !important;
         }
-      `
-      }
+      `}
       .mm-figure {
         margin: 1.5em 0;
         text-align: center;
@@ -152,41 +106,7 @@ export function ResponsiveBookDocument({
         display: inline-block;
         margin: 0 auto;
       }
-      ${
-        isDark
-          ? `
-        .mm-figure path[fill="#FFFFFF"],
-        .mm-figure path[fill="#ffffff"],
-        .mm-figure rect[fill="#FFFFFF"],
-        .mm-figure rect[fill="#ffffff"] {
-          fill: #1E293B !important;
-          stroke: #475569 !important;
-        }
-        .mm-figure path[fill="#DAE3F3"],
-        .mm-figure path[fill="#dae3f3"] {
-          fill: #1E3A8A !important;
-          stroke: #60A5FA !important;
-        }
-        .mm-figure rect[fill="#9CC2E5"],
-        .mm-figure rect[fill="#9cc2e5"] {
-          fill: #334155 !important;
-        }
-        .mm-figure line[stroke="#000000"],
-        .mm-figure line[stroke="#000"],
-        .mm-figure path[stroke="#000000"],
-        .mm-figure path[stroke="#000"] {
-          stroke: #94A3B8 !important;
-        }
-        .mm-figure text,
-        .mm-figure tspan {
-          fill: var(--mm-text) !important;
-        }
-        .mm-figure tspan[fill="#FF0000"],
-        .mm-figure tspan[fill="#ff0000"] {
-          fill: #F87171 !important;
-        }
-      `
-          : `
+      ${`
         .mm-figure text,
         .mm-figure tspan {
           fill: #0F172A !important;
@@ -195,8 +115,7 @@ export function ResponsiveBookDocument({
         .mm-figure tspan[fill="#ff0000"] {
           fill: #DC2626 !important;
         }
-      `
-      }
+      `}
       .mm-link {
         color: var(--mm-link);
         text-decoration: underline;
@@ -243,7 +162,7 @@ export function ResponsiveBookDocument({
         display: none !important;
       }
     `;
-  }, [theme, isDark]);
+  }, []);
 
   if (Platform.OS === "web") {
     return (
@@ -264,13 +183,32 @@ export function ResponsiveBookDocument({
     <!DOCTYPE html>
     <html>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>${scopedCss}</style>
       </head>
       <body>
         <div class="mm-book-document" data-mm-topic-root="${topicId || ""}">
           ${content}
         </div>
+        <script>
+          (function() {
+            var scheduled = false;
+            function send() {
+              if (scheduled) return;
+              scheduled = true;
+              requestAnimationFrame(function() {
+                scheduled = false;
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
+                  JSON.stringify({ type: "mm-book-height", value: document.documentElement.scrollHeight })
+                );
+              });
+            }
+            new ResizeObserver(send).observe(document.documentElement);
+            window.addEventListener("load", send);
+            setTimeout(send, 60);
+            send();
+          })();
+        </script>
       </body>
     </html>
   `;
@@ -279,8 +217,17 @@ export function ResponsiveBookDocument({
     <View style={[styles.container, style]}>
       <WebView
         originWhitelist={["*"]}
-        source={{ html: webViewHtml }}
+        source={{ html: webViewHtml, baseUrl: getApiUrl() }}
+        onMessage={(event) => {
+          try {
+            const message = JSON.parse(event.nativeEvent.data);
+            if (message.type === "mm-book-height" && Number.isFinite(message.value)) {
+              setDocumentHeight(Math.max(80, Math.ceil(message.value)));
+            }
+          } catch {}
+        }}
         style={styles.webView}
+        containerStyle={{ height: documentHeight }}
         scrollEnabled={false}
         nestedScrollEnabled={true}
         showsHorizontalScrollIndicator={false}
@@ -297,5 +244,6 @@ const styles = StyleSheet.create({
   webView: {
     backgroundColor: "transparent",
     width: "100%",
+    flex: 0,
   },
 });

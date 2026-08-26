@@ -173,15 +173,13 @@ class NumberingResolver:
             self._counters[(num_id, level)] = curr_val
             for lvl_idx in range(level + 1, 9):
                 self._counters.pop((num_id, lvl_idx), None)
-            try:
-                display_marker = _expand_marker(
-                    selected,
-                    curr_val,
-                    self._counters,
-                    self.package.source_path(paragraph),
-                )
-            except Exception:
-                display_marker = f"{curr_val}."
+            display_marker = _marker_text(
+                selected,
+                curr_val,
+                self._counters,
+                self.package.source_path(paragraph),
+                num_id=num_id,
+            )
 
         return ResolvedNumberingLevel(
             num_id=num_id,
@@ -585,6 +583,7 @@ def _marker_text(
     marker_value: int,
     counters: Mapping[Tuple[str, int], int],
     source_path: str,
+    num_id: Optional[str] = None,
 ) -> str:
     level_text = (
         getattr(numbering, "display_level_text", None) or numbering.level_text
@@ -596,9 +595,15 @@ def _marker_text(
     formats = getattr(numbering, "level_formats", ())
     legal = bool(getattr(numbering, "legal_numbering", False))
 
+    owner_num_id = getattr(numbering, "num_id", None) or num_id
+    if owner_num_id is None:
+        raise NumberingError(
+            f"Numbering marker {level_text!r} has no numId at {source_path}"
+        )
+
     def replace(match: re.Match[str]) -> str:
         referenced_level = int(match.group(1)) - 1
-        key = (numbering.num_id, referenced_level)
+        key = (owner_num_id, referenced_level)
         if referenced_level == numbering.level:
             value = marker_value
         elif key in counters:
@@ -667,7 +672,7 @@ def _roman(value: int, source_path: str) -> str:
 
 
 def _native_marker_can_represent(numbering: NumberingLevel, suffix: str) -> bool:
-    if suffix != "space":
+    if suffix not in ("nothing", "space"):
         return False
     display_level_text = (
         getattr(numbering, "display_level_text", None) or numbering.level_text

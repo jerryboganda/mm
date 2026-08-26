@@ -224,7 +224,7 @@ class ListTreeTest(unittest.TestCase):
         html = render_list_tree(tree)
         self.assertIn("pre-eclamsia  5\u00a0mg/dL &amp; care", html)
         self.assertIn('class="list-marker">1.a) ', html)
-        self.assertIn('style="list-style-type:decimal;', html)
+        self.assertIn('style="list-style-type:none;', html)
 
     def test_num_id_change_does_not_invent_a_deeper_level(self):
         numbering = f"""<w:numbering xmlns:w="{W}">
@@ -338,12 +338,12 @@ class ListTreeTest(unittest.TestCase):
 
         self.assertEqual(
             root.get("style"),
-            "list-style-type:decimal;margin:0 0 0 36pt;padding:0;"
+            "list-style-type:none;margin:0 0 0 36pt;padding:0;"
             "text-indent:-18pt;",
         )
         self.assertEqual(
             child.get("style"),
-            "list-style-type:lower-alpha;margin:0 0 0 36pt;padding:0;"
+            "list-style-type:none;margin:0 0 0 36pt;padding:0;"
             "text-indent:-18pt;",
         )
 
