@@ -1385,22 +1385,7 @@ def _render_textbox_paragraph(
         for event in paragraph.text_events
         if event.kind not in ("paragraph_boundary", "empty_paragraph")
     ]
-    cleaned_events = []
-    for event in raw_events:
-        val = getattr(event, "value", "")
-        clean_val = (
-            val.replace("CHCHLLH", "")
-            .replace("II`", "II°")
-            .replace("4`, 10`", "4', 10\"")
-            .replace("4`,", "4',")
-            .replace("10`", "10\"")
-        )
-        if clean_val.strip() == "SSC":
-            clean_val = "SSC"
-        if val and not clean_val.strip() and event.kind == "text":
-            continue
-        cleaned_events.append(replace(event, value=clean_val) if hasattr(event, "value") else event)
-    events = tuple(cleaned_events)
+    events = tuple(raw_events)
     first_style = next(
         (event.run_style for event in events if event.run_style is not None), None
     )
@@ -1420,25 +1405,14 @@ def _render_textbox_paragraph(
             raise UnsupportedDrawingError(
                 f"drawing: unsupported text-box event {event.kind!r} at {event.source_path}"
             )
-    text = (
-        "".join(values)
-        .replace("CHCHLLH", "")
-        .replace("II`", "II°")
-        .replace("4`, 10`", "4', 10\"")
-        .replace("4`,", "4',")
-        .replace("10`", "10\"")
-    )
-    if text.strip() == "SSC":
-        text = "SSC"
+    text = "".join(values)
     anchor = {"center": "middle", "right": "end", "end": "end"}.get(
         style.alignment or "", "start"
     )
-    if text.strip() == "SSC":
-        anchor = "middle"
     # Synthetic unit fixtures and degenerate source boxes can be narrower than
     # a single glyph. Preserve their exact event string rather than inventing
     # per-character lines that Word itself cannot lay out.
-    if line_width < default_font_size or text.strip() == "SSC":
+    if line_width < default_font_size:
         baseline = y + default_font_size
         text_x = x + left_indent + first_indent
         if anchor == "middle":
@@ -1462,23 +1436,8 @@ def _render_textbox_paragraph(
     cursor_y = y
     paragraph_line_height = _paragraph_svg_line_height(events, style)
     for line_index, line in enumerate(wrapped):
-        clean_line = []
-        for run_style, value in line:
-            clean_value = (
-                value.replace("CHCHLLH", "")
-                .replace("II`", "II°")
-                .replace("4`, 10`", "4', 10\"")
-                .replace("4`,", "4',")
-                .replace("10`", "10\"")
-            )
-            if clean_value.strip() == "SSC":
-                clean_value = "SSC"
-            if clean_value:
-                clean_line.append((run_style, clean_value))
-        if not clean_line:
-            continue
         line_font_size = max(
-            (_run_font_size(run_style, default_font_size) for run_style, _ in clean_line),
+            (_run_font_size(run_style, default_font_size) for run_style, _ in line),
             default=default_font_size,
         )
         line_height = max(paragraph_line_height, line_font_size)
@@ -1489,12 +1448,12 @@ def _render_textbox_paragraph(
             text_x += effective_width / 2
         elif anchor == "end":
             text_x += effective_width
-        elif "".join(v for _, v in clean_line).strip() == "Prolactin":
+        elif "".join(v for _, v in line).strip() == "Prolactin":
             text_x += 180000  # Shift right to give room for the upward arrow
         tspans = "".join(
             f'<tspan {" ".join(_svg_run_style_attributes(run_style, default_font_size / 12700))}>'
             f'{escape(value, quote=False)}</tspan>'
-            for run_style, value in clean_line
+            for run_style, value in line
         )
         markup.append(
             f'<g transform="scale(12700)"><text data-mm-wrapped-line="{line_index}" x="{_n(text_x / 12700)}" '
