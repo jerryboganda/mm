@@ -1397,7 +1397,7 @@ def _render_textbox_paragraph(
         )
         if clean_val.strip() == "SSC":
             clean_val = "SSC"
-        if val and not clean_val.strip() and event.kind in ("text", "tab"):
+        if val and not clean_val.strip() and event.kind == "text":
             continue
         cleaned_events.append(replace(event, value=clean_val) if hasattr(event, "value") else event)
     events = tuple(cleaned_events)
@@ -1536,7 +1536,7 @@ def _wrap_textbox_events(
             raise UnsupportedDrawingError(
                 f"drawing: unsupported text-box event {event.kind!r} at {event.source_path}"
             )
-        value = "    " if event.kind == "tab" else event.value
+        value = "\t" if event.kind == "tab" else event.value
         tokens = re.findall(r"\s+|\S+", value)
         for token in tokens:
             token_width = _estimated_svg_text_width(token, event.run_style)
@@ -1598,62 +1598,6 @@ def _render_textbox_table(
     space_first_last: bool,
 ) -> str:
     """Render the canonical Word table owned by a DrawingML text box."""
-    if "p[1266]" in table.source_path:
-        table_rows = [
-            ("Condition", "FSH", "LH", "E₂", "Prolactin"),
-            ("Pregnancy", "↓", "↓", "↑", "↑"),
-            ("COC , EST", "↓", "↓", "↑", "N"),
-            ("Asherman", "N", "N", "N", "N"),
-            ("Sheehan", "↓", "↓", "↓/N", "↓"),
-            ("Pituitary Adenoma", "↓", "↓", "↓", "↑"),
-            ("Ovarian Failure", "↑", "↑", "↓", "N / ↑"),
-            ("PCOS", "N / ↑", "↑", "↑", "N"),
-            ("Prolactinoma", "N", "N", "N", "↑"),
-        ]
-        col_widths = [72 * 12700, 34 * 12700, 34 * 12700, 38 * 12700, 48 * 12700]
-        row_h = 22 * 12700
-        total_w = sum(col_widths)
-        total_h = row_h * len(table_rows)
-
-        table_parts = []
-        table_parts.append(
-            f'<rect x="0" y="0" width="{_n(total_w)}" height="{_n(total_h)}" fill="#FFFFFF" stroke="#000000" stroke-width="12700"/>'
-        )
-        for i in range(1, len(table_rows)):
-            y_pos = i * row_h
-            table_parts.append(
-                f'<line x1="0" y1="{_n(y_pos)}" x2="{_n(total_w)}" y2="{_n(y_pos)}" stroke="#000000" stroke-width="12700"/>'
-            )
-        x_acc = 0
-        for w in col_widths[:-1]:
-            x_acc += w
-            table_parts.append(
-                f'<line x1="{_n(x_acc)}" y1="0" x2="{_n(x_acc)}" y2="{_n(total_h)}" stroke="#000000" stroke-width="12700"/>'
-            )
-
-        cell_text_parts = []
-        for r_idx, row in enumerate(table_rows):
-            y_center = (r_idx * row_h) / 12700 + 15
-            x_pos = 0
-            for c_idx, val in enumerate(row):
-                w_pt = col_widths[c_idx] / 12700
-                is_bold = r_idx == 0
-                x_text = (x_pos / 12700) + (4 if c_idx == 0 else w_pt / 2)
-                anchor = "start" if c_idx == 0 else "middle"
-                weight = ' font-weight="700"' if is_bold else ""
-                fs = 8.5 if r_idx == 0 or len(val) > 2 else (11 if val in ("↓", "↑") else 9)
-                cell_text_parts.append(
-                    f'<text x="{x_text:.1f}" y="{y_center:.1f}" text-anchor="{anchor}" font-size="{fs}"{weight} font-family="Calibri, sans-serif">{escape(val, quote=False)}</text>'
-                )
-                x_pos += col_widths[c_idx]
-
-        table_parts.append(f'<g transform="scale(12700)">{"".join(cell_text_parts)}</g>')
-        return (
-            f'<g data-mm-textbox-table="true" data-mm-source-path="{escape(table.source_path, quote=True)}" transform="translate({_n(x)} {_n(y)})">'
-            + "".join(table_parts)
-            + "</g>"
-        )
-
     column_widths = tuple(width * 635 for width in table.grid_widths_twips)
     row_heights = tuple(
         _textbox_table_row_height(

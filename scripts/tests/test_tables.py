@@ -354,7 +354,8 @@ class TableRenderingTest(unittest.TestCase):
         self.assertEqual(html.count("<ol "), 2)
         self.assertRegex(
             html,
-            r"<ol [^>]*><li[^>]*>Parent<ol [^>]*><li[^>]*>.*Child</li></ol></li></ol>",
+            r"<ol [^>]*><li[^>]*><span[^>]*>1\. </span>Parent"
+            r"<ol [^>]*><li[^>]*><span[^>]*>a\) </span>Child</li></ol></li></ol>",
         )
 
     def test_captioned_table_uses_figure_header_semantics_and_scroll_region(self):

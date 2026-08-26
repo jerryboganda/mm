@@ -222,7 +222,8 @@ class DrawingCompositionTest(unittest.TestCase):
             paragraph, x=0, y=0, available_width=952_500
         )
 
-        self.assertIn('y="127000"', markup)
+        self.assertIn('<g transform="scale(12700)">', markup)
+        self.assertIn('y="10"', markup)
         self.assertEqual(height, 127_000)
 
     def test_textbox_wraps_source_runs_without_concatenating_or_losing_run_styles(self):
