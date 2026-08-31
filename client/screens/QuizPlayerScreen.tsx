@@ -28,6 +28,7 @@ import { OptionButton } from "@/components/OptionButton";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ProgressBar } from "@/components/ProgressBar";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+import { MetaPillRow } from "@/components/MetaPill";
 import { ThemedText } from "@/components/ThemedText";
 import { apiRequest, queryClient } from "@/lib/query-client";
 import { useNetwork } from "@/lib/network";
@@ -48,6 +49,9 @@ interface QuizQuestion {
   question: string;
   options: { label: string; text: string }[];
   difficulty: "easy" | "medium" | "hard";
+  year?: number | null;
+  sourceName?: string | null;
+  subjectName?: string | null;
 }
 
 interface QuizData {
@@ -60,7 +64,13 @@ export default function QuizPlayerScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<QuizPlayerNavigationProp>();
   const route = useRoute<QuizPlayerRouteProp>();
-  const { mode, topicId, questionCount: paramQuestionCount } = route.params;
+  const {
+    mode,
+    topicId,
+    questionCount: paramQuestionCount,
+    year: paramYear,
+    sourceId: paramSourceId,
+  } = route.params;
   const isExamMode = mode === "exam";
   const { theme, isDark } = useTheme();
   const feedback = useFeedback();
@@ -78,12 +88,18 @@ export default function QuizPlayerScreen() {
   const warned60Ref = useRef(false);
   const warned30Ref = useRef(false);
 
-  const { data: quizData, isLoading, error } = useQuery<QuizData>({
+  const {
+    data: quizData,
+    isLoading,
+    error,
+  } = useQuery<QuizData>({
     queryKey: [
       "/api/quiz/start",
       mode === "exam" ? "mixed" : mode,
       topicId,
       paramQuestionCount,
+      paramYear ?? null,
+      paramSourceId ?? null,
     ],
     queryFn: async () => {
       const queryMode = mode === "exam" ? "mixed" : mode;
@@ -91,9 +107,11 @@ export default function QuizPlayerScreen() {
         ? `&count=${paramQuestionCount}`
         : "";
       const topicParam = topicId ? `&topicId=${topicId}` : "";
+      const yearParam = paramYear ? `&year=${paramYear}` : "";
+      const sourceParam = paramSourceId ? `&sourceId=${paramSourceId}` : "";
       const res = await apiRequest(
         "GET",
-        `/api/quiz/start/${queryMode}?${topicParam}${countParam}`,
+        `/api/quiz/start/${queryMode}?${topicParam}${countParam}${yearParam}${sourceParam}`,
       );
       return res.json();
     },
@@ -443,14 +461,22 @@ export default function QuizPlayerScreen() {
         />
 
         <View style={styles.questionContainer}>
-          <View
-            style={[styles.difficultyBadge, { backgroundColor: theme.glass }]}
-          >
-            <ThemedText
-              style={[styles.difficultyText, { color: theme.textSecondary }]}
+          <View style={styles.difficultyRow}>
+            <View
+              style={[styles.difficultyBadge, { backgroundColor: theme.glass }]}
             >
-              {currentQuestion?.difficulty.toUpperCase()}
-            </ThemedText>
+              <ThemedText
+                style={[styles.difficultyText, { color: theme.textSecondary }]}
+              >
+                {currentQuestion?.difficulty.toUpperCase()}
+              </ThemedText>
+            </View>
+            <MetaPillRow
+              year={currentQuestion?.year}
+              subjectName={currentQuestion?.subjectName}
+              sourceName={currentQuestion?.sourceName}
+              style={{ flex: 1 }}
+            />
           </View>
           <ThemedText type="h3" style={styles.questionText}>
             {currentQuestion?.question}
@@ -776,12 +802,18 @@ const styles = StyleSheet.create({
   questionContainer: {
     marginBottom: Spacing["2xl"],
   },
+  difficultyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
   difficultyBadge: {
-    alignSelf: "flex-start",
+    alignSelf: "center",
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     borderRadius: BorderRadius.full,
-    marginBottom: Spacing.md,
   },
   difficultyText: {
     fontSize: 10,

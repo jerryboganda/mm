@@ -16,6 +16,7 @@ import {
   ExplanationImage,
 } from "@/components/ExplanationFigures";
 import { McqExplanationRenderer } from "@/components/McqExplanationRenderer";
+import { MetaPillRow } from "@/components/MetaPill";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -32,6 +33,9 @@ interface QuestionDetail {
   isCorrect: boolean;
   explanation: string;
   images?: ExplanationImage[];
+  year?: number | null;
+  sourceName?: string | null;
+  subjectName?: string | null;
 }
 
 interface AttemptDetail {
@@ -240,6 +244,12 @@ export default function AttemptDetailScreen() {
                 </ThemedText>
               </View>
 
+              <MetaPillRow
+                year={q.year}
+                subjectName={q.subjectName}
+                sourceName={q.sourceName}
+                style={{ marginBottom: Spacing.xs }}
+              />
               <ThemedText style={[styles.questionText, { color: theme.text }]}>
                 {q.question}
               </ThemedText>

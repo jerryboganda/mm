@@ -146,10 +146,12 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
     // Batch-fetch all MCQs in one query
     const allMcqs = await storage.getMCQsByIds(questionIds);
     const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
+    const metaMap = await storage.getMCQMetadataByIds(questionIds);
 
     const questionsWithDetails = questionIds.map((qId) => {
       const mcq = mcqMap.get(qId);
       const answerInfo = answersData[qId] || {};
+      const meta = metaMap.get(qId);
       const options = normalizeOptions(mcq?.options);
       const selectedAnswer = resolveAnswerLabel(
         String(answerInfo.selected || answerInfo.selectedText || ""),
@@ -169,6 +171,9 @@ router.get("/:attemptId", authMiddleware, async (req: AuthRequest, res) => {
         isCorrect: Boolean(answerInfo.isCorrect),
         explanation: mcq?.explanation || "",
         images: (mcq?.images as unknown[] | null) ?? [],
+        year: meta?.year ?? null,
+        sourceName: meta?.sourceName ?? null,
+        subjectName: meta?.subjectName ?? null,
       };
     });
 

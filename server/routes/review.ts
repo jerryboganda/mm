@@ -36,11 +36,13 @@ router.get("/due", authMiddleware, async (req: AuthRequest, res) => {
     const mcqIds = dueReviews.map((r) => r.mcqId);
     const allMcqs = await storage.getMCQsByIds(mcqIds);
     const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
+    const metaMap = await storage.getMCQMetadataByIds(mcqIds);
 
     const questions = dueReviews
       .map((review) => {
         const mcq = mcqMap.get(review.mcqId);
         if (!mcq) return null;
+        const meta = metaMap.get(review.mcqId);
         return {
           reviewId: review.id,
           mcqId: mcq.id,
@@ -49,6 +51,9 @@ router.get("/due", authMiddleware, async (req: AuthRequest, res) => {
           difficulty: mcq.difficulty,
           interval: review.interval,
           repetitions: review.repetitions,
+          year: meta?.year ?? null,
+          sourceName: meta?.sourceName ?? null,
+          subjectName: meta?.subjectName ?? null,
         };
       })
       .filter(Boolean);

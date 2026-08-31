@@ -4,10 +4,12 @@ import Layout from "./components/Layout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import BooksPage from "./pages/BooksPage";
+import SubjectsPage from "./pages/SubjectsPage";
 import ChaptersPage from "./pages/ChaptersPage";
 import TopicsPage from "./pages/TopicsPage";
 import TopicEditorPage from "./pages/TopicEditorPage";
 import McqsPage from "./pages/McqsPage";
+import MetadataPage from "./pages/MetadataPage";
 import UsersPage from "./pages/UsersPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
@@ -50,6 +52,10 @@ export default function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/books" element={<BooksPage />} />
                 <Route
+                  path="/books/:bookId/subjects"
+                  element={<SubjectsPage />}
+                />
+                <Route
                   path="/books/:bookId/chapters"
                   element={<ChaptersPage />}
                 />
@@ -62,6 +68,7 @@ export default function App() {
                   element={<TopicEditorPage />}
                 />
                 <Route path="/mcqs" element={<McqsPage />} />
+                <Route path="/mcq-metadata" element={<MetadataPage />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/announcements" element={<AnnouncementsPage />} />

@@ -34,10 +34,30 @@ router.get("/topics", authMiddleware, async (req: AuthRequest, res) => {
   }
 });
 
+router.get(
+  "/filter-options",
+  authMiddleware,
+  async (_req: AuthRequest, res) => {
+    try {
+      const options = await storage.getQuizFilterOptions();
+      res.json(options);
+    } catch (error) {
+      logger.error("Get quiz filter options error", { error: String(error) });
+      res.status(500).json({ message: "Failed to get filter options" });
+    }
+  },
+);
+
 router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { mode } = req.params;
     const topicId = req.query.topicId as string | undefined;
+    const year = parseInt(req.query.year as string, 10);
+    const sourceId = req.query.sourceId as string | undefined;
+    const metaOpts = {
+      year: Number.isFinite(year) ? year : undefined,
+      sourceId: sourceId || undefined,
+    };
     const questionCount = Math.min(
       Math.max(parseInt(req.query.count as string) || 10, 1),
       50, // cap at 50
@@ -65,11 +85,11 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
     let questions: MCQ[] = [];
 
     if (mode === "topic" && topicId) {
-      questions = await storage.getMCQsByTopic(topicId);
+      questions = await storage.getMCQsByTopic(topicId, metaOpts);
     } else if (mode === "wrong") {
       questions = await storage.getWrongQuestions(req.userId!);
     } else {
-      questions = await storage.getMCQs(questionCount);
+      questions = await storage.getMCQs(questionCount, undefined, metaOpts);
     }
 
     if (!hasActiveSubscription) {
@@ -87,13 +107,23 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
       ? questions
       : [...questions].sort(() => Math.random() - 0.5).slice(0, questionCount);
 
-    const formattedQuestions = selectedQuestions.map((q) => ({
-      id: q.id,
-      question: q.question,
-      options: normalizeOptions(q.options),
-      difficulty: q.difficulty,
-      isPaid: q.isPaid ?? false,
-    }));
+    const metaMap = await storage.getMCQMetadataByIds(
+      selectedQuestions.map((q) => q.id),
+    );
+
+    const formattedQuestions = selectedQuestions.map((q) => {
+      const meta = metaMap.get(q.id);
+      return {
+        id: q.id,
+        question: q.question,
+        options: normalizeOptions(q.options),
+        difficulty: q.difficulty,
+        isPaid: q.isPaid ?? false,
+        year: meta?.year ?? null,
+        sourceName: meta?.sourceName ?? null,
+        subjectName: meta?.subjectName ?? null,
+      };
+    });
 
     res.json({
       quizId: `quiz-${Date.now()}`,
@@ -207,6 +237,16 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
       answers: detailedAnswers,
     });
 
+    const statsResults: Record<string, boolean> = {};
+    for (const [mcqId, detail] of Object.entries(detailedAnswers)) {
+      statsResults[mcqId] = Boolean(detail.isCorrect);
+    }
+    storage
+      .recordMcqStats(statsResults)
+      .catch((e) =>
+        logger.error("MCQ stats update failed", { error: String(e) }),
+      );
+
     res.json({ id: attempt.id });
   } catch (error) {
     logger.error("Submit quiz error", { error: String(error) });
@@ -229,10 +269,12 @@ router.get(
       const mcqIds = Object.keys(answers);
       const allMcqs = await storage.getMCQsByIds(mcqIds);
       const mcqMap = new Map(allMcqs.map((m) => [m.id, m]));
+      const metaMap = await storage.getMCQMetadataByIds(mcqIds);
 
       const questions = mcqIds.map((mcqId) => {
         const mcq = mcqMap.get(mcqId);
         const answer = answers[mcqId];
+        const meta = metaMap.get(mcqId);
         const selectedLabel = resolveAnswerLabel(
           String(answer?.selected || ""),
           mcq?.options,
@@ -255,6 +297,9 @@ router.get(
           isCorrect: Boolean(answer?.isCorrect),
           explanation: answer.explanation || mcq?.explanation || "",
           images: (mcq?.images as unknown[] | null) ?? [],
+          year: meta?.year ?? null,
+          sourceName: meta?.sourceName ?? null,
+          subjectName: meta?.subjectName ?? null,
         };
       });
 

@@ -67,6 +67,8 @@ export type RootStackParamList = {
     mode: "topic" | "mixed" | "wrong" | "exam";
     topicId?: string;
     questionCount?: number;
+    year?: number;
+    sourceId?: string;
   };
   QuizResults: { resultId: string };
   QuizSettings: undefined;

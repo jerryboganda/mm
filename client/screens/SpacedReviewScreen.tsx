@@ -12,6 +12,7 @@ import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
 import { OptionButton } from "@/components/OptionButton";
 import { apiRequest, queryClient } from "@/lib/query-client";
+import { MetaPillRow } from "@/components/MetaPill";
 import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -23,6 +24,9 @@ interface ReviewQuestion {
   difficulty: string;
   interval: number;
   repetitions: number;
+  year?: number | null;
+  sourceName?: string | null;
+  subjectName?: string | null;
 }
 
 interface ReviewResponse {
@@ -354,6 +358,12 @@ export default function SpacedReviewScreen() {
             </View>
           )}
 
+          <MetaPillRow
+            year={currentQuestion?.year}
+            subjectName={currentQuestion?.subjectName}
+            sourceName={currentQuestion?.sourceName}
+            style={{ marginBottom: Spacing.sm }}
+          />
           <ThemedText type="h3" style={styles.questionText}>
             {currentQuestion?.question}
           </ThemedText>
