@@ -560,13 +560,16 @@ export async function adminGetMcqFacets(): Promise<{
     .where(isNotNull(mcqs.year))
     .groupBy(mcqs.year)
     .orderBy(desc(mcqs.year));
-  const tagRows = (await db.execute(
+  const tagResult = await db.execute(
     sql`SELECT t.value AS tag, count(*)::int AS count
         FROM "mcqs" m, jsonb_array_elements_text(m."tags") AS t(value)
         WHERE m."tags" IS NOT NULL
         GROUP BY t.value
         ORDER BY count(*) DESC, t.value ASC`,
-  )) as unknown as { tag: string; count: number }[];
+  );
+  const tagRows = (
+    Array.isArray(tagResult) ? tagResult : (tagResult as { rows?: unknown[] }).rows ?? []
+  ) as { tag: string; count: number }[];
   const examTypeRows = await db
     .select({ examType: mcqs.examType })
     .from(mcqs)
@@ -679,12 +682,22 @@ export async function adminBulkUpdateMcqs(
     ...setFields,
     updatedAt: new Date(),
   };
-  // Drop explicit nulls that were not requested
+  // Drop fields that were not requested
   for (const k of Object.keys(updates)) {
     if (updates[k] === undefined) delete updates[k];
   }
-  if (Object.keys(updates).length === 0 && !addTags?.length) return 0;
+  const fieldCount = Object.keys(updates).filter((k) => k !== "updatedAt").length;
+  if (fieldCount === 0 && !addTags?.length) return 0;
 
+  let updated = ids.length;
+  if (fieldCount > 0) {
+    const result = await db
+      .update(mcqs)
+      .set(updates)
+      .where(inArray(mcqs.id, ids))
+      .returning({ id: mcqs.id });
+    updated = result.length;
+  }
   if (addTags?.length) {
     await db
       .update(mcqs)
@@ -701,15 +714,8 @@ export async function adminBulkUpdateMcqs(
           )
           WHERE "id" IN ${ids} AND "tags" IS NOT NULL`,
     );
-    return ids.length;
   }
-
-  const result = await db
-    .update(mcqs)
-    .set(updates)
-    .where(inArray(mcqs.id, ids))
-    .returning({ id: mcqs.id });
-  return result.length;
+  return updated;
 }
 
 export async function adminDeleteMcq(id: string): Promise<void> {
