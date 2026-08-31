@@ -17,6 +17,7 @@ import {
   ClipboardList,
   CreditCard,
   ReceiptText,
+  Tags,
 } from "lucide-react";
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { to: "/books", icon: BookOpen, label: "Content" },
   { to: "/mobile-app-content", icon: Smartphone, label: "Mobile App Content" },
   { to: "/mcqs", icon: ClipboardList, label: "MCQs" },
+  { to: "/mcq-metadata", icon: Tags, label: "MCQ Metadata" },
   { to: "/users", icon: Users, label: "Users" },
   { to: "/subscriptions", icon: CreditCard, label: "Subscriptions" },
   { to: "/manual-payments", icon: ReceiptText, label: "Manual Payments" },
@@ -33,6 +35,15 @@ const navItems = [
   { to: "/settings", icon: Settings, label: "Settings" },
 ];
 
+const breadcrumbLabels: Record<string, string> = {
+  mcqs: "MCQs",
+  "mcq-metadata": "MCQ Metadata",
+  subjects: "Subjects",
+  chapters: "Topics",
+  topics: "Subtopics",
+  books: "Books",
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,7 +52,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   // Build breadcrumbs from path
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const breadcrumbs = pathSegments.map((seg, i) => ({
-    label: seg.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase()),
+    label:
+      breadcrumbLabels[seg] ??
+      seg.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase()),
     path: "/" + pathSegments.slice(0, i + 1).join("/"),
   }));
 

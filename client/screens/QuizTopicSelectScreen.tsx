@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, View, FlatList } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,7 +17,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { ThemedText } from "@/components/ThemedText";
-import { Spacing } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/lib/auth";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -30,10 +36,54 @@ interface QuizTopic {
   isPaid?: boolean;
 }
 
+interface FilterOptions {
+  years: number[];
+  sources: { id: string; name: string }[];
+}
+
+function FilterChip({
+  label,
+  selected,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  const { theme } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      style={[
+        styles.chip,
+        {
+          backgroundColor: selected ? `${theme.primary}26` : theme.glass,
+          borderColor: selected ? theme.primary : theme.glassBorder,
+        },
+      ]}
+    >
+      <ThemedText
+        type="small"
+        style={[
+          styles.chipText,
+          { color: selected ? theme.primary : theme.textSecondary },
+        ]}
+        numberOfLines={1}
+      >
+        {label}
+      </ThemedText>
+    </Pressable>
+  );
+}
+
 export default function QuizTopicSelectScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<QuizTopicSelectNavigationProp>();
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const { theme } = useTheme();
   const { user } = useAuth();
   const bottomLayout = useBottomLayout({
@@ -48,6 +98,15 @@ export default function QuizTopicSelectScreen() {
     refetchOnReconnect: true,
   });
 
+  const { data: filterOptions } = useQuery<FilterOptions>({
+    queryKey: ["/api/quiz/filter-options"],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const hasFilters =
+    (filterOptions?.years?.length ?? 0) > 0 ||
+    (filterOptions?.sources?.length ?? 0) > 0;
+
   const handleStartQuiz = () => {
     if (selectedTopicId) {
       const selectedTopic = topics?.find((t) => t.id === selectedTopicId);
@@ -60,6 +119,8 @@ export default function QuizTopicSelectScreen() {
       navigation.navigate("QuizPlayer", {
         mode: "topic",
         topicId: selectedTopicId,
+        year: selectedYear ?? undefined,
+        sourceId: selectedSourceId ?? undefined,
       });
     }
   };
@@ -154,6 +215,58 @@ export default function QuizTopicSelectScreen() {
             >
               Choose a topic to practice MCQs from
             </ThemedText>
+            {hasFilters ? (
+              <View style={styles.filtersWrap}>
+                {(filterOptions?.years?.length ?? 0) > 0 && (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chipRow}
+                  >
+                    <FilterChip
+                      label="All years"
+                      selected={selectedYear === null}
+                      onPress={() => setSelectedYear(null)}
+                    />
+                    {filterOptions!.years.map((y) => (
+                      <FilterChip
+                        key={y}
+                        label={String(y)}
+                        selected={selectedYear === y}
+                        onPress={() =>
+                          setSelectedYear((prev) => (prev === y ? null : y))
+                        }
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+                {(filterOptions?.sources?.length ?? 0) > 0 && (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chipRow}
+                  >
+                    <FilterChip
+                      label="All sources"
+                      selected={selectedSourceId === null}
+                      onPress={() => setSelectedSourceId(null)}
+                    />
+                    {filterOptions!.sources.map((s) => (
+                      <FilterChip
+                        key={s.id}
+                        label={s.name}
+                        selected={selectedSourceId === s.id}
+                        onPress={() =>
+                          setSelectedSourceId((prev) =>
+                            prev === s.id ? null : s.id,
+                          )
+                        }
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
+            ) : null}
           </View>
         }
         ListEmptyComponent={isLoading ? renderLoading() : null}
@@ -195,6 +308,25 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginTop: Spacing.xs,
+  },
+  filtersWrap: {
+    marginTop: Spacing.md,
+    gap: Spacing.sm,
+  },
+  chipRow: {
+    gap: Spacing.sm,
+    paddingVertical: 2,
+  },
+  chip: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 2,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    maxWidth: 200,
+  },
+  chipText: {
+    fontSize: 12,
+    fontWeight: "600",
   },
   footer: {
     position: "absolute",

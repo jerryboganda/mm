@@ -1,10 +1,13 @@
 import {
   users,
   books,
+  subjects,
   chapters,
   topics,
   contentBlocks,
   mcqs,
+  sources,
+  mcqStats,
   userProgress,
   bookmarks,
   quizAttempts,
@@ -39,7 +42,7 @@ import {
   type NewsletterEntry,
 } from "../shared/schema";
 import { db, isMysql } from "./db";
-import { eq, and, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
+import { eq, and, asc, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
 import crypto from "crypto";
 
 /**
@@ -117,19 +120,58 @@ export interface IStorage {
   getContentBlocksByTopic(topicId: string): Promise<ContentBlock[]>;
 
   /**
-   * Retrieve all published MCQs belonging to a specific topic.
+   * Retrieve all published MCQs belonging to a specific topic, in stable
+   * creation order, optionally narrowed by year/source.
    * @param topicId - The parent topic's UUID
+   * @param opts - Optional year/sourceId filters
    * @returns An array of MCQ records
    */
-  getMCQsByTopic(topicId: string): Promise<MCQ[]>;
+  getMCQsByTopic(
+    topicId: string,
+    opts?: { year?: number; sourceId?: string },
+  ): Promise<MCQ[]>;
 
   /**
    * Retrieve a random set of published MCQs, optionally filtered by difficulty.
    * @param limit - Maximum number of MCQs to return (default varies by implementation)
    * @param difficulty - Difficulty level filter; pass "all" or omit to include all difficulties
+   * @param opts - Optional year/sourceId filters
    * @returns An array of MCQ records in random order
    */
-  getMCQs(limit?: number, difficulty?: string): Promise<MCQ[]>;
+  getMCQs(
+    limit?: number,
+    difficulty?: string,
+    opts?: { year?: number; sourceId?: string },
+  ): Promise<MCQ[]>;
+
+  /**
+   * Batch-fetch classification metadata (year, source, subject) for MCQs.
+   */
+  getMCQMetadataByIds(ids: string[]): Promise<
+    Map<
+      string,
+      {
+        year: number | null;
+        sourceName: string | null;
+        subjectName: string | null;
+      }
+    >
+  >;
+
+  /**
+   * Available student-side filter options (years + sources present in the
+   * published, non-archived question bank).
+   */
+  getQuizFilterOptions(): Promise<{
+    years: number[];
+    sources: { id: string; name: string }[];
+  }>;
+
+  /**
+   * Increment per-MCQ attempt stats after a quiz submission.
+   * @param results - Map of mcqId -> isCorrect
+   */
+  recordMcqStats(results: Record<string, boolean>): Promise<void>;
 
   /**
    * Retrieve a single MCQ by its ID.
@@ -496,26 +538,134 @@ export class DatabaseStorage implements IStorage {
   }
 
   /** @inheritdoc */
-  async getMCQsByTopic(topicId: string): Promise<MCQ[]> {
+  async getMCQsByTopic(
+    topicId: string,
+    opts?: { year?: number; sourceId?: string },
+  ): Promise<MCQ[]> {
+    const conditions = [
+      eq(mcqs.topicId, topicId),
+      eq(mcqs.isPublished, true),
+      eq(mcqs.isArchived, false),
+    ];
+    if (opts?.year) conditions.push(eq(mcqs.year, opts.year));
+    if (opts?.sourceId) conditions.push(eq(mcqs.sourceId, opts.sourceId));
     return await db
       .select()
       .from(mcqs)
-      .where(and(eq(mcqs.topicId, topicId), eq(mcqs.isPublished, true)))
-      .orderBy(mcqs.createdAt);
+      .where(and(...conditions))
+      .orderBy(mcqs.seq);
   }
 
   /** @inheritdoc */
-  async getMCQs(limit = 10, difficulty?: string): Promise<MCQ[]> {
-    let query = db.select().from(mcqs).where(eq(mcqs.isPublished, true));
-    if (difficulty && difficulty !== "all") {
-      query = db
-        .select()
-        .from(mcqs)
-        .where(
-          and(eq(mcqs.isPublished, true), eq(mcqs.difficulty, difficulty)),
-        );
+  async getMCQs(
+    limit = 10,
+    difficulty?: string,
+    opts?: { year?: number; sourceId?: string },
+  ): Promise<MCQ[]> {
+    const conditions = [eq(mcqs.isPublished, true), eq(mcqs.isArchived, false)];
+    if (difficulty && difficulty !== "all")
+      conditions.push(eq(mcqs.difficulty, difficulty));
+    if (opts?.year) conditions.push(eq(mcqs.year, opts.year));
+    if (opts?.sourceId) conditions.push(eq(mcqs.sourceId, opts.sourceId));
+    return await db
+      .select()
+      .from(mcqs)
+      .where(and(...conditions))
+      .orderBy(sql`RANDOM()`)
+      .limit(limit);
+  }
+
+  /** @inheritdoc */
+  async getMCQMetadataByIds(ids: string[]): Promise<
+    Map<
+      string,
+      {
+        year: number | null;
+        sourceName: string | null;
+        subjectName: string | null;
+      }
+    >
+  > {
+    const map = new Map<
+      string,
+      {
+        year: number | null;
+        sourceName: string | null;
+        subjectName: string | null;
+      }
+    >();
+    if (ids.length === 0) return map;
+    const rows = await db
+      .select({
+        id: mcqs.id,
+        year: mcqs.year,
+        sourceName: sources.name,
+        subjectName: subjects.title,
+      })
+      .from(mcqs)
+      .leftJoin(sources, eq(mcqs.sourceId, sources.id))
+      .leftJoin(topics, eq(mcqs.topicId, topics.id))
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .leftJoin(subjects, eq(chapters.subjectId, subjects.id))
+      .where(inArray(mcqs.id, ids));
+    for (const r of rows) {
+      map.set(r.id, {
+        year: r.year ?? null,
+        sourceName: r.sourceName ?? null,
+        subjectName: r.subjectName ?? null,
+      });
     }
-    return await query.limit(limit).orderBy(sql`RANDOM()`);
+    return map;
+  }
+
+  /** @inheritdoc */
+  async getQuizFilterOptions(): Promise<{
+    years: number[];
+    sources: { id: string; name: string }[];
+  }> {
+    const publishedActive = and(
+      eq(mcqs.isPublished, true),
+      eq(mcqs.isArchived, false),
+    );
+    const yearRows = await db
+      .select({ year: mcqs.year })
+      .from(mcqs)
+      .where(and(publishedActive, sql`${mcqs.year} IS NOT NULL`))
+      .groupBy(mcqs.year)
+      .orderBy(desc(mcqs.year));
+    const sourceRows = await db
+      .select({ id: sources.id, name: sources.name })
+      .from(mcqs)
+      .innerJoin(sources, eq(mcqs.sourceId, sources.id))
+      .where(publishedActive)
+      .groupBy(sources.id, sources.name)
+      .orderBy(sources.name);
+    return {
+      years: yearRows.map((r: { year: number | null }) => r.year as number),
+      sources: sourceRows.map((r: { id: string; name: string }) => ({
+        id: r.id,
+        name: r.name,
+      })),
+    };
+  }
+
+  /** @inheritdoc */
+  async recordMcqStats(results: Record<string, boolean>): Promise<void> {
+    const entries = Object.entries(results);
+    if (entries.length === 0) return;
+    for (const [mcqId, isCorrect] of entries) {
+      await db
+        .insert(mcqStats)
+        .values({ mcqId, attempts: 1, correct: isCorrect ? 1 : 0 })
+        .onConflictDoUpdate({
+          target: mcqStats.mcqId,
+          set: {
+            attempts: sql`${mcqStats.attempts} + 1`,
+            correct: sql`${mcqStats.correct} + ${isCorrect ? 1 : 0}`,
+            updatedAt: new Date(),
+          },
+        });
+    }
   }
 
   /** @inheritdoc */
@@ -699,8 +849,14 @@ export class DatabaseStorage implements IStorage {
     const allMcqs = await db
       .select()
       .from(mcqs)
-      .where(eq(mcqs.isPublished, true));
-    return allMcqs.filter((m: any) => wrongIds.includes(m.id));
+      .where(
+        and(
+          eq(mcqs.isPublished, true),
+          eq(mcqs.isArchived, false),
+          inArray(mcqs.id, wrongIds),
+        ),
+      );
+    return allMcqs;
   }
 
   /** @inheritdoc */
@@ -1136,7 +1292,13 @@ export class DatabaseStorage implements IStorage {
    * @returns An array of topic objects with their chapter title and question count
    */
   async getQuizTopicsWithCounts(): Promise<
-    { id: string; title: string; chapterTitle: string; isPaid: boolean; questionCount: number }[]
+    {
+      id: string;
+      title: string;
+      chapterTitle: string;
+      isPaid: boolean;
+      questionCount: number;
+    }[]
   > {
     const rows = await db
       .select({
@@ -1149,9 +1311,23 @@ export class DatabaseStorage implements IStorage {
       .from(topics)
       .innerJoin(chapters, eq(topics.chapterId, chapters.id))
       .innerJoin(mcqs, eq(mcqs.topicId, topics.id))
-      .where(and(eq(topics.isPublished, true), eq(mcqs.isPublished, true)))
-      .groupBy(topics.id, topics.title, chapters.title, topics.isPaid)
-      .having(sql`count(${mcqs.id}) > 0`);
+      .where(
+        and(
+          eq(topics.isPublished, true),
+          eq(mcqs.isPublished, true),
+          eq(mcqs.isArchived, false),
+        ),
+      )
+      .groupBy(
+        topics.id,
+        topics.title,
+        chapters.title,
+        topics.isPaid,
+        chapters.order,
+        topics.order,
+      )
+      .having(sql`count(${mcqs.id}) > 0`)
+      .orderBy(asc(chapters.order), asc(topics.order));
 
     return rows.map((r: any) => ({
       id: r.topicId,
@@ -1643,7 +1819,9 @@ export class DatabaseStorage implements IStorage {
     return entry;
   }
 
-  async createNewsletterEntry(data: { email: string }): Promise<NewsletterEntry> {
+  async createNewsletterEntry(data: {
+    email: string;
+  }): Promise<NewsletterEntry> {
     const [entry] = await db.insert(newsletterEntries).values(data).returning();
     return entry;
   }

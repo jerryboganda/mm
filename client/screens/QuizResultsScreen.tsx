@@ -17,6 +17,7 @@ import {
   ExplanationImage,
 } from "@/components/ExplanationFigures";
 import { McqExplanationRenderer } from "@/components/McqExplanationRenderer";
+import { MetaPillRow } from "@/components/MetaPill";
 import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
@@ -35,6 +36,9 @@ interface QuestionResult {
   isCorrect: boolean;
   explanation: string;
   images?: ExplanationImage[];
+  year?: number | null;
+  sourceName?: string | null;
+  subjectName?: string | null;
 }
 
 interface QuizResult {
@@ -195,6 +199,12 @@ export default function QuizResultsScreen() {
                   Q{index + 1}
                 </ThemedText>
               </View>
+              <MetaPillRow
+                year={q.year}
+                subjectName={q.subjectName}
+                sourceName={q.sourceName}
+                style={{ marginBottom: Spacing.xs }}
+              />
               <ThemedText style={styles.questionText} numberOfLines={4}>
                 {q.question}
               </ThemedText>
@@ -235,7 +245,12 @@ export default function QuizResultsScreen() {
                   { backgroundColor: `${theme.primary}1A` },
                 ]}
               >
-                <Feather name="info" size={14} color={theme.primary} style={{ marginTop: 2, marginRight: 6 }} />
+                <Feather
+                  name="info"
+                  size={14}
+                  color={theme.primary}
+                  style={{ marginTop: 2, marginRight: 6 }}
+                />
                 <View style={{ flex: 1 }}>
                   <McqExplanationRenderer explanation={q.explanation} />
                 </View>

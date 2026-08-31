@@ -94,13 +94,13 @@ export default function DashboardPage() {
         <StatCard icon={Users} label="Total Users" value={stats.totalUsers} color="bg-blue-500" subtitle={`+${stats.newUsersThisWeek} this week`} />
         <StatCard icon={Activity} label="Active Users" value={stats.activeUsersThisWeek} color="bg-green-500" subtitle="Last 7 days" />
         <StatCard icon={BookOpen} label="Books" value={`${stats.publishedBooks}/${stats.totalBooks}`} color="bg-purple-500" subtitle="Published / Total" />
-        <StatCard icon={FileText} label="Topics" value={`${stats.publishedTopics}/${stats.totalTopics}`} color="bg-indigo-500" subtitle="Published / Total" />
+        <StatCard icon={FileText} label="Subtopics" value={`${stats.publishedTopics}/${stats.totalTopics}`} color="bg-indigo-500" subtitle="Published / Total" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={ClipboardList} label="MCQs" value={`${stats.publishedMcqs}/${stats.totalMcqs}`} color="bg-amber-500" subtitle="Published / Total" />
         <StatCard icon={BarChart3} label="Quiz Attempts" value={stats.totalAttempts} color="bg-cyan-500" />
-        <StatCard icon={TrendingUp} label="Chapters" value={stats.totalChapters} color="bg-teal-500" />
+        <StatCard icon={TrendingUp} label="Topics" value={stats.totalChapters} color="bg-teal-500" />
         <StatCard icon={AlertTriangle} label="Pending Reports" value={stats.pendingReports} color={stats.pendingReports > 0 ? "bg-red-500" : "bg-gray-400"} />
       </div>
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import {
   Plus, Pencil, Trash2, Eye, EyeOff, GripVertical,
-  BookOpen, Loader2, ChevronRight, AlertCircle,
+  BookOpen, Loader2, ChevronRight, AlertCircle, Layers,
 } from 'lucide-react';
 
 interface Book {
@@ -159,7 +159,10 @@ export default function BooksPage() {
                   {book.description && <p className="text-sm text-gray-500 truncate mt-0.5">{book.description}</p>}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Link to={`/books/${book.id}/chapters`} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Manage chapters">
+                  <Link to={`/books/${book.id}/subjects`} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Manage subjects">
+                    <Layers className="w-4 h-4" />
+                  </Link>
+                  <Link to={`/books/${book.id}/chapters`} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Manage topics">
                     <ChevronRight className="w-5 h-5" />
                   </Link>
                   <button onClick={() => togglePublish(book)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title={book.isPublished ? 'Unpublish' : 'Publish'}>

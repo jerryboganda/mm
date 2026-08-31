@@ -41,7 +41,29 @@ import {
   adminUpdateMcq,
   adminDeleteMcq,
   adminBulkCreateMcqs,
+  adminBulkUpdateMcqs,
+  adminGetMcqFacets,
+  adminGetSubjects,
+  adminCreateSubject,
+  adminUpdateSubject,
+  adminDeleteSubject,
+  adminSubjectUsage,
+  adminGetSources,
+  adminCreateSource,
+  adminUpdateSource,
+  adminDeleteSource,
+  adminSourceMcqCount,
+  adminMergeSources,
+  adminGetInstitutions,
+  adminCreateInstitution,
+  adminUpdateInstitution,
+  adminDeleteInstitution,
+  adminInstitutionMcqCount,
+  adminMergeInstitutions,
   adminGetAllTopicsFlat,
+  parseBoolFilter,
+  parseListFilter,
+  type AdminMcqFilters,
   createAuditLog,
 } from "../admin-storage";
 import { logger } from "../lib/logger";
@@ -57,6 +79,7 @@ const bookSchema = z.object({
 
 const chapterSchema = z.object({
   bookId: z.string().min(1, "Book ID is required"),
+  subjectId: z.string().optional().nullable(),
   title: z.string().min(1, "Title is required").max(200),
   description: z.string().max(2000).optional().nullable(),
   isPublished: z.boolean().optional(),
@@ -88,21 +111,19 @@ const mcqOptionSchema = z.object({
 });
 
 const mcqOptionsSchema = z.union([
-  z.record(z.string()).refine(
-    (obj) => Object.keys(obj).length >= 2,
-    "At least 2 options required",
-  ),
   z
-    .array(mcqOptionSchema)
-    .min(2, "At least 2 options required")
-    .max(10),
-  z
-    .array(z.string().min(1))
-    .min(2, "At least 2 options required")
-    .max(10),
+    .record(z.string())
+    .refine(
+      (obj) => Object.keys(obj).length >= 2,
+      "At least 2 options required",
+    ),
+  z.array(mcqOptionSchema).min(2, "At least 2 options required").max(10),
+  z.array(z.string().min(1)).min(2, "At least 2 options required").max(10),
 ]);
 
-function normalizeMcqOptionsToRecord(rawOptions: unknown): Record<string, string> {
+function normalizeMcqOptionsToRecord(
+  rawOptions: unknown,
+): Record<string, string> {
   if (!rawOptions) return {};
   if (Array.isArray(rawOptions)) {
     const map: Record<string, string> = {};
@@ -112,8 +133,18 @@ function normalizeMcqOptionsToRecord(rawOptions: unknown): Record<string, string
       if (typeof item === "string") {
         map[fallback] = item;
       } else if (item && typeof item === "object") {
-        const label = String((item as any).label || (item as any).key || fallback).toUpperCase().trim();
-        const text = String((item as any).text ?? (item as any).value ?? (item as any).option ?? (item as any).content ?? "");
+        const label = String(
+          (item as any).label || (item as any).key || fallback,
+        )
+          .toUpperCase()
+          .trim();
+        const text = String(
+          (item as any).text ??
+            (item as any).value ??
+            (item as any).option ??
+            (item as any).content ??
+            "",
+        );
         map[label] = text;
       }
     });
@@ -121,7 +152,9 @@ function normalizeMcqOptionsToRecord(rawOptions: unknown): Record<string, string
   }
   if (typeof rawOptions === "object" && rawOptions !== null) {
     const map: Record<string, string> = {};
-    for (const [k, v] of Object.entries(rawOptions as Record<string, unknown>)) {
+    for (const [k, v] of Object.entries(
+      rawOptions as Record<string, unknown>,
+    )) {
       if (v !== null && v !== undefined) {
         map[k.toUpperCase().trim()] = String(v);
       }
@@ -131,7 +164,9 @@ function normalizeMcqOptionsToRecord(rawOptions: unknown): Record<string, string
   return {};
 }
 
-function normalizeMcqOptionExplanationsToRecord(rawExpls: unknown): Record<string, string> | undefined {
+function normalizeMcqOptionExplanationsToRecord(
+  rawExpls: unknown,
+): Record<string, string> | undefined {
   if (!rawExpls) return undefined;
   if (Array.isArray(rawExpls)) {
     const map: Record<string, string> = {};
@@ -141,8 +176,17 @@ function normalizeMcqOptionExplanationsToRecord(rawExpls: unknown): Record<strin
       if (typeof item === "string") {
         map[fallback] = item;
       } else if (item && typeof item === "object") {
-        const label = String((item as any).label || (item as any).key || fallback).toUpperCase().trim();
-        const text = String((item as any).text ?? (item as any).explanation ?? (item as any).value ?? "");
+        const label = String(
+          (item as any).label || (item as any).key || fallback,
+        )
+          .toUpperCase()
+          .trim();
+        const text = String(
+          (item as any).text ??
+            (item as any).explanation ??
+            (item as any).value ??
+            "",
+        );
         map[label] = text;
       }
     });
@@ -160,16 +204,41 @@ function normalizeMcqOptionExplanationsToRecord(rawExpls: unknown): Record<strin
   return undefined;
 }
 
+/** Normalize free-form tags: trim, collapse case-duplicates, dedupe. */
+function normalizeMcqTags(raw: unknown): string[] | null | undefined {
+  if (raw === null) return null;
+  if (raw === undefined) return undefined;
+  const list = Array.isArray(raw)
+    ? raw.map(String)
+    : typeof raw === "string"
+      ? raw.split(",")
+      : [];
+  const seen = new Map<string, string>();
+  for (const item of list) {
+    const tag = item.trim().replace(/\s+/g, " ");
+    if (!tag) continue;
+    const key = tag.toLowerCase();
+    if (!seen.has(key)) seen.set(key, tag);
+  }
+  return Array.from(seen.values());
+}
+
 const mcqSchema = z.object({
   topicId: z.string().min(1, "Topic ID is required"),
   question: z.string().min(1, "Question is required").max(5000),
   options: mcqOptionsSchema,
   correctAnswer: z.string().min(1, "Correct answer is required"),
   explanation: z.string().max(100000).optional().nullable(),
-  optionExplanations: z.record(z.string().optional().nullable()).optional().nullable(),
+  optionExplanations: z
+    .record(z.string().optional().nullable())
+    .optional()
+    .nullable(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
   references: z.string().max(10000).optional().nullable(),
-  tags: z.union([z.array(z.string()), z.string()]).optional().nullable(),
+  tags: z
+    .union([z.array(z.string()), z.string()])
+    .optional()
+    .nullable(),
   images: z
     .array(
       z.object({
@@ -181,6 +250,22 @@ const mcqSchema = z.object({
     .nullable(),
   isPublished: z.boolean().optional(),
   isPaid: z.boolean().optional(),
+  year: z.number().int().min(1950).max(2100).optional().nullable(),
+  sourceId: z.string().optional().nullable(),
+  institutionId: z.string().optional().nullable(),
+  questionType: z
+    .enum([
+      "single_best",
+      "multiple_true",
+      "negative",
+      "assertion_reason",
+      "image_based",
+      "clinical_vignette",
+    ])
+    .optional()
+    .nullable(),
+  examType: z.string().max(100).optional().nullable(),
+  isArchived: z.boolean().optional(),
 });
 
 const reorderSchema = z.object({
@@ -701,9 +786,10 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
     }
 
     const existingBlocks = await adminGetContentBlocks(topicId);
-    if (existingBlocks.some(b => b.type === "document_html")) {
+    if (existingBlocks.some((b) => b.type === "document_html")) {
       return res.status(403).json({
-        message: "This topic contains authoritative textbook content from the release pipeline and is locked against direct manual edits to maintain 100% textbook layout parity. Use the content compiler release pipeline to deploy updates."
+        message:
+          "This topic contains authoritative textbook content from the release pipeline and is locked against direct manual edits to maintain 100% textbook layout parity. Use the content compiler release pipeline to deploy updates.",
       });
     }
 
@@ -741,28 +827,48 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
 // MCQs
 // ═══════════════════════════════════════════════════════════════
 
+router.get("/mcqs/facets", async (_req: AuthRequest, res) => {
+  try {
+    const facets = await adminGetMcqFacets();
+    res.json(facets);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
 router.get("/mcqs", async (req: AuthRequest, res) => {
   try {
-    const { topicId, difficulty, isPublished, isPaid, search, page, pageSize } =
-      req.query as any;
+    const q = req.query as Record<string, unknown>;
+    const years = parseListFilter(q.years)
+      .map((y) => parseInt(y, 10))
+      .filter((y) => Number.isFinite(y));
     const result = await adminGetMcqs({
-      topicId,
-      difficulty,
-      isPublished:
-        isPublished === "true"
-          ? true
-          : isPublished === "false"
-            ? false
-            : undefined,
-      isPaid:
-        isPaid === "true"
-          ? true
-          : isPaid === "false"
-            ? false
-            : undefined,
-      search,
-      page: page ? parseInt(page) : undefined,
-      pageSize: pageSize ? parseInt(pageSize) : undefined,
+      topicId: q.topicId as string | undefined,
+      topicIds: parseListFilter(q.topicIds),
+      bookId: q.bookId as string | undefined,
+      subjectId: q.subjectId as string | undefined,
+      chapterId: q.chapterId as string | undefined,
+      years: years.length ? years : undefined,
+      sourceIds: parseListFilter(q.sourceIds),
+      institutionId: q.institutionId as string | undefined,
+      questionType: q.questionType as string | undefined,
+      examType: q.examType as string | undefined,
+      difficulty: q.difficulty as string | undefined,
+      difficulties: parseListFilter(q.difficulties),
+      status: q.status as AdminMcqFilters["status"],
+      isPublished: parseBoolFilter(q.isPublished),
+      isPaid: parseBoolFilter(q.isPaid),
+      tags: parseListFilter(q.tags),
+      hasExplanation: parseBoolFilter(q.hasExplanation),
+      hasImage: parseBoolFilter(q.hasImage),
+      hasYear: parseBoolFilter(q.hasYear),
+      hasSource: parseBoolFilter(q.hasSource),
+      search: q.search as string | undefined,
+      sort: q.sort as string | undefined,
+      page: q.page ? parseInt(String(q.page)) : undefined,
+      pageSize: q.pageSize ? parseInt(String(q.pageSize)) : undefined,
     });
     res.json(result);
   } catch (err: unknown) {
@@ -792,7 +898,10 @@ router.post("/mcqs", async (req: AuthRequest, res) => {
     const m = await adminCreateMcq({
       ...data,
       options: normalizeMcqOptionsToRecord(data.options),
-      optionExplanations: normalizeMcqOptionExplanationsToRecord(data.optionExplanations),
+      optionExplanations: normalizeMcqOptionExplanationsToRecord(
+        data.optionExplanations,
+      ),
+      tags: normalizeMcqTags(data.tags),
     });
     await createAuditLog({
       adminUserId: req.userId!,
@@ -815,10 +924,17 @@ router.put("/mcqs/:id", async (req: AuthRequest, res) => {
     if (!data) return;
     const payload = {
       ...data,
-      ...(data.options ? { options: normalizeMcqOptionsToRecord(data.options) } : {}),
-      ...(data.optionExplanations !== undefined
-        ? { optionExplanations: normalizeMcqOptionExplanationsToRecord(data.optionExplanations) }
+      ...(data.options
+        ? { options: normalizeMcqOptionsToRecord(data.options) }
         : {}),
+      ...(data.optionExplanations !== undefined
+        ? {
+            optionExplanations: normalizeMcqOptionExplanationsToRecord(
+              data.optionExplanations,
+            ),
+          }
+        : {}),
+      ...(data.tags !== undefined ? { tags: normalizeMcqTags(data.tags) } : {}),
     };
     const m = await adminUpdateMcq(mcqId, payload);
     if (!m) return res.status(404).json({ message: "MCQ not found" });
@@ -867,7 +983,10 @@ router.post("/mcqs/bulk", async (req: AuthRequest, res) => {
     const normalizedMcqs = data.mcqs.map((mcq) => ({
       ...mcq,
       options: normalizeMcqOptionsToRecord(mcq.options),
-      optionExplanations: normalizeMcqOptionExplanationsToRecord(mcq.optionExplanations),
+      optionExplanations: normalizeMcqOptionExplanationsToRecord(
+        mcq.optionExplanations,
+      ),
+      tags: normalizeMcqTags(mcq.tags),
     }));
     const created = await adminBulkCreateMcqs(normalizedMcqs);
     await createAuditLog({
@@ -879,6 +998,386 @@ router.post("/mcqs/bulk", async (req: AuthRequest, res) => {
     res
       .status(201)
       .json({ message: `${created} MCQs created`, count: created });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/mcqs/bulk-update", async (req: AuthRequest, res) => {
+  try {
+    const bulkUpdateSchema = z.object({
+      ids: z.array(z.string().min(1)).min(1, "Select at least 1 MCQ").max(1000),
+      patch: z
+        .object({
+          year: z.number().int().min(1950).max(2100).nullable().optional(),
+          sourceId: z.string().nullable().optional(),
+          institutionId: z.string().nullable().optional(),
+          questionType: mcqSchema.shape.questionType,
+          examType: z.string().max(100).nullable().optional(),
+          difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+          isPublished: z.boolean().optional(),
+          isPaid: z.boolean().optional(),
+          isArchived: z.boolean().optional(),
+          addTags: z.array(z.string()).optional(),
+        })
+        .refine(
+          (p) => Object.keys(p).length > 0,
+          "Provide at least one field to update",
+        ),
+    });
+    const data = validateBody(bulkUpdateSchema, req.body, res);
+    if (!data) return;
+    const patch = {
+      ...data.patch,
+      ...(data.patch.addTags
+        ? { addTags: normalizeMcqTags(data.patch.addTags) ?? [] }
+        : {}),
+    };
+    const updated = await adminBulkUpdateMcqs(data.ids, patch);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "bulk_update",
+      entityType: "mcq",
+      details: { count: updated, patch: data.patch },
+    });
+    res.json({ message: `${updated} MCQs updated`, count: updated });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Subjects (books > subjects > chapters > topics)
+// ═══════════════════════════════════════════════════════════════
+
+const subjectSchema = z.object({
+  bookId: z.string().min(1, "Book ID is required"),
+  title: z.string().min(1, "Title is required").max(200),
+  description: z.string().max(2000).optional().nullable(),
+  isPublished: z.boolean().optional(),
+  order: z.number().int().optional(),
+});
+
+router.get("/subjects", async (req: AuthRequest, res) => {
+  try {
+    const bookId = req.query.bookId as string | undefined;
+    const data = await adminGetSubjects(bookId);
+    res.json(data);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/subjects", async (req: AuthRequest, res) => {
+  try {
+    const data = validateBody(subjectSchema, req.body, res);
+    if (!data) return;
+    const s = await adminCreateSubject(data);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "create",
+      entityType: "subject",
+      entityId: s.id,
+    });
+    res.status(201).json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.put("/subjects/:id", async (req: AuthRequest, res) => {
+  try {
+    const id = getParamValue(req.params.id);
+    const data = validateBody(
+      subjectSchema.partial().extend({
+        isActive: z.boolean().optional(),
+      }),
+      req.body,
+      res,
+    );
+    if (!data) return;
+    const s = await adminUpdateSubject(id, data);
+    if (!s) return res.status(404).json({ message: "Subject not found" });
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "update",
+      entityType: "subject",
+      entityId: s.id,
+    });
+    res.json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.delete("/subjects/:id", async (req: AuthRequest, res) => {
+  try {
+    const id = getParamValue(req.params.id);
+    const usage = await adminSubjectUsage(id);
+    if (usage > 0) {
+      return res.status(400).json({
+        message: `Subject is assigned to ${usage} topic group(s). Reassign them first or deactivate it.`,
+        usage,
+      });
+    }
+    await adminDeleteSubject(id);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "delete",
+      entityType: "subject",
+      entityId: id,
+    });
+    res.json({ message: "Subject deleted" });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Sources (chapter / reference / source entities)
+// ═══════════════════════════════════════════════════════════════
+
+const sourceKindEnum = z.enum([
+  "textbook",
+  "past_paper",
+  "university_exam",
+  "board_exam",
+  "lecture",
+  "notes",
+  "custom",
+]);
+
+const sourceSchema = z.object({
+  name: z.string().min(1, "Name is required").max(300),
+  kind: sourceKindEnum.optional(),
+  isActive: z.boolean().optional(),
+});
+
+router.get("/sources", async (_req: AuthRequest, res) => {
+  try {
+    res.json(await adminGetSources());
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/sources", async (req: AuthRequest, res) => {
+  try {
+    const data = validateBody(sourceSchema, req.body, res);
+    if (!data) return;
+    const s = await adminCreateSource(data);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "create",
+      entityType: "mcq_source",
+      entityId: s.id,
+    });
+    res.status(201).json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.put("/sources/:id", async (req: AuthRequest, res) => {
+  try {
+    const id = getParamValue(req.params.id);
+    const data = validateBody(sourceSchema.partial(), req.body, res);
+    if (!data) return;
+    const s = await adminUpdateSource(id, data);
+    if (!s) return res.status(404).json({ message: "Source not found" });
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "update",
+      entityType: "mcq_source",
+      entityId: s.id,
+    });
+    res.json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.delete("/sources/:id", async (req: AuthRequest, res) => {
+  try {
+    const id = getParamValue(req.params.id);
+    const usage = await adminSourceMcqCount(id);
+    if (usage > 0) {
+      return res.status(400).json({
+        message: `Source is attached to ${usage} MCQs. Merge it into another source or deactivate it instead.`,
+        usage,
+      });
+    }
+    await adminDeleteSource(id);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "delete",
+      entityType: "mcq_source",
+      entityId: id,
+    });
+    res.json({ message: "Source deleted" });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/sources/merge", async (req: AuthRequest, res) => {
+  try {
+    const data = validateBody(
+      z.object({
+        fromId: z.string().min(1),
+        toId: z.string().min(1),
+      }),
+      req.body,
+      res,
+    );
+    if (!data) return;
+    if (data.fromId === data.toId) {
+      return res
+        .status(400)
+        .json({ message: "Cannot merge a source into itself" });
+    }
+    const moved = await adminMergeSources(data.fromId, data.toId);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "merge",
+      entityType: "mcq_source",
+      entityId: data.toId,
+      details: { fromId: data.fromId, movedMcqs: moved },
+    });
+    res.json({ message: `Merged. ${moved} MCQs reassigned.`, moved });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Institutions
+// ═══════════════════════════════════════════════════════════════
+
+const institutionSchema = z.object({
+  name: z.string().min(1, "Name is required").max(300),
+  isActive: z.boolean().optional(),
+});
+
+router.get("/institutions", async (_req: AuthRequest, res) => {
+  try {
+    res.json(await adminGetInstitutions());
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/institutions", async (req: AuthRequest, res) => {
+  try {
+    const data = validateBody(institutionSchema, req.body, res);
+    if (!data) return;
+    const i = await adminCreateInstitution(data);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "create",
+      entityType: "institution",
+      entityId: i.id,
+    });
+    res.status(201).json(i);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.put("/institutions/:id", async (req: AuthRequest, res) => {
+  try {
+    const id = getParamValue(req.params.id);
+    const data = validateBody(institutionSchema.partial(), req.body, res);
+    if (!data) return;
+    const i = await adminUpdateInstitution(id, data);
+    if (!i) return res.status(404).json({ message: "Institution not found" });
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "update",
+      entityType: "institution",
+      entityId: i.id,
+    });
+    res.json(i);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.delete("/institutions/:id", async (req: AuthRequest, res) => {
+  try {
+    const id = getParamValue(req.params.id);
+    const usage = await adminInstitutionMcqCount(id);
+    if (usage > 0) {
+      return res.status(400).json({
+        message: `Institution is attached to ${usage} MCQs. Merge it or deactivate it instead.`,
+        usage,
+      });
+    }
+    await adminDeleteInstitution(id);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "delete",
+      entityType: "institution",
+      entityId: id,
+    });
+    res.json({ message: "Institution deleted" });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/institutions/merge", async (req: AuthRequest, res) => {
+  try {
+    const data = validateBody(
+      z.object({ fromId: z.string().min(1), toId: z.string().min(1) }),
+      req.body,
+      res,
+    );
+    if (!data) return;
+    if (data.fromId === data.toId) {
+      return res
+        .status(400)
+        .json({ message: "Cannot merge an institution into itself" });
+    }
+    const moved = await adminMergeInstitutions(data.fromId, data.toId);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "merge",
+      entityType: "institution",
+      entityId: data.toId,
+      details: { fromId: data.fromId, movedMcqs: moved },
+    });
+    res.json({ message: `Merged. ${moved} MCQs reassigned.`, moved });
   } catch (err: unknown) {
     res
       .status(500)

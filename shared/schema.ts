@@ -8,6 +8,7 @@ import {
   timestamp,
   jsonb,
   numeric,
+  bigint,
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -110,6 +111,40 @@ export const books = pgTable("books", {
 
 export const booksRelations = relations(books, ({ many }) => ({
   chapters: many(chapters),
+  subjects: many(subjects),
+}));
+
+// Subjects sit between books and chapters in the academic hierarchy:
+// books > subjects > chapters (UI: "Topics") > topics (UI: "Subtopics") > mcqs.
+// Nullable on chapters so existing content keeps working until assigned.
+export const subjects = pgTable(
+  "subjects",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    bookId: varchar("book_id")
+      .notNull()
+      .references(() => books.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    order: integer("order").default(0),
+    isPublished: boolean("is_published").default(true),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_subjects_book_published").on(table.bookId, table.isPublished),
+  ],
+);
+
+export const subjectsRelations = relations(subjects, ({ one, many }) => ({
+  book: one(books, {
+    fields: [subjects.bookId],
+    references: [books.id],
+  }),
+  chapters: many(chapters),
 }));
 
 export const chapters = pgTable(
@@ -121,6 +156,9 @@ export const chapters = pgTable(
     bookId: varchar("book_id")
       .notNull()
       .references(() => books.id, { onDelete: "cascade" }),
+    subjectId: varchar("subject_id").references(() => subjects.id, {
+      onDelete: "set null",
+    }),
     title: text("title").notNull(),
     description: text("description"),
     order: integer("order").default(0),
@@ -129,6 +167,7 @@ export const chapters = pgTable(
   },
   (table) => [
     index("idx_chapters_book_published").on(table.bookId, table.isPublished),
+    index("idx_chapters_subject").on(table.subjectId),
   ],
 );
 
@@ -136,6 +175,10 @@ export const chaptersRelations = relations(chapters, ({ one, many }) => ({
   book: one(books, {
     fields: [chapters.bookId],
     references: [books.id],
+  }),
+  subject: one(subjects, {
+    fields: [chapters.subjectId],
+    references: [subjects.id],
   }),
   topics: many(topics),
 }));
@@ -198,36 +241,110 @@ export const contentBlocksRelations = relations(contentBlocks, ({ one }) => ({
   }),
 }));
 
-export const mcqs = pgTable("mcqs", {
+export const sources = pgTable(
+  "sources",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    name: text("name").notNull(),
+    // textbook | past_paper | university_exam | board_exam | lecture | notes | custom
+    kind: text("kind").notNull().default("custom"),
+    isActive: boolean("is_active").default(true).notNull(),
+    order: integer("order").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_sources_active_order").on(table.isActive, table.order),
+  ],
+);
+
+export const institutions = pgTable("institutions", {
   id: varchar("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  topicId: varchar("topic_id")
-    .notNull()
-    .references(() => topics.id, { onDelete: "cascade" }),
-  question: text("question").notNull(),
-  options: jsonb("options").notNull(),
-  correctAnswer: text("correct_answer").notNull(),
-  explanation: text("explanation"),
-  optionExplanations: jsonb("option_explanations"),
-  difficulty: text("difficulty").notNull().default("medium"),
-  references: text("references"),
-  tags: jsonb("tags"),
-  // Optional explanation figures: [{ url: string, caption?: string }]
-  // Additive/nullable so existing rows and callers are unaffected.
-  images: jsonb("images"),
-  isPublished: boolean("is_published").default(true),
-  isPaid: boolean("is_paid").default(false).notNull(),
+  name: text("name").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const mcqs = pgTable(
+  "mcqs",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    topicId: varchar("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    question: text("question").notNull(),
+    options: jsonb("options").notNull(),
+    correctAnswer: text("correct_answer").notNull(),
+    explanation: text("explanation"),
+    optionExplanations: jsonb("option_explanations"),
+    difficulty: text("difficulty").notNull().default("medium"),
+    references: text("references"),
+    tags: jsonb("tags"),
+    // Optional explanation figures: [{ url: string, caption?: string }]
+    // Additive/nullable so existing rows and callers are unaffected.
+    images: jsonb("images"),
+    isPublished: boolean("is_published").default(true),
+    isPaid: boolean("is_paid").default(false).notNull(),
+    // ── Classification metadata (additive; null = unclassified) ──
+    year: integer("year"),
+    sourceId: varchar("source_id").references(() => sources.id, {
+      onDelete: "set null",
+    }),
+    institutionId: varchar("institution_id").references(() => institutions.id, {
+      onDelete: "set null",
+    }),
+    questionType: text("question_type").default("single_best"),
+    examType: text("exam_type"),
+    // Status = Draft (isPublished=false) | Published | Archived (isArchived=true)
+    isArchived: boolean("is_archived").default(false).notNull(),
+    // Stable creation order. Assigned from its own sequence on insert and
+    // NEVER modified by edits/filters. Default student/admin ordering.
+    seq: bigint("seq", { mode: "number" })
+      .notNull()
+      .default(sql`nextval('mcqs_seq_seq')`),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_mcqs_year").on(table.year),
+    index("idx_mcqs_source").on(table.sourceId),
+    index("idx_mcqs_institution").on(table.institutionId),
+    index("idx_mcqs_seq").on(table.seq),
+    index("idx_mcqs_archived").on(table.isArchived),
+  ],
+);
 
 export const mcqsRelations = relations(mcqs, ({ one }) => ({
   topic: one(topics, {
     fields: [mcqs.topicId],
     references: [topics.id],
   }),
+  source: one(sources, {
+    fields: [mcqs.sourceId],
+    references: [sources.id],
+  }),
+  institution: one(institutions, {
+    fields: [mcqs.institutionId],
+    references: [institutions.id],
+  }),
 }));
+
+// Per-MCQ attempt analytics, incremented transactionally on quiz submit.
+export const mcqStats = pgTable("mcq_stats", {
+  mcqId: varchar("mcq_id")
+    .primaryKey()
+    .references(() => mcqs.id, { onDelete: "cascade" }),
+  attempts: integer("attempts").notNull().default(0),
+  correct: integer("correct").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export const userProgress = pgTable(
   "user_progress",
@@ -1484,10 +1601,14 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type UserSession = typeof userSessions.$inferSelect;
 export type Book = typeof books.$inferSelect;
+export type Subject = typeof subjects.$inferSelect;
 export type Chapter = typeof chapters.$inferSelect;
 export type Topic = typeof topics.$inferSelect;
 export type ContentBlock = typeof contentBlocks.$inferSelect;
 export type MCQ = typeof mcqs.$inferSelect;
+export type McqSource = typeof sources.$inferSelect;
+export type Institution = typeof institutions.$inferSelect;
+export type McqStats = typeof mcqStats.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
 export type Bookmark = typeof bookmarks.$inferSelect;
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
@@ -1514,8 +1635,7 @@ export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
 export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
 export type SubscriptionAuditLog = typeof subscriptionAuditLogs.$inferSelect;
 export type ManualPaymentProof = typeof manualPaymentProofs.$inferSelect;
-export type InsertManualPaymentProof =
-  typeof manualPaymentProofs.$inferInsert;
+export type InsertManualPaymentProof = typeof manualPaymentProofs.$inferInsert;
 
 // ── Website Marketing Tables ──────────────────────────────────
 export const waitlistEntries = pgTable("waitlist_entries", {
@@ -1562,7 +1682,9 @@ export const insertWaitlistSchema = createInsertSchema(waitlistEntries).pick({
   email: true,
 });
 
-export const insertNewsletterSchema = createInsertSchema(newsletterEntries).pick({
+export const insertNewsletterSchema = createInsertSchema(
+  newsletterEntries,
+).pick({
   email: true,
 });
 
@@ -1588,4 +1710,3 @@ export type WaitlistEntry = typeof waitlistEntries.$inferSelect;
 export type NewsletterEntry = typeof newsletterEntries.$inferSelect;
 export type ContactMessage = typeof contactMessages.$inferSelect;
 export type InstitutionalRequest = typeof institutionalRequests.$inferSelect;
-

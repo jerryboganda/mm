@@ -96,8 +96,8 @@ export default function AnalyticsPage() {
               <thead>
                 <tr className="border-b border-gray-100">
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Book</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Chapters</th>
                   <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Topics</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Subtopics</th>
                   <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">MCQs</th>
                 </tr>
               </thead>
