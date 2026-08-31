@@ -77,6 +77,10 @@ ALTER TABLE "mcqs" ALTER COLUMN "seq" SET NOT NULL;
 ALTER TABLE "mcqs" ALTER COLUMN "seq" SET DEFAULT nextval('mcqs_seq_seq');
 ALTER SEQUENCE "mcqs_seq_seq" OWNED BY "mcqs"."seq";
 
+-- Advance the sequence past the backfilled values so new inserts never
+-- collide with existing rows.
+SELECT setval('mcqs_seq_seq', (SELECT COALESCE(MAX("seq"), 0) FROM "mcqs"));
+
 -- ── Indexes for filtering/sorting ──────────────────────────────
 CREATE INDEX IF NOT EXISTS "idx_mcqs_year"        ON "mcqs" ("year");
 CREATE INDEX IF NOT EXISTS "idx_mcqs_source"      ON "mcqs" ("source_id");
