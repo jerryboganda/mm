@@ -98,7 +98,15 @@ export default function UsersPage() {
       role: u.role,
       name: u.name,
       subscriptionStatus: u.subscriptionStatus,
-      subscriptionPlan: u.subscriptionPlan || "",
+      subscriptionPlan:
+        u.subscriptionPlan === "six_months" ||
+        u.subscriptionPlan === "6-months-plan" ||
+        u.subscriptionPlan === "quarterly" ||
+        u.subscriptionPlan === "monthly"
+          ? "6 Months Plan"
+          : u.subscriptionPlan === "annual" || u.subscriptionPlan === "yearly"
+            ? "1 Year Plan"
+            : u.subscriptionPlan || "",
       isEmailVerified: u.isEmailVerified,
     });
     setDeviceLimitForm({
@@ -325,9 +333,8 @@ export default function UsersPage() {
                   className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none text-sm"
                 >
                   <option value="">None</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="yearly">Yearly</option>
+                  <option value="6 Months Plan">6 Months Plan (PKR 700)</option>
+                  <option value="1 Year Plan">1 Year Plan (PKR 1,000)</option>
                 </select>
               </div>
               <div className="border-t border-gray-100 pt-4">

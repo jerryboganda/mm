@@ -60,16 +60,12 @@ const STATUS_STYLES: Record<PackageStatus, string> = {
 };
 
 const BILLING_CYCLES = [
-  "monthly",
-  "quarterly",
   "semi_annual",
   "annual",
 ] as const;
 const BILLING_LABELS: Record<string, string> = {
-  monthly: "Monthly",
-  quarterly: "Quarterly",
-  semi_annual: "Semi-Annual",
-  annual: "Annual",
+  semi_annual: "6 Months (Semi-Annual)",
+  annual: "1 Year (Annual)",
 };
 
 const emptyForm = () => ({
@@ -88,8 +84,8 @@ const emptyFeature = (): PackageFeature => ({
 });
 
 const emptyPrice = (): PackagePrice => ({
-  billingCycle: "monthly",
-  price: 0,
+  billingCycle: "semi_annual",
+  price: 700,
   currency: "PKR",
   stripePriceId: "",
   isActive: true,
