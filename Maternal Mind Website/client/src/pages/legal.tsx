@@ -292,45 +292,81 @@ export function PrivacyPage() {
                   <h2 className="text-lg font-semibold text-white mb-3">
                     1. Information We Collect
                   </h2>
-                  <p className="text-white/60 leading-relaxed">
-                    We collect information you provide directly (name, email,
-                    account details) and usage data (study progress, quiz
-                    results, app interactions). We do not collect clinical
-                    patient data or sensitive medical records.
+                  <p className="text-white/60 leading-relaxed mb-3">
+                    Maternal Mind is an educational platform dedicated to Obstetrics and Gynaecology. We collect only the information necessary to provide, personalize, and secure your learning experience:
+                  </p>
+                  <ul className="list-disc pl-5 text-white/60 space-y-2">
+                    <li>
+                      <strong className="text-white">Account Information:</strong> Name, email address, password hash, and optional profile picture.
+                    </li>
+                    <li>
+                      <strong className="text-white">Educational & Usage Data:</strong> Topics viewed, study progress, quiz scores, accuracy statistics, bookmarks, and personal clinical study notes.
+                    </li>
+                    <li>
+                      <strong className="text-white">Device & Session Data:</strong> Device model, operating system version, authorized session identifiers, and IP addresses to prevent unauthorized multi-device sharing and safeguard account security.
+                    </li>
+                    <li>
+                      <strong className="text-white">Payment & Subscription Data:</strong> Subscription tier (6 Months Plan or 1 Year Plan), renewal dates, and payment receipts. Note that in-app purchases on iOS are processed directly by Apple StoreKit; we never store your credit card or sensitive banking details.
+                    </li>
+                  </ul>
+                  <p className="text-white/60 leading-relaxed mt-3">
+                    We do not collect clinical patient data or medical health records.
                   </p>
                 </section>
                 <section>
                   <h2 className="text-lg font-semibold text-white mb-3">
                     2. How We Use Your Information
                   </h2>
-                  <p className="text-white/60 leading-relaxed">
-                    Your data is used to provide the service (delivering
-                    content, tracking progress, managing subscriptions), improve
-                    the platform, communicate important updates, and provide
-                    customer support. We do not sell your personal information.
+                  <p className="text-white/60 leading-relaxed mb-3">
+                    We process your information for the following legitimate purposes:
+                  </p>
+                  <ul className="list-disc pl-5 text-white/60 space-y-1">
+                    <li>Delivering curriculum topics, questions, and revision algorithms.</li>
+                    <li>Syncing your study history and mock exam scores across authorized devices.</li>
+                    <li>Managing active subscriptions and processing verification requests.</li>
+                    <li>Providing prompt technical and academic support.</li>
+                    <li>Protecting against fraud, account compromise, and unauthorized access.</li>
+                  </ul>
+                  <p className="text-white/60 leading-relaxed mt-3">
+                    We <strong className="text-white">never sell, rent, or trade</strong> your personal information to third-party marketers or advertisers.
                   </p>
                 </section>
                 <section>
                   <h2 className="text-lg font-semibold text-white mb-3">
-                    3. Data Security
+                    3. Data Security & Storage
                   </h2>
                   <p className="text-white/60 leading-relaxed">
-                    We implement industry-standard security measures to protect
-                    your data, including encryption in transit and at rest,
-                    secure authentication, and regular security assessments.
-                    However, no method of transmission over the internet is
-                    completely secure.
+                    We implement industry-standard administrative, technical, and physical safeguards to protect your personal data. All communications are encrypted using Transport Layer Security (TLS 1.3 / HTTPS), and sensitive authentication credentials are encrypted and securely hashed.
                   </p>
                 </section>
                 <section>
                   <h2 className="text-lg font-semibold text-white mb-3">
-                    4. Data Retention
+                    4. Account & Data Deletion
                   </h2>
-                  <p className="text-white/60 leading-relaxed">
-                    We retain your data for as long as your account is active.
-                    If you delete your account, we will remove your personal
-                    data within 30 days, except where retention is required by
-                    law.
+                  <p className="text-white/60 leading-relaxed mb-3">
+                    You have full control over your data. In full compliance with Apple and international privacy standards, you may permanently delete your account and all associated personal data at any time:
+                  </p>
+                  <ul className="list-disc pl-5 text-white/60 space-y-1">
+                    <li>
+                      <strong className="text-white">In-App:</strong> Go to Profile &gt; Account Settings &gt; Delete Account.
+                    </li>
+                    <li>
+                      <strong className="text-white">Web Portal:</strong> Visit our dedicated{" "}
+                      <Link href="/delete-account" className="text-[#11a4d4] hover:underline">
+                        Account Deletion Page
+                      </Link>
+                      .
+                    </li>
+                    <li>
+                      <strong className="text-white">Email Request:</strong> Email us at{" "}
+                      <a href="mailto:maternalmind.help@gmail.com" className="text-[#11a4d4]">
+                        maternalmind.help@gmail.com
+                      </a>
+                      .
+                    </li>
+                  </ul>
+                  <p className="text-white/60 leading-relaxed mt-3">
+                    Upon confirmation, all your personal data, quiz attempts, study history, and session records will be permanently erased from our active databases within 30 days.
                   </p>
                 </section>
                 <section>
@@ -338,49 +374,42 @@ export function PrivacyPage() {
                     5. Third-Party Services
                   </h2>
                   <p className="text-white/60 leading-relaxed">
-                    We use essential third-party services for payment processing
-                    (App Store/Google Play), analytics (aggregated, anonymised),
-                    and infrastructure. These providers are bound by their own
-                    privacy policies and data protection agreements.
+                    We use trusted service providers for core infrastructure, authentication, and payment processing (including Apple App Store in-app purchases). These partners operate under strict confidentiality and data protection agreements compliant with applicable privacy laws.
                   </p>
                 </section>
                 <section>
                   <h2 className="text-lg font-semibold text-white mb-3">
-                    6. Your Rights
+                    6. Your Rights & Choices
                   </h2>
                   <p className="text-white/60 leading-relaxed">
-                    You have the right to access, correct, or delete your
-                    personal data. You may request a copy of your data or ask us
-                    to stop processing it. Contact us at{" "}
-                    <span className="text-[#11a4d4]">
-                      privacy@maternalmind.app
-                    </span>{" "}
-                    to exercise these rights.
-                  </p>
-                </section>
-                <section>
-                  <h2 className="text-lg font-semibold text-white mb-3">
-                    7. Cookies and Tracking
-                  </h2>
-                  <p className="text-white/60 leading-relaxed">
-                    Our website uses essential cookies for functionality. We may
-                    use analytics tools to understand how the platform is used.
-                    You can manage cookie preferences through your browser
-                    settings.
-                  </p>
-                </section>
-                <section>
-                  <h2 className="text-lg font-semibold text-white mb-3">
-                    8. Contact
-                  </h2>
-                  <p className="text-white/60 leading-relaxed">
-                    For privacy-related inquiries, contact our Data Protection
-                    team at{" "}
-                    <span className="text-[#11a4d4]">
-                      privacy@maternalmind.app
-                    </span>
+                    You have the right to access, review, export, or correct your personal data, as well as the right to restrict or object to certain data processing. To exercise any of these rights, contact us at{" "}
+                    <a href="mailto:maternalmind.help@gmail.com" className="text-[#11a4d4]">
+                      maternalmind.help@gmail.com
+                    </a>
                     .
                   </p>
+                </section>
+                <section>
+                  <h2 className="text-lg font-semibold text-white mb-3">
+                    7. Children's Privacy
+                  </h2>
+                  <p className="text-white/60 leading-relaxed">
+                    Maternal Mind is designed for medical students, postgraduates, and healthcare professionals. We do not knowingly collect or solicit personal information from children under 13 years of age.
+                  </p>
+                </section>
+                <section>
+                  <h2 className="text-lg font-semibold text-white mb-3">
+                    8. Contact Us
+                  </h2>
+                  <p className="text-white/60 leading-relaxed">
+                    If you have questions, concerns, or requests regarding this Privacy Policy or data protection practices, please contact us:
+                  </p>
+                  <div className="mt-3 text-sm text-white/70 space-y-1">
+                    <p>• Email: <a href="mailto:maternalmind.help@gmail.com" className="text-[#11a4d4]">maternalmind.help@gmail.com</a></p>
+                    <p>• WhatsApp Support: <a href="https://wa.me/923360830836" target="_blank" rel="noreferrer" className="text-[#11a4d4]">+92 336 0830836</a></p>
+                    <p>• Contact Portal: <Link href="/contact" className="text-[#11a4d4] hover:underline">https://maternalmind.com.pk/contact</Link></p>
+                    <p>• Location: Chowk Azam, Layyah, Pakistan</p>
+                  </div>
                 </section>
               </div>
             </GlassCard>

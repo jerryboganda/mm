@@ -37,10 +37,15 @@ function Router() {
         <Route path="/institutions" component={Institutions} />
         <Route path="/about" component={About} />
         <Route path="/support" component={Support} />
+        <Route path="/contact" component={Support} />
+        <Route path="/contact-us" component={Support} />
         <Route path="/legal" component={LegalHub} />
         <Route path="/legal/terms" component={TermsPage} />
+        <Route path="/terms" component={TermsPage} />
         <Route path="/legal/privacy" component={PrivacyPage} />
+        <Route path="/privacy" component={PrivacyPage} />
         <Route path="/legal/disclaimer" component={DisclaimerPage} />
+        <Route path="/disclaimer" component={DisclaimerPage} />
         <Route path="/delete-account" component={DeleteAccount} />
         <Route path="/resources" component={ResourcesHub} />
         <Route path="/resources/:slug">
