@@ -9,7 +9,7 @@ mkdir -p "$NODE_ROOT" "$PUBLIC_ROOT"
 cd "$NODE_ROOT"
 
 APP_ROOT=$(pwd -P)
-VENV_NODE=$(find /home/u776151780/nodevenv -name "node" 2>/dev/null | head -n 1)
+VENV_NODE=$(find "$HOME/nodevenv" -name "node" 2>/dev/null | head -n 1)
 ALT_NODE="/opt/alt/alt-nodejs20/root/usr/bin/node"
 SYS_NODE="$(which node 2>/dev/null || echo "/usr/bin/node")"
 
@@ -35,6 +35,11 @@ DATABASE_URL=mysql://u776151780_mmuser:y!&rxCgt*4H@127.0.0.1:3306/u776151780_mat
 SESSION_SECRET=64H28SmybRTDp7iqXuv3UVJ1hsrt9KMxYZ5kNzLBWOlwcjno0CQgeIAfaPdEFG
 ALLOWED_ORIGIN=https://maternalmind.com.pk
 EOF
+
+if [ ! -d "node_modules/mysql2" ]; then
+  echo "Installing production dependencies on Hostinger..."
+  npm install --omit=dev --no-audit --no-fund --legacy-peer-deps || npm install --production --no-audit --no-fund || true
+fi
 
 if [ -f "scripts/init-mysql-schema.mjs" ]; then
   echo "Initializing/verifying production MySQL schema & topology..."
@@ -184,8 +189,8 @@ mkdir -p tmp
 echo "Verifying the Node entrypoint can start before Passenger reload..."
 rm -f passenger_error.log
 fuser -k 5001/tcp 2>/dev/null || true
-pkill -9 -u u776151780 -f "server_dist/index.js" 2>/dev/null || true
-pkill -9 -u u776151780 -f "app.js" 2>/dev/null || true
+pkill -9 -u "$USER" -f "server_dist/index.js" 2>/dev/null || true
+pkill -9 -u "$USER" -f "app.js" 2>/dev/null || true
 sleep 1
 set +e
 timeout 12 "$NODE_PATH" app.js > /tmp/maternal-mind-startup.log 2>&1
