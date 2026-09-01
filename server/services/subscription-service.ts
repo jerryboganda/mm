@@ -21,14 +21,13 @@ import {
 import { db, isMysql } from "../db";
 import { eq, and, desc, sql, count, gt, lte, inArray, or } from "drizzle-orm";
 
+import {
+  CANONICAL_BILLING_CYCLE_DAYS,
+  normalizeSubscriptionPlan,
+} from "../../shared/pricing-contracts";
+
 // ── Billing-cycle duration map (in days) ──────────────────────
-const BILLING_CYCLE_DAYS: Record<string, number> = {
-  monthly: 30,
-  quarterly: 90,
-  semi_annual: 180,
-  annual: 365,
-  lifetime: 36500, // ~100 years
-};
+const BILLING_CYCLE_DAYS: Record<string, number> = CANONICAL_BILLING_CYCLE_DAYS;
 
 // ── Dunning retry intervals (in days after last failure) ──────
 const DUNNING_RETRY_INTERVALS = [1, 3, 5, 7];
@@ -2384,7 +2383,12 @@ class SubscriptionService {
         .select()
         .from(subscriptionPackages)
         .where(eq(subscriptionPackages.id, bestSub.packageId));
-      if (pkg) packageName = pkg.slug;
+      if (pkg) {
+        packageName =
+          normalizeSubscriptionPlan(pkg.name) ||
+          normalizeSubscriptionPlan(pkg.slug) ||
+          pkg.name;
+      }
 
       // Map subscription status to the legacy status field
       const legacyStatus =

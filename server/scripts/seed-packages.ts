@@ -20,80 +20,46 @@ try {
   // .env may not exist (env provided by the host) — ignore.
 }
 
-type SeedPackage = {
-  slug: string;
-  name: string;
-  shortDescription: string;
-  description: string;
-  displayOrder: number;
-  billingCycle: string;
-  price: string;
-  originalPrice?: string;
-  features: { name: string; valueType: string; value?: string; key?: string }[];
-};
-
-const CURRENCY = "PKR";
-
-const PACKAGES: SeedPackage[] = [
-  {
-    slug: "six_months",
-    name: "6 Months",
-    shortDescription: "Full access for 6 months",
-    description:
-      "6 months of full premium access to all OB-GYN topics and MCQs.",
-    displayOrder: 1,
-    billingCycle: "semi_annual",
-    price: "700.00",
-    features: [
-      {
-        name: "Full content access",
-        valueType: "check",
-        key: "full_content_access",
-      },
-      { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
-      { name: "Priority support", valueType: "check", key: "priority_support" },
-    ],
-  },
-  {
-    slug: "annual",
-    name: "1 Year",
-    shortDescription: "Best value, full access for 1 year",
-    description: "A full year of premium access to all OB-GYN topics and MCQs.",
-    displayOrder: 2,
-    billingCycle: "annual",
-    price: "1000.00",
-    features: [
-      {
-        name: "Full content access",
-        valueType: "check",
-        key: "full_content_access",
-      },
-      { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
-      { name: "Priority support", valueType: "check", key: "priority_support" },
-    ],
-  },
-];
+import {
+  CANONICAL_PACKAGES,
+  CANONICAL_CURRENCY,
+} from "../../shared/pricing-contracts";
 
 async function seed(): Promise<void> {
-  const { eq, and } = await import("drizzle-orm");
-  const { db, pool } = await import("../db");
+  const { eq, and, notInArray } = await import("drizzle-orm");
+  const { db, pool, isMysql } = await import("../db");
   const { subscriptionPackages, packagePrices, packageFeatures } = await import(
     "../../shared/schema"
   );
   const { logger } = await import("../lib/logger");
+  const crypto = await import("crypto");
 
   try {
-    for (const p of PACKAGES) {
-      // Upsert the package by slug
+    const validSlugs = CANONICAL_PACKAGES.map((p) => p.slug);
+
+    // 1. Archive and hide any obsolete packages (e.g., 3-months-plan, monthly)
+    await db
+      .update(subscriptionPackages)
+      .set({
+        status: "archived",
+        isVisibleToUsers: false,
+      })
+      .where(notInArray(subscriptionPackages.slug, validSlugs));
+
+    logger.info("[seed-packages] Archived all non-canonical packages.");
+
+    // 2. Upsert canonical packages & prices
+    for (const p of CANONICAL_PACKAGES) {
       let [pkg] = await db
         .select()
         .from(subscriptionPackages)
         .where(eq(subscriptionPackages.slug, p.slug));
 
       if (!pkg) {
-        [pkg] = await db
-          .insert(subscriptionPackages)
-          .values({
+        const pkgId = crypto.randomUUID();
+        if (isMysql) {
+          await db.insert(subscriptionPackages).values({
+            id: pkgId,
             name: p.name,
             slug: p.slug,
             description: p.description,
@@ -102,9 +68,30 @@ async function seed(): Promise<void> {
             isVisibleToUsers: true,
             displayOrder: p.displayOrder,
             trialDays: 0,
-          })
-          .returning();
-        logger.info(`[seed-packages] Created package: ${p.slug}`);
+          });
+          const [inserted] = await db
+            .select()
+            .from(subscriptionPackages)
+            .where(eq(subscriptionPackages.id, pkgId));
+          pkg = inserted;
+        } else {
+          const [inserted] = await db
+            .insert(subscriptionPackages)
+            .values({
+              id: pkgId,
+              name: p.name,
+              slug: p.slug,
+              description: p.description,
+              shortDescription: p.shortDescription,
+              status: "active",
+              isVisibleToUsers: true,
+              displayOrder: p.displayOrder,
+              trialDays: 0,
+            })
+            .returning();
+          pkg = inserted;
+        }
+        logger.info(`[seed-packages] Created canonical package: ${p.slug}`);
       } else {
         await db
           .update(subscriptionPackages)
@@ -117,7 +104,7 @@ async function seed(): Promise<void> {
             isVisibleToUsers: true,
           })
           .where(eq(subscriptionPackages.id, pkg.id));
-        logger.info(`[seed-packages] Updated package: ${p.slug}`);
+        logger.info(`[seed-packages] Updated canonical package: ${p.slug}`);
       }
 
       // Ensure a price for the billing cycle exists and update if changed
@@ -132,33 +119,35 @@ async function seed(): Promise<void> {
         );
 
       if (!existingPrice) {
+        const priceId = crypto.randomUUID();
         await db.insert(packagePrices).values({
+          id: priceId,
           packageId: pkg.id,
           billingCycle: p.billingCycle,
           price: p.price,
-          currency: CURRENCY,
+          currency: CANONICAL_CURRENCY,
           originalPrice: p.originalPrice ?? null,
           isActive: true,
         });
         logger.info(
-          `[seed-packages] Added ${p.billingCycle} price for ${p.slug}`,
+          `[seed-packages] Added ${p.billingCycle} price for ${p.slug}: ${p.price} ${CANONICAL_CURRENCY}`,
         );
       } else {
         await db
           .update(packagePrices)
           .set({
             price: p.price,
-            currency: CURRENCY,
+            currency: CANONICAL_CURRENCY,
             originalPrice: p.originalPrice ?? null,
             isActive: true,
           })
           .where(eq(packagePrices.id, existingPrice.id));
         logger.info(
-          `[seed-packages] Updated ${p.billingCycle} price to ${p.price} PKR for ${p.slug}`,
+          `[seed-packages] Standardized ${p.billingCycle} price to ${p.price} ${CANONICAL_CURRENCY} for ${p.slug}`,
         );
       }
 
-      // Ensure features exist (match by name)
+      // Ensure features exist (match by key or name)
       const existingFeatures = await db
         .select()
         .from(packageFeatures)
@@ -172,6 +161,7 @@ async function seed(): Promise<void> {
         order += 1;
         if (existingNames.has(f.name)) continue;
         await db.insert(packageFeatures).values({
+          id: crypto.randomUUID(),
           packageId: pkg.id,
           name: f.name,
           valueType: f.valueType,
@@ -182,7 +172,7 @@ async function seed(): Promise<void> {
       }
     }
 
-    logger.info("[seed-packages] Done.");
+    logger.info("[seed-packages] Successfully standardized all canonical packages.");
     await pool.end();
     process.exit(0);
   } catch (err) {

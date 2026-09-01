@@ -14,6 +14,7 @@ import {
   enforceDeviceLimit,
   getEffectiveDeviceLimit,
 } from "../lib/device-sessions";
+import { normalizeSubscriptionPlan } from "../../shared/pricing-contracts";
 
 const router = Router();
 const getParamValue = (param: string | string[]) =>
@@ -83,7 +84,9 @@ router.put("/:id", async (req: AuthRequest, res) => {
     if (subscriptionStatus !== undefined)
       data.subscriptionStatus = subscriptionStatus;
     if (subscriptionPlan !== undefined)
-      data.subscriptionPlan = subscriptionPlan;
+      data.subscriptionPlan = subscriptionPlan
+        ? normalizeSubscriptionPlan(subscriptionPlan) || subscriptionPlan
+        : null;
     if (subscriptionExpiresAt !== undefined) {
       data.subscriptionExpiresAt = subscriptionExpiresAt
         ? new Date(subscriptionExpiresAt)
