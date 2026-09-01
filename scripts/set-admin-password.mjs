@@ -9,7 +9,7 @@ async function main() {
   const hash = await bcrypt.hash("Admin@123456", 10);
   await conn.query(
     "UPDATE users SET password = ?, is_active = 1, is_email_verified = 1 WHERE email = 'drfarzanamuneer1@gmail.com'",
-    [hash]
+    [hash],
   );
   console.log("SUCCESS! Admin password updated to Admin@123456 and verified.");
   await conn.end();

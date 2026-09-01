@@ -283,11 +283,10 @@ router.put("/add-ons/:id", async (req: AuthRequest, res: Response) => {
         errors: parsed.error.flatten().fieldErrors,
       });
     }
-    const [addOn] = await db
+    const [addOn] = (await db
       .update(addOns)
       .set({ ...(parsed.data as any), updatedAt: new Date() })
-      .where(eq(addOns.id, getParamValue(req.params.id))) as any
-      ;
+      .where(eq(addOns.id, getParamValue(req.params.id)))) as any;
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json(addOn);
   } catch (error) {
@@ -299,11 +298,10 @@ router.put("/add-ons/:id", async (req: AuthRequest, res: Response) => {
 // DELETE /add-ons/:id — Soft-delete add-on
 router.delete("/add-ons/:id", async (req: AuthRequest, res: Response) => {
   try {
-    const [addOn] = await db
+    const [addOn] = (await db
       .update(addOns)
       .set({ isActive: false, updatedAt: new Date() })
-      .where(eq(addOns.id, getParamValue(req.params.id))) as any
-      ;
+      .where(eq(addOns.id, getParamValue(req.params.id)))) as any;
     if (!addOn) return res.status(404).json({ message: "Add-on not found" });
     res.json({ message: "Add-on deactivated", addOn });
   } catch (error) {
@@ -350,7 +348,9 @@ router.get(
       );
       res.json(analytics);
     } catch (error) {
-      logger.error("Error fetching campaign analytics", { error: String(error) });
+      logger.error("Error fetching campaign analytics", {
+        error: String(error),
+      });
       res.status(500).json({ message: "Error fetching campaign analytics" });
     }
   },
@@ -864,7 +864,9 @@ router.put(
 
       res.json(result);
     } catch (error) {
-      logger.error("Error changing subscription plan", { error: String(error) });
+      logger.error("Error changing subscription plan", {
+        error: String(error),
+      });
       res.status(500).json({ message: "Error changing subscription plan" });
     }
   },
@@ -881,7 +883,9 @@ router.get("/analytics/overview", async (_req: AuthRequest, res: Response) => {
     const stats = await subscriptionService.getSubscriptionStats();
     res.json(stats);
   } catch (error) {
-    logger.error("Error fetching subscription overview", { error: String(error) });
+    logger.error("Error fetching subscription overview", {
+      error: String(error),
+    });
     res.status(500).json({ message: "Error fetching subscription overview" });
   }
 });
@@ -936,7 +940,9 @@ router.get(
         })),
       );
     } catch (error) {
-      logger.error("Error fetching revenue analytics", { error: String(error) });
+      logger.error("Error fetching revenue analytics", {
+        error: String(error),
+      });
       res.status(500).json({ message: "Error fetching revenue analytics" });
     }
   },
@@ -994,7 +1000,9 @@ router.get(
         }),
       );
     } catch (error) {
-      logger.error("Error fetching subscriber growth", { error: String(error) });
+      logger.error("Error fetching subscriber growth", {
+        error: String(error),
+      });
       res.status(500).json({ message: "Error fetching subscriber growth" });
     }
   },

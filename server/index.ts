@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
@@ -299,7 +298,9 @@ function configureExpoAndLanding(app: express.Application) {
       landingPageTemplate = fs.readFileSync(templatePath, "utf-8");
     }
   } catch (err) {
-    logger.warn("Could not load landing-page.html template", { error: String(err) });
+    logger.warn("Could not load landing-page.html template", {
+      error: String(err),
+    });
   }
   const appName = getAppName();
   const webDistPath = path.resolve(process.cwd(), "web_dist");
@@ -343,7 +344,9 @@ function configureExpoAndLanding(app: express.Application) {
     app.use(express.static(websiteDistPath));
     logger.info("Marketing Website: serving from / (website_dist)");
   } else {
-    logger.info("Marketing Website: website_dist not found — using default template fallback");
+    logger.info(
+      "Marketing Website: website_dist not found — using default template fallback",
+    );
   }
 
   app.use((req: Request, res: Response, next: NextFunction) => {
@@ -397,9 +400,12 @@ function configureExpoAndLanding(app: express.Application) {
     }),
     async (req: Request, res: Response, next: NextFunction) => {
       const filename = path.basename(req.path);
-      const minioRes = await getObjectFromMinIO(`uploads/content-images/${filename}`);
+      const minioRes = await getObjectFromMinIO(
+        `uploads/content-images/${filename}`,
+      );
       if (minioRes?.body) {
-        if (minioRes.contentType) res.setHeader("Content-Type", minioRes.contentType);
+        if (minioRes.contentType)
+          res.setHeader("Content-Type", minioRes.contentType);
         return (minioRes.body as any).pipe(res);
       }
       next();
@@ -421,9 +427,12 @@ function configureExpoAndLanding(app: express.Application) {
     }),
     async (req: Request, res: Response, next: NextFunction) => {
       const filename = path.basename(req.path);
-      const minioRes = await getObjectFromMinIO(`uploads/payment-proofs/${filename}`);
+      const minioRes = await getObjectFromMinIO(
+        `uploads/payment-proofs/${filename}`,
+      );
       if (minioRes?.body) {
-        if (minioRes.contentType) res.setHeader("Content-Type", minioRes.contentType);
+        if (minioRes.contentType)
+          res.setHeader("Content-Type", minioRes.contentType);
         return (minioRes.body as any).pipe(res);
       }
       next();
@@ -483,7 +492,9 @@ process.on("uncaughtException", (error) => {
 });
 
 void ensureDatabaseConnection().catch((err) =>
-  logger.error("[DB] Non-blocking connection check failed", { error: String(err) }),
+  logger.error("[DB] Non-blocking connection check failed", {
+    error: String(err),
+  }),
 );
 
 setupSecurityHeaders(app);

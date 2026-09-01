@@ -9,11 +9,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -106,10 +102,10 @@ export default function PurchaseScreen() {
   const bank = instructions?.bank;
   const wallets = instructions?.wallets || [];
   const whatsappNumber = instructions?.whatsappNumber || "+923360830836";
-  const supportEmail = instructions?.supportEmail || "maternalmind.help@gmail.com";
+  const supportEmail =
+    instructions?.supportEmail || "maternalmind.help@gmail.com";
 
-  const hasBank =
-    !!bank && (bank.accountNumber || bank.iban || bank.bankName);
+  const hasBank = !!bank && (bank.accountNumber || bank.iban || bank.bankName);
 
   const handleUpload = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -128,14 +124,20 @@ export default function PurchaseScreen() {
   const handleWhatsApp = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const cleanNum = whatsappNumber.replace(/[^0-9]/g, "");
-    const msg = encodeURIComponent(`Hi, I have made a payment for Maternal Mind ${packageName} (${formatPrice(price)}). Here is my payment receipt.`);
+    const msg = encodeURIComponent(
+      `Hi, I have made a payment for Maternal Mind ${packageName} (${formatPrice(price)}). Here is my payment receipt.`,
+    );
     Linking.openURL(`https://wa.me/${cleanNum}?text=${msg}`);
   };
 
   const handleEmail = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const subject = encodeURIComponent(`Payment Proof - Maternal Mind ${packageName}`);
-    const body = encodeURIComponent(`Hi Maternal Mind Team,\n\nI have transferred payment for ${packageName} (${formatPrice(price)}).\n\nPlease find my payment proof attached.\n\nThank you!`);
+    const subject = encodeURIComponent(
+      `Payment Proof - Maternal Mind ${packageName}`,
+    );
+    const body = encodeURIComponent(
+      `Hi Maternal Mind Team,\n\nI have transferred payment for ${packageName} (${formatPrice(price)}).\n\nPlease find my payment proof attached.\n\nThank you!`,
+    );
     Linking.openURL(`mailto:${supportEmail}?subject=${subject}&body=${body}`);
   };
 
@@ -166,7 +168,9 @@ export default function PurchaseScreen() {
         {/* Order summary */}
         <GlassCard style={styles.summaryCard}>
           <View style={styles.summaryRow}>
-            <ThemedText style={[styles.summaryLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.summaryLabel, { color: theme.textSecondary }]}
+            >
               {packageName}
             </ThemedText>
             <ThemedText type="h4" style={{ color: theme.primary }}>
@@ -187,8 +191,14 @@ export default function PurchaseScreen() {
               ]}
             >
               <Feather name="tag" size={14} color={theme.success} />
-              <ThemedText style={[styles.couponBannerText, { color: theme.success }]}>
-                Coupon <ThemedText style={{ fontWeight: "700", color: theme.success }}>{couponCode}</ThemedText> Applied
+              <ThemedText
+                style={[styles.couponBannerText, { color: theme.success }]}
+              >
+                Coupon{" "}
+                <ThemedText style={{ fontWeight: "700", color: theme.success }}>
+                  {couponCode}
+                </ThemedText>{" "}
+                Applied
               </ThemedText>
             </View>
           ) : null}
@@ -206,7 +216,10 @@ export default function PurchaseScreen() {
           <>
             {instructions?.instructions ? (
               <ThemedText
-                style={[styles.instructionsText, { color: theme.textSecondary }]}
+                style={[
+                  styles.instructionsText,
+                  { color: theme.textSecondary },
+                ]}
               >
                 {instructions.instructions}
               </ThemedText>
@@ -229,7 +242,9 @@ export default function PurchaseScreen() {
                 {bank?.accountNumber ? (
                   <DetailRow label="Account #" value={bank.accountNumber} />
                 ) : null}
-                {bank?.iban ? <DetailRow label="IBAN" value={bank.iban} /> : null}
+                {bank?.iban ? (
+                  <DetailRow label="IBAN" value={bank.iban} />
+                ) : null}
                 {bank?.branch ? (
                   <DetailRow label="Branch" value={bank.branch} />
                 ) : null}
@@ -241,7 +256,11 @@ export default function PurchaseScreen() {
               .map((w, i) => (
                 <GlassCard key={i} style={styles.detailCard}>
                   <View style={styles.cardHeader}>
-                    <Feather name="smartphone" size={18} color={theme.primary} />
+                    <Feather
+                      name="smartphone"
+                      size={18}
+                      color={theme.primary}
+                    />
                     <ThemedText type="h4" style={styles.cardHeaderText}>
                       {w.name || "Mobile Wallet"}
                     </ThemedText>
@@ -252,54 +271,92 @@ export default function PurchaseScreen() {
                   {w.number ? (
                     <DetailRow label="Account Number" value={w.number} />
                   ) : null}
-                  {w.iban ? (
-                    <DetailRow label="IBAN" value={w.iban} />
-                  ) : null}
+                  {w.iban ? <DetailRow label="IBAN" value={w.iban} /> : null}
                 </GlassCard>
               ))}
 
-            <ThemedText style={[styles.sectionLabel, { color: theme.primary, marginTop: Spacing.lg }]}>
+            <ThemedText
+              style={[
+                styles.sectionLabel,
+                { color: theme.primary, marginTop: Spacing.lg },
+              ]}
+            >
               UPLOAD PROOF OF PAYMENT
             </ThemedText>
 
             <GlassCard style={styles.proofOptionsCard}>
-              <ThemedText style={[styles.proofSubtext, { color: theme.textSecondary }]}>
-                Send your payment screenshot through any of the 3 easy methods below:
+              <ThemedText
+                style={[styles.proofSubtext, { color: theme.textSecondary }]}
+              >
+                Send your payment screenshot through any of the 3 easy methods
+                below:
               </ThemedText>
 
               <Pressable style={styles.contactRow} onPress={handleWhatsApp}>
-                <View style={[styles.contactIconBg, { backgroundColor: "#25D36622" }]}>
+                <View
+                  style={[
+                    styles.contactIconBg,
+                    { backgroundColor: "#25D36622" },
+                  ]}
+                >
                   <Feather name="message-circle" size={18} color="#25D366" />
                 </View>
                 <View style={styles.contactTextCol}>
-                  <ThemedText style={styles.contactTitle}>WhatsApp Proof</ThemedText>
-                  <ThemedText style={[styles.contactSub, { color: theme.textMuted }]}>
+                  <ThemedText style={styles.contactTitle}>
+                    WhatsApp Proof
+                  </ThemedText>
+                  <ThemedText
+                    style={[styles.contactSub, { color: theme.textMuted }]}
+                  >
                     {whatsappNumber}
                   </ThemedText>
                 </View>
-                <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                <Feather
+                  name="chevron-right"
+                  size={16}
+                  color={theme.textMuted}
+                />
               </Pressable>
 
               <Pressable style={styles.contactRow} onPress={handleEmail}>
-                <View style={[styles.contactIconBg, { backgroundColor: `${theme.primary}22` }]}>
+                <View
+                  style={[
+                    styles.contactIconBg,
+                    { backgroundColor: `${theme.primary}22` },
+                  ]}
+                >
                   <Feather name="mail" size={18} color={theme.primary} />
                 </View>
                 <View style={styles.contactTextCol}>
-                  <ThemedText style={styles.contactTitle}>Email Proof</ThemedText>
-                  <ThemedText style={[styles.contactSub, { color: theme.textMuted }]}>
+                  <ThemedText style={styles.contactTitle}>
+                    Email Proof
+                  </ThemedText>
+                  <ThemedText
+                    style={[styles.contactSub, { color: theme.textMuted }]}
+                  >
                     {supportEmail}
                   </ThemedText>
                 </View>
-                <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                <Feather
+                  name="chevron-right"
+                  size={16}
+                  color={theme.textMuted}
+                />
               </Pressable>
             </GlassCard>
 
             <View
-              style={[styles.noteBox, { backgroundColor: `${theme.primary}12` }]}
+              style={[
+                styles.noteBox,
+                { backgroundColor: `${theme.primary}12` },
+              ]}
             >
               <Feather name="info" size={16} color={theme.primary} />
-              <ThemedText style={[styles.noteText, { color: theme.textSecondary }]}>
-                Tip: long-press any account value to copy it. You can upload in-app below or send via WhatsApp / Email.
+              <ThemedText
+                style={[styles.noteText, { color: theme.textSecondary }]}
+              >
+                Tip: long-press any account value to copy it. You can upload
+                in-app below or send via WhatsApp / Email.
               </ThemedText>
             </View>
           </>
@@ -356,7 +413,12 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   detailLabel: { fontSize: 13 },
-  detailValue: { fontSize: 14, fontWeight: "600", flexShrink: 1, textAlign: "right" },
+  detailValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    flexShrink: 1,
+    textAlign: "right",
+  },
   loadingBox: { paddingVertical: Spacing["2xl"], alignItems: "center" },
   proofOptionsCard: { padding: Spacing.md, marginBottom: Spacing.md },
   proofSubtext: { fontSize: 13, marginBottom: Spacing.md, lineHeight: 18 },

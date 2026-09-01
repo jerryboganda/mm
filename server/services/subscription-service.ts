@@ -6,15 +6,9 @@ import {
   packagePrices,
   packageFeatures,
   subscriptions,
-  subscriptionAddOns,
   invoices,
   invoiceLineItems,
-  paymentTransactions,
   subscriptionAuditLogs,
-  addOns,
-  addOnBundles,
-  coupons,
-  couponUsage,
   users,
   type SubscriptionPackage,
   type PackagePrice,
@@ -24,19 +18,8 @@ import {
   type InvoiceLineItem,
   type SubscriptionAuditLog,
 } from "../../shared/schema";
-import { db } from "../db";
-import {
-  eq,
-  and,
-  desc,
-  sql,
-  count,
-  gt,
-  lte,
-  inArray,
-  or,
-  isNull,
-} from "drizzle-orm";
+import { db, isMysql } from "../db";
+import { eq, and, desc, sql, count, gt, lte, inArray, or } from "drizzle-orm";
 
 // ── Billing-cycle duration map (in days) ──────────────────────
 const BILLING_CYCLE_DAYS: Record<string, number> = {
@@ -103,14 +86,14 @@ class SubscriptionService {
         .from(subscriptionPackages)
         .orderBy(subscriptionPackages.displayOrder);
     } catch (error) {
-      logger.error("SubscriptionService getPackages error", { error: String(error) });
+      logger.error("SubscriptionService getPackages error", {
+        error: String(error),
+      });
       throw error;
     }
   }
 
-  async getPackage(
-    id: string,
-  ): Promise<
+  async getPackage(id: string): Promise<
     | (SubscriptionPackage & {
         prices: PackagePrice[];
         features: PackageFeature[];
@@ -138,7 +121,9 @@ class SubscriptionService {
 
       return { ...pkg, prices, features };
     } catch (error) {
-      logger.error("SubscriptionService getPackage error", { error: String(error) });
+      logger.error("SubscriptionService getPackage error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -150,13 +135,25 @@ class SubscriptionService {
     >,
   ): Promise<SubscriptionPackage> {
     try {
+      const id = crypto.randomUUID();
+      const insertData = { id, ...data, version: 1 };
+      if (isMysql) {
+        await db.insert(subscriptionPackages).values(insertData);
+        const [pkg] = await db
+          .select()
+          .from(subscriptionPackages)
+          .where(eq(subscriptionPackages.id, id));
+        return pkg!;
+      }
       const [pkg] = await db
         .insert(subscriptionPackages)
-        .values({ ...data, version: 1 }) as any
-        ;
+        .values(insertData)
+        .returning();
       return pkg;
     } catch (error) {
-      logger.error("SubscriptionService createPackage error", { error: String(error) });
+      logger.error("SubscriptionService createPackage error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -185,29 +182,55 @@ class SubscriptionService {
         updateData.version = existing.version + 1;
       }
 
+      if (isMysql) {
+        await db
+          .update(subscriptionPackages)
+          .set(updateData)
+          .where(eq(subscriptionPackages.id, id));
+        const [updated] = await db
+          .select()
+          .from(subscriptionPackages)
+          .where(eq(subscriptionPackages.id, id));
+        return updated || undefined;
+      }
+
       const [updated] = await db
         .update(subscriptionPackages)
         .set(updateData)
-        .where(eq(subscriptionPackages.id, id)) as any
-        ;
-
+        .where(eq(subscriptionPackages.id, id))
+        .returning();
       return updated || undefined;
     } catch (error) {
-      logger.error("SubscriptionService updatePackage error", { error: String(error) });
+      logger.error("SubscriptionService updatePackage error", {
+        error: String(error),
+      });
       throw error;
     }
   }
 
   async deletePackage(id: string): Promise<SubscriptionPackage | undefined> {
     try {
+      if (isMysql) {
+        await db
+          .update(subscriptionPackages)
+          .set({ status: "archived", updatedAt: new Date() })
+          .where(eq(subscriptionPackages.id, id));
+        const [updated] = await db
+          .select()
+          .from(subscriptionPackages)
+          .where(eq(subscriptionPackages.id, id));
+        return updated || undefined;
+      }
       const [updated] = await db
         .update(subscriptionPackages)
         .set({ status: "archived", updatedAt: new Date() })
-        .where(eq(subscriptionPackages.id, id)) as any
-        ;
+        .where(eq(subscriptionPackages.id, id))
+        .returning();
       return updated || undefined;
     } catch (error) {
-      logger.error("SubscriptionService deletePackage error", { error: String(error) });
+      logger.error("SubscriptionService deletePackage error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -251,7 +274,9 @@ class SubscriptionService {
         features: allFeatures.filter((f: any) => f.packageId === pkg.id),
       }));
     } catch (error) {
-      logger.error("SubscriptionService getPackageComparison error", { error: String(error) });
+      logger.error("SubscriptionService getPackageComparison error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -270,13 +295,28 @@ class SubscriptionService {
         .from(subscriptionPackages)
         .where(eq(subscriptionPackages.id, data.packageId));
 
-      const [price] = await db
-        .insert(packagePrices)
-        .values({
-          ...data,
-          packageVersion: pkg ? pkg.version : 1,
-        }) as any
-        ;
+      const id = crypto.randomUUID();
+      const insertData = {
+        id,
+        ...data,
+        packageVersion: pkg ? pkg.version : 1,
+      };
+
+      let price: PackagePrice;
+      if (isMysql) {
+        await db.insert(packagePrices).values(insertData);
+        const [p] = await db
+          .select()
+          .from(packagePrices)
+          .where(eq(packagePrices.id, id));
+        price = p!;
+      } else {
+        const [p] = await db
+          .insert(packagePrices)
+          .values(insertData)
+          .returning();
+        price = p!;
+      }
 
       // Bump package version since pricing changed
       if (pkg) {
@@ -288,7 +328,9 @@ class SubscriptionService {
 
       return price;
     } catch (error) {
-      logger.error("SubscriptionService createPrice error", { error: String(error) });
+      logger.error("SubscriptionService createPrice error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -298,14 +340,27 @@ class SubscriptionService {
     data: Partial<Omit<PackagePrice, "id" | "createdAt">>,
   ): Promise<PackagePrice | undefined> {
     try {
+      if (isMysql) {
+        await db
+          .update(packagePrices)
+          .set({ ...data, updatedAt: new Date() })
+          .where(eq(packagePrices.id, id));
+        const [updated] = await db
+          .select()
+          .from(packagePrices)
+          .where(eq(packagePrices.id, id));
+        return updated || undefined;
+      }
       const [updated] = await db
         .update(packagePrices)
         .set({ ...data, updatedAt: new Date() })
-        .where(eq(packagePrices.id, id)) as any
-        ;
+        .where(eq(packagePrices.id, id))
+        .returning();
       return updated || undefined;
     } catch (error) {
-      logger.error("SubscriptionService updatePrice error", { error: String(error) });
+      logger.error("SubscriptionService updatePrice error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -314,7 +369,9 @@ class SubscriptionService {
     try {
       await db.delete(packagePrices).where(eq(packagePrices.id, id));
     } catch (error) {
-      logger.error("SubscriptionService deletePrice error", { error: String(error) });
+      logger.error("SubscriptionService deletePrice error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -327,13 +384,25 @@ class SubscriptionService {
     data: Omit<PackageFeature, "id" | "createdAt">,
   ): Promise<PackageFeature> {
     try {
+      const id = crypto.randomUUID();
+      const insertData = { id, ...data };
+      if (isMysql) {
+        await db.insert(packageFeatures).values(insertData);
+        const [feature] = await db
+          .select()
+          .from(packageFeatures)
+          .where(eq(packageFeatures.id, id));
+        return feature!;
+      }
       const [feature] = await db
         .insert(packageFeatures)
-        .values(data) as any
-        ;
-      return feature;
+        .values(insertData)
+        .returning();
+      return feature!;
     } catch (error) {
-      logger.error("SubscriptionService createFeature error", { error: String(error) });
+      logger.error("SubscriptionService createFeature error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -343,14 +412,27 @@ class SubscriptionService {
     data: Partial<Omit<PackageFeature, "id" | "createdAt">>,
   ): Promise<PackageFeature | undefined> {
     try {
+      if (isMysql) {
+        await db
+          .update(packageFeatures)
+          .set(data)
+          .where(eq(packageFeatures.id, id));
+        const [updated] = await db
+          .select()
+          .from(packageFeatures)
+          .where(eq(packageFeatures.id, id));
+        return updated || undefined;
+      }
       const [updated] = await db
         .update(packageFeatures)
         .set(data)
-        .where(eq(packageFeatures.id, id)) as any
-        ;
+        .where(eq(packageFeatures.id, id))
+        .returning();
       return updated || undefined;
     } catch (error) {
-      logger.error("SubscriptionService updateFeature error", { error: String(error) });
+      logger.error("SubscriptionService updateFeature error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -359,7 +441,9 @@ class SubscriptionService {
     try {
       await db.delete(packageFeatures).where(eq(packageFeatures.id, id));
     } catch (error) {
-      logger.error("SubscriptionService deleteFeature error", { error: String(error) });
+      logger.error("SubscriptionService deleteFeature error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -372,7 +456,9 @@ class SubscriptionService {
         .where(eq(packageFeatures.packageId, packageId))
         .orderBy(packageFeatures.displayOrder);
     } catch (error) {
-      logger.error("SubscriptionService getFeaturesByPackage error", { error: String(error) });
+      logger.error("SubscriptionService getFeaturesByPackage error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -392,6 +478,7 @@ class SubscriptionService {
       paymentGateway?: string;
       performedBy?: string;
       source?: string;
+      durationDaysOverride?: number | null;
     },
   ): Promise<Subscription> {
     try {
@@ -439,32 +526,50 @@ class SubscriptionService {
       const trialEndAt = hasTrial ? addDays(now, pkg.trialDays) : null;
       const activatedAt = hasTrial ? null : now;
 
-      const days = cycleDays(price.billingCycle, price.customDurationDays);
+      const days =
+        options?.durationDaysOverride && options.durationDaysOverride > 0
+          ? options.durationDaysOverride
+          : cycleDays(price.billingCycle, price.customDurationDays);
       const periodStart = hasTrial ? addDays(now, pkg.trialDays) : now;
       const periodEnd = addDays(periodStart, days);
 
-      const [sub] = await db
-        .insert(subscriptions)
-        .values({
-          userId,
-          packageId,
-          priceId,
-          status,
-          trialStartAt,
-          trialEndAt,
-          activatedAt,
-          currentPeriodStart: periodStart,
-          currentPeriodEnd: periodEnd,
-          billingCycle: price.billingCycle,
-          priceAtPurchase: price.price,
-          currency: price.currency,
-          couponId: options?.couponId || null,
-          discountAmount: options?.discountAmount || null,
-          externalSubscriptionId: options?.externalSubscriptionId || null,
-          paymentGateway: options?.paymentGateway || "revenuecat",
-          packageVersionAtPurchase: pkg.version,
-        }) as any
-        ;
+      const subId = crypto.randomUUID();
+      const subValues = {
+        id: subId,
+        userId,
+        packageId,
+        priceId,
+        status,
+        trialStartAt,
+        trialEndAt,
+        activatedAt,
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: periodEnd,
+        billingCycle: price.billingCycle,
+        priceAtPurchase: price.price,
+        currency: price.currency,
+        couponId: options?.couponId || null,
+        discountAmount: options?.discountAmount || null,
+        externalSubscriptionId: options?.externalSubscriptionId || null,
+        paymentGateway: options?.paymentGateway || "revenuecat",
+        packageVersionAtPurchase: pkg.version,
+      };
+
+      let sub: Subscription;
+      if (isMysql) {
+        await db.insert(subscriptions).values(subValues);
+        const [insertedSub] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subId));
+        sub = insertedSub!;
+      } else {
+        const [insertedSub] = await db
+          .insert(subscriptions)
+          .values(subValues)
+          .returning();
+        sub = insertedSub!;
+      }
 
       // Audit log
       await this.logSubscriptionEvent({
@@ -489,7 +594,9 @@ class SubscriptionService {
 
       return sub;
     } catch (error) {
-      logger.error("SubscriptionService createSubscription error", { error: String(error) });
+      logger.error("SubscriptionService createSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -505,18 +612,34 @@ class SubscriptionService {
       const previousStatus = sub.status;
       const now = new Date();
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "active",
-          activatedAt: now,
-          failedPaymentCount: 0,
-          lastPaymentFailedAt: null,
-          nextRetryAt: null,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "active" as const,
+        activatedAt: now,
+        failedPaymentCount: 0,
+        lastPaymentFailedAt: null,
+        nextRetryAt: null,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -530,7 +653,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService activateSubscription error", { error: String(error) });
+      logger.error("SubscriptionService activateSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -558,19 +683,35 @@ class SubscriptionService {
       const newPeriodStart = sub.currentPeriodEnd || now;
       const newPeriodEnd = addDays(newPeriodStart, days);
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "active",
-          currentPeriodStart: newPeriodStart,
-          currentPeriodEnd: newPeriodEnd,
-          failedPaymentCount: 0,
-          lastPaymentFailedAt: null,
-          nextRetryAt: null,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "active" as const,
+        currentPeriodStart: newPeriodStart,
+        currentPeriodEnd: newPeriodEnd,
+        failedPaymentCount: 0,
+        lastPaymentFailedAt: null,
+        nextRetryAt: null,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -588,7 +729,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService renewSubscription error", { error: String(error) });
+      logger.error("SubscriptionService renewSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -630,23 +773,38 @@ class SubscriptionService {
         newPrice.customDurationDays,
       );
 
-      // Upgrade takes effect immediately
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          packageId: newPackageId,
-          priceId: newPriceId,
-          status: "active",
-          billingCycle: newPrice.billingCycle,
-          priceAtPurchase: newPrice.price,
-          currency: newPrice.currency,
-          currentPeriodStart: now,
-          currentPeriodEnd: addDays(now, days),
-          packageVersionAtPurchase: newPkg.version,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        packageId: newPackageId,
+        priceId: newPriceId,
+        status: "active" as const,
+        billingCycle: newPrice.billingCycle,
+        priceAtPurchase: newPrice.price,
+        currency: newPrice.currency,
+        currentPeriodStart: now,
+        currentPeriodEnd: addDays(now, days),
+        packageVersionAtPurchase: newPkg.version,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -667,7 +825,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return { subscription: updated, prorationAmount };
     } catch (error) {
-      logger.error("SubscriptionService upgradeSubscription error", { error: String(error) });
+      logger.error("SubscriptionService upgradeSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -700,25 +860,41 @@ class SubscriptionService {
 
       // Downgrade takes effect at end of current period — store the intent
       // in metadata so a cron job or renewal handler can apply it
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          metadata: {
-            ...(sub.metadata as Record<string, unknown> | null),
-            pendingDowngrade: {
-              newPackageId,
-              newPriceId,
-              newBillingCycle: newPrice.billingCycle,
-              newPrice: newPrice.price,
-              newCurrency: newPrice.currency,
-              newPackageVersion: newPkg.version,
-              scheduledAt: sub.currentPeriodEnd?.toISOString(),
-            },
+      const setData = {
+        metadata: {
+          ...(sub.metadata as Record<string, unknown> | null),
+          pendingDowngrade: {
+            newPackageId,
+            newPriceId,
+            newBillingCycle: newPrice.billingCycle,
+            newPrice: newPrice.price,
+            newCurrency: newPrice.currency,
+            newPackageVersion: newPkg.version,
+            scheduledAt: sub.currentPeriodEnd?.toISOString(),
           },
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+        },
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -738,7 +914,9 @@ class SubscriptionService {
 
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService downgradeSubscription error", { error: String(error) });
+      logger.error("SubscriptionService downgradeSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -754,15 +932,31 @@ class SubscriptionService {
       const previousStatus = sub.status;
       const now = new Date();
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "paused",
-          pausedAt: now,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "paused" as const,
+        pausedAt: now,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -776,7 +970,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService pauseSubscription error", { error: String(error) });
+      logger.error("SubscriptionService pauseSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -804,17 +1000,33 @@ class SubscriptionService {
 
       const newPeriodEnd = addDays(now, remainingDays);
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "active",
-          resumedAt: now,
-          currentPeriodStart: now,
-          currentPeriodEnd: newPeriodEnd,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "active" as const,
+        resumedAt: now,
+        currentPeriodStart: now,
+        currentPeriodEnd: newPeriodEnd,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -829,7 +1041,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService resumeSubscription error", { error: String(error) });
+      logger.error("SubscriptionService resumeSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -851,17 +1065,33 @@ class SubscriptionService {
 
       if (immediate) {
         // Cancel immediately
-        const [updated] = await db
-          .update(subscriptions)
-          .set({
-            status: "canceled",
-            canceledAt: now,
-            cancelReason: reason || null,
-            cancelAtPeriodEnd: false,
-            updatedAt: now,
-          })
-          .where(eq(subscriptions.id, subscriptionId)) as any
-          ;
+        const setData = {
+          status: "canceled" as const,
+          canceledAt: now,
+          cancelReason: reason || null,
+          cancelAtPeriodEnd: false,
+          updatedAt: now,
+        };
+
+        let updated: Subscription;
+        if (isMysql) {
+          await db
+            .update(subscriptions)
+            .set(setData)
+            .where(eq(subscriptions.id, subscriptionId));
+          const [s] = await db
+            .select()
+            .from(subscriptions)
+            .where(eq(subscriptions.id, subscriptionId));
+          updated = s!;
+        } else {
+          const [s] = await db
+            .update(subscriptions)
+            .set(setData)
+            .where(eq(subscriptions.id, subscriptionId))
+            .returning();
+          updated = s!;
+        }
 
         await this.logSubscriptionEvent({
           subscriptionId,
@@ -877,16 +1107,32 @@ class SubscriptionService {
         return updated;
       } else {
         // Cancel at period end — subscription remains active until period ends
-        const [updated] = await db
-          .update(subscriptions)
-          .set({
-            canceledAt: now,
-            cancelReason: reason || null,
-            cancelAtPeriodEnd: true,
-            updatedAt: now,
-          })
-          .where(eq(subscriptions.id, subscriptionId)) as any
-          ;
+        const setData = {
+          canceledAt: now,
+          cancelReason: reason || null,
+          cancelAtPeriodEnd: true,
+          updatedAt: now,
+        };
+
+        let updated: Subscription;
+        if (isMysql) {
+          await db
+            .update(subscriptions)
+            .set(setData)
+            .where(eq(subscriptions.id, subscriptionId));
+          const [s] = await db
+            .select()
+            .from(subscriptions)
+            .where(eq(subscriptions.id, subscriptionId));
+          updated = s!;
+        } else {
+          const [s] = await db
+            .update(subscriptions)
+            .set(setData)
+            .where(eq(subscriptions.id, subscriptionId))
+            .returning();
+          updated = s!;
+        }
 
         await this.logSubscriptionEvent({
           subscriptionId,
@@ -906,7 +1152,9 @@ class SubscriptionService {
         return updated;
       }
     } catch (error) {
-      logger.error("SubscriptionService cancelSubscription error", { error: String(error) });
+      logger.error("SubscriptionService cancelSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -932,16 +1180,32 @@ class SubscriptionService {
         gracePeriodEndAt = addDays(now, pkg.gracePeriodDays);
       }
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "expired",
-          expiredAt: now,
-          gracePeriodEndAt,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "expired" as const,
+        expiredAt: now,
+        gracePeriodEndAt,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -956,7 +1220,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService expireSubscription error", { error: String(error) });
+      logger.error("SubscriptionService expireSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -989,27 +1255,43 @@ class SubscriptionService {
 
       const days = cycleDays(sub.billingCycle, customDurationDays);
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "active",
-          activatedAt: now,
-          currentPeriodStart: now,
-          currentPeriodEnd: addDays(now, days),
-          canceledAt: null,
-          cancelReason: null,
-          cancelAtPeriodEnd: false,
-          expiredAt: null,
-          gracePeriodEndAt: null,
-          pausedAt: null,
-          resumedAt: null,
-          failedPaymentCount: 0,
-          lastPaymentFailedAt: null,
-          nextRetryAt: null,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "active" as const,
+        activatedAt: now,
+        currentPeriodStart: now,
+        currentPeriodEnd: addDays(now, days),
+        canceledAt: null,
+        cancelReason: null,
+        cancelAtPeriodEnd: false,
+        expiredAt: null,
+        gracePeriodEndAt: null,
+        pausedAt: null,
+        resumedAt: null,
+        failedPaymentCount: 0,
+        lastPaymentFailedAt: null,
+        nextRetryAt: null,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1023,7 +1305,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService reactivateSubscription error", { error: String(error) });
+      logger.error("SubscriptionService reactivateSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1073,7 +1357,9 @@ class SubscriptionService {
 
       return sub;
     } catch (error) {
-      logger.error("SubscriptionService getUserActiveSubscription error", { error: String(error) });
+      logger.error("SubscriptionService getUserActiveSubscription error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1086,7 +1372,9 @@ class SubscriptionService {
         .where(eq(subscriptions.userId, userId))
         .orderBy(desc(subscriptions.createdAt));
     } catch (error) {
-      logger.error("SubscriptionService getUserSubscriptions error", { error: String(error) });
+      logger.error("SubscriptionService getUserSubscriptions error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1178,7 +1466,9 @@ class SubscriptionService {
 
       return { hasAccess: false };
     } catch (error) {
-      logger.error("SubscriptionService checkSubscriptionAccess error", { error: String(error) });
+      logger.error("SubscriptionService checkSubscriptionAccess error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1271,11 +1561,25 @@ class SubscriptionService {
         }
       }
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set(updateData)
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(updateData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(updateData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1294,7 +1598,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService handlePaymentFailure error", { error: String(error) });
+      logger.error("SubscriptionService handlePaymentFailure error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1310,17 +1616,33 @@ class SubscriptionService {
       const previousStatus = sub.status;
       const now = new Date();
 
-      const [updated] = await db
-        .update(subscriptions)
-        .set({
-          status: "active",
-          failedPaymentCount: 0,
-          lastPaymentFailedAt: null,
-          nextRetryAt: null,
-          updatedAt: now,
-        })
-        .where(eq(subscriptions.id, subscriptionId)) as any
-        ;
+      const setData = {
+        status: "active" as const,
+        failedPaymentCount: 0,
+        lastPaymentFailedAt: null,
+        nextRetryAt: null,
+        updatedAt: now,
+      };
+
+      let updated: Subscription;
+      if (isMysql) {
+        await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId));
+        const [s] = await db
+          .select()
+          .from(subscriptions)
+          .where(eq(subscriptions.id, subscriptionId));
+        updated = s!;
+      } else {
+        const [s] = await db
+          .update(subscriptions)
+          .set(setData)
+          .where(eq(subscriptions.id, subscriptionId))
+          .returning();
+        updated = s!;
+      }
 
       await this.logSubscriptionEvent({
         subscriptionId,
@@ -1335,7 +1657,9 @@ class SubscriptionService {
       await this.syncUserSubscriptionFields(sub.userId);
       return updated;
     } catch (error) {
-      logger.error("SubscriptionService handlePaymentSuccess error", { error: String(error) });
+      logger.error("SubscriptionService handlePaymentSuccess error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1355,7 +1679,9 @@ class SubscriptionService {
         )
         .orderBy(subscriptions.nextRetryAt);
     } catch (error) {
-      logger.error("SubscriptionService getSubscriptionsForRetry error", { error: String(error) });
+      logger.error("SubscriptionService getSubscriptionsForRetry error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1399,9 +1725,10 @@ class SubscriptionService {
         : 0;
       const total = Math.max(0, subtotal - discountTotal);
 
-      const [invoice] = await db
-        .insert(invoices)
-        .values({
+      return await db.transaction(async (tx: any) => {
+        const invoiceId = crypto.randomUUID();
+        const invoiceValues = {
+          id: invoiceId,
           invoiceNumber,
           userId: sub.userId,
           subscriptionId,
@@ -1414,15 +1741,30 @@ class SubscriptionService {
           periodStart: sub.currentPeriodStart,
           periodEnd: sub.currentPeriodEnd,
           couponId: sub.couponId,
-        }) as any
-        ;
+        };
 
-      // Insert line items
-      const insertedItems: InvoiceLineItem[] = [];
-      for (const item of lineItems) {
-        const [lineItem] = await db
-          .insert(invoiceLineItems)
-          .values({
+        let invoice: Invoice;
+        if (isMysql) {
+          await tx.insert(invoices).values(invoiceValues);
+          const [inv] = await tx
+            .select()
+            .from(invoices)
+            .where(eq(invoices.id, invoiceId));
+          invoice = inv!;
+        } else {
+          const [inv] = await tx
+            .insert(invoices)
+            .values(invoiceValues)
+            .returning();
+          invoice = inv!;
+        }
+
+        // Insert line items
+        const insertedItems: InvoiceLineItem[] = [];
+        for (const item of lineItems) {
+          const lineItemId = crypto.randomUUID();
+          const lineItemValues = {
+            id: lineItemId,
             invoiceId: invoice.id,
             type: item.type,
             description: item.description,
@@ -1433,14 +1775,32 @@ class SubscriptionService {
             total: item.total,
             periodStart: item.periodStart || null,
             periodEnd: item.periodEnd || null,
-          }) as any
-          ;
-        insertedItems.push(lineItem);
-      }
+          };
 
-      return { ...invoice, lineItems: insertedItems };
+          let lineItem: InvoiceLineItem;
+          if (isMysql) {
+            await tx.insert(invoiceLineItems).values(lineItemValues);
+            const [li] = await tx
+              .select()
+              .from(invoiceLineItems)
+              .where(eq(invoiceLineItems.id, lineItemId));
+            lineItem = li!;
+          } else {
+            const [li] = await tx
+              .insert(invoiceLineItems)
+              .values(lineItemValues)
+              .returning();
+            lineItem = li!;
+          }
+          insertedItems.push(lineItem);
+        }
+
+        return { ...invoice, lineItems: insertedItems };
+      });
     } catch (error) {
-      logger.error("SubscriptionService createInvoice error", { error: String(error) });
+      logger.error("SubscriptionService createInvoice error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1471,7 +1831,9 @@ class SubscriptionService {
 
       return `${prefix}${String(nextSeq).padStart(4, "0")}`;
     } catch (error) {
-      logger.error("SubscriptionService generateInvoiceNumber error", { error: String(error) });
+      logger.error("SubscriptionService generateInvoiceNumber error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1484,7 +1846,9 @@ class SubscriptionService {
         .where(eq(invoices.userId, userId))
         .orderBy(desc(invoices.createdAt));
     } catch (error) {
-      logger.error("SubscriptionService getUserInvoices error", { error: String(error) });
+      logger.error("SubscriptionService getUserInvoices error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1507,7 +1871,9 @@ class SubscriptionService {
 
       return { ...invoice, lineItems: items };
     } catch (error) {
-      logger.error("SubscriptionService getInvoice error", { error: String(error) });
+      logger.error("SubscriptionService getInvoice error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1528,24 +1894,39 @@ class SubscriptionService {
     ipAddress?: string;
   }): Promise<SubscriptionAuditLog> {
     try {
+      const logId = crypto.randomUUID();
+      const logValues = {
+        id: logId,
+        subscriptionId: data.subscriptionId || null,
+        userId: data.userId,
+        performedBy: data.performedBy || null,
+        action: data.action,
+        previousStatus: data.previousStatus || null,
+        newStatus: data.newStatus || null,
+        details: data.details || null,
+        source: data.source || "system",
+        ipAddress: data.ipAddress || null,
+      };
+
+      if (isMysql) {
+        await db.insert(subscriptionAuditLogs).values(logValues);
+        const [log] = await db
+          .select()
+          .from(subscriptionAuditLogs)
+          .where(eq(subscriptionAuditLogs.id, logId));
+        return log!;
+      }
+
       const [log] = await db
         .insert(subscriptionAuditLogs)
-        .values({
-          subscriptionId: data.subscriptionId || null,
-          userId: data.userId,
-          performedBy: data.performedBy || null,
-          action: data.action,
-          previousStatus: data.previousStatus || null,
-          newStatus: data.newStatus || null,
-          details: data.details || null,
-          source: data.source || "system",
-          ipAddress: data.ipAddress || null,
-        }) as any
-        ;
-      return log;
+        .values(logValues)
+        .returning();
+      return log!;
     } catch (error) {
       // Audit logging should not break the main operation — log and continue
-      logger.error("SubscriptionService logSubscriptionEvent error", { error: String(error) });
+      logger.error("SubscriptionService logSubscriptionEvent error", {
+        error: String(error),
+      });
       // Return a minimal object to satisfy the type contract
       return {
         id: "",
@@ -1573,7 +1954,9 @@ class SubscriptionService {
         .where(eq(subscriptionAuditLogs.subscriptionId, subscriptionId))
         .orderBy(desc(subscriptionAuditLogs.createdAt));
     } catch (error) {
-      logger.error("SubscriptionService getSubscriptionAuditLog error", { error: String(error) });
+      logger.error("SubscriptionService getSubscriptionAuditLog error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1586,7 +1969,9 @@ class SubscriptionService {
         .where(eq(subscriptionAuditLogs.userId, userId))
         .orderBy(desc(subscriptionAuditLogs.createdAt));
     } catch (error) {
-      logger.error("SubscriptionService getUserAuditLog error", { error: String(error) });
+      logger.error("SubscriptionService getUserAuditLog error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1702,7 +2087,9 @@ class SubscriptionService {
         newSubscriptionsThisMonth,
       };
     } catch (error) {
-      logger.error("SubscriptionService getSubscriptionStats error", { error: String(error) });
+      logger.error("SubscriptionService getSubscriptionStats error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1783,7 +2170,9 @@ class SubscriptionService {
         mrr: parseFloat(r.mrr.toFixed(2)),
       }));
     } catch (error) {
-      logger.error("SubscriptionService getRevenueByPackage error", { error: String(error) });
+      logger.error("SubscriptionService getRevenueByPackage error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1804,12 +2193,15 @@ class SubscriptionService {
       const days = daysMap[period || "30d"] ?? 30;
       const sinceDate = addDays(new Date(), -days);
 
+      const dateFormatExpr = (col: any) =>
+        isMysql
+          ? sql<string>`DATE_FORMAT(${col}, '%Y-%m-%d')`
+          : sql<string>`to_char(${col}, 'YYYY-MM-DD')`;
+
       // Cancellations
       const cancelledRows = await db
         .select({
-          date: sql<string>`to_char(${subscriptions.canceledAt}, 'YYYY-MM-DD')`.as(
-            "date",
-          ),
+          date: dateFormatExpr(subscriptions.canceledAt).as("date"),
           total: count(),
         })
         .from(subscriptions)
@@ -1819,15 +2211,13 @@ class SubscriptionService {
             gt(subscriptions.canceledAt, sinceDate),
           ),
         )
-        .groupBy(sql`to_char(${subscriptions.canceledAt}, 'YYYY-MM-DD')`)
-        .orderBy(sql`to_char(${subscriptions.canceledAt}, 'YYYY-MM-DD')`);
+        .groupBy(dateFormatExpr(subscriptions.canceledAt))
+        .orderBy(dateFormatExpr(subscriptions.canceledAt));
 
       // Expirations
       const expiredRows = await db
         .select({
-          date: sql<string>`to_char(${subscriptions.expiredAt}, 'YYYY-MM-DD')`.as(
-            "date",
-          ),
+          date: dateFormatExpr(subscriptions.expiredAt).as("date"),
           total: count(),
         })
         .from(subscriptions)
@@ -1837,8 +2227,8 @@ class SubscriptionService {
             gt(subscriptions.expiredAt, sinceDate),
           ),
         )
-        .groupBy(sql`to_char(${subscriptions.expiredAt}, 'YYYY-MM-DD')`)
-        .orderBy(sql`to_char(${subscriptions.expiredAt}, 'YYYY-MM-DD')`);
+        .groupBy(dateFormatExpr(subscriptions.expiredAt))
+        .orderBy(dateFormatExpr(subscriptions.expiredAt));
 
       // Merge into daily timeline
       const dayMap = new Map<
@@ -1878,7 +2268,9 @@ class SubscriptionService {
         churnByDay,
       };
     } catch (error) {
-      logger.error("SubscriptionService getChurnAnalytics error", { error: String(error) });
+      logger.error("SubscriptionService getChurnAnalytics error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -1897,17 +2289,20 @@ class SubscriptionService {
       const days = daysMap[period || "30d"] ?? 30;
       const sinceDate = addDays(new Date(), -days);
 
+      const dateFormatExpr = (col: any) =>
+        isMysql
+          ? sql<string>`DATE_FORMAT(${col}, '%Y-%m-%d')`
+          : sql<string>`to_char(${col}, 'YYYY-MM-DD')`;
+
       const rows = await db
         .select({
-          date: sql<string>`to_char(${subscriptions.createdAt}, 'YYYY-MM-DD')`.as(
-            "date",
-          ),
+          date: dateFormatExpr(subscriptions.createdAt).as("date"),
           total: count(),
         })
         .from(subscriptions)
         .where(gt(subscriptions.createdAt, sinceDate))
-        .groupBy(sql`to_char(${subscriptions.createdAt}, 'YYYY-MM-DD')`)
-        .orderBy(sql`to_char(${subscriptions.createdAt}, 'YYYY-MM-DD')`);
+        .groupBy(dateFormatExpr(subscriptions.createdAt))
+        .orderBy(dateFormatExpr(subscriptions.createdAt));
 
       const growthByDay = rows.map((r: any) => ({
         date: r.date,
@@ -1921,7 +2316,9 @@ class SubscriptionService {
 
       return { totalNewSubscribers, growthByDay };
     } catch (error) {
-      logger.error("SubscriptionService getSubscriberGrowth error", { error: String(error) });
+      logger.error("SubscriptionService getSubscriberGrowth error", {
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -2003,7 +2400,9 @@ class SubscriptionService {
         .where(eq(users.id, userId));
     } catch (error) {
       // Legacy sync should not break the main operation
-      logger.error("SubscriptionService syncUserSubscriptionFields error", { error: String(error) });
+      logger.error("SubscriptionService syncUserSubscriptionFields error", {
+        error: String(error),
+      });
     }
   }
 }

@@ -8,7 +8,7 @@ function convertFile(filePath) {
   if (!content.includes(".returning()")) return;
 
   // Add crypto import if needed
-  if (!content.includes('crypto')) {
+  if (!content.includes("crypto")) {
     content = `import crypto from "crypto";\n` + content;
   }
 
@@ -16,7 +16,9 @@ function convertFile(filePath) {
   content = content.replace(/\.returning\(\);?/g, ";");
 
   fs.writeFileSync(filePath, content, "utf-8");
-  console.log(`Converted returning() in ${path.relative(process.cwd(), filePath)}`);
+  console.log(
+    `Converted returning() in ${path.relative(process.cwd(), filePath)}`,
+  );
 }
 
 const files = [

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Platform, StyleSheet, View, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import WebView from "react-native-webview";
 import { getApiUrl } from "@/lib/query-client";
 
@@ -221,7 +221,10 @@ export function ResponsiveBookDocument({
         onMessage={(event) => {
           try {
             const message = JSON.parse(event.nativeEvent.data);
-            if (message.type === "mm-book-height" && Number.isFinite(message.value)) {
+            if (
+              message.type === "mm-book-height" &&
+              Number.isFinite(message.value)
+            ) {
               setDocumentHeight(Math.max(80, Math.ceil(message.value)));
             }
           } catch {}

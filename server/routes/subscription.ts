@@ -9,14 +9,13 @@ import { subscriptionService } from "../services/subscription-service";
 import { couponService } from "../services/coupon-service";
 import { z } from "zod";
 import {
-  validateCouponSchema,
   submitPaymentProofSchema,
   manualPaymentProofs,
   subscriptionPackages,
   packagePrices,
   users,
 } from "../../shared/schema";
-import { db } from "../db";
+import { db, isMysql } from "../db";
 import { getPaymentInstructions } from "../services/payment-settings";
 import { sendProofReceivedEmail } from "../services/subscription-emails";
 import { logger } from "../lib/logger";
@@ -25,11 +24,7 @@ import { uploadToMinIO } from "../lib/s3";
 const router = Router();
 
 // ── Payment-proof image upload (multer → local disk) ──────────────
-const proofUploadDir = path.resolve(
-  process.cwd(),
-  "uploads",
-  "payment-proofs",
-);
+const proofUploadDir = path.resolve(process.cwd(), "uploads", "payment-proofs");
 const allowedProofTypes = new Set([
   "image/jpeg",
   "image/png",
@@ -545,8 +540,7 @@ router.post(
       const parsed = uploadProofBodySchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({
-          message:
-            parsed.error.errors[0]?.message || "Invalid request body",
+          message: parsed.error.errors[0]?.message || "Invalid request body",
         });
       }
       const {
@@ -627,10 +621,7 @@ router.post(
       await db.insert(manualPaymentProofs).values(proofObj);
 
       // Notify the user their proof was received (best-effort)
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId));
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
       if (user?.email) {
         void sendProofReceivedEmail(user.email, user.name || "there", pkg.name);
       }
@@ -720,21 +711,36 @@ router.post(
         });
       }
 
-      const [proof] = await db
-        .insert(manualPaymentProofs)
-        .values({
-          userId,
-          packageId: resolvedPkgId,
-          priceId: resolvedPriceId,
-          proofImageUrl:
-            "https://maternalmind.com.pk/assets/coupon-verification.png",
-          amountClaimed: "0",
-          paymentMethod: "Promo / Coupon Code",
-          senderReference: cleanCode,
-          userNote: `Submitted promo/coupon code: ${cleanCode}`,
-          status: "pending",
-        })
-        .returning();
+      const proofId = crypto.randomUUID();
+      const insertData = {
+        id: proofId,
+        userId,
+        packageId: resolvedPkgId,
+        priceId: resolvedPriceId,
+        proofImageUrl:
+          "https://maternalmind.com.pk/assets/coupon-verification.png",
+        amountClaimed: "0",
+        paymentMethod: "Promo / Coupon Code",
+        senderReference: cleanCode,
+        userNote: `Submitted promo/coupon code: ${cleanCode}`,
+        status: "pending" as const,
+      };
+
+      let proof;
+      if (isMysql) {
+        await db.insert(manualPaymentProofs).values(insertData);
+        const [p] = await db
+          .select()
+          .from(manualPaymentProofs)
+          .where(eq(manualPaymentProofs.id, proofId));
+        proof = p;
+      } else {
+        const [p] = await db
+          .insert(manualPaymentProofs)
+          .values(insertData)
+          .returning();
+        proof = p;
+      }
 
       return res.status(201).json({
         success: true,

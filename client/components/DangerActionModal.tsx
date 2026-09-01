@@ -114,9 +114,7 @@ export function DangerActionModal({
       footer={footer}
     >
       <View style={styles.headerRow}>
-        <View
-          style={[styles.eyebrow, { backgroundColor: `${accentColor}24` }]}
-        >
+        <View style={[styles.eyebrow, { backgroundColor: `${accentColor}24` }]}>
           <ThemedText style={[styles.eyebrowText, { color: accentColor }]}>
             {eyebrowLabel ?? (isSuccess ? "Completed" : "Danger Zone")}
           </ThemedText>
@@ -187,18 +185,19 @@ export function DangerActionModal({
                     style={[
                       styles.checkbox,
                       {
-                        borderColor: checked ? accentColor : theme.glassBorderLight,
+                        borderColor: checked
+                          ? accentColor
+                          : theme.glassBorderLight,
                         backgroundColor: checked ? accentColor : "transparent",
                       },
                     ]}
                   >
-                    {checked ? <Feather name="check" size={14} color="#fff" /> : null}
+                    {checked ? (
+                      <Feather name="check" size={14} color="#fff" />
+                    ) : null}
                   </View>
                   <ThemedText
-                    style={[
-                      styles.acknowledgementText,
-                      { color: theme.text },
-                    ]}
+                    style={[styles.acknowledgementText, { color: theme.text }]}
                   >
                     {item.label}
                   </ThemedText>
@@ -210,7 +209,9 @@ export function DangerActionModal({
       ) : null}
 
       {errorMessage ? (
-        <View style={[styles.errorBanner, { backgroundColor: `${theme.error}1A` }]}>
+        <View
+          style={[styles.errorBanner, { backgroundColor: `${theme.error}1A` }]}
+        >
           <Feather name="alert-circle" size={16} color={theme.error} />
           <ThemedText style={[styles.errorText, { color: theme.error }]}>
             {errorMessage}

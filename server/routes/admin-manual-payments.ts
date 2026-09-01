@@ -1,4 +1,3 @@
-import crypto from "crypto";
 /**
  * Admin Manual Payments API Routes
  *
@@ -9,6 +8,7 @@ import crypto from "crypto";
  * Mounted at /api/admin/manual-payments.
  */
 import { Router, Response } from "express";
+import crypto from "crypto";
 import { authMiddleware, requireRole, type AuthRequest } from "../middleware";
 import { subscriptionService } from "../services/subscription-service";
 import {
@@ -16,12 +16,14 @@ import {
   subscriptionPackages,
   users,
   announcements,
+  coupons,
+  couponUsage,
   reviewPaymentProofSchema,
   manualGrantSchema,
   paymentInstructionsSchema,
 } from "../../shared/schema";
 import { db } from "../db";
-import { eq, and, desc, count } from "drizzle-orm";
+import { eq, desc, count, sql } from "drizzle-orm";
 import {
   getPaymentInstructions,
   setPaymentInstructions,
@@ -36,70 +38,74 @@ const router = Router();
 const getParamValue = (param: string | string[]) =>
   Array.isArray(param) ? param[0] : param;
 
-function formatDate(value: Date | string | null | undefined): string | undefined {
+function formatDate(
+  value: Date | string | null | undefined,
+): string | undefined {
   if (!value) return undefined;
   const d = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(d.getTime())) return undefined;
-  return d.toLocaleDateString("en-GB", {
-    year: "numeric",
+  if (isNaN(d.getTime())) return undefined;
+  return d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    year: "numeric",
   });
 }
 
 router.use(authMiddleware, requireRole("admin"));
 
 // ══════════════════════════════════════════════════════════════════
-// ══  PAYMENT INSTRUCTIONS (defined before /:id)                ══
+// ══  PAYMENT INSTRUCTIONS                                      ══
 // ══════════════════════════════════════════════════════════════════
 
-// GET /payment-settings — current payment instructions
-router.get("/payment-settings", async (_req: AuthRequest, res: Response) => {
+// GET /instructions — fetch the configured payment instructions
+router.get("/instructions", async (_req: AuthRequest, res: Response) => {
   try {
     const instructions = await getPaymentInstructions();
-    res.json({ instructions });
+    res.json(instructions);
   } catch (error) {
-    logger.error("admin manual-payments GET /payment-settings error", {
+    logger.error("admin manual-payments GET /instructions error", {
       error: String(error),
     });
-    res.status(500).json({ message: "Failed to load payment settings" });
+    res.status(500).json({ message: "Failed to load payment instructions" });
   }
 });
 
-// PUT /payment-settings — update payment instructions
-router.put("/payment-settings", async (req: AuthRequest, res: Response) => {
+// PUT /instructions — update payment instructions
+router.put("/instructions", async (req: AuthRequest, res: Response) => {
   try {
     const parsed = paymentInstructionsSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({
         message: "Validation failed",
-        errors: parsed.error.flatten().fieldErrors,
+        errors: parsed.error.format(),
       });
     }
-    const saved = await setPaymentInstructions(parsed.data);
-    res.json({ instructions: saved });
+
+    const updated = await setPaymentInstructions(parsed.data);
+    res.json(updated);
   } catch (error) {
-    logger.error("admin manual-payments PUT /payment-settings error", {
+    logger.error("admin manual-payments PUT /instructions error", {
       error: String(error),
     });
-    res.status(500).json({ message: "Failed to save payment settings" });
+    res.status(500).json({ message: "Failed to update payment instructions" });
   }
 });
 
 // ══════════════════════════════════════════════════════════════════
-// ══  MANUAL GRANT (defined before /:id)                        ══
+// ══  MANUAL SUBSCRIPTION GRANT                                 ══
 // ══════════════════════════════════════════════════════════════════
 
-// POST /grant — directly grant or extend a subscription (no proof)
+// POST /grant — directly give/extend a subscription to a user
 router.post("/grant", async (req: AuthRequest, res: Response) => {
   try {
     const parsed = manualGrantSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({
         message: "Validation failed",
-        errors: parsed.error.flatten().fieldErrors,
+        errors: parsed.error.format(),
       });
     }
+
     const { userId: bodyUserId, email, packageId, priceId } = parsed.data;
 
     const [user] = bodyUserId
@@ -108,18 +114,18 @@ router.post("/grant", async (req: AuthRequest, res: Response) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     const userId = user.id;
 
+    // Verify package exists
     const [pkg] = await db
       .select()
       .from(subscriptionPackages)
       .where(eq(subscriptionPackages.id, packageId));
     if (!pkg) return res.status(404).json({ message: "Package not found" });
 
-    const existing =
-      await subscriptionService.getUserActiveSubscription(userId);
+    // If an existing subscription is active, extend it or reactivate
+    const existing = await subscriptionService.getUserActiveSubscription(userId);
 
     let subscription;
-    if (existing) {
-      // Extend the current active subscription by one more period
+    if (existing && existing.packageId === packageId) {
       subscription = await subscriptionService.renewSubscription(existing.id);
     } else {
       subscription = await subscriptionService.createSubscription(
@@ -146,6 +152,7 @@ router.post("/grant", async (req: AuthRequest, res: Response) => {
     // In-app notification for the user
     try {
       await db.insert(announcements).values({
+        id: crypto.randomUUID(),
         title: "Subscription Verified ✅",
         message: `Your subscription for ${pkg.name} is now active! All premium OB-GYN modules, MCQs, and notes are fully unlocked.`,
         type: "update",
@@ -305,16 +312,62 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // Check if this is a promo / coupon code submission
+    const isCouponMethod =
+      proof.paymentMethod === "Promo / Coupon Code" ||
+      (proof.userNote && proof.userNote.toLowerCase().includes("promo/coupon"));
+
+    let couponRecord: any = null;
+    if (isCouponMethod && proof.senderReference) {
+      const cleanRef = proof.senderReference.toUpperCase().trim();
+      const [foundCoupon] = await db
+        .select()
+        .from(coupons)
+        .where(eq(coupons.code, cleanRef));
+      if (foundCoupon) {
+        couponRecord = foundCoupon;
+      }
+    }
+
     const subscription = await subscriptionService.createSubscription(
       proof.userId,
       proof.packageId,
       proof.priceId,
       {
-        paymentGateway: "manual",
+        couponId: couponRecord?.id || undefined,
+        discountAmount: couponRecord
+          ? String(couponRecord.discountValue || "0")
+          : undefined,
+        paymentGateway: isCouponMethod ? "coupon" : "manual",
         performedBy: req.userId!,
         source: "admin",
+        durationDaysOverride: couponRecord?.durationDaysOverride || undefined,
       },
     );
+
+    // Record coupon usage if coupon matched
+    if (couponRecord) {
+      try {
+        await db.insert(couponUsage).values({
+          id: crypto.randomUUID(),
+          couponId: couponRecord.id,
+          userId: proof.userId,
+          subscriptionId: subscription.id,
+          discountApplied: String(couponRecord.discountValue || "0"),
+        });
+        await db
+          .update(coupons)
+          .set({
+            currentUseCount: sql`${coupons.currentUseCount} + 1`,
+            updatedAt: new Date(),
+          })
+          .where(eq(coupons.id, couponRecord.id));
+      } catch (couponErr) {
+        logger.error("Failed to record coupon usage during approval", {
+          error: String(couponErr),
+        });
+      }
+    }
 
     await db
       .update(manualPaymentProofs)
@@ -353,6 +406,7 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
     // In-app notification for the user
     try {
       await db.insert(announcements).values({
+        id: crypto.randomUUID(),
         title: "Subscription Verified ✅",
         message: `Your payment for ${pkg?.name || "your plan"} has been approved! All premium OB-GYN modules, MCQs, and notes are now fully unlocked.`,
         type: "update",

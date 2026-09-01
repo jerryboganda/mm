@@ -24,7 +24,7 @@ const req = http.request(
       console.log("RESPONSE BODY:", data);
       console.log("COOKIE HEADERS:", res.headers["set-cookie"]);
     });
-  }
+  },
 );
 
 req.on("error", (e) => console.error(e));

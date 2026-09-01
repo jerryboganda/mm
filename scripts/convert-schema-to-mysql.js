@@ -7,7 +7,7 @@ let content = fs.readFileSync(schemaPath, "utf-8");
 // 1. Change imports
 content = content.replace(
   /from "drizzle-orm\/pg-core";/g,
-  'from "drizzle-orm/mysql-core";'
+  'from "drizzle-orm/mysql-core";',
 );
 content = content.replace(/\bpgTable\b/g, "mysqlTable");
 content = content.replace(/\binteger\b/g, "int");

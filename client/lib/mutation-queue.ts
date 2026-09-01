@@ -34,8 +34,9 @@ async function getStorage() {
       },
     };
   }
-  const AsyncStorage =
-    await import("@react-native-async-storage/async-storage");
+  const AsyncStorage = await import(
+    "@react-native-async-storage/async-storage"
+  );
   return AsyncStorage.default;
 }
 

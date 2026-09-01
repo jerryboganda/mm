@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   background: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   content: {
     flex: 1,

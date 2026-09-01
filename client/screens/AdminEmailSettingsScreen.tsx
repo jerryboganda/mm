@@ -5,7 +5,6 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  Pressable,
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,7 +17,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { GlassInput } from "@/components/GlassInput";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { getApiUrl } from "@/lib/query-client";
 import * as SecureStore from "expo-secure-store";
@@ -62,7 +61,6 @@ export default function AdminEmailSettingsScreen() {
 
   const fetchSettings = useCallback(async () => {
     try {
-      setLoading(true);
       const token = await getToken();
       const baseUrl = getApiUrl();
       const res = await fetch(new URL("/api/admin/email-settings", baseUrl), {
@@ -199,7 +197,9 @@ export default function AdminEmailSettingsScreen() {
       <BackgroundGradient>
         <View style={[styles.loadingContainer, { paddingTop: headerHeight }]}>
           <ActivityIndicator size="large" color={theme.primary} />
-          <ThemedText style={[styles.loadingText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.loadingText, { color: theme.textSecondary }]}
+          >
             Loading settings...
           </ThemedText>
         </View>
@@ -223,14 +223,21 @@ export default function AdminEmailSettingsScreen() {
         {/* Header Info Card */}
         <GlassCard style={styles.infoCard}>
           <View style={styles.infoContent}>
-            <View style={[styles.infoIconContainer, { backgroundColor: `${theme.primary}20` }]}>
+            <View
+              style={[
+                styles.infoIconContainer,
+                { backgroundColor: `${theme.primary}20` },
+              ]}
+            >
               <Feather name="mail" size={24} color={theme.primary} />
             </View>
             <View style={styles.infoTextContainer}>
               <ThemedText type="h4" style={styles.infoTitle}>
                 Brevo SMTP Configuration
               </ThemedText>
-              <ThemedText style={[styles.infoSubtitle, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.infoSubtitle, { color: theme.textSecondary }]}
+              >
                 Configure your Brevo (Sendinblue) SMTP settings to enable email
                 sending for verification, password reset, and support.
               </ThemedText>
@@ -239,7 +246,9 @@ export default function AdminEmailSettingsScreen() {
         </GlassCard>
 
         {/* SMTP Settings Section */}
-        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>SMTP SERVER</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>
+          SMTP SERVER
+        </ThemedText>
         <View style={styles.formSection}>
           <GlassInput
             label="SMTP Host"
@@ -260,7 +269,9 @@ export default function AdminEmailSettingsScreen() {
           />
         </View>
 
-        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>AUTHENTICATION</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>
+          AUTHENTICATION
+        </ThemedText>
         <View style={styles.formSection}>
           <GlassInput
             label="SMTP Login"
@@ -284,7 +295,9 @@ export default function AdminEmailSettingsScreen() {
           />
         </View>
 
-        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>SENDER INFO</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>
+          SENDER INFO
+        </ThemedText>
         <View style={styles.formSection}>
           <GlassInput
             label="From Email"
@@ -314,19 +327,25 @@ export default function AdminEmailSettingsScreen() {
         />
 
         {/* Divider */}
-        <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
+        <View
+          style={[styles.divider, { backgroundColor: theme.glassBorder }]}
+        />
 
         {/* Test Email Section */}
-        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>TEST EMAIL</ThemedText>
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>
+          TEST EMAIL
+        </ThemedText>
         <GlassCard style={styles.testCard}>
           <View style={styles.testContent}>
-              <Feather
+            <Feather
               name="send"
               size={20}
               color={theme.warning}
               style={styles.testIcon}
             />
-            <ThemedText style={[styles.testDescription, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.testDescription, { color: theme.textSecondary }]}
+            >
               Send a test email to verify your SMTP configuration is working
               correctly. The current settings (including unsaved changes) will
               be used.
@@ -354,7 +373,9 @@ export default function AdminEmailSettingsScreen() {
         </GlassCard>
 
         {/* Help Card */}
-        <GlassCard style={[styles.helpCard, { backgroundColor: `${theme.info}10` }]}>
+        <GlassCard
+          style={[styles.helpCard, { backgroundColor: `${theme.info}10` }]}
+        >
           <ThemedText type="h4" style={styles.helpTitle}>
             ðŸ“‹ How to get Brevo SMTP credentials
           </ThemedText>
@@ -474,8 +495,7 @@ const styles = StyleSheet.create({
   testInputContainer: {
     marginBottom: Spacing.md,
   },
-  testButton: {
-  },
+  testButton: {},
   helpCard: {
     padding: Spacing.lg,
     marginBottom: Spacing.xl,

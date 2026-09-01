@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   View,
@@ -6,7 +6,6 @@ import {
   Pressable,
   Dimensions,
   ActivityIndicator,
-  Platform,
 } from "react-native";
 import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   loadingContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
   },

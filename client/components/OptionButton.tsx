@@ -5,11 +5,10 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { ThemedText } from "@/components/ThemedText";
-import { Colors, Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
 interface OptionButtonProps {
@@ -120,7 +119,10 @@ export function OptionButton({
           {label}
         </ThemedText>
       </View>
-      <ThemedText style={[styles.text, { color: theme.text }]} numberOfLines={4}>
+      <ThemedText
+        style={[styles.text, { color: theme.text }]}
+        numberOfLines={4}
+      >
         {text}
       </ThemedText>
     </AnimatedPressable>

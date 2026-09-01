@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, type TextProps } from "react-native";
 
-import { Colors, Typography } from "@/constants/theme";
+import { Typography } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { useMobileContent } from "@/lib/mobile-content";
 

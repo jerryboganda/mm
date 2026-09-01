@@ -14,20 +14,19 @@ import { Platform } from "react-native";
 import { getHapticEnabled } from "./feedback";
 
 // Re-export all types so call sites still compile
-export {
-  ImpactFeedbackStyle,
-  NotificationFeedbackType,
-} from "expo-haptics";
+export { ImpactFeedbackStyle, NotificationFeedbackType } from "expo-haptics";
 
 export async function impactAsync(
-  style: RealHaptics.ImpactFeedbackStyle = RealHaptics.ImpactFeedbackStyle.Medium,
+  style: RealHaptics.ImpactFeedbackStyle = RealHaptics.ImpactFeedbackStyle
+    .Medium,
 ): Promise<void> {
   if (!getHapticEnabled() || Platform.OS === "web") return;
   return RealHaptics.impactAsync(style);
 }
 
 export async function notificationAsync(
-  type: RealHaptics.NotificationFeedbackType = RealHaptics.NotificationFeedbackType.Success,
+  type: RealHaptics.NotificationFeedbackType = RealHaptics
+    .NotificationFeedbackType.Success,
 ): Promise<void> {
   if (!getHapticEnabled() || Platform.OS === "web") return;
   return RealHaptics.notificationAsync(type);

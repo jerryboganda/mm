@@ -128,7 +128,10 @@ export function AppModalSurface({
                   hitSlop={12}
                   style={[
                     styles.closeButton,
-                    { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+                    {
+                      backgroundColor: theme.glass,
+                      borderColor: theme.glassBorder,
+                    },
                   ]}
                   accessibilityRole="button"
                   accessibilityLabel="Close dialog"
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.72)",
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0, 0, 0, 0.48)",
   },
   positioner: {

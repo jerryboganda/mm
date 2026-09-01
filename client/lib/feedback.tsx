@@ -16,7 +16,7 @@ import React, {
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
-import { Audio } from "expo-av";
+import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from "expo-audio";
 
 // ── AsyncStorage keys ────────────────────────────────────────────
 const KEY_SOUND_EFFECTS = "@mm_pref_sound_effects";
@@ -91,7 +91,7 @@ export function getSoundEnabled(): boolean {
 export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const [soundEnabled, _setSoundEnabled] = useState(true);
   const [hapticEnabled, _setHapticEnabled] = useState(true);
-  const soundCache = useRef<Map<SoundName, Audio.Sound>>(new Map());
+  const soundCache = useRef<Map<SoundName, AudioPlayer>>(new Map());
 
   // Restore from AsyncStorage on mount
   useEffect(() => {
@@ -119,12 +119,11 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
-  // Configure audio session for mixing with other audio
+  // Configure audio session for mixing with other audio (sound effects / UI feedback)
   useEffect(() => {
-    Audio.setAudioModeAsync({
-      playsInSilentModeIOS: false,
-      staysActiveInBackground: false,
-      shouldDuckAndroid: true,
+    setAudioModeAsync({
+      playsInSilentMode: false,
+      interruptionMode: "mixWithOthers",
     }).catch(() => {});
   }, []);
 
@@ -170,35 +169,30 @@ export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const playSound = useCallback(async (name: SoundName) => {
     if (!_soundEnabled || Platform.OS === "web") return;
     try {
-      // Re-use cached sound object when possible
-      let sound = soundCache.current.get(name);
-      if (sound) {
-        const status = await sound.getStatusAsync();
-        if (status.isLoaded) {
-          await sound.setPositionAsync(0);
-          await sound.playAsync();
-          return;
-        }
-        // Sound was unloaded, remove from cache
-        soundCache.current.delete(name);
+      // Re-use cached player when possible
+      let player = soundCache.current.get(name);
+      if (player) {
+        player.seekTo(0);
+        player.play();
+        return;
       }
-      // Create fresh
-      const { sound: newSound } = await Audio.Sound.createAsync(SOUNDS[name], {
-        shouldPlay: true,
-        volume: 0.5,
-      });
-      soundCache.current.set(name, newSound);
+      // Create fresh player and start playback
+      player = createAudioPlayer(SOUNDS[name]);
+      player.volume = 0.5;
+      player.play();
+      soundCache.current.set(name, player);
     } catch (e) {
       // Silent fail — sounds are non-critical
       console.warn("[Feedback] Sound play failed:", e);
     }
   }, []);
 
-  // Cleanup sounds on unmount
+  // Cleanup players on unmount
   useEffect(() => {
     const cache = soundCache.current;
     return () => {
-      cache.forEach((s) => s.unloadAsync().catch(() => {}));
+      cache.forEach((p) => p.remove());
+      cache.clear();
     };
   }, []);
 

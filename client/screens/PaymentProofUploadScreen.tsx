@@ -5,18 +5,14 @@ import {
   ScrollView,
   Pressable,
   TextInput,
-  Image,
   Alert,
   Platform,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import {
-  useNavigation,
-  useRoute,
-  RouteProp,
-} from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -83,7 +79,7 @@ export default function PaymentProofUploadScreen() {
   } = route.params;
 
   const [image, setImage] = useState<PickedImage | null>(null);
-  const [amount, setAmount] = useState(price || "");
+  const [amount, setAmount] = useState(discountedPrice || price || "");
   const [method, setMethod] = useState("");
   const [reference, setReference] = useState("");
   const [note, setNote] = useState("");
@@ -101,8 +97,7 @@ export default function PaymentProofUploadScreen() {
   const handlePickImage = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    const permission =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(
         "Permission Required",
@@ -130,7 +125,10 @@ export default function PaymentProofUploadScreen() {
 
   const handleSubmit = async () => {
     if (!image) {
-      Alert.alert("Proof Required", "Please attach a screenshot of your payment.");
+      Alert.alert(
+        "Proof Required",
+        "Please attach a screenshot of your payment.",
+      );
       return;
     }
 
@@ -156,7 +154,8 @@ export default function PaymentProofUploadScreen() {
       formData.append("priceId", priceId);
       if (amount.trim()) formData.append("amountClaimed", amount.trim());
       if (method.trim()) formData.append("paymentMethod", method.trim());
-      if (reference.trim()) formData.append("senderReference", reference.trim());
+      if (reference.trim())
+        formData.append("senderReference", reference.trim());
       if (note.trim()) formData.append("userNote", note.trim());
       if (couponCode) formData.append("couponCode", couponCode);
       if (couponId) formData.append("couponId", couponId);
@@ -197,7 +196,11 @@ export default function PaymentProofUploadScreen() {
 
   const inputStyle = [
     styles.input,
-    { backgroundColor: theme.glass, borderColor: theme.glassBorder, color: theme.text },
+    {
+      backgroundColor: theme.glass,
+      borderColor: theme.glassBorder,
+      color: theme.text,
+    },
   ];
 
   return (
@@ -215,7 +218,8 @@ export default function PaymentProofUploadScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedText style={[styles.summary, { color: theme.textSecondary }]}>
-          {packageName} — PKR {price}{couponCode ? ` (Coupon ${couponCode} Applied)` : ""}
+          {packageName} — PKR {price}
+          {couponCode ? ` (Coupon ${couponCode} Applied)` : ""}
         </ThemedText>
 
         <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
@@ -230,11 +234,18 @@ export default function PaymentProofUploadScreen() {
           ]}
         >
           {image ? (
-            <Image source={{ uri: image.uri }} style={styles.preview} resizeMode="cover" />
+            <Image
+              source={{ uri: image.uri }}
+              style={styles.preview}
+              contentFit="cover"
+              transition={0}
+            />
           ) : (
             <View style={styles.pickerPlaceholder}>
               <Feather name="image" size={32} color={theme.textMuted} />
-              <ThemedText style={[styles.pickerText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.pickerText, { color: theme.textSecondary }]}
+              >
                 Tap to attach your payment receipt
               </ThemedText>
             </View>
@@ -248,7 +259,12 @@ export default function PaymentProofUploadScreen() {
           </Pressable>
         ) : null}
 
-        <ThemedText style={[styles.sectionLabel, { color: theme.primary, marginTop: Spacing.xl }]}>
+        <ThemedText
+          style={[
+            styles.sectionLabel,
+            { color: theme.primary, marginTop: Spacing.xl },
+          ]}
+        >
           DETAILS (OPTIONAL)
         </ThemedText>
 
@@ -309,7 +325,9 @@ export default function PaymentProofUploadScreen() {
         {submitting ? (
           <View style={styles.submittingRow}>
             <ActivityIndicator size="small" color={theme.primary} />
-            <ThemedText style={[styles.submittingText, { color: theme.textMuted }]}>
+            <ThemedText
+              style={[styles.submittingText, { color: theme.textMuted }]}
+            >
               Uploading your proof...
             </ThemedText>
           </View>
@@ -339,7 +357,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     overflow: "hidden",
   },
-  pickerPlaceholder: { alignItems: "center", gap: Spacing.sm, padding: Spacing.lg },
+  pickerPlaceholder: {
+    alignItems: "center",
+    gap: Spacing.sm,
+    padding: Spacing.lg,
+  },
   pickerText: { fontSize: 14, textAlign: "center" },
   preview: { width: "100%", height: "100%" },
   changeLink: { alignSelf: "center", marginTop: Spacing.sm },

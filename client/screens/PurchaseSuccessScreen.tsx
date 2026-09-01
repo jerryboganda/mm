@@ -11,7 +11,7 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
@@ -49,7 +49,7 @@ export default function PurchaseSuccessScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, scaleAnim]);
 
   const handleContinue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -87,9 +87,7 @@ export default function PurchaseSuccessScreen() {
           <ThemedText type="h1" style={styles.title}>
             Welcome to Premium!
           </ThemedText>
-          <ThemedText
-            style={[styles.subtitle, { color: theme.textSecondary }]}
-          >
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
             Your subscription is now active. Enjoy unlimited access to all
             Maternal Mind features.
           </ThemedText>

@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
-import { db } from "../db";
+import { db, isMysql } from "../db";
 import { paymentTransactions } from "../../shared/schema";
 import { logger } from "../lib/logger";
 
@@ -578,27 +578,39 @@ class PaymentGatewayManager {
     refundReason?: string;
     metadata?: any;
   }) {
+    const txnId = crypto.randomUUID();
+    const insertValues = {
+      id: txnId,
+      invoiceId: data.invoiceId || null,
+      userId: data.userId,
+      status: data.status,
+      amount: data.amount,
+      currency: data.currency,
+      paymentGateway: data.paymentGateway,
+      gatewayTransactionId: data.gatewayTransactionId || null,
+      gatewayResponse: data.gatewayResponse || null,
+      failureReason: data.failureReason || null,
+      failureCode: data.failureCode || null,
+      refundedAmount: data.refundedAmount || null,
+      refundedAt: data.refundedAt || null,
+      refundReason: data.refundReason || null,
+      metadata: data.metadata || null,
+    };
+
+    if (isMysql) {
+      await db.insert(paymentTransactions).values(insertValues);
+      const [transaction] = await db
+        .select()
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.id, txnId));
+      return transaction!;
+    }
+
     const [transaction] = await db
       .insert(paymentTransactions)
-      .values({
-        invoiceId: data.invoiceId || null,
-        userId: data.userId,
-        status: data.status,
-        amount: data.amount,
-        currency: data.currency,
-        paymentGateway: data.paymentGateway,
-        gatewayTransactionId: data.gatewayTransactionId || null,
-        gatewayResponse: data.gatewayResponse || null,
-        failureReason: data.failureReason || null,
-        failureCode: data.failureCode || null,
-        refundedAmount: data.refundedAmount || null,
-        refundedAt: data.refundedAt || null,
-        refundReason: data.refundReason || null,
-        metadata: data.metadata || null,
-      }) as any
-      ;
-
-    return transaction;
+      .values(insertValues)
+      .returning();
+    return transaction!;
   }
 
   /**
@@ -650,15 +662,13 @@ class PaymentGatewayManager {
       refundReason?: string;
     },
   ) {
-    const [transaction] = await db
+    const [transaction] = (await db
       .update(paymentTransactions)
       .set({
         ...updates,
         updatedAt: new Date(),
       })
-      .where(eq(paymentTransactions.id, id)) as any
-      ;
-
+      .where(eq(paymentTransactions.id, id))) as any;
     return transaction || null;
   }
 }

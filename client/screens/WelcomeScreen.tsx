@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Image, Dimensions } from "react-native";
+import { StyleSheet, View, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -10,8 +10,6 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
-
-const { width, height } = Dimensions.get("window");
 
 type WelcomeScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -70,7 +68,9 @@ export default function WelcomeScreen() {
               <ThemedText type="body" style={styles.featureTitle}>
                 Comprehensive Content
               </ThemedText>
-              <ThemedText style={[styles.featureDesc, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.featureDesc, { color: theme.textSecondary }]}
+              >
                 Learn from structured textbook chapters
               </ThemedText>
             </View>
@@ -97,7 +97,9 @@ export default function WelcomeScreen() {
               <ThemedText type="body" style={styles.featureTitle}>
                 Practice Quizzes
               </ThemedText>
-              <ThemedText style={[styles.featureDesc, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.featureDesc, { color: theme.textSecondary }]}
+              >
                 Test your knowledge with MCQs
               </ThemedText>
             </View>
@@ -124,7 +126,9 @@ export default function WelcomeScreen() {
               <ThemedText type="body" style={styles.featureTitle}>
                 Track Progress
               </ThemedText>
-              <ThemedText style={[styles.featureDesc, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.featureDesc, { color: theme.textSecondary }]}
+              >
                 Monitor your learning journey
               </ThemedText>
             </View>

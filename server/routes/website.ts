@@ -6,7 +6,7 @@ import {
   insertContactSchema,
   insertInstitutionalRequestSchema,
 } from "../../shared/schema";
-import { fromError } from "zod-validation-error";
+import { fromError } from "zod-validation-error/v3";
 import { asyncHandler, success, error } from "../lib/api-response";
 import { logger } from "../lib/logger";
 
@@ -46,7 +46,10 @@ router.post(
       return error(res, fromError(parsed.error).message, 400);
     }
     const message = await storage.createContactMessage(parsed.data);
-    logger.info("Website contact submission", { email: parsed.data.email, subject: parsed.data.subject });
+    logger.info("Website contact submission", {
+      email: parsed.data.email,
+      subject: parsed.data.subject,
+    });
     return success(res, { success: true, id: message.id }, 201);
   }),
 );
@@ -59,7 +62,10 @@ router.post(
       return error(res, fromError(parsed.error).message, 400);
     }
     const request = await storage.createInstitutionalRequest(parsed.data);
-    logger.info("Website institutional request", { email: parsed.data.email, institution: parsed.data.institution });
+    logger.info("Website institutional request", {
+      email: parsed.data.email,
+      institution: parsed.data.institution,
+    });
     return success(res, { success: true, id: request.id }, 201);
   }),
 );

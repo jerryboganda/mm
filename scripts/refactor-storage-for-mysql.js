@@ -15,7 +15,7 @@ function refactorFile(filePath) {
     /const\s+\[([^\]]+)\]\s*=\s*await\s+db\s*\n?\s*\.insert\(([^)]+)\)\s*\n?\s*\.values\(([^)]+)\)\s*\n?\s*\.returning\(\);/g,
     (match, varName, table, valuesVar) => {
       return `const __id = (${valuesVar} as any).id || crypto.randomUUID();\n  const ${varName} = { id: __id, ...${valuesVar} };\n  await db.insert(${table}).values(${varName} as any);`;
-    }
+    },
   );
 
   // Replace [var] = await db.update(table).set(data).where(...).returning();
@@ -23,7 +23,7 @@ function refactorFile(filePath) {
     /const\s+\[([^\]]+)\]\s*=\s*await\s+db\s*\n?\s*\.update\(([^)]+)\)\s*\n?\s*\.set\(([^)]+)\)\s*\n?\s*\.where\(([^)]+)\)\s*\n?\s*\.returning\(\);/g,
     (match, varName, table, setData, whereCond) => {
       return `await db.update(${table}).set(${setData}).where(${whereCond});\n  const [${varName}] = await db.select().from(${table}).where(${whereCond});`;
-    }
+    },
   );
 
   fs.writeFileSync(filePath, content, "utf-8");
@@ -39,7 +39,7 @@ const targetFiles = [
   "server/services/subscription-service.ts",
   "server/services/coupon-service.ts",
   "server/services/payment-gateway.ts",
-  "server/lib/device-sessions.ts"
+  "server/lib/device-sessions.ts",
 ];
 
 for (const file of targetFiles) {

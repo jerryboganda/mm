@@ -3,12 +3,9 @@ import { StyleSheet, View, ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
   withSpring,
-  useSharedValue,
-  withTiming,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
 interface ProgressBarProps {

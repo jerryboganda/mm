@@ -153,10 +153,7 @@ export async function createOrReplaceUserSession(options: {
     await db.insert(userSessions).values(sessionData);
     session = sessionData;
   } else {
-    [session] = await db
-      .insert(userSessions)
-      .values(sessionData)
-      .returning();
+    [session] = await db.insert(userSessions).values(sessionData).returning();
   }
 
   await enforceDeviceLimit(

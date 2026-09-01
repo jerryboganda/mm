@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config();
 
-import express from "express";
 import http from "http";
+dotenv.config();
 
 async function main() {
   // Dynamically import the compiled server bundle

@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import { drizzle as drizzlePg } from "drizzle-orm/node-postgres";
 import { drizzle as drizzleMysql } from "drizzle-orm/mysql2";
@@ -15,7 +14,8 @@ if (!process.env.DATABASE_URL) {
 }
 
 const dbUrl = process.env.DATABASE_URL;
-export const isMysql = dbUrl.startsWith("mysql:") || dbUrl.startsWith("mysql://");
+export const isMysql =
+  dbUrl.startsWith("mysql:") || dbUrl.startsWith("mysql://");
 
 let poolInstance: any;
 let dbInstance: any;

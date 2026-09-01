@@ -124,7 +124,15 @@ export function BackgroundGradient({
         true,
       );
     }
-  }, [animated]);
+  }, [
+    animated,
+    orbOpacity1,
+    orbOpacity2,
+    orbScale1,
+    orbScale2,
+    orbTranslateX2,
+    orbTranslateY1,
+  ]);
 
   const animatedOrb1Style = useAnimatedStyle(() => ({
     transform: [
@@ -272,7 +280,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   orbContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: "hidden",
   },
   orb: {

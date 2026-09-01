@@ -315,7 +315,7 @@ const DDL_STATEMENTS = [
     message TEXT NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'unread',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 ];
 
 async function init() {
@@ -332,13 +332,15 @@ async function init() {
     console.log("[+] All MySQL schema tables verified/created successfully.");
 
     // Seed default admin if missing
-    const [adminRows] = await conn.query("SELECT id FROM users WHERE email = 'drfarzanamuneer1@gmail.com'");
+    const [adminRows] = await conn.query(
+      "SELECT id FROM users WHERE email = 'drfarzanamuneer1@gmail.com'",
+    );
     if (!adminRows || adminRows.length === 0) {
       console.log("[*] Seeding default admin user...");
       const hashedPassword = await bcrypt.hash("Admin@123456", 10);
       await conn.query(
         "INSERT INTO users (id, email, password, name, role, is_email_verified) VALUES ('u-admin-01', 'drfarzanamuneer1@gmail.com', ?, 'Dr. Farzana Muneer', 'admin', true)",
-        [hashedPassword]
+        [hashedPassword],
       );
       console.log("[+] Default admin user created.");
     }
@@ -347,21 +349,33 @@ async function init() {
     const [bookRows] = await conn.query("SELECT id FROM books LIMIT 1");
     if (!bookRows || bookRows.length === 0) {
       console.log("[*] Seeding 13 books and 285 topics topology...");
-      const bookSqlPath = path.resolve(process.cwd(), "scripts/maternal_mind_book_mysql.sql");
+      const bookSqlPath = path.resolve(
+        process.cwd(),
+        "scripts/maternal_mind_book_mysql.sql",
+      );
       if (fs.existsSync(bookSqlPath)) {
         const bookSql = fs.readFileSync(bookSqlPath, "utf-8");
         // Extract only books, chapters, and topics inserts
         const filteredLines = bookSql
           .split("\n")
-          .filter((line) => line.startsWith("INSERT INTO books") || line.startsWith("INSERT INTO chapters") || line.startsWith("INSERT INTO topics"));
-        
-        console.log(`[*] Inserting ${filteredLines.length} topology records...`);
+          .filter(
+            (line) =>
+              line.startsWith("INSERT INTO books") ||
+              line.startsWith("INSERT INTO chapters") ||
+              line.startsWith("INSERT INTO topics"),
+          );
+
+        console.log(
+          `[*] Inserting ${filteredLines.length} topology records...`,
+        );
         for (const line of filteredLines) {
           if (line.trim()) {
             await conn.query(line);
           }
         }
-        console.log("[+] Topology (13 books, chapters, 285 topics) inserted successfully.");
+        console.log(
+          "[+] Topology (13 books, chapters, 285 topics) inserted successfully.",
+        );
       }
     }
   } catch (err) {

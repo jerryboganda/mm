@@ -571,7 +571,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(mcqs)
       .where(and(...conditions))
-      .orderBy(sql`RANDOM()`)
+      .orderBy(isMysql ? sql`RAND()` : sql`RANDOM()`)
       .limit(limit);
   }
 
@@ -1722,7 +1722,7 @@ export class DatabaseStorage implements IStorage {
           )`,
         ),
       )
-      .orderBy(sql`RANDOM()`)
+      .orderBy(isMysql ? sql`RAND()` : sql`RANDOM()`)
       .limit(limit);
 
     return result.map((r: any) => ({

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, ScrollView, Dimensions } from "react-native";
+import { StyleSheet, View, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -12,14 +12,12 @@ import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type PaywallScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
-
-const { width: screenWidth } = Dimensions.get("window");
 
 const premiumBenefits = [
   {
@@ -76,7 +74,8 @@ export default function PaywallScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: (headerHeight > 0 ? headerHeight : insets.top) + Spacing["2xl"],
+            paddingTop:
+              (headerHeight > 0 ? headerHeight : insets.top) + Spacing["2xl"],
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -102,9 +101,7 @@ export default function PaywallScreen() {
           >
             Go Premium
           </ThemedText>
-          <ThemedText
-            style={[styles.subtitle, { color: theme.textSecondary }]}
-          >
+          <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
             Unlock the full power of Maternal Mind and accelerate your medical
             education
           </ThemedText>
@@ -118,10 +115,7 @@ export default function PaywallScreen() {
             <GlassCard key={index} style={styles.benefitCard}>
               <View style={styles.benefitIcon}>
                 <LinearGradient
-                  colors={[
-                    theme.primary,
-                    theme.primaryDark || theme.primary
-                  ]}
+                  colors={[theme.primary, theme.primaryDark || theme.primary]}
                   style={StyleSheet.absoluteFill}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}

@@ -109,7 +109,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           HomeTab: "home",
           LibraryTab: {
             screens: {
-              Books: "library",
+              LearnHome: "library",
               Chapters: "library/book/:bookId",
               Topics: "library/chapter/:chapterId",
             },

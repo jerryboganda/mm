@@ -165,18 +165,21 @@ export default function HelpSupportScreen() {
     setExpandedFaq(expandedFaq === index ? null : index);
   };
 
-  const openExternalLink = useCallback(async (url: string, channel: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const canOpen = await Linking.canOpenURL(url);
-    if (!canOpen) {
-      Alert.alert(
-        t("Unavailable"),
-        `Unable to open ${channel} on this device.`,
-      );
-      return;
-    }
-    await Linking.openURL(url);
-  }, []);
+  const openExternalLink = useCallback(
+    async (url: string, channel: string) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      const canOpen = await Linking.canOpenURL(url);
+      if (!canOpen) {
+        Alert.alert(
+          t("Unavailable"),
+          `Unable to open ${channel} on this device.`,
+        );
+        return;
+      }
+      await Linking.openURL(url);
+    },
+    [t],
+  );
 
   const handleContactSupportEmail = useCallback(() => {
     const subject = encodeURIComponent("Support Request");
@@ -207,6 +210,7 @@ export default function HelpSupportScreen() {
     openExternalLink,
     supportContactSettings.whatsappDefaultMessage,
     supportContactSettings.whatsappNumber,
+    t,
   ]);
 
   const contactMethods = useMemo(

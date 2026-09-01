@@ -128,8 +128,11 @@ export async function getSupportContactSettings(): Promise<SupportContactSetting
     firstNonEmpty(settingsMap, SUPPORT_CONTACT_KEY_ALIASES.supportEmail) ||
     DEFAULT_SUPPORT_EMAIL;
   const websiteUrl =
-    firstNonEmpty(settingsMap, [SUPPORT_CONTACT_KEYS.websiteUrl, "website_url", "support_website"]) ||
-    DEFAULT_WEBSITE_URL;
+    firstNonEmpty(settingsMap, [
+      SUPPORT_CONTACT_KEYS.websiteUrl,
+      "website_url",
+      "support_website",
+    ]) || DEFAULT_WEBSITE_URL;
   const whatsappDefaultMessage =
     firstNonEmpty(
       settingsMap,

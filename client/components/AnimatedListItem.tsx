@@ -82,7 +82,17 @@ export function AnimatedListItem({
         withSpring(0, { damping: 14, stiffness: 120 }),
       );
     }
-  }, [index, delay, direction, type, reduceMotion]);
+  }, [
+    index,
+    delay,
+    direction,
+    type,
+    reduceMotion,
+    opacity,
+    scale,
+    translateX,
+    translateY,
+  ]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

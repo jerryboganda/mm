@@ -21,7 +21,7 @@ const req = http.request(
     let body = "";
     res.on("data", (chunk) => (body += chunk));
     res.on("end", () => console.log("Body:", body));
-  }
+  },
 );
 
 req.on("error", console.error);

@@ -79,9 +79,7 @@ export default function ErrorScreen({
                 >
                   Error Code
                 </ThemedText>
-                <ThemedText
-                  style={[styles.errorCode, { color: theme.error }]}
-                >
+                <ThemedText style={[styles.errorCode, { color: theme.error }]}>
                   {errorCode}
                 </ThemedText>
               </View>
@@ -90,7 +88,11 @@ export default function ErrorScreen({
 
           <GlassCard style={styles.helpCard}>
             <View style={styles.helpContent}>
-              <Feather name="info" size={20} color={theme.info || theme.primary} />
+              <Feather
+                name="info"
+                size={20}
+                color={theme.info || theme.primary}
+              />
               <ThemedText
                 style={[styles.helpText, { color: theme.textSecondary }]}
               >

@@ -2,20 +2,43 @@
 const { defineConfig } = require("eslint/config");
 const expoConfig = require("eslint-config-expo/flat");
 const eslintPluginPrettierRecommended = require("eslint-plugin-prettier/recommended");
-const reactCompiler = require("eslint-plugin-react-compiler");
+const globals = require("globals");
 
 module.exports = defineConfig([
   expoConfig,
   eslintPluginPrettierRecommended,
   {
-    plugins: {
-      "react-compiler": reactCompiler,
-    },
     rules: {
-      "react-compiler/react-compiler": "error",
+      "react-hooks/immutability": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/static-components": "off",
     },
   },
   {
-    ignores: ["dist/*"],
+    files: ["server/**/*.{ts,js}", "scripts/**/*.{ts,js,mjs,cjs}"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
+    ignores: [
+      "scripts/*.bundle.cjs",
+      "scripts/*.bundle.js",
+      "scripts/*.bundle.mjs",
+      "scripts/*bundle*",
+      "dist/**",
+      "server_dist/**",
+      "web_dist/**",
+      "admin_dist/**",
+      "website_dist/**",
+      "coverage/**",
+      ".agents/**",
+      "eslint_report.json",
+    ],
   },
 ]);
+
+

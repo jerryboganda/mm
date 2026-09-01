@@ -2,7 +2,11 @@ import fs from "fs";
 import path from "path";
 
 const pgDumpPath = path.join(process.cwd(), "maternal_mind_final_backup.sql");
-const mysqlDumpPath = path.join(process.cwd(), "scripts", "maternal_mind_mysql.sql");
+const mysqlDumpPath = path.join(
+  process.cwd(),
+  "scripts",
+  "maternal_mind_mysql.sql",
+);
 
 if (!fs.existsSync(pgDumpPath)) {
   console.error("PostgreSQL dump file missing!");
@@ -32,7 +36,12 @@ let mysqlDump = dump
   .replace(/public\./g, "");
 
 // Ensure SET FOREIGN_KEY_CHECKS=0 at top
-mysqlDump = `SET FOREIGN_KEY_CHECKS = 0;\n` + mysqlDump + `\nSET FOREIGN_KEY_CHECKS = 1;\n`;
+mysqlDump =
+  `SET FOREIGN_KEY_CHECKS = 0;\n` +
+  mysqlDump +
+  `\nSET FOREIGN_KEY_CHECKS = 1;\n`;
 
 fs.writeFileSync(mysqlDumpPath, mysqlDump, "utf-8");
-console.log("Converted PostgreSQL dump to MySQL dump successfully at scripts/maternal_mind_mysql.sql!");
+console.log(
+  "Converted PostgreSQL dump to MySQL dump successfully at scripts/maternal_mind_mysql.sql!",
+);

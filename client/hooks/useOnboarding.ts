@@ -19,33 +19,33 @@ export function useOnboarding() {
   >(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    checkOnboardingStatus();
-  }, []);
-
   const checkOnboardingStatus = async () => {
     try {
       const value = await AsyncStorage.getItem(ONBOARDING_COMPLETE_KEY);
       setHasCompletedOnboarding(value === "true");
-    } catch (error) {
+    } catch {
       setHasCompletedOnboarding(false);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    checkOnboardingStatus();
+  }, []);
+
   const completeOnboarding = async () => {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
       setHasCompletedOnboarding(true);
-    } catch (error) {}
+    } catch {}
   };
 
   const resetOnboarding = async () => {
     try {
       await AsyncStorage.removeItem(ONBOARDING_COMPLETE_KEY);
       setHasCompletedOnboarding(false);
-    } catch (error) {}
+    } catch {}
   };
 
   return {

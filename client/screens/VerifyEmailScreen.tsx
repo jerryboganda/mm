@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Image, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useRoute, RouteProp } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import * as Haptics from "@/lib/haptics-wrapper";
 
@@ -17,15 +16,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
 type VerifyEmailScreenRouteProp = RouteProp<RootStackParamList, "VerifyEmail">;
-type VerifyEmailScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "VerifyEmail"
->;
 
 export default function VerifyEmailScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const navigation = useNavigation<VerifyEmailScreenNavigationProp>();
   const route = useRoute<VerifyEmailScreenRouteProp>();
   const { verifyEmail, resendVerificationEmail } = useAuth();
   const { theme } = useTheme();

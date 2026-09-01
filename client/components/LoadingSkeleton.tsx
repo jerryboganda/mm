@@ -30,7 +30,7 @@ export function LoadingSkeleton({
 
   useEffect(() => {
     shimmer.value = withRepeat(withTiming(1, { duration: 1500 }), -1, false);
-  }, []);
+  }, [shimmer]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [

@@ -63,14 +63,14 @@ export function MobileContentProvider({
     refetchInterval: 30_000,
   });
 
-  const textOverrides = data?.textOverrides || {};
-  const readerWatermark = data?.readerWatermark || {
-    enabled: true,
-    opacity: 0.06,
-  };
-  const updatedAt = data?.updatedAt || null;
-
   const value = useMemo<MobileContentContextValue>(() => {
+    const textOverrides = data?.textOverrides || {};
+    const readerWatermark = data?.readerWatermark || {
+      enabled: true,
+      opacity: 0.06,
+    };
+    const updatedAt = data?.updatedAt || null;
+
     const resolveText = (input: string): string => {
       if (typeof input !== "string") return input;
 
@@ -100,7 +100,7 @@ export function MobileContentProvider({
       isLoading,
       updatedAt,
     };
-  }, [isLoading, readerWatermark, textOverrides, updatedAt]);
+  }, [data, isLoading]);
 
   React.useEffect(() => {
     const patchedAlert: AlertFn = (title, message, buttons, options) => {

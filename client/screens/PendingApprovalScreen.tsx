@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView, ActivityIndicator, Pressable, Linking } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  ActivityIndicator,
+  Pressable,
+  Linking,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -13,7 +20,7 @@ import { PrimaryButton } from "@/components/PrimaryButton";
 import { ThemedText } from "@/components/ThemedText";
 import { apiRequest } from "@/lib/query-client";
 import { useAuth } from "@/lib/auth";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
@@ -104,18 +111,27 @@ export default function PendingApprovalScreen() {
       >
         {isRejected ? (
           <>
-            <View style={[styles.iconCircle, { backgroundColor: `${theme.error}15` }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: `${theme.error}15` },
+              ]}
+            >
               <Feather name="x" size={44} color={theme.error} />
             </View>
             <ThemedText type="h2" style={styles.title}>
               Payment Not Approved
             </ThemedText>
-            <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.subtitle, { color: theme.textSecondary }]}
+            >
               Unfortunately we couldn&apos;t verify your payment.
             </ThemedText>
             {latest?.rejectionReason ? (
               <GlassCard style={styles.reasonCard}>
-                <ThemedText style={[styles.reasonLabel, { color: theme.textMuted }]}>
+                <ThemedText
+                  style={[styles.reasonLabel, { color: theme.textMuted }]}
+                >
                   Reason
                 </ThemedText>
                 <ThemedText style={styles.reasonText}>
@@ -132,25 +148,38 @@ export default function PendingApprovalScreen() {
           </>
         ) : (
           <>
-            <View style={[styles.iconCircle, { backgroundColor: `${theme.primary}15` }]}>
+            <View
+              style={[
+                styles.iconCircle,
+                { backgroundColor: `${theme.primary}15` },
+              ]}
+            >
               <ActivityIndicator size="large" color={theme.primary} />
             </View>
             <ThemedText type="h2" style={styles.title}>
               Verification in Progress
             </ThemedText>
-            <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
-              Your promo/coupon code or payment proof has been received, we shall verify soon. This screen will update automatically once verified.
+            <ThemedText
+              style={[styles.subtitle, { color: theme.textSecondary }]}
+            >
+              Your promo/coupon code or payment proof has been received, we
+              shall verify soon. This screen will update automatically once
+              verified.
             </ThemedText>
             <GlassCard style={styles.statusCard}>
               <Feather name="clock" size={18} color={theme.primary} />
-              <ThemedText style={[styles.statusText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.statusText, { color: theme.textSecondary }]}
+              >
                 Awaiting admin verification
               </ThemedText>
             </GlassCard>
 
             {/* Query & Contact Section */}
             <GlassCard style={styles.contactCard}>
-              <ThemedText style={[styles.contactCardTitle, { color: theme.primary }]}>
+              <ThemedText
+                style={[styles.contactCardTitle, { color: theme.primary }]}
+              >
                 For further queries please contact on
               </ThemedText>
 
@@ -161,52 +190,102 @@ export default function PendingApprovalScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Contact on WhatsApp +923360830836"
                 >
-                  <View style={[styles.contactIconCircle, { backgroundColor: "#25D36620" }]}>
+                  <View
+                    style={[
+                      styles.contactIconCircle,
+                      { backgroundColor: "#25D36620" },
+                    ]}
+                  >
                     <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
                   </View>
                   <View style={styles.contactItemTextCol}>
-                    <ThemedText style={styles.contactItemLabel}>Whatsapp</ThemedText>
-                    <ThemedText style={[styles.contactItemValue, { color: theme.textSecondary }]}>
+                    <ThemedText style={styles.contactItemLabel}>
+                      Whatsapp
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.contactItemValue,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
                       +923360830836
                     </ThemedText>
                   </View>
-                  <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                  <Feather
+                    name="chevron-right"
+                    size={16}
+                    color={theme.textMuted}
+                  />
                 </Pressable>
 
                 <Pressable
                   style={styles.contactItem}
-                  onPress={() => Linking.openURL("https://maternalmind.com.pk/")}
+                  onPress={() =>
+                    Linking.openURL("https://maternalmind.com.pk/")
+                  }
                   accessibilityRole="button"
                   accessibilityLabel="Visit Website https://maternalmind.com.pk/"
                 >
-                  <View style={[styles.contactIconCircle, { backgroundColor: `${theme.primary}20` }]}>
+                  <View
+                    style={[
+                      styles.contactIconCircle,
+                      { backgroundColor: `${theme.primary}20` },
+                    ]}
+                  >
                     <Feather name="globe" size={18} color={theme.primary} />
                   </View>
                   <View style={styles.contactItemTextCol}>
                     <ThemedText style={styles.contactItemLabel}>Web</ThemedText>
-                    <ThemedText style={[styles.contactItemValue, { color: theme.textSecondary }]}>
+                    <ThemedText
+                      style={[
+                        styles.contactItemValue,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
                       https://maternalmind.com.pk/
                     </ThemedText>
                   </View>
-                  <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                  <Feather
+                    name="chevron-right"
+                    size={16}
+                    color={theme.textMuted}
+                  />
                 </Pressable>
 
                 <Pressable
                   style={styles.contactItem}
-                  onPress={() => Linking.openURL("mailto:maternalmind.help@gmail.com")}
+                  onPress={() =>
+                    Linking.openURL("mailto:maternalmind.help@gmail.com")
+                  }
                   accessibilityRole="button"
                   accessibilityLabel="Send email to maternalmind.help@gmail.com"
                 >
-                  <View style={[styles.contactIconCircle, { backgroundColor: `${theme.info}20` }]}>
+                  <View
+                    style={[
+                      styles.contactIconCircle,
+                      { backgroundColor: `${theme.info}20` },
+                    ]}
+                  >
                     <Feather name="mail" size={18} color={theme.info} />
                   </View>
                   <View style={styles.contactItemTextCol}>
-                    <ThemedText style={styles.contactItemLabel}>Email</ThemedText>
-                    <ThemedText style={[styles.contactItemValue, { color: theme.textSecondary }]}>
+                    <ThemedText style={styles.contactItemLabel}>
+                      Email
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.contactItemValue,
+                        { color: theme.textSecondary },
+                      ]}
+                    >
                       maternalmind.help@gmail.com
                     </ThemedText>
                   </View>
-                  <Feather name="chevron-right" size={16} color={theme.textMuted} />
+                  <Feather
+                    name="chevron-right"
+                    size={16}
+                    color={theme.textMuted}
+                  />
                 </Pressable>
               </View>
             </GlassCard>
@@ -222,7 +301,10 @@ export default function PendingApprovalScreen() {
               <Pressable
                 onPress={handleCheckAgain}
                 disabled={isChecking}
-                style={[styles.refreshButton, isChecking && styles.refreshButtonDisabled]}
+                style={[
+                  styles.refreshButton,
+                  isChecking && styles.refreshButtonDisabled,
+                ]}
                 accessibilityRole="button"
                 accessibilityLabel="Check status again"
               >
@@ -231,14 +313,22 @@ export default function PendingApprovalScreen() {
                 ) : (
                   <Feather name="refresh-cw" size={16} color={theme.primary} />
                 )}
-                <ThemedText style={{ color: theme.primary, fontSize: 14, fontWeight: "600" }}>
+                <ThemedText
+                  style={{
+                    color: theme.primary,
+                    fontSize: 14,
+                    fontWeight: "600",
+                  }}
+                >
                   {isChecking ? "Checking Status..." : "Check Status Again"}
                 </ThemedText>
               </Pressable>
             </View>
 
             {checkError ? (
-              <ThemedText style={[styles.checkErrorText, { color: theme.error }]}>
+              <ThemedText
+                style={[styles.checkErrorText, { color: theme.error }]}
+              >
                 {checkError}
               </ThemedText>
             ) : null}
@@ -357,6 +447,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: Spacing.xs,
   },
-  signOut: { marginTop: Spacing.xl, padding: Spacing.md, marginBottom: Spacing.lg },
+  signOut: {
+    marginTop: Spacing.xl,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
   signOutText: { fontSize: 14 },
 });

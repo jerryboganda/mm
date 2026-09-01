@@ -71,7 +71,9 @@ try {
   log("Building Server Bundle via esbuild...");
   run("npm run server:build");
 
-  log("\x1b[32m[BUILD-ALL SUCCESS]\x1b[0m All frontends (website_dist, admin_dist, web_dist) & server (server_dist) built successfully for Single-Slot deployment!");
+  log(
+    "\x1b[32m[BUILD-ALL SUCCESS]\x1b[0m All frontends (website_dist, admin_dist, web_dist) & server (server_dist) built successfully for Single-Slot deployment!",
+  );
 } catch (err) {
   console.error("\x1b[31m[BUILD-ALL ERROR]\x1b[0m Build failed:", err.message);
   process.exit(1);
