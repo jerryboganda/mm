@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "maternalmind",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "runtimeVersion": {
       "policy": "fingerprint"
     },
@@ -41,7 +40,6 @@
         "backgroundColor": "#0c1e2e"
       },
       "versionCode": 6,
-      "supportsTablet": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.maternalmind.app"
     },
@@ -81,7 +79,10 @@
             "enableShrinkResourcesInReleaseBuilds": true
           }
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font",
+      "expo-image"
     ],
     "experiments": {
       "reactCompiler": true
