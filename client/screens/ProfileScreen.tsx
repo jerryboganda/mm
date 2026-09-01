@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ import { Spacing, BorderRadius } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useBottomLayout } from "@/hooks/useBottomLayout";
+import { normalizeSubscriptionPlan } from "../../shared/pricing-contracts";
 
 type ProfileScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -73,9 +74,16 @@ function formatAmount(val: string | number): string {
 export default function ProfileScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
-  const { user, logout, deactivateAccount, requestAccountDeletion } = useAuth();
+  const { user, logout, deactivateAccount, requestAccountDeletion, refreshUser } = useAuth();
   const { theme, isDark } = useTheme();
   const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
+
+  // Auto-refresh user data whenever the Profile screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshUser?.();
+    }, [refreshUser]),
+  );
 
   const [isProcessingProfileAction, setIsProcessingProfileAction] =
     React.useState(false);
@@ -108,15 +116,36 @@ export default function ProfileScreen() {
     openProfileAction("logout");
   };
 
+  const isPremium = user?.subscriptionStatus === "active";
+
   const getSubscriptionBadge = () => {
-    switch (user?.subscriptionStatus) {
-      case "active":
-        return { label: "Premium", color: theme.success };
-      case "expired":
-        return { label: "Expired", color: theme.error };
-      default:
-        return { label: "Free", color: theme.textSecondary };
+    if (isPremium) {
+      const planName =
+        (user?.subscriptionPlan
+          ? normalizeSubscriptionPlan(user.subscriptionPlan) ||
+            user.subscriptionPlan
+          : "6 Months Plan") || "Premium Access";
+      return {
+        label: planName,
+        color: theme.success,
+        icon: "award" as const,
+        isPremium: true,
+      };
     }
+    if (user?.subscriptionStatus === "expired") {
+      return {
+        label: "Expired",
+        color: theme.error,
+        icon: "alert-circle" as const,
+        isPremium: false,
+      };
+    }
+    return {
+      label: "Free Plan",
+      color: theme.textSecondary,
+      icon: "shield" as const,
+      isPremium: false,
+    };
   };
 
   const subscriptionBadge = getSubscriptionBadge();
@@ -714,9 +743,16 @@ export default function ProfileScreen() {
               ]}
             />
           </Pressable>
-          <ThemedText type="h3" style={styles.userName} numberOfLines={1}>
-            {user?.name || "Student"}
-          </ThemedText>
+          <View style={styles.userNameRow}>
+            <ThemedText type="h3" style={styles.userName} numberOfLines={1}>
+              {user?.name || "Student"}
+            </ThemedText>
+            {isPremium && (
+              <View style={styles.verifiedTickBadge}>
+                <Feather name="check-circle" size={18} color={theme.success} />
+              </View>
+            )}
+          </View>
           <ThemedText
             style={[styles.userEmail, { color: theme.textSecondary }]}
             numberOfLines={1}
@@ -726,26 +762,57 @@ export default function ProfileScreen() {
           <View
             style={[
               styles.subscriptionBadge,
-              { backgroundColor: `${subscriptionBadge.color}20` },
+              {
+                backgroundColor: isPremium
+                  ? `${theme.success}20`
+                  : `${subscriptionBadge.color}15`,
+                borderColor: isPremium ? `${theme.success}50` : "transparent",
+                borderWidth: isPremium ? 1 : 0,
+              },
             ]}
           >
+            <Feather
+              name={subscriptionBadge.icon}
+              size={13}
+              color={subscriptionBadge.color}
+              style={{ marginRight: 5 }}
+            />
             <ThemedText
               style={[
                 styles.subscriptionText,
-                { color: subscriptionBadge.color },
+                {
+                  color: subscriptionBadge.color,
+                  fontWeight: isPremium ? "700" : "600",
+                },
               ]}
             >
               {subscriptionBadge.label}
             </ThemedText>
+            {isPremium && (
+              <Feather
+                name="check"
+                size={13}
+                color={theme.success}
+                style={{ marginLeft: 4 }}
+              />
+            )}
           </View>
         </View>
 
-        {user?.subscriptionStatus === "active" ? (
+        {isPremium ? (
           <GlassCard
-            style={[styles.upgradeCard, { borderColor: theme.success }]}
+            style={[
+              styles.upgradeCard,
+              {
+                borderColor: `${theme.success}60`,
+                backgroundColor: isDark
+                  ? "rgba(16, 185, 129, 0.08)"
+                  : "rgba(16, 185, 129, 0.05)",
+              },
+            ]}
             onPress={() => navigation.navigate("Subscription")}
             accessibilityRole="button"
-            accessibilityLabel="Premium User verified. Tap to view subscription details"
+            accessibilityLabel="Premium Subscription Active. Tap to view subscription details"
           >
             <View style={styles.upgradeContent}>
               <View
@@ -754,15 +821,18 @@ export default function ProfileScreen() {
                   { backgroundColor: `${theme.success}25` },
                 ]}
               >
-                <Feather name="check-circle" size={24} color={theme.success} />
+                <Feather name="award" size={24} color={theme.success} />
               </View>
               <View style={styles.upgradeText}>
-                <ThemedText
-                  type="h4"
-                  style={[styles.upgradeTitle, { color: theme.success }]}
-                >
-                  Premium User ✅
-                </ThemedText>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <ThemedText
+                    type="h4"
+                    style={[styles.upgradeTitle, { color: theme.success }]}
+                  >
+                    Premium Member
+                  </ThemedText>
+                  <Feather name="check-circle" size={16} color={theme.success} />
+                </View>
                 <ThemedText
                   style={[
                     styles.upgradeSubtitle,
@@ -770,8 +840,11 @@ export default function ProfileScreen() {
                   ]}
                 >
                   {user.subscriptionPlan
-                    ? `All content unlocked • ${user.subscriptionPlan}`
+                    ? `All content unlocked • ${normalizeSubscriptionPlan(user.subscriptionPlan) || user.subscriptionPlan}`
                     : "All content and features unlocked"}
+                  {user.subscriptionExpiresAt
+                    ? ` • Expires ${formatDate(user.subscriptionExpiresAt.toString())}`
+                    : ""}
                 </ThemedText>
               </View>
               <Feather
@@ -996,15 +1069,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 2,
   },
-  userName: {
+  userNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.xs,
     marginBottom: Spacing.xs,
+  },
+  userName: {
+    marginBottom: 0,
+  },
+  verifiedTickBadge: {
+    marginLeft: 4,
   },
   userEmail: {
     marginBottom: Spacing.md,
   },
   subscriptionBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.xs,
+    paddingVertical: Spacing.xs + 1,
     borderRadius: BorderRadius.full,
   },
   subscriptionText: {

@@ -23,6 +23,8 @@ interface User {
   role: "student" | "admin";
   subscriptionStatus: "active" | "expired" | "none";
   subscriptionPlan?: string;
+  subscriptionExpiresAt?: string | null;
+  subscriptionEnd?: string | null;
   isEmailVerified: boolean;
   isActive: boolean;
   deactivatedAt?: string | null;
