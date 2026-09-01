@@ -96,18 +96,28 @@ export default function AboutScreen() {
 
         <GlassCard style={styles.versionCard}>
           <View style={styles.versionRow}>
-            <ThemedText style={[styles.versionLabel, { color: theme.textSecondary }]}>Version</ThemedText>
+            <ThemedText
+              style={[styles.versionLabel, { color: theme.textSecondary }]}
+            >
+              Version
+            </ThemedText>
             <ThemedText style={styles.versionValue}>{appVersion}</ThemedText>
           </View>
           <View style={[styles.divider, { backgroundColor: theme.glass }]} />
           <View style={styles.versionRow}>
-            <ThemedText style={[styles.versionLabel, { color: theme.textSecondary }]}>Build</ThemedText>
+            <ThemedText
+              style={[styles.versionLabel, { color: theme.textSecondary }]}
+            >
+              Build
+            </ThemedText>
             <ThemedText style={styles.versionValue}>{buildNumber}</ThemedText>
           </View>
         </GlassCard>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>LEGAL</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            LEGAL
+          </ThemedText>
           {legalItems.map((item) => (
             <GlassCard
               key={item.id}
@@ -119,12 +129,13 @@ export default function AboutScreen() {
               }
             >
               <View style={styles.legalRow}>
-                <View style={[styles.legalIcon, { backgroundColor: `${theme.primary}15` }]}>
-                  <Feather
-                    name={item.icon}
-                    size={18}
-                    color={theme.primary}
-                  />
+                <View
+                  style={[
+                    styles.legalIcon,
+                    { backgroundColor: `${theme.primary}15` },
+                  ]}
+                >
+                  <Feather name={item.icon} size={18} color={theme.primary} />
                 </View>
                 <ThemedText style={styles.legalTitle}>{item.title}</ThemedText>
                 <Feather
@@ -138,7 +149,9 @@ export default function AboutScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>ACKNOWLEDGEMENTS</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            ACKNOWLEDGEMENTS
+          </ThemedText>
           <GlassCard style={styles.acknowledgementsCard}>
             {acknowledgements.map((item, index) => (
               <View
@@ -152,7 +165,12 @@ export default function AboutScreen() {
                 ]}
               >
                 <Feather name="check" size={14} color={theme.success} />
-                <ThemedText style={[styles.acknowledgementText, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[
+                    styles.acknowledgementText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   {item}
                 </ThemedText>
               </View>
@@ -161,7 +179,9 @@ export default function AboutScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>CONNECT</ThemedText>
+          <ThemedText style={[styles.sectionLabel, { color: theme.primary }]}>
+            CONNECT
+          </ThemedText>
           <View style={styles.socialRow}>
             <Pressable
               style={({ pressed }) => [

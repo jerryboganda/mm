@@ -12,7 +12,7 @@ if (!content.includes('import crypto from "crypto";')) {
 // Replace id column definitions with $defaultFn
 content = content.replace(
   /id: varchar\("id", \{ length: 36 \}\)\s*\n?\s*\.primaryKey\(\)\s*,?/g,
-  'id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),'
+  'id: varchar("id", { length: 36 }).$defaultFn(() => crypto.randomUUID()).primaryKey(),',
 );
 
 fs.writeFileSync(schemaPath, content, "utf-8");

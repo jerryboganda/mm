@@ -15,7 +15,6 @@ import SearchScreen from "@/screens/SearchScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
-import type { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useMobileContent } from "@/lib/mobile-content";
 
 export type LearnStackParamList = {

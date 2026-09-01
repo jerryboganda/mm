@@ -156,7 +156,9 @@ export async function sendSubscriptionWelcomeEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send welcome email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send welcome email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -202,7 +204,9 @@ export async function sendRenewalReminderEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send renewal reminder", { error: String(error) });
+    logger.error("subscription-emails: Failed to send renewal reminder", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -253,7 +257,9 @@ export async function sendPaymentSuccessEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send payment success email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send payment success email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -298,7 +304,9 @@ export async function sendPaymentFailedEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send payment failed email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send payment failed email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -341,7 +349,9 @@ export async function sendSubscriptionExpiringEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send expiring email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send expiring email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -400,7 +410,9 @@ export async function sendSubscriptionCanceledEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send canceled email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send canceled email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -446,7 +458,9 @@ export async function sendTrialEndingEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send trial ending email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send trial ending email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -487,7 +501,9 @@ export async function sendSubscriptionReactivatedEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send reactivated email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send reactivated email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -524,7 +540,9 @@ export async function sendProofReceivedEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send proof received email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send proof received email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -568,7 +586,9 @@ export async function sendSubscriptionApprovedEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send approved email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send approved email", {
+      error: String(error),
+    });
     return false;
   }
 }
@@ -619,7 +639,9 @@ export async function sendSubscriptionRejectedEmail(
     });
     return true;
   } catch (error) {
-    logger.error("subscription-emails: Failed to send rejected email", { error: String(error) });
+    logger.error("subscription-emails: Failed to send rejected email", {
+      error: String(error),
+    });
     return false;
   }
 }

@@ -20,19 +20,7 @@ import {
   type CouponUsage,
 } from "../../shared/schema";
 import { db } from "../db";
-import {
-  eq,
-  and,
-  desc,
-  sql,
-  count,
-  gt,
-  lte,
-  gte,
-  inArray,
-  or,
-  isNull,
-} from "drizzle-orm";
+import { eq, and, desc, sql, count, inArray, or, isNull } from "drizzle-orm";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -138,12 +126,12 @@ interface CampaignAnalyticsResult {
 interface StackedDiscountResult {
   totalDiscount: number;
   finalPrice: number;
-  breakdown: Array<{
+  breakdown: {
     couponId: string;
     code: string;
     discountType: string;
     discountApplied: number;
-  }>;
+  }[];
 }
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -267,31 +255,27 @@ class CouponService {
    */
   async createCoupon(data: CreateCouponData): Promise<Coupon> {
     const id = crypto.randomUUID();
-    await db
-      .insert(coupons)
-      .values({
-        id,
-        code: data.code.toUpperCase().trim(),
-        description: data.description ?? null,
-        campaignId: data.campaignId ?? null,
-        discountType: data.discountType,
-        discountValue: data.discountValue,
-        minPurchaseAmount: data.minPurchaseAmount ?? null,
-        maxDiscountAmount: data.maxDiscountAmount ?? null,
-        durationDaysOverride: data.durationDaysOverride ?? null,
-        applicablePackageIds: data.applicablePackageIds ?? null,
-        applicableAddOnIds: data.applicableAddOnIds ?? null,
-        maxTotalUses: data.maxTotalUses ?? null,
-        maxUsesPerUser: data.maxUsesPerUser ?? 1,
-        validFrom: data.validFrom ? new Date(data.validFrom as string) : null,
-        validUntil: data.validUntil
-          ? new Date(data.validUntil as string)
-          : null,
-        isStackable: data.isStackable ?? false,
-        referralUserId: data.referralUserId ?? null,
-        isActive: data.isActive ?? true,
-        metadata: data.metadata ?? null,
-      });
+    await db.insert(coupons).values({
+      id,
+      code: data.code.toUpperCase().trim(),
+      description: data.description ?? null,
+      campaignId: data.campaignId ?? null,
+      discountType: data.discountType,
+      discountValue: data.discountValue,
+      minPurchaseAmount: data.minPurchaseAmount ?? null,
+      maxDiscountAmount: data.maxDiscountAmount ?? null,
+      durationDaysOverride: data.durationDaysOverride ?? null,
+      applicablePackageIds: data.applicablePackageIds ?? null,
+      applicableAddOnIds: data.applicableAddOnIds ?? null,
+      maxTotalUses: data.maxTotalUses ?? null,
+      maxUsesPerUser: data.maxUsesPerUser ?? 1,
+      validFrom: data.validFrom ? new Date(data.validFrom as string) : null,
+      validUntil: data.validUntil ? new Date(data.validUntil as string) : null,
+      isStackable: data.isStackable ?? false,
+      referralUserId: data.referralUserId ?? null,
+      isActive: data.isActive ?? true,
+      metadata: data.metadata ?? null,
+    });
     return (await this.getCoupon(id))!;
   }
 
@@ -342,10 +326,7 @@ class CouponService {
     if (data.isActive !== undefined) values.isActive = data.isActive;
     if (data.metadata !== undefined) values.metadata = data.metadata;
 
-    await db
-      .update(coupons)
-      .set(values)
-      .where(eq(coupons.id, id));
+    await db.update(coupons).set(values).where(eq(coupons.id, id));
 
     return (await this.getCoupon(id)) ?? undefined;
   }
@@ -1046,14 +1027,19 @@ class CouponService {
     if ((userUsage?.uses ?? 0) >= maxPerUser) {
       return {
         valid: false,
-        message: "You have already reached the maximum usage limit for this coupon",
+        message:
+          "You have already reached the maximum usage limit for this coupon",
       };
     }
 
     // 6. Package compatibility
     if (coupon.applicablePackageIds) {
       const allowedPkgs = coupon.applicablePackageIds as string[];
-      if (Array.isArray(allowedPkgs) && allowedPkgs.length > 0 && !allowedPkgs.includes(packageId)) {
+      if (
+        Array.isArray(allowedPkgs) &&
+        allowedPkgs.length > 0 &&
+        !allowedPkgs.includes(packageId)
+      ) {
         return {
           valid: false,
           message: "This coupon is not valid for the selected package",
@@ -1224,9 +1210,7 @@ class CouponService {
         .returning({ id: coupons.id });
 
       if (!updatedCoupon) {
-        throw new Error(
-          "Coupon redemption failed: limit reached or inactive",
-        );
+        throw new Error("Coupon redemption failed: limit reached or inactive");
       }
 
       // Fetch package and price details for records

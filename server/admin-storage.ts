@@ -568,7 +568,9 @@ export async function adminGetMcqFacets(): Promise<{
         ORDER BY count(*) DESC, t.value ASC`,
   );
   const tagRows = (
-    Array.isArray(tagResult) ? tagResult : (tagResult as { rows?: unknown[] }).rows ?? []
+    Array.isArray(tagResult)
+      ? tagResult
+      : ((tagResult as { rows?: unknown[] }).rows ?? [])
   ) as { tag: string; count: number }[];
   const examTypeRows = await db
     .select({ examType: mcqs.examType })
@@ -686,7 +688,9 @@ export async function adminBulkUpdateMcqs(
   for (const k of Object.keys(updates)) {
     if (updates[k] === undefined) delete updates[k];
   }
-  const fieldCount = Object.keys(updates).filter((k) => k !== "updatedAt").length;
+  const fieldCount = Object.keys(updates).filter(
+    (k) => k !== "updatedAt",
+  ).length;
   if (fieldCount === 0 && !addTags?.length) return 0;
 
   let updated = ids.length;

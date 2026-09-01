@@ -160,7 +160,7 @@ function ContinueLearningCard({
   onPress: () => void;
   isNarrow: boolean;
 }) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const { resolveText } = useMobileContent();
 
   return (
@@ -451,7 +451,7 @@ export default function HomeScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     // Navigate through root navigator since SpacedReview is a root-level screen
-    (navigation as any).getParent()?.navigate("SpacedReview");
+    (navigation.getParent() as any)?.getParent()?.navigate("SpacedReview");
   };
 
   const progress = progressData as any;
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
     minHeight: 130,
   },
   bentoBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   bentoContent: {
     flex: 1,

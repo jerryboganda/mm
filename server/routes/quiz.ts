@@ -139,7 +139,7 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
 
 router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { quizId, answers, mode, topicId } = req.body;
+    const { answers, mode, topicId } = req.body;
 
     if (
       !answers ||

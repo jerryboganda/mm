@@ -172,7 +172,8 @@ export default function LoginScreen() {
     const rawNumber = supportContact.whatsappNumber || "+923360830836";
     const cleanNumber = rawNumber.replace(/[^\d]/g, "");
     const msg = encodeURIComponent(
-      supportContact.whatsappDefaultMessage || "Hello Support Team, I need help logging in.",
+      supportContact.whatsappDefaultMessage ||
+        "Hello Support Team, I need help logging in.",
     );
     const url = `https://wa.me/${cleanNumber}?text=${msg}`;
     try {
@@ -185,20 +186,12 @@ export default function LoginScreen() {
     }
   };
 
-  const handleOpenPhone = async () => {
-    const rawNumber = supportContact.phoneNumber || "+923360830836";
-    const url = `tel:${rawNumber}`;
-    try {
-      await Linking.openURL(url);
-    } catch {
-      Alert.alert("Phone Helpline", `Call us directly at: ${rawNumber}`);
-    }
-  };
-
   const handleOpenEmail = async () => {
-    const emailAddr = supportContact.supportEmail || "maternalmind.help@gmail.com";
+    const emailAddr =
+      supportContact.supportEmail || "maternalmind.help@gmail.com";
     const msg = encodeURIComponent(
-      supportContact.whatsappDefaultMessage || "Hello Support Team, I need help logging in.",
+      supportContact.whatsappDefaultMessage ||
+        "Hello Support Team, I need help logging in.",
     );
     const url = `mailto:${emailAddr}?subject=${encodeURIComponent(
       "Trouble logging in",
@@ -211,7 +204,8 @@ export default function LoginScreen() {
   };
 
   const handleOpenWebsite = async () => {
-    const webUrl = (supportContact as any).websiteUrl || "https://maternalmind.com.pk/";
+    const webUrl =
+      (supportContact as any).websiteUrl || "https://maternalmind.com.pk/";
     try {
       await Linking.openURL(webUrl);
     } catch {
@@ -411,22 +405,36 @@ export default function LoginScreen() {
               styles.modalCard,
               {
                 backgroundColor: isDark ? "#0F172A" : "#FFFFFF",
-                borderColor: isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)",
+                borderColor: isDark
+                  ? "rgba(255, 255, 255, 0.15)"
+                  : "rgba(0, 0, 0, 0.1)",
               },
             ]}
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalBadgeContainer}>
-              <View style={[styles.modalBadge, { backgroundColor: `${theme.primary}20` }]}>
-                <Ionicons name="headset-outline" size={28} color={theme.primary} />
+              <View
+                style={[
+                  styles.modalBadge,
+                  { backgroundColor: `${theme.primary}20` },
+                ]}
+              >
+                <Ionicons
+                  name="headset-outline"
+                  size={28}
+                  color={theme.primary}
+                />
               </View>
             </View>
 
             <ThemedText style={[styles.modalTitle, { color: theme.text }]}>
               Login Support & Helpline
             </ThemedText>
-            <ThemedText style={[styles.modalSubtitle, { color: theme.textSecondary }]}>
-              Need help accessing your account? Reach out to us directly through any of our support channels.
+            <ThemedText
+              style={[styles.modalSubtitle, { color: theme.textSecondary }]}
+            >
+              Need help accessing your account? Reach out to us directly through
+              any of our support channels.
             </ThemedText>
 
             <Pressable
@@ -443,7 +451,8 @@ export default function LoginScreen() {
                   WhatsApp Helpline
                 </ThemedText>
                 <ThemedText style={styles.whatsappCardSub}>
-                  {supportContact.whatsappNumber || "+923360830836"} • Direct Chat
+                  {supportContact.whatsappNumber || "+923360830836"} • Direct
+                  Chat
                 </ThemedText>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
@@ -453,62 +462,107 @@ export default function LoginScreen() {
               style={[
                 styles.contactOptionCard,
                 {
-                  backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
-                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.03)",
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.08)",
                 },
               ]}
               onPress={handleOpenWebsite}
               accessibilityRole="button"
               accessibilityLabel="Visit Official Website"
             >
-              <View style={[styles.contactIconBg, { backgroundColor: `${theme.primary}20` }]}>
-                <Ionicons name="globe-outline" size={22} color={theme.primary} />
+              <View
+                style={[
+                  styles.contactIconBg,
+                  { backgroundColor: `${theme.primary}20` },
+                ]}
+              >
+                <Ionicons
+                  name="globe-outline"
+                  size={22}
+                  color={theme.primary}
+                />
               </View>
               <View style={styles.contactTextContainer}>
-                <ThemedText style={[styles.optionCardTitle, { color: theme.text }]}>
+                <ThemedText
+                  style={[styles.optionCardTitle, { color: theme.text }]}
+                >
                   Official Website
                 </ThemedText>
-                <ThemedText style={[styles.optionCardSub, { color: theme.textSecondary }]}>
-                  {(supportContact as any).websiteUrl || "https://maternalmind.com.pk/"}
+                <ThemedText
+                  style={[styles.optionCardSub, { color: theme.textSecondary }]}
+                >
+                  {(supportContact as any).websiteUrl ||
+                    "https://maternalmind.com.pk/"}
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color={theme.textSecondary}
+              />
             </Pressable>
 
             <Pressable
               style={[
                 styles.contactOptionCard,
                 {
-                  backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
-                  borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)",
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.05)"
+                    : "rgba(0,0,0,0.03)",
+                  borderColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.08)",
                 },
               ]}
               onPress={handleOpenEmail}
               accessibilityRole="button"
               accessibilityLabel="Send email support"
             >
-              <View style={[styles.contactIconBg, { backgroundColor: "rgba(56, 189, 248, 0.2)" }]}>
+              <View
+                style={[
+                  styles.contactIconBg,
+                  { backgroundColor: "rgba(56, 189, 248, 0.2)" },
+                ]}
+              >
                 <Ionicons name="mail-outline" size={22} color="#38BDF8" />
               </View>
               <View style={styles.contactTextContainer}>
-                <ThemedText style={[styles.optionCardTitle, { color: theme.text }]}>
+                <ThemedText
+                  style={[styles.optionCardTitle, { color: theme.text }]}
+                >
                   Email Support
                 </ThemedText>
-                <ThemedText style={[styles.optionCardSub, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.optionCardSub, { color: theme.textSecondary }]}
+                >
                   {supportContact.supportEmail || "maternalmind.help@gmail.com"}
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color={theme.textSecondary}
+              />
             </Pressable>
 
             <Pressable
               style={[
                 styles.modalCloseButton,
-                { backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)" },
+                {
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.06)",
+                },
               ]}
               onPress={() => setShowSupportModal(false)}
             >
-              <ThemedText style={[styles.modalCloseText, { color: theme.text }]}>
+              <ThemedText
+                style={[styles.modalCloseText, { color: theme.text }]}
+              >
                 Close
               </ThemedText>
             </Pressable>

@@ -13,7 +13,9 @@
 // own; tsx does not. Static ESM imports are hoisted, so the DB modules are
 // imported dynamically below — after env is loaded.
 try {
-  (process as unknown as { loadEnvFile?: (p?: string) => void }).loadEnvFile?.();
+  (
+    process as unknown as { loadEnvFile?: (p?: string) => void }
+  ).loadEnvFile?.();
 } catch {
   // .env may not exist (env provided by the host) — ignore.
 }
@@ -37,12 +39,17 @@ const PACKAGES: SeedPackage[] = [
     slug: "six_months",
     name: "6 Months",
     shortDescription: "Full access for 6 months",
-    description: "6 months of full premium access to all OB-GYN topics and MCQs.",
+    description:
+      "6 months of full premium access to all OB-GYN topics and MCQs.",
     displayOrder: 1,
     billingCycle: "semi_annual",
     price: "700.00",
     features: [
-      { name: "Full content access", valueType: "check", key: "full_content_access" },
+      {
+        name: "Full content access",
+        valueType: "check",
+        key: "full_content_access",
+      },
       { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
       { name: "Priority support", valueType: "check", key: "priority_support" },
     ],
@@ -56,7 +63,11 @@ const PACKAGES: SeedPackage[] = [
     billingCycle: "annual",
     price: "1000.00",
     features: [
-      { name: "Full content access", valueType: "check", key: "full_content_access" },
+      {
+        name: "Full content access",
+        valueType: "check",
+        key: "full_content_access",
+      },
       { name: "Unlimited MCQs", valueType: "check", key: "unlimited_mcqs" },
       { name: "Priority support", valueType: "check", key: "priority_support" },
     ],

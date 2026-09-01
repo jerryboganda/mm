@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
-dotenv.config();
 import { db } from "../server/db";
 import { sql } from "drizzle-orm";
+dotenv.config();
 
 async function wipeStudyData() {
   console.log("=== STARTING STUDY DATA WIPE ===");
@@ -17,13 +17,15 @@ async function wipeStudyData() {
     "content_blocks",
     "topics",
     "chapters",
-    "books"
+    "books",
   ];
 
   for (const table of tablesToWipe) {
     try {
       console.log(`Truncating table '${table}'...`);
-      await db.execute(sql.raw(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`));
+      await db.execute(
+        sql.raw(`TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`),
+      );
       console.log(`✓ Table '${table}' wiped successfully.`);
     } catch (err: any) {
       console.error(`✗ Error wiping table '${table}': ${err.message}`);

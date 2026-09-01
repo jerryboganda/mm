@@ -8,7 +8,11 @@ import React, {
 } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
-import { getApiUrl, queryClient, attemptTokenRefresh } from "@/lib/query-client";
+import {
+  getApiUrl,
+  queryClient,
+  attemptTokenRefresh,
+} from "@/lib/query-client";
 import { getDeviceIdentity } from "@/lib/device-identity";
 
 interface User {

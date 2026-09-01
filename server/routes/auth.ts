@@ -413,13 +413,17 @@ router.post(
 
       const user = await storage.getUserByEmail(data.email);
       if (!user) {
-        logger.warn("[AUTH LOGIN FAILED: USER NOT FOUND]", { email: data.email });
+        logger.warn("[AUTH LOGIN FAILED: USER NOT FOUND]", {
+          email: data.email,
+        });
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
       const validPassword = await bcrypt.compare(data.password, user.password);
       if (!validPassword) {
-        logger.warn("[AUTH LOGIN FAILED: PASSWORD MISMATCH]", { email: data.email });
+        logger.warn("[AUTH LOGIN FAILED: PASSWORD MISMATCH]", {
+          email: data.email,
+        });
         return res.status(401).json({ message: "Invalid email or password" });
       }
 

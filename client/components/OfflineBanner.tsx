@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Animated, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -22,7 +22,7 @@ export function OfflineBanner({
 }: OfflineBannerProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const slideAnim = useRef(new Animated.Value(isOffline ? 0 : -80)).current;
+  const [slideAnim] = useState(() => new Animated.Value(isOffline ? 0 : -80));
 
   useEffect(() => {
     Animated.spring(slideAnim, {
@@ -50,7 +50,7 @@ export function OfflineBanner({
         <Feather name="wifi-off" size={14} color="#fff" />
         <View style={styles.textCol}>
           <ThemedText style={styles.text}>
-            You're offline â€” showing cached content
+            You&apos;re offline — showing cached content
           </ThemedText>
           {cachedQueryCount !== undefined && cachedQueryCount > 0 && (
             <ThemedText style={styles.subtext}>
@@ -59,11 +59,7 @@ export function OfflineBanner({
           )}
         </View>
         {onRetry && (
-          <Pressable
-            onPress={onRetry}
-            hitSlop={12}
-            style={styles.retryButton}
-          >
+          <Pressable onPress={onRetry} hitSlop={12} style={styles.retryButton}>
             <Feather name="refresh-cw" size={14} color="#fff" />
           </Pressable>
         )}

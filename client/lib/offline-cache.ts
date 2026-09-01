@@ -65,8 +65,9 @@ async function getStorage() {
   }
 
   // Lazy import for native
-  const AsyncStorage =
-    await import("@react-native-async-storage/async-storage");
+  const AsyncStorage = await import(
+    "@react-native-async-storage/async-storage"
+  );
   return AsyncStorage.default;
 }
 

@@ -13,7 +13,9 @@
 // own; tsx does not. Static ESM imports are hoisted, so the DB modules are
 // imported dynamically below — after env is loaded.
 try {
-  (process as unknown as { loadEnvFile?: (p?: string) => void }).loadEnvFile?.();
+  (
+    process as unknown as { loadEnvFile?: (p?: string) => void }
+  ).loadEnvFile?.();
 } catch {
   // .env may not exist (env provided by the host) — ignore.
 }

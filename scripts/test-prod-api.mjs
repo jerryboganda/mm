@@ -7,19 +7,27 @@ async function testE2E() {
 
   // 1. Check Root Marketing Website
   const webRes = await fetch(`${BASE_URL}/`);
-  console.log(`[1] Marketing Website Root (/) HTTP Status: ${webRes.status} (Expected: 200)`);
+  console.log(
+    `[1] Marketing Website Root (/) HTTP Status: ${webRes.status} (Expected: 200)`,
+  );
   const webHtml = await webRes.text();
   console.log(`    HTML: ${webHtml.substring(0, 100).replace(/\n/g, " ")}...`);
 
   // 2. Check Admin Panel SPA
   const adminRes = await fetch(`${BASE_URL}/admin/`);
-  console.log(`[2] Admin Panel (/admin/) HTTP Status: ${adminRes.status} (Expected: 200)`);
+  console.log(
+    `[2] Admin Panel (/admin/) HTTP Status: ${adminRes.status} (Expected: 200)`,
+  );
   const adminHtml = await adminRes.text();
-  console.log(`    Admin Title/HTML: ${adminHtml.substring(0, 100).replace(/\n/g, " ")}...`);
+  console.log(
+    `    Admin Title/HTML: ${adminHtml.substring(0, 100).replace(/\n/g, " ")}...`,
+  );
 
   // 3. Check User App SPA
   const appRes = await fetch(`${BASE_URL}/app/`);
-  console.log(`[3] Expo Mobile Web App (/app/) HTTP Status: ${appRes.status} (Expected: 200)`);
+  console.log(
+    `[3] Expo Mobile Web App (/app/) HTTP Status: ${appRes.status} (Expected: 200)`,
+  );
 
   // 4. Authenticate as Admin
   console.log(`[4] Authenticating with production API (/api/auth/login)...`);
@@ -40,7 +48,9 @@ async function testE2E() {
     throw new Error(`Login failed to return token. Status: ${loginRes.status}`);
   }
 
-  console.log(`    Logged in user: ${loginData.user?.name} (${loginData.user?.role})`);
+  console.log(
+    `    Logged in user: ${loginData.user?.name} (${loginData.user?.role})`,
+  );
 
   // 5. Fetch Books List
   const booksRes = await fetch(`${BASE_URL}/api/books`, {
@@ -65,16 +75,26 @@ async function testE2E() {
     const b = blocks[0];
     console.log(`    - Block Type: ${b.type}`);
     console.log(`    - Block Content length: ${b.content.length} characters`);
-    console.log(`    - Contains Parity Release Marker: ${b.content.includes("data-mm-release")}`);
-    console.log(`    - Contains Vector/SVG table or layout: ${b.content.includes("mm-table-scroll")}`);
+    console.log(
+      `    - Contains Parity Release Marker: ${b.content.includes("data-mm-release")}`,
+    );
+    console.log(
+      `    - Contains Vector/SVG table or layout: ${b.content.includes("mm-table-scroll")}`,
+    );
   }
 
   // 7. Verify Media Assets Serving
   const mediaUrl = `${BASE_URL}/uploads/content-images/maternal-mind-book/f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605/media/646a5366f941f2526cac8b3fbf1538df90f5efc97c6adc3d6623c812eff81546.jfif`;
   const mediaRes = await fetch(mediaUrl);
-  console.log(`[7] Production Media Asset HTTP Status: ${mediaRes.status} (Expected: 200)`);
-  console.log(`    - Media Content-Type: ${mediaRes.headers.get("content-type")}`);
-  console.log(`    - Media Content-Length: ${mediaRes.headers.get("content-length")} bytes`);
+  console.log(
+    `[7] Production Media Asset HTTP Status: ${mediaRes.status} (Expected: 200)`,
+  );
+  console.log(
+    `    - Media Content-Type: ${mediaRes.headers.get("content-type")}`,
+  );
+  console.log(
+    `    - Media Content-Length: ${mediaRes.headers.get("content-length")} bytes`,
+  );
 
   console.log("\n=======================================================");
   console.log("✅ ALL 7 PRODUCTION END-TO-END VERIFICATION CHECKS PASSED!");

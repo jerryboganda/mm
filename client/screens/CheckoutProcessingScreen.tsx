@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
-  ActivityIndicator,
   Animated,
   Easing,
+  ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -23,8 +23,8 @@ export default function CheckoutProcessingScreen({
 }: Props) {
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const [pulseAnim] = useState(() => new Animated.Value(1));
+  const [rotateAnim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const pulse = Animated.loop(
@@ -60,7 +60,7 @@ export default function CheckoutProcessingScreen({
       pulse.stop();
       rotate.stop();
     };
-  }, []);
+  }, [pulseAnim, rotateAnim]);
 
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
@@ -71,7 +71,13 @@ export default function CheckoutProcessingScreen({
     <BackgroundGradient>
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <Animated.View
-          style={[styles.iconContainer, { backgroundColor: `${theme.primary}15`, transform: [{ scale: pulseAnim }] }]}
+          style={[
+            styles.iconContainer,
+            {
+              backgroundColor: `${theme.primary}15`,
+              transform: [{ scale: pulseAnim }],
+            },
+          ]}
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
             <Feather name="loader" size={48} color={theme.primary} />
@@ -89,14 +95,28 @@ export default function CheckoutProcessingScreen({
 
         <View style={styles.stepsContainer}>
           <View style={styles.step}>
-            <View style={[styles.stepIcon, styles.stepIconComplete, { backgroundColor: theme.success }]}>
+            <View
+              style={[
+                styles.stepIcon,
+                styles.stepIconComplete,
+                { backgroundColor: theme.success },
+              ]}
+            >
               <Feather name="check" size={14} color="#fff" />
             </View>
-            <ThemedText style={[styles.stepText, { color: theme.text }]}>Verifying payment</ThemedText>
+            <ThemedText style={[styles.stepText, { color: theme.text }]}>
+              Verifying payment
+            </ThemedText>
           </View>
           <View style={[styles.stepLine, { backgroundColor: theme.glass }]} />
           <View style={styles.step}>
-            <View style={[styles.stepIcon, styles.stepIconActive, { backgroundColor: theme.primary }]}>
+            <View
+              style={[
+                styles.stepIcon,
+                styles.stepIconActive,
+                { backgroundColor: theme.primary },
+              ]}
+            >
               <ActivityIndicator size="small" color="#fff" />
             </View>
             <ThemedText style={[styles.stepText, { color: theme.text }]}>
@@ -159,15 +179,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: Spacing.md,
   },
-  stepIconComplete: {
-  },
-  stepIconActive: {
-  },
+  stepIconComplete: {},
+  stepIconActive: {},
   stepText: {
     fontSize: 14,
   },
-  stepTextPending: {
-  },
+  stepTextPending: {},
   stepLine: {
     width: 2,
     height: 20,

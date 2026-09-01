@@ -96,7 +96,9 @@ export default function SubscriptionScreen() {
 
   const [couponCodeInput, setCouponCodeInput] = useState("");
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
-  const [appliedCoupon, setAppliedCoupon] = useState<ValidatedCoupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<ValidatedCoupon | null>(
+    null,
+  );
   const [couponError, setCouponError] = useState<string | null>(null);
   const [isClaimingFree, setIsClaimingFree] = useState(false);
 
@@ -115,52 +117,6 @@ export default function SubscriptionScreen() {
     .filter((p) => p.prices && p.prices.length > 0)
     .sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const handleApplyCoupon = async () => {
-    if (!couponCodeInput.trim()) return;
-    const code = couponCodeInput.trim().toUpperCase();
-
-    const targetPkg = packages[0];
-    if (!targetPkg || !targetPkg.prices || targetPkg.prices.length === 0) return;
-    const targetPrice = targetPkg.prices[0];
-
-    setIsValidatingCoupon(true);
-    setCouponError(null);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    try {
-      const res = await apiRequest("POST", "/api/subscriptions/validate-coupon", {
-        code,
-        packageId: targetPkg.id,
-        priceId: targetPrice.id,
-      });
-
-      const json = await res.json();
-      if (!res.ok || !json.valid) {
-        setAppliedCoupon(null);
-        setCouponError(json.message || json.error || "Invalid or expired promo code");
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      } else {
-        setAppliedCoupon(json);
-        setCouponError(null);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
-    } catch (err: any) {
-      let msg = "Failed to validate promo code";
-      try {
-        const raw = err.message || "";
-        const match = raw.match(/^(\d+):\s*([\s\S]*)$/);
-        const body = match ? match[2] : raw;
-        const parsed = JSON.parse(body);
-        if (parsed?.message) msg = parsed.message;
-      } catch {}
-      setCouponError(msg);
-      setAppliedCoupon(null);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    } finally {
-      setIsValidatingCoupon(false);
-    }
-  };
-
   const handleSendForVerification = async () => {
     if (!couponCodeInput.trim()) return;
     const code = couponCodeInput.trim().toUpperCase();
@@ -173,15 +129,21 @@ export default function SubscriptionScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const res = await apiRequest("POST", "/api/subscriptions/submit-coupon-proof", {
-        code,
-        packageId: targetPkg?.id,
-        priceId: targetPrice?.id,
-      });
+      const res = await apiRequest(
+        "POST",
+        "/api/subscriptions/submit-coupon-proof",
+        {
+          code,
+          packageId: targetPkg?.id,
+          priceId: targetPrice?.id,
+        },
+      );
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.message || "Failed to submit coupon for verification");
+        throw new Error(
+          json.message || "Failed to submit coupon for verification",
+        );
       }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -195,7 +157,10 @@ export default function SubscriptionScreen() {
         const parsed = JSON.parse(body);
         if (parsed?.message) msg = parsed.message;
       } catch {}
-      if (/already have a verification request/i.test(msg) || /awaiting review/i.test(msg)) {
+      if (
+        /already have a verification request/i.test(msg) ||
+        /awaiting review/i.test(msg)
+      ) {
         navigation.navigate("PendingApproval");
         return;
       }
@@ -221,11 +186,15 @@ export default function SubscriptionScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      const res = await apiRequest("POST", "/api/subscriptions/redeem-free-coupon", {
-        code: appliedCoupon.code,
-        packageId: pkg.id,
-        priceId: price.id,
-      });
+      const res = await apiRequest(
+        "POST",
+        "/api/subscriptions/redeem-free-coupon",
+        {
+          code: appliedCoupon.code,
+          packageId: pkg.id,
+          priceId: price.id,
+        },
+      );
       const json = await res.json();
 
       if (!res.ok || !json.success) {
@@ -263,7 +232,9 @@ export default function SubscriptionScreen() {
       billingCycle: price.billingCycle,
       couponId: appliedCoupon?.couponId,
       couponCode: appliedCoupon?.code,
-      discountedPrice: appliedCoupon ? String(appliedCoupon.finalPrice) : undefined,
+      discountedPrice: appliedCoupon
+        ? String(appliedCoupon.finalPrice)
+        : undefined,
     });
   };
 
@@ -324,7 +295,8 @@ export default function SubscriptionScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: (headerHeight > 0 ? headerHeight : insets.top) + Spacing["2xl"],
+            paddingTop:
+              (headerHeight > 0 ? headerHeight : insets.top) + Spacing["2xl"],
             paddingBottom: insets.bottom + Spacing["3xl"],
           },
         ]}
@@ -371,7 +343,9 @@ export default function SubscriptionScreen() {
                 <Feather name="check-circle" size={20} color={theme.success} />
                 <View style={styles.appliedTextCol}>
                   <View style={styles.appliedBadgeRow}>
-                    <ThemedText style={[styles.appliedCodeText, { color: theme.success }]}>
+                    <ThemedText
+                      style={[styles.appliedCodeText, { color: theme.success }]}
+                    >
                       {appliedCoupon.code}
                     </ThemedText>
                     <View
@@ -391,7 +365,12 @@ export default function SubscriptionScreen() {
                       </ThemedText>
                     </View>
                   </View>
-                  <ThemedText style={[styles.appliedMsgText, { color: theme.textSecondary }]}>
+                  <ThemedText
+                    style={[
+                      styles.appliedMsgText,
+                      { color: theme.textSecondary },
+                    ]}
+                  >
                     {appliedCoupon.message ||
                       (appliedCoupon.isFreeAccess
                         ? "100% discount applied! Claim instant access below."
@@ -417,7 +396,9 @@ export default function SubscriptionScreen() {
                       backgroundColor: isDark
                         ? "rgba(255,255,255,0.06)"
                         : "rgba(0,0,0,0.04)",
-                      borderColor: couponError ? theme.error : theme.glassBorder,
+                      borderColor: couponError
+                        ? theme.error
+                        : theme.glassBorder,
                       color: theme.text,
                     },
                   ]}
@@ -456,7 +437,9 @@ export default function SubscriptionScreen() {
                 </Pressable>
               </View>
               {couponError ? (
-                <ThemedText style={[styles.couponErrorText, { color: theme.error }]}>
+                <ThemedText
+                  style={[styles.couponErrorText, { color: theme.error }]}
+                >
                   {couponError}
                 </ThemedText>
               ) : null}
@@ -476,8 +459,8 @@ export default function SubscriptionScreen() {
             const originalPriceFormatted = appliedCoupon
               ? formatPrice(price.price)
               : price.originalPrice
-              ? formatPrice(price.originalPrice)
-              : null;
+                ? formatPrice(price.originalPrice)
+                : null;
             const finalPriceFormatted = appliedCoupon
               ? formatPrice(appliedCoupon.finalPrice)
               : formatPrice(price.price);
@@ -485,7 +468,9 @@ export default function SubscriptionScreen() {
             return (
               <Pressable
                 key={pkg.id}
-                onPress={() => (isFree ? handleClaimFreeAccess(pkg) : handleSelect(pkg))}
+                onPress={() =>
+                  isFree ? handleClaimFreeAccess(pkg) : handleSelect(pkg)
+                }
                 disabled={isClaimingFree}
                 style={[
                   styles.planCard,
@@ -540,7 +525,12 @@ export default function SubscriptionScreen() {
                     ) : null}
 
                     {appliedCoupon && !isFree ? (
-                      <View style={[styles.discountBadgeSmall, { backgroundColor: theme.primary }]}>
+                      <View
+                        style={[
+                          styles.discountBadgeSmall,
+                          { backgroundColor: theme.primary },
+                        ]}
+                      >
                         <ThemedText style={styles.discountBadgeSmallText}>
                           -{appliedCoupon.discountValue}% OFF
                         </ThemedText>
@@ -568,11 +558,7 @@ export default function SubscriptionScreen() {
                   <View style={styles.featuresList}>
                     {includedFeatures.map((f, i) => (
                       <View key={i} style={styles.featureRow}>
-                        <Feather
-                          name="check"
-                          size={15}
-                          color={theme.success}
-                        />
+                        <Feather name="check" size={15} color={theme.success} />
                         <ThemedText
                           style={[styles.featureText, { color: theme.text }]}
                         >
@@ -588,7 +574,9 @@ export default function SubscriptionScreen() {
                     styles.selectRow,
                     {
                       borderTopColor: theme.glassBorder,
-                      backgroundColor: isFree ? `${theme.success}12` : "transparent",
+                      backgroundColor: isFree
+                        ? `${theme.success}12`
+                        : "transparent",
                     },
                   ]}
                 >
@@ -602,7 +590,9 @@ export default function SubscriptionScreen() {
                           { color: isFree ? theme.success : theme.primary },
                         ]}
                       >
-                        {isFree ? "Claim Instant Free Access" : "Select & Continue"}
+                        {isFree
+                          ? "Claim Instant Free Access"
+                          : "Select & Continue"}
                       </ThemedText>
                       <Feather
                         name={isFree ? "zap" : "arrow-right"}
@@ -805,7 +795,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: Spacing.xl,
   },
-  centerTitle: { textAlign: "center", marginTop: Spacing.lg, marginBottom: Spacing.md },
+  centerTitle: {
+    textAlign: "center",
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
   centerSubtitle: { textAlign: "center", marginBottom: Spacing["2xl"] },
   retryButton: {
     borderWidth: 1,

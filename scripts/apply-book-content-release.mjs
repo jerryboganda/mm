@@ -8,12 +8,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import pg from "pg";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const SOURCE_SHA256 = "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605";
+const SOURCE_SHA256 =
+  "f94027611ab71565c9dfd689046bb4a24db921b97ef1453416d5acfa140ed605";
 
 async function main() {
   const args = process.argv.slice(2);
@@ -22,7 +22,7 @@ async function main() {
   const releaseDir = path.resolve(
     process.cwd(),
     "content/book-releases",
-    SOURCE_SHA256
+    SOURCE_SHA256,
   );
   const manifestPath = path.join(releaseDir, "release_manifest.json");
   const sqlPath = path.join(releaseDir, "release.sql");
@@ -33,11 +33,17 @@ async function main() {
   }
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  console.log(`[*] Loaded release manifest for source digest: ${manifest.source_sha256}`);
-  console.log(`[*] Scope: ${manifest.topic_count} topics, ${manifest.total_block_count} blocks, ${manifest.total_media_count} media assets.`);
+  console.log(
+    `[*] Loaded release manifest for source digest: ${manifest.source_sha256}`,
+  );
+  console.log(
+    `[*] Scope: ${manifest.topic_count} topics, ${manifest.total_block_count} blocks, ${manifest.total_media_count} media assets.`,
+  );
 
   if (manifest.source_sha256 !== SOURCE_SHA256) {
-    console.error(`[-] Digest mismatch! Expected ${SOURCE_SHA256}, got ${manifest.source_sha256}`);
+    console.error(
+      `[-] Digest mismatch! Expected ${SOURCE_SHA256}, got ${manifest.source_sha256}`,
+    );
     process.exit(1);
   }
 
@@ -49,7 +55,9 @@ async function main() {
   const sqlContent = fs.readFileSync(sqlPath, "utf8");
 
   if (isDryRun) {
-    console.log(`[+] DRY-RUN SUCCESS: Manifest and SQL valid. ${manifest.total_block_count} blocks ready for release.`);
+    console.log(
+      `[+] DRY-RUN SUCCESS: Manifest and SQL valid. ${manifest.total_block_count} blocks ready for release.`,
+    );
     process.exit(0);
   }
 
@@ -65,12 +73,16 @@ async function main() {
       uri: databaseUrl,
       multipleStatements: true,
     });
-    console.log("[*] Connected to MySQL database. Beginning atomic release transaction...");
+    console.log(
+      "[*] Connected to MySQL database. Beginning atomic release transaction...",
+    );
     try {
       await connection.query("START TRANSACTION;");
       await connection.query(sqlContent);
       await connection.query("COMMIT;");
-      console.log(`[+] Successfully applied release ${SOURCE_SHA256} to production database!`);
+      console.log(
+        `[+] Successfully applied release ${SOURCE_SHA256} to production database!`,
+      );
     } catch (err) {
       await connection.query("ROLLBACK;");
       console.error("[-] Release transaction failed and was rolled back:", err);
@@ -82,12 +94,16 @@ async function main() {
     const pg = await import("pg");
     const client = new pg.default.Client({ connectionString: databaseUrl });
     await client.connect();
-    console.log("[*] Connected to PostgreSQL database. Beginning atomic release transaction...");
+    console.log(
+      "[*] Connected to PostgreSQL database. Beginning atomic release transaction...",
+    );
     try {
       await client.query("BEGIN;");
       await client.query(sqlContent.replace(/`order`/g, '"order"'));
       await client.query("COMMIT;");
-      console.log(`[+] Successfully applied release ${SOURCE_SHA256} to production database!`);
+      console.log(
+        `[+] Successfully applied release ${SOURCE_SHA256} to production database!`,
+      );
     } catch (err) {
       await client.query("ROLLBACK;");
       console.error("[-] Release transaction failed and was rolled back:", err);

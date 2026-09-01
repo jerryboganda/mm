@@ -6,7 +6,6 @@ import {
   Easing,
   Pressable,
   Linking,
-  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
@@ -109,7 +108,7 @@ export default function PurchaseFailedScreen() {
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start();
-  }, []);
+  }, [fadeAnim, shakeAnim]);
 
   const handleRetry = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -147,10 +146,7 @@ export default function PurchaseFailedScreen() {
           ]}
         >
           <View
-            style={[
-              styles.iconCircle,
-              { backgroundColor: `${theme.error}15` },
-            ]}
+            style={[styles.iconCircle, { backgroundColor: `${theme.error}15` }]}
           >
             <Feather name="x" size={48} color={theme.error} />
           </View>
@@ -161,10 +157,7 @@ export default function PurchaseFailedScreen() {
         </ThemedText>
 
         <View
-          style={[
-            styles.errorBox,
-            { backgroundColor: `${theme.error}15` },
-          ]}
+          style={[styles.errorBox, { backgroundColor: `${theme.error}15` }]}
         >
           <Feather name="alert-triangle" size={16} color={theme.error} />
           <ThemedText style={[styles.errorText, { color: theme.error }]}>
@@ -184,11 +177,7 @@ export default function PurchaseFailedScreen() {
                   { backgroundColor: `${theme.warning}15` },
                 ]}
               >
-                <Feather
-                  name={issue.icon}
-                  size={18}
-                  color={theme.warning}
-                />
+                <Feather name={issue.icon} size={18} color={theme.warning} />
               </View>
               <View style={styles.issueContent}>
                 <ThemedText style={styles.issueTitle}>{issue.title}</ThemedText>
@@ -216,17 +205,13 @@ export default function PurchaseFailedScreen() {
 
           <Pressable onPress={handleContact} style={styles.helpButton}>
             <Feather name="mail" size={18} color={theme.primary} />
-            <ThemedText
-              style={[styles.helpText, { color: theme.primary }]}
-            >
+            <ThemedText style={[styles.helpText, { color: theme.primary }]}>
               Contact Support
             </ThemedText>
           </Pressable>
 
           <Pressable onPress={handleCancel} style={styles.cancelButton}>
-            <ThemedText
-              style={[styles.cancelText, { color: theme.textMuted }]}
-            >
+            <ThemedText style={[styles.cancelText, { color: theme.textMuted }]}>
               Cancel
             </ThemedText>
           </Pressable>

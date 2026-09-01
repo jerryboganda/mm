@@ -1,11 +1,20 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
 import * as fs from "fs";
 import { logger } from "./logger";
 
 const endpoint = process.env.PLATFORM_S3_ENDPOINT || process.env.S3_ENDPOINT;
-const bucket = process.env.PLATFORM_S3_BUCKET || process.env.S3_BUCKET || "maternal-mind";
-const accessKeyId = process.env.PLATFORM_S3_ACCESS_KEY || process.env.S3_ACCESS_KEY || "maternal-mind";
-const secretAccessKey = process.env.PLATFORM_S3_SECRET_KEY || process.env.S3_SECRET_KEY;
+const bucket =
+  process.env.PLATFORM_S3_BUCKET || process.env.S3_BUCKET || "maternal-mind";
+const accessKeyId =
+  process.env.PLATFORM_S3_ACCESS_KEY ||
+  process.env.S3_ACCESS_KEY ||
+  "maternal-mind";
+const secretAccessKey =
+  process.env.PLATFORM_S3_SECRET_KEY || process.env.S3_SECRET_KEY;
 
 export const s3Enabled = Boolean(endpoint && secretAccessKey);
 
@@ -27,7 +36,9 @@ export async function uploadToMinIO(
   contentType: string,
 ): Promise<boolean> {
   if (!s3Client) {
-    logger.warn(`[MinIO] S3 client not configured — skipping upload for ${key}`);
+    logger.warn(
+      `[MinIO] S3 client not configured — skipping upload for ${key}`,
+    );
     return false;
   }
   try {
@@ -42,7 +53,9 @@ export async function uploadToMinIO(
     logger.info(`[MinIO] Successfully uploaded ${key} to bucket ${bucket}`);
     return true;
   } catch (err) {
-    logger.error(`[MinIO] Failed to upload ${key} to bucket ${bucket}`, { error: String(err) });
+    logger.error(`[MinIO] Failed to upload ${key} to bucket ${bucket}`, {
+      error: String(err),
+    });
     return false;
   }
 }

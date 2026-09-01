@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
   ScrollView,
-  Image,
   Pressable,
   TextInput,
   Alert,
-  ActivityIndicator,
-  Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "@/lib/haptics-wrapper";
 import * as ImagePicker from "expo-image-picker";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
@@ -26,14 +24,13 @@ import { useAuth } from "@/lib/auth";
 import { useMobileContent } from "@/lib/mobile-content";
 import { apiRequest } from "@/lib/query-client";
 import { useNetwork } from "@/lib/network";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 
 export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation();
-  const queryClient = useQueryClient();
   const { user, refreshUser } = useAuth();
   const { theme } = useTheme();
   const { resolveText } = useMobileContent();
@@ -41,16 +38,11 @@ export default function EditProfileScreen() {
   const { isOffline } = useNetwork();
 
   const [name, setName] = useState(user?.name || "");
-  const [photoUri, setPhotoUri] = useState<string | null>(user?.avatarUrl || null);
-  const [hasChanges, setHasChanges] = useState(false);
-
-  useEffect(() => {
-    if (name !== user?.name || photoUri !== (user?.avatarUrl || null)) {
-      setHasChanges(true);
-    } else {
-      setHasChanges(false);
-    }
-  }, [name, photoUri, user?.avatarUrl, user?.name]);
+  const [photoUri, setPhotoUri] = useState<string | null>(
+    user?.avatarUrl || null,
+  );
+  const hasChanges =
+    name !== (user?.name || "") || photoUri !== (user?.avatarUrl || null);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: { name: string; avatarUrl?: string | null }) => {
@@ -174,7 +166,8 @@ export default function EditProfileScreen() {
                   : require("../../assets/images/default-avatar.png")
               }
               style={[styles.photo, { borderColor: theme.primary }]}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={0}
             />
             <View
               style={[

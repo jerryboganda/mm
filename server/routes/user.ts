@@ -3,7 +3,6 @@ import { storage } from "../storage";
 import { sendEmail, supportIssueEmailHtml } from "../email";
 import { AuthRequest, authMiddleware } from "../middleware";
 import { getSupportContactSettings } from "../lib/support-contact";
-import { subscriptionService } from "../services/subscription-service";
 import { sanitizeString } from "../lib/api-response";
 import { logger } from "../lib/logger";
 
@@ -14,63 +13,67 @@ const ACCOUNT_DEACTIVATED_MESSAGE =
 const ACCOUNT_DELETION_PENDING_MESSAGE =
   "Your account deletion request is in progress. Please contact support if you need help.";
 
-router.patch(["/", "/profile"], authMiddleware, async (req: AuthRequest, res) => {
-  try {
-    const { name, avatarUrl } = req.body;
+router.patch(
+  ["/", "/profile"],
+  authMiddleware,
+  async (req: AuthRequest, res) => {
+    try {
+      const { name, avatarUrl } = req.body;
 
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return res.status(400).json({ message: "Name is required" });
-    }
-
-    const sanitizedName = sanitizeString(name);
-    let sanitizedAvatarUrl: string | null | undefined;
-
-    if (avatarUrl !== undefined) {
-      if (avatarUrl !== null && typeof avatarUrl !== "string") {
-        return res.status(400).json({ message: "Invalid profile photo" });
+      if (!name || typeof name !== "string" || name.trim().length === 0) {
+        return res.status(400).json({ message: "Name is required" });
       }
 
-      if (typeof avatarUrl === "string") {
-        const trimmedAvatarUrl = avatarUrl.trim();
-        const isDataImage = /^data:image\/(png|jpe?g|webp);base64,/i.test(
-          trimmedAvatarUrl,
-        );
-        if (!isDataImage || trimmedAvatarUrl.length > 1_500_000) {
-          return res.status(400).json({
-            message:
-              "Profile photo must be a PNG, JPG, or WebP image under 1.5 MB.",
-          });
+      const sanitizedName = sanitizeString(name);
+      let sanitizedAvatarUrl: string | null | undefined;
+
+      if (avatarUrl !== undefined) {
+        if (avatarUrl !== null && typeof avatarUrl !== "string") {
+          return res.status(400).json({ message: "Invalid profile photo" });
         }
-        sanitizedAvatarUrl = trimmedAvatarUrl;
-      } else {
-        sanitizedAvatarUrl = null;
+
+        if (typeof avatarUrl === "string") {
+          const trimmedAvatarUrl = avatarUrl.trim();
+          const isDataImage = /^data:image\/(png|jpe?g|webp);base64,/i.test(
+            trimmedAvatarUrl,
+          );
+          if (!isDataImage || trimmedAvatarUrl.length > 1_500_000) {
+            return res.status(400).json({
+              message:
+                "Profile photo must be a PNG, JPG, or WebP image under 1.5 MB.",
+            });
+          }
+          sanitizedAvatarUrl = trimmedAvatarUrl;
+        } else {
+          sanitizedAvatarUrl = null;
+        }
       }
-    }
 
-    const updatedUser = await storage.updateUserProfile(req.userId!, {
-      name: sanitizedName,
-      avatarUrl: sanitizedAvatarUrl,
-    });
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
+      const updatedUser = await storage.updateUserProfile(req.userId!, {
+        name: sanitizedName,
+        avatarUrl: sanitizedAvatarUrl,
+      });
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-    res.json({
-      id: updatedUser.id,
-      email: updatedUser.email,
-      name: updatedUser.name,
-      avatarUrl: updatedUser.avatarUrl,
-      role: updatedUser.role,
-      subscriptionStatus: updatedUser.subscriptionStatus,
-      subscriptionPlan: updatedUser.subscriptionPlan,
-    });
-  } catch (error) {
-    logger.error("Update profile error", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-    res.status(500).json({ message: "Failed to update profile" });
-  }
-});
+      res.json({
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        avatarUrl: updatedUser.avatarUrl,
+        role: updatedUser.role,
+        subscriptionStatus: updatedUser.subscriptionStatus,
+        subscriptionPlan: updatedUser.subscriptionPlan,
+      });
+    } catch (error) {
+      logger.error("Update profile error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  },
+);
 
 router.post(
   "/support/report-issue",

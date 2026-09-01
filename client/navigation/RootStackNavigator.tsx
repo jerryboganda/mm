@@ -3,13 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { useAuth } from "@/lib/auth";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import {
-  ActivityIndicator,
-  View,
-  StyleSheet,
-  Pressable,
-} from "react-native";
-import { ThemedText } from "@/components/ThemedText";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
 
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import WelcomeScreen from "@/screens/WelcomeScreen";
@@ -118,7 +112,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
-  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { resolveText } = useMobileContent();
   const { hasCompletedOnboarding, isLoading: onboardingLoading } =
     useOnboarding();

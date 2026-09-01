@@ -1,5 +1,11 @@
 import React, { useMemo } from "react";
-import { StyleSheet, View, useWindowDimensions, TextStyle, StyleProp } from "react-native";
+import {
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  TextStyle,
+  StyleProp,
+} from "react-native";
 import RenderHtml from "react-native-render-html";
 import { ThemedText } from "@/components/ThemedText";
 import { useTheme } from "@/hooks/useTheme";
@@ -128,7 +134,9 @@ export function RichTextHtml({
 
   if (!looksLikeHtml) {
     return (
-      <ThemedText style={style || { color: theme.textSecondary, fontSize: baseFontSize }}>
+      <ThemedText
+        style={style || { color: theme.textSecondary, fontSize: baseFontSize }}
+      >
         {html}
       </ThemedText>
     );

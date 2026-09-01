@@ -30,16 +30,26 @@ if (!webhookUrl) {
   console.log("1. GitHub Actions Manual Trigger (Recommended):");
   console.log("   - Open https://github.com/jerryboganda/mm/actions");
   console.log("   - Select 'Manual Deploy to Hostinger'");
-  console.log("   - Click 'Run workflow' -> Choose 'all', 'website', or 'app_and_admin'\n");
+  console.log(
+    "   - Click 'Run workflow' -> Choose 'all', 'website', or 'app_and_admin'\n",
+  );
 
   console.log("2. Hostinger hPanel Manual Deploy Button:");
   console.log("   - Log in to Hostinger hPanel -> Go to Git / Deployment tab");
-  console.log("   - Click the 'Deploy' button manually whenever you are ready to publish.\n");
+  console.log(
+    "   - Click the 'Deploy' button manually whenever you are ready to publish.\n",
+  );
 
   console.log("3. Hostinger Git Webhook Trigger:");
-  console.log("   - Copy your Webhook URL from Hostinger hPanel > Git > Deployments.");
-  console.log("   - Add it to your local .env file as: HOSTINGER_WEBHOOK_URL=https://...");
-  console.log("   - Re-run `npm run deploy:hostinger` to trigger deployment instantly.\n");
+  console.log(
+    "   - Copy your Webhook URL from Hostinger hPanel > Git > Deployments.",
+  );
+  console.log(
+    "   - Add it to your local .env file as: HOSTINGER_WEBHOOK_URL=https://...",
+  );
+  console.log(
+    "   - Re-run `npm run deploy:hostinger` to trigger deployment instantly.\n",
+  );
   process.exit(0);
 }
 
@@ -49,7 +59,9 @@ console.log(`Target Webhook: ${webhookUrl}`);
 const client = webhookUrl.startsWith("https") ? https : http;
 
 const req = client.request(webhookUrl, { method: "POST" }, (res) => {
-  console.log(`Hostinger Response Status: ${res.statusCode} ${res.statusMessage}`);
+  console.log(
+    `Hostinger Response Status: ${res.statusCode} ${res.statusMessage}`,
+  );
   let body = "";
   res.on("data", (chunk) => (body += chunk));
   res.on("end", () => {
@@ -57,7 +69,9 @@ const req = client.request(webhookUrl, { method: "POST" }, (res) => {
     if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
       console.log("\n✅ Manual Hostinger Deployment Successfully Triggered!");
     } else {
-      console.log("\n⚠️ Hostinger returned a non-200 status code. Please check your Webhook URL in hPanel.");
+      console.log(
+        "\n⚠️ Hostinger returned a non-200 status code. Please check your Webhook URL in hPanel.",
+      );
     }
   });
 });

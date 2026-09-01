@@ -16,26 +16,14 @@ import * as Haptics from "@/lib/haptics-wrapper";
 
 import { ThemedText } from "@/components/ThemedText";
 import { PrimaryButton } from "@/components/PrimaryButton";
-import { Spacing, BorderRadius } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/useTheme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 type OnboardingScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
-
-interface OnboardingSlide {
-  id: string;
-  icon: keyof typeof Feather.glyphMap;
-  title: string;
-  description: string;
-  color: string; // This can remain as a semantic color key or hex if specific
-  colorKey?: "primary" | "success" | "warning"; // Add this to map to theme
-}
-
-// We can't access theme hook here, so we'll define data inside the component or map it later.
-// Let's modify the slides data to be functional or mapped inside.
 
 const slidesData = [
   {

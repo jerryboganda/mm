@@ -3,11 +3,11 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  Image,
   Pressable,
   Modal,
   ActivityIndicator,
 } from "react-native";
+import { Image } from "expo-image";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -93,10 +93,9 @@ export default function ProfileScreen() {
 
   const [showInvoicesModal, setShowInvoicesModal] = React.useState(false);
 
-  const {
-    data: invoicesData,
-    isLoading: isLoadingInvoices,
-  } = useQuery<{ invoices: InvoiceItem[] }>({
+  const { data: invoicesData, isLoading: isLoadingInvoices } = useQuery<{
+    invoices: InvoiceItem[];
+  }>({
     queryKey: ["/api/subscriptions/invoices"],
     queryFn: async () => {
       const res = await apiRequest("GET", "/api/subscriptions/invoices");
@@ -459,7 +458,9 @@ export default function ProfileScreen() {
                 <ThemedText type="h3" style={styles.modalTitle}>
                   My Invoices &amp; Coupons
                 </ThemedText>
-                <ThemedText style={[styles.modalSubtitle, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.modalSubtitle, { color: theme.textSecondary }]}
+                >
                   Receipt history and redeemed promo codes
                 </ThemedText>
               </View>
@@ -475,18 +476,30 @@ export default function ProfileScreen() {
             {isLoadingInvoices ? (
               <View style={styles.invoicesLoadingBox}>
                 <ActivityIndicator size="large" color={theme.primary} />
-                <ThemedText style={[styles.invoicesLoadingText, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[
+                    styles.invoicesLoadingText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
                   Loading invoice history...
                 </ThemedText>
               </View>
-            ) : !invoicesData?.invoices || invoicesData.invoices.length === 0 ? (
+            ) : !invoicesData?.invoices ||
+              invoicesData.invoices.length === 0 ? (
               <View style={styles.invoicesEmptyBox}>
                 <Feather name="file-text" size={48} color={theme.textMuted} />
                 <ThemedText type="h4" style={styles.invoicesEmptyTitle}>
                   No Invoices Found
                 </ThemedText>
-                <ThemedText style={[styles.invoicesEmptySub, { color: theme.textSecondary }]}>
-                  Your past invoice receipts and redeemed coupon records will appear here.
+                <ThemedText
+                  style={[
+                    styles.invoicesEmptySub,
+                    { color: theme.textSecondary },
+                  ]}
+                >
+                  Your past invoice receipts and redeemed coupon records will
+                  appear here.
                 </ThemedText>
               </View>
             ) : (
@@ -502,10 +515,18 @@ export default function ProfileScreen() {
                     <GlassCard key={inv.id} style={styles.invoiceCard}>
                       <View style={styles.invoiceTopRow}>
                         <View style={styles.invoiceNumCol}>
-                          <ThemedText type="h4" style={styles.invoiceNumberText}>
+                          <ThemedText
+                            type="h4"
+                            style={styles.invoiceNumberText}
+                          >
                             {inv.invoiceNumber}
                           </ThemedText>
-                          <ThemedText style={[styles.invoiceDateText, { color: theme.textMuted }]}>
+                          <ThemedText
+                            style={[
+                              styles.invoiceDateText,
+                              { color: theme.textMuted },
+                            ]}
+                          >
                             {formatDate(inv.paidAt || inv.createdAt)}
                           </ThemedText>
                         </View>
@@ -515,25 +536,50 @@ export default function ProfileScreen() {
                             { backgroundColor: `${theme.success}20` },
                           ]}
                         >
-                          <ThemedText style={[styles.invoiceStatusText, { color: theme.success }]}>
+                          <ThemedText
+                            style={[
+                              styles.invoiceStatusText,
+                              { color: theme.success },
+                            ]}
+                          >
                             {inv.status.toUpperCase()}
                           </ThemedText>
                         </View>
                       </View>
 
                       {inv.notes ? (
-                        <View style={[styles.invoiceNoteRow, { backgroundColor: `${theme.primary}12` }]}>
+                        <View
+                          style={[
+                            styles.invoiceNoteRow,
+                            { backgroundColor: `${theme.primary}12` },
+                          ]}
+                        >
                           <Feather name="tag" size={13} color={theme.primary} />
-                          <ThemedText style={[styles.invoiceNoteText, { color: theme.textSecondary }]}>
+                          <ThemedText
+                            style={[
+                              styles.invoiceNoteText,
+                              { color: theme.textSecondary },
+                            ]}
+                          >
                             {inv.notes}
                           </ThemedText>
                         </View>
                       ) : null}
 
-                      <View style={[styles.invoiceDivider, { backgroundColor: theme.glassBorder }]} />
+                      <View
+                        style={[
+                          styles.invoiceDivider,
+                          { backgroundColor: theme.glassBorder },
+                        ]}
+                      />
 
                       <View style={styles.invoiceDetailRow}>
-                        <ThemedText style={[styles.invoiceDetailLabel, { color: theme.textSecondary }]}>
+                        <ThemedText
+                          style={[
+                            styles.invoiceDetailLabel,
+                            { color: theme.textSecondary },
+                          ]}
+                        >
                           Original Price
                         </ThemedText>
                         <ThemedText style={styles.invoiceDetailValue}>
@@ -543,17 +589,32 @@ export default function ProfileScreen() {
 
                       {hasDiscount ? (
                         <View style={styles.invoiceDetailRow}>
-                          <ThemedText style={[styles.invoiceDetailLabel, { color: theme.success }]}>
+                          <ThemedText
+                            style={[
+                              styles.invoiceDetailLabel,
+                              { color: theme.success },
+                            ]}
+                          >
                             Coupon Discount
                           </ThemedText>
-                          <ThemedText style={[styles.invoiceDetailValue, { color: theme.success }]}>
+                          <ThemedText
+                            style={[
+                              styles.invoiceDetailValue,
+                              { color: theme.success },
+                            ]}
+                          >
                             -{formatAmount(inv.discountTotal)}
                           </ThemedText>
                         </View>
                       ) : null}
 
                       <View style={styles.invoiceDetailRow}>
-                        <ThemedText style={[styles.invoiceDetailLabel, { color: theme.text, fontWeight: "600" }]}>
+                        <ThemedText
+                          style={[
+                            styles.invoiceDetailLabel,
+                            { color: theme.text, fontWeight: "600" },
+                          ]}
+                        >
                           Final Amount
                         </ThemedText>
                         <ThemedText
@@ -565,14 +626,25 @@ export default function ProfileScreen() {
                             },
                           ]}
                         >
-                          {isFree ? "PKR 0 (Free Access)" : formatAmount(inv.total)}
+                          {isFree
+                            ? "PKR 0 (Free Access)"
+                            : formatAmount(inv.total)}
                         </ThemedText>
                       </View>
 
                       {inv.periodEnd ? (
                         <View style={styles.invoiceExpiryRow}>
-                          <Feather name="calendar" size={13} color={theme.textMuted} />
-                          <ThemedText style={[styles.invoiceExpiryText, { color: theme.textMuted }]}>
+                          <Feather
+                            name="calendar"
+                            size={13}
+                            color={theme.textMuted}
+                          />
+                          <ThemedText
+                            style={[
+                              styles.invoiceExpiryText,
+                              { color: theme.textMuted },
+                            ]}
+                          >
                             Access Expiry: {formatDate(inv.periodEnd)}
                           </ThemedText>
                         </View>
@@ -618,7 +690,8 @@ export default function ProfileScreen() {
                   : require("../../assets/images/default-avatar.png")
               }
               style={[styles.avatar, { borderColor: theme.primary }]}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={0}
             />
             <View
               style={[
@@ -684,7 +757,10 @@ export default function ProfileScreen() {
                 <Feather name="check-circle" size={24} color={theme.success} />
               </View>
               <View style={styles.upgradeText}>
-                <ThemedText type="h4" style={[styles.upgradeTitle, { color: theme.success }]}>
+                <ThemedText
+                  type="h4"
+                  style={[styles.upgradeTitle, { color: theme.success }]}
+                >
                   Premium User ✅
                 </ThemedText>
                 <ThemedText

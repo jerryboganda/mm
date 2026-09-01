@@ -2,7 +2,7 @@
   "expo": {
     "name": "Maternal Mind",
     "slug": "maternalmind",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "maternalmind",
@@ -40,7 +40,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#0c1e2e"
       },
-      "versionCode": 5,
+      "versionCode": 6,
       "supportsTablet": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.maternalmind.app"
@@ -70,6 +70,8 @@
         }
       ],
       "expo-secure-store",
+      "./plugins/withMlkitScannerLargeScreenFix.js",
+      "./plugins/withR8OptimizedResourceShrinking.js",
       [
         "expo-build-properties",
         {

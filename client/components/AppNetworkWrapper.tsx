@@ -37,8 +37,9 @@ export function AppNetworkWrapper({ children }: AppNetworkWrapperProps) {
     ? queryClient
         .getQueryCache()
         .getAll()
-        .filter((q) => q.state.status === "success" && q.state.data !== undefined)
-        .length
+        .filter(
+          (q) => q.state.status === "success" && q.state.data !== undefined,
+        ).length
     : 0;
 
   return (

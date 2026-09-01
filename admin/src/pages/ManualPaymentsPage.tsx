@@ -7,6 +7,9 @@ import {
   ReceiptText,
   Plus,
   AlertCircle,
+  Ticket,
+  ImageOff,
+  ExternalLink,
 } from "lucide-react";
 
 interface Proof {
@@ -154,10 +157,8 @@ export default function ManualPaymentsPage() {
                 {proofs.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
-                      <img
-                        src={p.proofImageUrl}
-                        alt="proof"
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-200 cursor-pointer"
+                      <ProofThumbnail
+                        proof={p}
                         onClick={() => setSelected(p)}
                       />
                     </td>
@@ -247,6 +248,129 @@ export default function ManualPaymentsPage() {
   );
 }
 
+function ProofThumbnail({
+  proof,
+  onClick,
+}: {
+  proof: Proof;
+  onClick: () => void;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const isCoupon =
+    proof.paymentMethod === "Promo / Coupon Code" ||
+    (proof.userNote && proof.userNote.toLowerCase().includes("promo/coupon"));
+
+  if (isCoupon) {
+    return (
+      <button
+        onClick={onClick}
+        type="button"
+        className="w-12 h-12 rounded-lg bg-purple-50 border border-purple-200 flex flex-col items-center justify-center text-purple-600 hover:bg-purple-100 transition-colors cursor-pointer"
+        title={`Promo code: ${proof.senderReference || "Coupon"}`}
+      >
+        <Ticket className="w-5 h-5" />
+        <span className="text-[9px] font-bold uppercase tracking-wider">Promo</span>
+      </button>
+    );
+  }
+
+  if (hasError || !proof.proofImageUrl) {
+    return (
+      <button
+        onClick={onClick}
+        type="button"
+        className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+        title="View details"
+      >
+        <ImageOff className="w-4 h-4" />
+      </button>
+    );
+  }
+
+  return (
+    <img
+      src={proof.proofImageUrl}
+      alt="proof"
+      onError={() => setHasError(true)}
+      className="w-12 h-12 rounded-lg object-cover border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+      onClick={onClick}
+    />
+  );
+}
+
+function ProofPreview({ proof }: { proof: Proof }) {
+  const [imgError, setImgError] = useState(false);
+  const isCoupon =
+    proof.paymentMethod === "Promo / Coupon Code" ||
+    (proof.userNote && proof.userNote.toLowerCase().includes("promo/coupon"));
+
+  if (isCoupon) {
+    return (
+      <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100 rounded-xl text-center space-y-4 min-h-[260px]">
+        <div className="w-16 h-16 rounded-2xl bg-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-200">
+          <Ticket className="w-8 h-8" />
+        </div>
+        <div>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 mb-2">
+            Coupon / Promo Code Submission
+          </span>
+          <h3 className="text-xl font-mono font-bold text-gray-900 tracking-wider">
+            {proof.senderReference || "N/A"}
+          </h3>
+          <p className="text-xs text-gray-500 mt-1 max-w-xs">
+            Digital coupon redemption request. Approving will apply coupon duration and discount to the user.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (imgError || !proof.proofImageUrl) {
+    return (
+      <div className="flex flex-col items-center justify-center p-6 bg-gray-50 border border-gray-200 rounded-xl text-center space-y-3 min-h-[260px]">
+        <ImageOff className="w-10 h-10 text-gray-400" />
+        <div>
+          <p className="text-sm font-medium text-gray-700">Receipt Image Unavailable</p>
+          <p className="text-xs text-gray-400 mt-1">Image preview could not be loaded.</p>
+        </div>
+        {proof.proofImageUrl && (
+          <a
+            href={proof.proofImageUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-primary-600 hover:underline mt-2 font-medium"
+          >
+            <ExternalLink className="w-3.5 h-3.5" /> Open Direct Link
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <a
+        href={proof.proofImageUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="block group relative"
+      >
+        <img
+          src={proof.proofImageUrl}
+          alt="payment proof"
+          onError={() => setImgError(true)}
+          className="w-full max-h-[380px] object-contain rounded-xl border border-gray-200 bg-gray-50"
+        />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-xl flex items-center justify-center">
+          <span className="opacity-0 group-hover:opacity-100 bg-black/75 text-white text-xs px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 font-medium transition-opacity">
+            <ExternalLink className="w-3.5 h-3.5" /> View Full Image
+          </span>
+        </div>
+      </a>
+    </div>
+  );
+}
+
 function ReviewModal({
   proof,
   onClose,
@@ -313,13 +437,7 @@ function ReviewModal({
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 p-6">
-          <a href={proof.proofImageUrl} target="_blank" rel="noreferrer">
-            <img
-              src={proof.proofImageUrl}
-              alt="payment proof"
-              className="w-full rounded-xl border border-gray-200"
-            />
-          </a>
+          <ProofPreview proof={proof} />
 
           <div>
             <Row label="User" value={proof.userName} />

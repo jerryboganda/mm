@@ -117,7 +117,11 @@ export default function MaintenanceScreen({
 
           <GlassCard style={styles.noteCard}>
             <View style={styles.noteContent}>
-              <Feather name="info" size={20} color={theme.info || theme.primary} />
+              <Feather
+                name="info"
+                size={20}
+                color={theme.info || theme.primary}
+              />
               <ThemedText
                 style={[styles.noteText, { color: theme.textSecondary }]}
               >

@@ -145,7 +145,11 @@ export default function TopicReaderScreen() {
     anchorSpacing: Spacing.lg,
   });
 
-  const { data: topic, isLoading, error } = useQuery<TopicDetail>({
+  const {
+    data: topic,
+    isLoading,
+    error,
+  } = useQuery<TopicDetail>({
     queryKey: ["/api/topics", topicId],
   });
 

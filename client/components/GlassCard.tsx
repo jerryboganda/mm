@@ -40,7 +40,13 @@ interface GlassCardProps {
   density?: "default" | "compact";
   titleNumberOfLines?: number;
   subtitleNumberOfLines?: number;
-  accessibilityRole?: "button" | "link" | "none" | "image" | "header" | "summary";
+  accessibilityRole?:
+    | "button"
+    | "link"
+    | "none"
+    | "image"
+    | "header"
+    | "summary";
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }
@@ -245,7 +251,8 @@ export function GlassCard({
       style={cardStyles}
       accessibilityRole={accessibilityRole || (onPress ? "button" : undefined)}
       accessibilityLabel={
-        accessibilityLabel || (title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined)
+        accessibilityLabel ||
+        (title ? `${title}${subtitle ? `, ${subtitle}` : ""}` : undefined)
       }
       accessibilityHint={accessibilityHint}
       accessibilityState={{ disabled, selected: active }}
@@ -327,7 +334,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cardBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   cardDisabled: {
     opacity: 0.45,
@@ -340,10 +347,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   lightAccentWash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   hoverOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   content: {
     flexDirection: "row",

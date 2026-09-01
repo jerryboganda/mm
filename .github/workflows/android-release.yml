@@ -51,6 +51,21 @@ jobs:
           EXPO_NO_TELEMETRY: "1"
         run: npx expo prebuild --platform android --no-install
 
+      - name: Verify Android optimization config
+        run: |
+          set -euo pipefail
+          echo "::group::gradle.properties (optimization flags)"
+          grep -E "enableMinifyInReleaseBuilds|enableShrinkResourcesInReleaseBuilds|optimizedResourceShrinking|edgeToEdgeEnabled" android/gradle.properties || true
+          echo "::endgroup::"
+          grep -q "android.enableMinifyInReleaseBuilds=true" android/gradle.properties
+          grep -q "android.enableShrinkResourcesInReleaseBuilds=true" android/gradle.properties
+          grep -q "android.r8.optimizedResourceShrinking=true" android/gradle.properties
+          echo "::group::ML Kit scanner activity manifest override"
+          grep -A1 -B1 "GmsBarcodeScanningDelegateActivity" android/app/src/main/AndroidManifest.xml || true
+          echo "::endgroup::"
+          grep -q "GmsBarcodeScanningDelegateActivity" android/app/src/main/AndroidManifest.xml
+          grep -q 'android:screenOrientation="fullUser"' android/app/src/main/AndroidManifest.xml
+
       - name: Restore keystore
         run: |
           set -euo pipefail
@@ -69,6 +84,33 @@ jobs:
         run: |
           cd android
           ./gradlew :app:bundleRelease --no-daemon
+
+      - name: Verify merged manifest and R8 output
+        run: |
+          set -euo pipefail
+          MERGED_MANIFEST=$(find android/app/build/intermediates/merged_manifests -name AndroidManifest.xml -path "*release*" | head -n 1)
+          echo "Merged manifest: $MERGED_MANIFEST"
+          echo "::group::GmsBarcodeScanningDelegateActivity in merged manifest"
+          grep -A2 "GmsBarcodeScanningDelegateActivity" "$MERGED_MANIFEST"
+          echo "::endgroup::"
+          if grep "GmsBarcodeScanningDelegateActivity" "$MERGED_MANIFEST" | grep -q 'PORTRAIT\|portrait'; then
+            echo "::error::GmsBarcodeScanningDelegateActivity is still orientation-locked"
+            exit 1
+          fi
+          if [ ! -f android/app/build/outputs/mapping/release/mapping.txt ]; then
+            echo "::error::R8 mapping.txt missing — minification did not run"
+            exit 1
+          fi
+          echo "mapping.txt size: $(wc -c < android/app/build/outputs/mapping/release/mapping.txt) bytes"
+
+      - name: Upload verification artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-verification
+          path: |
+            android/app/build/outputs/mapping/release/mapping.txt
+            android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml
+          if-no-files-found: error
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4

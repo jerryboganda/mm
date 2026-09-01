@@ -45,11 +45,11 @@ export default function PermissionsPromptScreen() {
       if (status === "denied" && Platform.OS !== "web") {
         try {
           await Linking.openSettings();
-        } catch (error) {}
+        } catch {}
       }
 
       await completeOnboarding();
-    } catch (error) {
+    } catch {
       await completeOnboarding();
     } finally {
       setIsRequesting(false);
@@ -64,18 +64,14 @@ export default function PermissionsPromptScreen() {
   const completeOnboarding = async () => {
     try {
       await AsyncStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
-    } catch (error) {}
+    } catch {}
     navigation.navigate("Disclaimer" as any);
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundRoot }]}>
       <LinearGradient
-        colors={[
-          theme.backgroundRoot,
-          "#0a1518",
-          theme.backgroundRoot,
-        ]}
+        colors={[theme.backgroundRoot, "#0a1518", theme.backgroundRoot]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -106,7 +102,9 @@ export default function PermissionsPromptScreen() {
           <ThemedText type="h2" style={styles.title}>
             Stay on Track
           </ThemedText>
-          <ThemedText style={[styles.description, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.description, { color: theme.textSecondary }]}
+          >
             Enable notifications to receive study reminders, quiz alerts, and
             updates on your learning progress.
           </ThemedText>
@@ -120,13 +118,17 @@ export default function PermissionsPromptScreen() {
                 <ThemedText style={styles.benefitTitle}>
                   Study Reminders
                 </ThemedText>
-                <ThemedText style={[styles.benefitDesc, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.benefitDesc, { color: theme.textSecondary }]}
+                >
                   Get gentle nudges to keep your study streak
                 </ThemedText>
               </View>
             </View>
 
-            <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
+            <View
+              style={[styles.divider, { backgroundColor: theme.glassBorder }]}
+            />
 
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
@@ -136,13 +138,17 @@ export default function PermissionsPromptScreen() {
                 <ThemedText style={styles.benefitTitle}>
                   Achievement Alerts
                 </ThemedText>
-                <ThemedText style={[styles.benefitDesc, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.benefitDesc, { color: theme.textSecondary }]}
+                >
                   Celebrate your milestones and progress
                 </ThemedText>
               </View>
             </View>
 
-            <View style={[styles.divider, { backgroundColor: theme.glassBorder }]} />
+            <View
+              style={[styles.divider, { backgroundColor: theme.glassBorder }]}
+            />
 
             <View style={styles.benefitItem}>
               <View style={styles.benefitIcon}>
@@ -150,7 +156,9 @@ export default function PermissionsPromptScreen() {
               </View>
               <View style={styles.benefitText}>
                 <ThemedText style={styles.benefitTitle}>New Content</ThemedText>
-                <ThemedText style={[styles.benefitDesc, { color: theme.textSecondary }]}>
+                <ThemedText
+                  style={[styles.benefitDesc, { color: theme.textSecondary }]}
+                >
                   Be first to know about new topics and quizzes
                 </ThemedText>
               </View>

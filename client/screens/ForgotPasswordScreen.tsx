@@ -84,7 +84,7 @@ export default function ForgotPasswordScreen() {
         setError(data.message || "Failed to send reset code");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-    } catch (err: any) {
+    } catch {
       setError("Network error. Please try again.");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -151,7 +151,7 @@ export default function ForgotPasswordScreen() {
         setOtpError(data.message || "Invalid or expired code");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-    } catch (err: any) {
+    } catch {
       setOtpError("Network error. Please try again.");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -248,7 +248,7 @@ export default function ForgotPasswordScreen() {
             <ThemedText
               style={[styles.footerText, { color: theme.textSecondary }]}
             >
-              Didn't receive the code?{" "}
+              {"Didn't receive the code? "}
             </ThemedText>
             <ThemedText
               style={[styles.linkText, { color: theme.primary }]}
@@ -294,7 +294,7 @@ export default function ForgotPasswordScreen() {
             Forgot Password
           </ThemedText>
           <ThemedText style={[styles.subtitle, { color: theme.textSecondary }]}>
-            Enter your email and we'll send you a 6-digit reset code
+            {"Enter your email and we'll send you a 6-digit reset code"}
           </ThemedText>
         </View>
 

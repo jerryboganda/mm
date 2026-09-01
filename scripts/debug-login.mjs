@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
-dotenv.config();
 
 import { storage } from "../server/storage.js";
 import bcrypt from "bcryptjs";
+dotenv.config();
 
 async function main() {
   console.log("[*] Testing storage.getUserByEmail with storage singleton...");
