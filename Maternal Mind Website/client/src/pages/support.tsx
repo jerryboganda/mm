@@ -8,6 +8,7 @@ import {
   Loader2,
   MessageSquare,
   Globe,
+  Truck,
 } from "lucide-react";
 import {
   GlassCard,
@@ -119,17 +120,10 @@ export default function Support() {
       </section>
 
       <section className="relative py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <ScrollReveal>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
               {[
-                {
-                  icon: Mail,
-                  title: "Email Support",
-                  desc: "maternalmind.help@gmail.com",
-                  sub: "24/7 Email Help",
-                  href: "mailto:maternalmind.help@gmail.com",
-                },
                 {
                   icon: MessageSquare,
                   title: "WhatsApp Helpline",
@@ -143,6 +137,20 @@ export default function Support() {
                   desc: "maternalmind.com.pk",
                   sub: "Online Portal & Portal Access",
                   href: "https://maternalmind.com.pk/",
+                },
+                {
+                  icon: Mail,
+                  title: "Email Support",
+                  desc: "maternalmind.help@gmail.com",
+                  sub: "24/7 Academic & App Help",
+                  href: "mailto:maternalmind.help@gmail.com",
+                },
+                {
+                  icon: Truck,
+                  title: "Book Delivery Orders",
+                  desc: "+923212066562",
+                  sub: "Hardcopy Book Dispatch",
+                  href: "https://wa.me/923212066562",
                 },
               ].map((item, i) => (
                 <a

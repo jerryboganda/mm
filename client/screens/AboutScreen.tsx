@@ -18,7 +18,7 @@ import Constants from "expo-constants";
 import { BackgroundGradient } from "@/components/BackgroundGradient";
 import { GlassCard } from "@/components/GlassCard";
 import { ThemedText } from "@/components/ThemedText";
-import { Spacing } from "@/constants/theme";
+import { Spacing, BorderRadius } from "@/constants/theme";
 import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -222,6 +222,30 @@ export default function AboutScreen() {
               <Feather name="globe" size={20} color={theme.text} />
             </Pressable>
           </View>
+          <Pressable
+            style={({ pressed }) => [
+              styles.bookDeliveryCard,
+              {
+                backgroundColor: theme.glass,
+                borderColor: theme.glassBorder,
+                opacity: pressed ? 0.8 : 1,
+              },
+            ]}
+            onPress={() => handleOpenLink("https://wa.me/923212066562")}
+            accessibilityRole="button"
+            accessibilityLabel="For Hardcopy Book Delivery call or WhatsApp +923212066562"
+          >
+            <Feather name="book-open" size={18} color={theme.primary} />
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <ThemedText style={{ fontSize: 13, fontWeight: "600", color: theme.text }}>
+                For Book Delivery
+              </ThemedText>
+              <ThemedText style={{ fontSize: 12, color: theme.textSecondary }}>
+                WhatsApp / Call: +923212066562
+              </ThemedText>
+            </View>
+            <Feather name="external-link" size={16} color={theme.textMuted} />
+          </Pressable>
         </View>
 
         <View style={[styles.footer, { borderTopColor: theme.glass }]}>
@@ -334,6 +358,14 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
+  },
+  bookDeliveryCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: Spacing.md,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
   },
   footer: {
     alignItems: "center",

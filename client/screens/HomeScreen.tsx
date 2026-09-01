@@ -536,13 +536,46 @@ export default function HomeScreen() {
                   >
                     {greeting},
                   </Text>
-                  <Text
-                    style={[styles.userName, { color: theme.text }]}
-                    numberOfLines={1}
-                    accessibilityRole="header"
-                  >
-                    {firstName}
-                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <Text
+                      style={[styles.userName, { color: theme.text }]}
+                      numberOfLines={1}
+                      accessibilityRole="header"
+                    >
+                      {firstName}
+                    </Text>
+                    {user?.subscriptionStatus === "active" && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 3,
+                          backgroundColor: `${theme.success}20`,
+                          paddingHorizontal: 6,
+                          paddingVertical: 2,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: `${theme.success}40`,
+                        }}
+                      >
+                        <Feather
+                          name="check-circle"
+                          size={11}
+                          color={theme.success}
+                        />
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            fontWeight: "700",
+                            color: theme.success,
+                            letterSpacing: 0.5,
+                          }}
+                        >
+                          PRO
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
                 <Pressable
                   style={[
