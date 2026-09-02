@@ -3,6 +3,8 @@ const { withAndroidManifest } = require("expo/config-plugins");
 const GMS_BARCODE_DELEGATE_ACTIVITY =
   "com.google.mlkit.vision.codescanner.internal.GmsBarcodeScanningDelegateActivity";
 
+const TOOLS_NS = "http://schemas.android.com/tools";
+
 /**
  * Android 16 large-screen compatibility fix.
  *
@@ -19,13 +21,21 @@ const GMS_BARCODE_DELEGATE_ACTIVITY =
  */
 function withMlkitScannerLargeScreenFix(config) {
   return withAndroidManifest(config, (config) => {
-    const manifest = config.modResults;
+    // `modResults` shape: { manifest: { $: {<root attrs>}, application: [...] } }
+    const manifestElement = config.modResults.manifest;
+    if (!manifestElement || !manifestElement.$) {
+      return config;
+    }
 
-    manifest.$ = manifest.$ || {};
-    manifest.$["xmlns:tools"] =
-      manifest.$["xmlns:tools"] || "http://schemas.android.com/tools";
+    // Ensure the tools namespace is declared on the real <manifest> root.
+    manifestElement.$["xmlns:tools"] =
+      manifestElement.$["xmlns:tools"] || TOOLS_NS;
 
-    const application = manifest.manifest.application?.[0] || {};
+    const application = manifestElement.application?.[0];
+    if (!application) {
+      return config;
+    }
+
     const activities = application.activity || [];
 
     let delegate = activities.find(
@@ -36,7 +46,6 @@ function withMlkitScannerLargeScreenFix(config) {
       delegate = { $: { "android:name": GMS_BARCODE_DELEGATE_ACTIVITY } };
       activities.push(delegate);
       application.activity = activities;
-      manifest.manifest.application[0] = application;
     }
 
     delegate.$["android:screenOrientation"] = "fullUser";
