@@ -70,6 +70,10 @@ jobs:
         run: |
           set -euo pipefail
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/upload.keystore
+          # Ensure gradle.properties ends with a newline before appending
+          # (Expo prebuild emits no trailing newline; without this, the first
+          # appended property gets glued onto the last generated one).
+          [ -n "$(tail -c 1 android/gradle.properties)" ] && echo >> android/gradle.properties || true
           {
             echo "MM_UPLOAD_STORE_FILE=upload.keystore"
             echo "MM_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
