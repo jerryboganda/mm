@@ -1,9 +1,17 @@
 name: Android Release Build
 
 # Builds a signed Android App Bundle (.aab) entirely in GitHub Actions — no EAS.
-# Use this for the store builds that OTA cannot deliver: the one-time build that
-# embeds the expo-updates engine, and any later build that changes native code
-# (new native dependency, SDK bump, app.json native config, runtime-version change).
+#
+# NOTE: This is the SLOW path — a full 4-ABI native build can approach the 6h
+# GitHub runner limit. For day-to-day store builds use EAS instead (~20-30 min):
+#   npm run build:android:store
+# (EAS reuses the project's managed upload credentials, the same ones used for
+# the versionCode 4/5 store releases.)
+#
+# Use THIS workflow when you specifically need the upload keystore from repo
+# secrets (e.g. after rotating keys) — it embeds expo-updates engine, applies
+# expo prebuild with the repo's config plugins, and verifies R8/manifest before
+# uploading artifacts.
 #
 # Manual-trigger only. Requires these repository secrets:
 #   ANDROID_KEYSTORE_BASE64   base64 of your upload keystore (.jks/.keystore)
