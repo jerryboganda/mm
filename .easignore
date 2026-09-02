@@ -1,95 +1,26 @@
-# Server-side code (not needed for mobile build)
-server/
-server_dist/
-scripts/
-drizzle.config.ts
-*.sql
-
-# Large tar archives & backups
+node_modules/
+.git/
+android/
+admin/node_modules/
+Maternal Mind Website/node_modules/
 *.tar.gz
 backups/
-uploads/
-MCQ_Extraction_July2024_02/
-
-# Docker / deployment
-Dockerfile
-docker-compose*
-Maternal Mind Education Content/
-
-# Android native build (EAS builds its own)
-android/
-
-# iOS native build
-ios/
-
-# Admin panel (not needed for mobile build)
-admin/
-admin_dist/
-
-# Website (separate project, not needed for mobile)
-Maternal Mind Website/
-website_dist/
+temp_media/
+temp_out/
+server_dist/
 web_dist/
-
-# Test output / screenshots / playwright
-output/
-test-results/
-screenshots/
-tests/
-playwright.config.ts
-
-# Temp / fix folders
-.tmp_incident_fix/
-.tmp_livefix/
-.agent/
-.agents/
-.local/
-.playwright-cli/
-.remember/
-.serena/
-
-# SSH keys & VPS docs
-office_pc_ed25519
-office_pc_ed25519.pub
-OFFICE_VPS_SSH_COPY_PASTE.txt
-VPS SSH Login Details.md
-test_output.txt
-test_output_2.txt
-
-# Docs / notes
-*.md
-attached_assets/
-
-# Dependencies (EAS installs its own)
-node_modules/
-
-# Expo
+website_dist/
+admin_dist/
 .expo/
-dist/
-dist-test/
-web-build/
-
-# Build artifacts
-*.tsbuildinfo
-
-# Env / secrets
-.env
-.env.*
-!.env.example
-
-# Debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Misc
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
+*.log
+test-results/
+playwright-report/
+project_deploy_*.tar.gz
+mcqs_fix_light.tar.gz
+production_deploy.tar.gz
+Maternal Mind Education Content/
+BOOK MATERNAL MIND BY DR.FARZANA MUNEER(FINAL).docx
+uploads/
+updates/
+secrets/
+docs/superpowers/
