@@ -43,6 +43,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
@@ -80,14 +85,19 @@ jobs:
             echo "MM_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}"
             echo "MM_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}"
           } >> android/gradle.properties
+          # CI runner tuning: bigger Gradle heap + parallel workers so the
+          # 4-ABI C++ builds + R8 finish well inside the 6h job cap.
+          echo "org.gradle.jvmargs=-Xmx8g -XX:MaxMetaspaceSize=1g -XX:+UseParallelGC" >> android/gradle.properties
+          echo "org.gradle.workers.max=4" >> android/gradle.properties
 
       - name: Inject release signing config
         run: node scripts/ci/patch-android-signing.mjs
 
       - name: Build release AAB
+        timeout-minutes: 240
         run: |
           cd android
-          ./gradlew :app:bundleRelease --no-daemon
+          ./gradlew :app:bundleRelease --no-daemon --stacktrace
 
       - name: Verify merged manifest and R8 output
         run: |
