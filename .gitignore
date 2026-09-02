@@ -102,3 +102,14 @@ website_dist/
 # verify OTA manifests). This negation overrides the global `*.pem` ignore above.
 !client/certs/
 !client/certs/certificate.pem
+
+# Local machine artifacts — never commit (deploy tarballs, DB dumps, raw book sources)
+*.tar.gz
+backups/
+temp_media/
+temp_out/
+eslint_report.json
+.tmp_db_diff.json
+.tmp_expected_blocks.json
+.tmp_parity_report.json
+Maternal Mind Education Content/
