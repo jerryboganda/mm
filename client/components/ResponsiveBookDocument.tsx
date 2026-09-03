@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import WebView from "react-native-webview";
 import { getApiUrl } from "@/lib/query-client";
@@ -66,7 +66,6 @@ export function ResponsiveBookDocument({
       .mm-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 0.9em;
         line-height: 1.4;
         margin-left: 0 !important;
       }
@@ -75,6 +74,8 @@ export function ResponsiveBookDocument({
         border: 1px solid var(--mm-border) !important;
         vertical-align: top;
         color: var(--mm-text);
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
       .mm-table th {
         background-color: var(--mm-table-header);
@@ -101,7 +102,6 @@ export function ResponsiveBookDocument({
       }
       .mm-figure svg {
         max-width: 100%;
-        min-width: 650px;
         height: auto;
         display: inline-block;
         margin: 0 auto;
@@ -164,11 +164,48 @@ export function ResponsiveBookDocument({
     `;
   }, []);
 
+  // Web: shrink-to-fit oversized headings (mirrors the native WebView
+  // script). Only headings that actually overflow are touched.
+  const webRootRef = useRef<any>(null);
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    try {
+      const root = webRootRef.current;
+      if (!root || typeof root.querySelectorAll !== "function") return;
+      const heads = root.querySelectorAll(".mm-heading");
+      heads.forEach((h: any) => {
+        try {
+          const sw = h.scrollWidth, cw = h.clientWidth;
+          if (sw > cw + 1 && cw > 0) {
+            h.style.zoom = Math.max(0.2, cw / sw);
+          }
+        } catch {}
+      });
+      try {
+        const MAX_INDENT_PX = 192;
+        const nodes = root.querySelectorAll("p, div, h1, h2, h3, li");
+        nodes.forEach((n: any) => {
+          try {
+            const cs = window.getComputedStyle(n);
+            const ml = parseFloat(cs.marginLeft) || 0;
+            const pl = parseFloat(cs.paddingLeft) || 0;
+            const ti = parseFloat(cs.textIndent) || 0;
+            if (ml > MAX_INDENT_PX) n.style.marginLeft = MAX_INDENT_PX + "px";
+            if (pl > MAX_INDENT_PX) n.style.paddingLeft = MAX_INDENT_PX + "px";
+            if (ti > MAX_INDENT_PX || ti < -MAX_INDENT_PX)
+              n.style.textIndent = (ti > 0 ? MAX_INDENT_PX : -MAX_INDENT_PX) + "px";
+          } catch {}
+        });
+      } catch {}
+    } catch {}
+  }, [content, topicId]);
+
   if (Platform.OS === "web") {
     return (
       <View style={[styles.container, style]}>
         <style dangerouslySetInnerHTML={{ __html: scopedCss }} />
         <div
+          ref={webRootRef}
           className="mm-book-document"
           data-mm-topic-root={topicId}
           dangerouslySetInnerHTML={{ __html: content }}
@@ -192,6 +229,60 @@ export function ResponsiveBookDocument({
         </div>
         <script>
           (function() {
+            // Backfill natural dimensions for SVGs compiled before explicit
+            // width/height (e.g. stale offline cache): derive px from the
+            // EMU viewBox at 96dpi so figures render at true book size.
+            try {
+              var svgs = document.querySelectorAll('.mm-book-document svg');
+              for (var i = 0; i < svgs.length; i++) {
+                var s = svgs[i];
+                if (s.getAttribute('width') && s.getAttribute('height')) continue;
+                var vb = s.getAttribute('viewBox') || s.getAttribute('viewbox') || '';
+                var p = vb.trim().split(/[\s,]+/);
+                if (p.length === 4) {
+                  var w = Math.max(1, Math.round(parseFloat(p[2]) * 96 / 914400));
+                  var h = Math.max(1, Math.round(parseFloat(p[3]) * 96 / 914400));
+                  if (isFinite(w) && isFinite(h) && w > 0 && h > 0) {
+                    s.setAttribute('width', String(w));
+                    s.setAttribute('height', String(h));
+                  }
+                }
+              }
+            } catch (e) {}
+            // Shrink-to-fit oversized headings (e.g. 47pt part-titles whose
+            // size lives on an inner run span): zoom the whole heading so a
+            // single long word can never force document-level horizontal
+            // scroll on narrow viewports. Only headings that actually
+            // overflow are touched; all others keep exact book sizes.
+            try {
+              var heads = document.querySelectorAll('.mm-book-document .mm-heading');
+              for (var j = 0; j < heads.length; j++) {
+                var h = heads[j];
+                var sw = h.scrollWidth, cw = h.clientWidth;
+                if (sw > cw + 1 && cw > 0) {
+                  var z = Math.max(0.2, cw / sw);
+                  h.style.zoom = z;
+                }
+              }
+            } catch (e2) {}
+            // Cap pathological indents (e.g. a 360pt left margin) that would
+            // push content off-screen on narrow viewports. Normal book
+            // indents (<=144pt) are preserved exactly; only outliers are
+            // tamed so no paragraph is ever unreachable.
+            try {
+              var MAX_INDENT_PX = 192;
+              var nodes = document.querySelectorAll('.mm-book-document p, .mm-book-document div, .mm-book-document h1, .mm-book-document h2, .mm-book-document h3, .mm-book-document li');
+              for (var k = 0; k < nodes.length; k++) {
+                var n = nodes[k];
+                var ncs = window.getComputedStyle(n);
+                var nml = parseFloat(ncs.marginLeft) || 0;
+                var npl = parseFloat(ncs.paddingLeft) || 0;
+                var nti = parseFloat(ncs.textIndent) || 0;
+                if (nml > MAX_INDENT_PX) n.style.marginLeft = MAX_INDENT_PX + 'px';
+                if (npl > MAX_INDENT_PX) n.style.paddingLeft = MAX_INDENT_PX + 'px';
+                if (nti > MAX_INDENT_PX || nti < -MAX_INDENT_PX) n.style.textIndent = (nti > 0 ? MAX_INDENT_PX : -MAX_INDENT_PX) + 'px';
+              }
+            } catch (e3) {}
             var scheduled = false;
             function send() {
               if (scheduled) return;
