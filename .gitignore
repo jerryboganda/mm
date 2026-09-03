@@ -103,7 +103,7 @@ website_dist/
 !client/certs/
 !client/certs/certificate.pem
 
-# Local machine artifacts — never commit (deploy tarballs, DB dumps, raw book sources)
+# Local machine artifacts ï¿½ never commit (deploy tarballs, DB dumps, raw book sources)
 *.tar.gz
 backups/
 temp_media/
@@ -113,3 +113,6 @@ eslint_report.json
 .tmp_expected_blocks.json
 .tmp_parity_report.json
 Maternal Mind Education Content/
+dist-fresh/
+webdeploy/
+dist/
