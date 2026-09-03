@@ -98,10 +98,12 @@ async function main() {
         };
         const tdet = await getJson(`${BASE}/api/topics/${t.id}`, headers);
         if (tdet && Array.isArray(tdet.blocks)) {
+          // Normalize CRLF (Postgres/SQL transport) to LF so the digest
+          // verifies semantic content parity, not line-ending bytes.
           const digests = tdet.blocks.map((bl) =>
             crypto
               .createHash("sha256")
-              .update(bl.content || "", "utf8")
+              .update((bl.content || "").replace(/\r\n/g, "\n"), "utf8")
               .digest("hex"),
           );
           const exp = EXPECTED[t.id];
