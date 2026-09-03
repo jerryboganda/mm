@@ -269,13 +269,19 @@ class DrawingCompiler:
         title = _label_text(figure.objects)
         accessible = escape(title if title else f"Source figure {figure.figure_id}", quote=True)
         view_x, view_y, view_width, view_height = _svg_view_box(figure)
+        # Natural CSS-pixel size (96 DPI ⇒ 9525 EMU = 1px; the viewBox is
+        # already snapped to whole pixels above).  Emitting explicit
+        # width/height lets readers render the figure at its true book size
+        # (capped by max-width:100%) instead of forcing an arbitrary
+        # min-width that blows tiny shapes up to phone-breaking sizes.
+        natural_w = max(view_width / 9525, 1)
+        natural_h = max(view_height / 9525, 1)
         svg = (
             f'<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{accessible}" '
             f'viewBox="{_n(view_x)} {_n(view_y)} {_n(view_width)} {_n(view_height)}" '
-            f'preserveAspectRatio="xMidYMid meet" data-mm-object-manifest="{figure.object_manifest_sha256}">'
-            + ("<defs>" + "".join(definitions) + "</defs>" if definitions else "")
-            + "".join(body)
-            + "</svg>"
+            f'width="{_n(natural_w)}" height="{_n(natural_h)}" '
+            f'data-mm-natural-width="{_n(natural_w)}" data-mm-natural-height="{_n(natural_h)}" '
+            f'preserveAspectRatio="xMidYMid meet" data-mm-object-manifest="{figure.object_manifest_sha256}">' + ("<defs>" + "".join(definitions) + "</defs>" if definitions else "") + "".join(body) + "</svg>"
         )
         return (
             f'<figure class="mm-figure" data-mm-figure-id="{figure.figure_id}" '
