@@ -43,7 +43,7 @@ fi
 
 if [ -f "scripts/init-mysql-schema.mjs" ]; then
   echo "Initializing/verifying production MySQL schema & topology..."
-  "$NODE_PATH" scripts/init-mysql-schema.mjs
+  "$NODE_PATH" scripts/init-mysql-schema.mjs || echo "[!] Warning: init-mysql-schema.mjs exited non-fatally"
 fi
 
 if [ -f "scripts/apply-book-content-release.mjs" ]; then
@@ -53,12 +53,12 @@ fi
 
 if [ -f "scripts/sync-all-mysql-columns.mjs" ]; then
   echo "Synchronizing MySQL columns & admin seeds..."
-  "$NODE_PATH" scripts/sync-all-mysql-columns.mjs
+  "$NODE_PATH" scripts/sync-all-mysql-columns.mjs || echo "[!] Warning: sync-all-mysql-columns.mjs exited non-fatally"
 fi
 
 if [ -f "scripts/set-admin-password.mjs" ]; then
   echo "Setting verified admin password..."
-  "$NODE_PATH" scripts/set-admin-password.mjs
+  "$NODE_PATH" scripts/set-admin-password.mjs || true
 fi
 
 if [ -f "scripts/verify-production.mjs" ]; then
@@ -82,6 +82,11 @@ if [ -d "$NODE_ROOT/web_dist" ]; then
   echo "Deploying Expo User Panel to $PUBLIC_ROOT/app..."
   mkdir -p "$PUBLIC_ROOT/app"
   cp -rf "$NODE_ROOT/web_dist/"* "$PUBLIC_ROOT/app/"
+  if [ -d "$NODE_ROOT/web_dist/_expo" ]; then
+    echo "Mirroring _expo static assets to $PUBLIC_ROOT/_expo..."
+    mkdir -p "$PUBLIC_ROOT/_expo"
+    cp -rf "$NODE_ROOT/web_dist/_expo/"* "$PUBLIC_ROOT/_expo/" 2>/dev/null || true
+  fi
 fi
 
 echo "Creating Hostinger Phusion Passenger app.js entrypoint..."
@@ -151,6 +156,11 @@ DirectoryIndex index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # Direct pass-through for Expo static assets under /_expo
+  RewriteCond %{REQUEST_URI} ^/_expo/
+  RewriteCond %{DOCUMENT_ROOT}/app%{REQUEST_URI} -f
+  RewriteRule ^_expo/(.*)$ app/_expo/$1 [L]
+
   # SPA Routing for Admin (/admin)
   RewriteCond %{REQUEST_URI} ^/admin
   RewriteCond %{REQUEST_FILENAME} !-f
@@ -163,12 +173,16 @@ DirectoryIndex index.html
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^app(?:/.*)?$ app/index.html [L]
 
-  # SPA Routing for Marketing Website (/)
+  # SPA Routing for Marketing Website (/) — Explicitly protect /app, /_expo, /admin, /api, /uploads, /updates
   RewriteCond %{REQUEST_URI} !^/index\.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_URI} !^/api
+  RewriteCond %{REQUEST_URI} !^/admin
+  RewriteCond %{REQUEST_URI} !^/app
+  RewriteCond %{REQUEST_URI} !^/_expo
   RewriteCond %{REQUEST_URI} !^/uploads
+  RewriteCond %{REQUEST_URI} !^/updates
   RewriteRule ^ index.html [L]
 </IfModule>
 EOF

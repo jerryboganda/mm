@@ -327,13 +327,18 @@ function configureExpoAndLanding(app: express.Application) {
 
   if (fs.existsSync(webDistPath)) {
     app.use("/app", express.static(webDistPath));
+    // Support root-relative /_expo static asset requests from Expo bundles
+    const webExpoPath = path.join(webDistPath, "_expo");
+    if (fs.existsSync(webExpoPath)) {
+      app.use("/_expo", express.static(webExpoPath));
+    }
     app.get("/app", (_req: Request, res: Response) => {
       res.sendFile(path.join(webDistPath, "index.html"));
     });
     app.get("/app/{*path}", (_req: Request, res: Response) => {
       res.sendFile(path.join(webDistPath, "index.html"));
     });
-    logger.info("Mobile web app: serving from /app/");
+    logger.info("Mobile web app: serving from /app/ and /_expo/");
   } else {
     logger.info("Mobile web app: web_dist not found — skipping");
   }
@@ -354,6 +359,7 @@ function configureExpoAndLanding(app: express.Application) {
       req.path.startsWith("/api") ||
       req.path.startsWith("/admin") ||
       req.path.startsWith("/app") ||
+      req.path.startsWith("/_expo") ||
       req.path.startsWith("/uploads") ||
       req.path.startsWith("/updates")
     ) {

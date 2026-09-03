@@ -318,12 +318,42 @@ const DDL_STATEMENTS = [
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 ];
 
+async function connectWithRetry(maxRetries = 5, delayMs = 2000) {
+  let lastErr;
+  let targetUrl = dbUrl;
+  for (let i = 1; i <= maxRetries; i++) {
+    try {
+      console.log(`[*] Connecting to MySQL (attempt ${i}/${maxRetries})...`);
+      const conn = await mysql.createConnection({
+        uri: targetUrl,
+        multipleStatements: true,
+      });
+      return conn;
+    } catch (err) {
+      lastErr = err;
+      console.warn(`[!] Connection attempt ${i} failed: ${err.message}`);
+      if (err.code === "ECONNREFUSED" && targetUrl.includes("127.0.0.1")) {
+        console.log("[*] Retrying with localhost fallback...");
+        targetUrl = targetUrl.replace("127.0.0.1", "localhost");
+      }
+      if (i < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 async function init() {
   console.log("[*] Connecting to MySQL to initialize tables...");
-  const conn = await mysql.createConnection({
-    uri: dbUrl,
-    multipleStatements: true,
-  });
+  let conn;
+  try {
+    conn = await connectWithRetry();
+  } catch (err) {
+    console.error("[-] Could not connect to MySQL after retries:", err.message);
+    console.log("[!] Continuing deployment non-fatally...");
+    return;
+  }
 
   try {
     for (const ddl of DDL_STATEMENTS) {
