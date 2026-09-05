@@ -171,8 +171,36 @@ export function normalizeOptionExplanationsMap(
   return {};
 }
 
-interface MCQRow {
-  id: string;
+function TopicGroupOptions({
+  groups,
+  showBook,
+}: {
+  groups: { chapterTitle: string; bookTitle: string; topics: TopicRef[] }[];
+  showBook: boolean;
+}) {
+  return (
+    <>
+      {groups.map((g) => (
+        <optgroup
+          key={`${g.bookTitle}›${g.chapterTitle}`}
+          label={
+            showBook && g.bookTitle
+              ? `${g.bookTitle} › ${g.chapterTitle}`
+              : g.chapterTitle
+          }
+        >
+          {g.topics.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.title}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </>
+  );
+}
+
+interface MCQRow {  id: string;
   topicId: string;
   question: string;
   options: any;
@@ -247,8 +275,8 @@ const QUESTION_TYPES = [
   { value: "clinical_vignette", label: "Clinical Vignette" },
 ];
 
-const YEAR_OPTIONS = Array.from({ length: 2030 - 1990 + 1 }, (_, i) =>
-  String(2030 - i),
+const YEAR_OPTIONS = Array.from({ length: 2026 - 2017 + 1 }, (_, i) =>
+  String(2026 - i),
 );
 
 const SORT_OPTIONS = [
@@ -404,6 +432,30 @@ export default function McqsPage() {
         .map((t) => ({ value: t.id, label: `${t.chapterTitle} › ${t.title}` })),
     [topicsList, fChapter],
   );
+
+  // Topics grouped by chapter so dropdowns show short topic names only
+  // (e.g. "1. HEAVY MENSTRUAL BLEEDING") under a chapter heading instead
+  // of one long "Book › Subject › Chapter › Topic" string per option.
+  const topicsByChapter = useMemo(() => {
+    const map = new Map<
+      string,
+      { chapterTitle: string; bookTitle: string; topics: TopicRef[] }
+    >();
+    topicsList.forEach((t) => {
+      const key = t.chapterId || "__none";
+      let g = map.get(key);
+      if (!g) {
+        g = {
+          chapterTitle: t.chapterTitle || "Other",
+          bookTitle: t.bookTitle || "",
+          topics: [],
+        };
+        map.set(key, g);
+      }
+      g.topics.push(t);
+    });
+    return Array.from(map.values());
+  }, [topicsList]);
 
   const yearOptions = useMemo(() => {
     const set = new Set<string>([...facets.years.map(String), ...YEAR_OPTIONS]);
@@ -1478,13 +1530,10 @@ export default function McqsPage() {
                   className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                 >
                   <option value="">Select topic…</option>
-                  {topicsList.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.bookTitle} ›{" "}
-                      {t.subjectTitle ? `${t.subjectTitle} › ` : ""}
-                      {t.chapterTitle} › {t.title}
-                    </option>
-                  ))}
+                  <TopicGroupOptions
+                    groups={topicsByChapter}
+                    showBook={books.length > 1}
+                  />
                 </select>
               </div>
               <div>
@@ -1853,11 +1902,10 @@ export default function McqsPage() {
                     className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   >
                     <option value="">Select topic…</option>
-                    {topicsList.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.bookTitle} › {t.title}
-                      </option>
-                    ))}
+                    <TopicGroupOptions
+                      groups={topicsByChapter}
+                      showBook={books.length > 1}
+                    />
                   </select>
                 </div>
                 <div>
