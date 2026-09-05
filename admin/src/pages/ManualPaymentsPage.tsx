@@ -20,6 +20,10 @@ interface Proof {
   packageId: string;
   packageName: string | null;
   priceId: string | null;
+  priceAmount: string | null;
+  priceCurrency: string | null;
+  billingCycle: string | null;
+  hasActiveSubscription?: boolean;
   status: "pending" | "approved" | "rejected";
   amountClaimed: string | null;
   currency: string | null;
@@ -52,6 +56,43 @@ const statusBadge: Record<string, string> = {
   approved: "bg-emerald-100 text-emerald-700",
   rejected: "bg-red-100 text-red-700",
 };
+
+function isCouponProof(p: Proof) {
+  return (
+    p.paymentMethod === "Promo / Coupon Code" ||
+    (p.userNote != null && p.userNote.toLowerCase().includes("promo/coupon"))
+  );
+}
+
+function isZeroAmount(v: string | null) {
+  if (v == null || v === "") return true;
+  const n = Number(v);
+  return Number.isFinite(n) && n === 0;
+}
+
+function AmountCell({ proof: p }: { proof: Proof }) {
+  // Coupon redemptions legitimately claim 0 — show that instead of a bare
+  // "0.00" that looks like missing data (the reported discrepancy).
+  if (isCouponProof(p) && isZeroAmount(p.amountClaimed)) {
+    return (
+      <span className="inline-flex flex-col gap-0.5">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-800 w-fit">
+          <Ticket className="w-3 h-3" /> Coupon • Free
+        </span>
+        {p.priceAmount != null && (
+          <span className="text-[11px] text-gray-400">
+            Plan: {p.priceCurrency || ""} {p.priceAmount}
+          </span>
+        )}
+      </span>
+    );
+  }
+  return (
+    <span>
+      {p.amountClaimed ? `${p.currency || ""} ${p.amountClaimed}` : "—"}
+    </span>
+  );
+}
 
 export default function ManualPaymentsPage() {
   const [status, setStatus] = useState<StatusTab>("pending");
@@ -172,9 +213,7 @@ export default function ManualPaymentsPage() {
                       {p.packageName || "—"}
                     </td>
                     <td className="px-4 py-3 text-gray-700">
-                      {p.amountClaimed
-                        ? `${p.currency || ""} ${p.amountClaimed}`
-                        : "—"}
+                      <AmountCell proof={p} />
                     </td>
                     <td className="px-4 py-3 text-gray-500">
                       {new Date(p.createdAt).toLocaleDateString()}
@@ -185,6 +224,11 @@ export default function ManualPaymentsPage() {
                       >
                         {p.status}
                       </span>
+                      {p.hasActiveSubscription && p.status === "pending" && (
+                        <div className="text-[11px] text-amber-600 font-medium mt-1">
+                          Active sub — approve extends
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
@@ -443,12 +487,22 @@ function ReviewModal({
             <Row label="User" value={proof.userName} />
             <Row label="Email" value={proof.userEmail} />
             <Row label="Package" value={proof.packageName} />
+            {proof.priceAmount != null && (
+              <Row
+                label="Plan Price"
+                value={`${proof.priceCurrency || ""} ${proof.priceAmount}${
+                  proof.billingCycle ? ` (${proof.billingCycle})` : ""
+                }`}
+              />
+            )}
             <Row
               label="Amount"
               value={
-                proof.amountClaimed
-                  ? `${proof.currency || ""} ${proof.amountClaimed}`
-                  : null
+                isCouponProof(proof) && isZeroAmount(proof.amountClaimed)
+                  ? `Free (coupon ${proof.senderReference || ""})`.trim()
+                  : proof.amountClaimed
+                    ? `${proof.currency || ""} ${proof.amountClaimed}`
+                    : null
               }
             />
             <Row label="Method" value={proof.paymentMethod} />
@@ -460,6 +514,16 @@ function ReviewModal({
             />
             <Row label="Status" value={proof.status} />
             <Row label="Rejection Reason" value={proof.rejectionReason} />
+
+            {proof.hasActiveSubscription && proof.status === "pending" && (
+              <div className="flex items-start gap-2 bg-amber-50 text-amber-800 px-3 py-2 rounded-lg text-sm mt-4">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>
+                  User already has an active subscription — approving will{" "}
+                  <strong>extend it</strong>, not create a duplicate.
+                </span>
+              </div>
+            )}
 
             {error && (
               <div className="flex items-center gap-2 bg-red-50 text-red-700 px-3 py-2 rounded-lg text-sm mt-4">
@@ -512,7 +576,9 @@ function ReviewModal({
                       ) : (
                         <Check className="w-4 h-4" />
                       )}
-                      Approve
+                      {proof.hasActiveSubscription
+                        ? "Approve & Extend"
+                        : "Approve"}
                     </button>
                     <button
                       onClick={() => setRejecting(true)}
