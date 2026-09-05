@@ -49,7 +49,9 @@ interface AuthContextType {
     name: string,
     email: string,
     password: string,
-  ) => Promise<{ requiresEmailVerification?: boolean } | void>;
+  ) => Promise<
+    { requiresEmailVerification?: boolean; emailDeliveryFailed?: boolean } | void
+  >;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   setSessionExpired: (expired: boolean) => void;
@@ -279,7 +281,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // If requiresEmailVerification, we don't set user yet
     if (data.requiresEmailVerification) {
-      return { requiresEmailVerification: true };
+      return {
+        requiresEmailVerification: true,
+        emailDeliveryFailed: data.emailDeliveryFailed === true,
+      };
     }
 
     await setToken(TOKEN_KEY, data.accessToken);
