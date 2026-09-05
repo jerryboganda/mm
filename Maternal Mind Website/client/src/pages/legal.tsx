@@ -240,13 +240,15 @@ export function TermsPage() {
                   <h2 className="text-lg font-semibold text-white mb-3">
                     9. Contact
                   </h2>
-                  <p className="text-white/60 leading-relaxed">
-                    For questions about these Terms, contact us at{" "}
-                    <span className="text-[#11a4d4]">
-                      legal@maternalmind.app
-                    </span>
-                    .
+                  <p className="text-white/60 leading-relaxed mb-2">
+                    For questions about these Terms, contact us:
                   </p>
+                  <div className="text-sm text-white/70 space-y-1">
+                    <p>• WhatsApp: <a href="https://wa.me/923360830836" target="_blank" rel="noreferrer" className="text-[#11a4d4]">+923360830836</a></p>
+                    <p>• Web: <a href="https://maternalmind.com.pk/" target="_blank" rel="noreferrer" className="text-[#11a4d4]">https://maternalmind.com.pk/</a></p>
+                    <p>• Email: <a href="mailto:maternalmind.help@gmail.com" className="text-[#11a4d4]">maternalmind.help@gmail.com</a></p>
+                    <p>• For Book Delivery: <a href="https://wa.me/923212066562" target="_blank" rel="noreferrer" className="text-[#11a4d4]">+923212066562</a></p>
+                  </div>
                 </section>
               </div>
             </GlassCard>
@@ -405,8 +407,10 @@ export function PrivacyPage() {
                     If you have questions, concerns, or requests regarding this Privacy Policy or data protection practices, please contact us:
                   </p>
                   <div className="mt-3 text-sm text-white/70 space-y-1">
+                    <p>• WhatsApp: <a href="https://wa.me/923360830836" target="_blank" rel="noreferrer" className="text-[#11a4d4]">+923360830836</a></p>
+                    <p>• Web: <a href="https://maternalmind.com.pk/" target="_blank" rel="noreferrer" className="text-[#11a4d4]">https://maternalmind.com.pk/</a></p>
                     <p>• Email: <a href="mailto:maternalmind.help@gmail.com" className="text-[#11a4d4]">maternalmind.help@gmail.com</a></p>
-                    <p>• WhatsApp Support: <a href="https://wa.me/923360830836" target="_blank" rel="noreferrer" className="text-[#11a4d4]">+92 336 0830836</a></p>
+                    <p>• For Book Delivery: <a href="https://wa.me/923212066562" target="_blank" rel="noreferrer" className="text-[#11a4d4]">+923212066562</a></p>
                     <p>• Contact Portal: <Link href="/contact" className="text-[#11a4d4] hover:underline">https://maternalmind.com.pk/contact</Link></p>
                     <p>• Location: Chowk Azam, Layyah, Pakistan</p>
                   </div>

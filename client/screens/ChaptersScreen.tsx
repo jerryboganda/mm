@@ -70,6 +70,7 @@ export default function ChaptersScreen() {
             chapterId: item.id,
             chapterTitle: item.title,
             bookId,
+            bookTitle,
           })
         }
         icon={

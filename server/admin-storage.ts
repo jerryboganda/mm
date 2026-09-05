@@ -8,6 +8,7 @@ import {
   subjects,
   chapters,
   topics,
+  subtopics,
   contentBlocks,
   mcqs,
   sources,
@@ -23,6 +24,7 @@ import {
   type Subject,
   type Chapter,
   type Topic,
+  type Subtopic,
   type ContentBlock,
   type MCQ,
   type McqSource,
@@ -179,11 +181,32 @@ export async function adminReorderChapters(
 
 // ── Topics CRUD ───────────────────────────────────────────────
 
-export async function adminGetTopics(chapterId: string): Promise<Topic[]> {
+export async function adminGetTopics(
+  chapterId?: string,
+  bookId?: string,
+): Promise<Topic[]> {
+  if (bookId) {
+    return db
+      .select()
+      .from(topics)
+      .where(eq(topics.bookId, bookId))
+      .orderBy(asc(topics.order));
+  }
+  if (chapterId) {
+    return db
+      .select()
+      .from(topics)
+      .where(eq(topics.chapterId, chapterId))
+      .orderBy(asc(topics.order));
+  }
+  return db.select().from(topics).orderBy(asc(topics.order));
+}
+
+export async function adminGetTopicsByBook(bookId: string): Promise<Topic[]> {
   return db
     .select()
     .from(topics)
-    .where(eq(topics.chapterId, chapterId))
+    .where(eq(topics.bookId, bookId))
     .orderBy(asc(topics.order));
 }
 
@@ -193,7 +216,8 @@ export async function adminGetTopic(id: string): Promise<Topic | undefined> {
 }
 
 export async function adminCreateTopic(data: {
-  chapterId: string;
+  chapterId?: string | null;
+  bookId?: string | null;
   title: string;
   description?: string | null;
   isPublished?: boolean;
@@ -204,10 +228,17 @@ export async function adminCreateTopic(data: {
   references?: string | null;
 }): Promise<Topic> {
   if (data.order === undefined) {
-    const [maxRow] = await db
+    const condition = data.bookId
+      ? eq(topics.bookId, data.bookId)
+      : data.chapterId
+        ? eq(topics.chapterId, data.chapterId)
+        : undefined;
+
+    const query = db
       .select({ maxOrder: sql<number>`coalesce(max(${topics.order}), -1)` })
-      .from(topics)
-      .where(eq(topics.chapterId, data.chapterId));
+      .from(topics);
+
+    const [maxRow] = condition ? await query.where(condition) : await query;
     data.order = (maxRow?.maxOrder ?? -1) + 1;
   }
   const [t] = await db.insert(topics).values(data).returning();
@@ -222,7 +253,8 @@ export async function adminUpdateTopic(
     isPublished: boolean;
     isPaid: boolean;
     order: number;
-    chapterId: string;
+    chapterId: string | null;
+    bookId: string | null;
     author: string | null;
     source: string | null;
     references: string | null;
@@ -241,15 +273,93 @@ export async function adminDeleteTopic(id: string): Promise<void> {
 }
 
 export async function adminReorderTopics(
-  chapterId: string,
+  chapterOrBookId: string,
+  orderedIds: string[],
+  isBookId: boolean = false,
+): Promise<void> {
+  for (let i = 0; i < orderedIds.length; i++) {
+    const condition = isBookId
+      ? and(eq(topics.id, orderedIds[i]), eq(topics.bookId, chapterOrBookId))
+      : and(eq(topics.id, orderedIds[i]), eq(topics.chapterId, chapterOrBookId));
+
+    await db
+      .update(topics)
+      .set({ order: i })
+      .where(condition);
+  }
+}
+
+// ── Subtopics CRUD ─────────────────────────────────────────────
+
+export async function adminGetSubtopics(topicId: string): Promise<Subtopic[]> {
+  return db
+    .select()
+    .from(subtopics)
+    .where(eq(subtopics.topicId, topicId))
+    .orderBy(asc(subtopics.order));
+}
+
+export async function adminGetSubtopic(
+  id: string,
+): Promise<Subtopic | undefined> {
+  const [s] = await db.select().from(subtopics).where(eq(subtopics.id, id));
+  return s || undefined;
+}
+
+export async function adminCreateSubtopic(data: {
+  topicId: string;
+  title: string;
+  description?: string | null;
+  isPublished?: boolean;
+  isPaid?: boolean;
+  estimatedMinutes?: number;
+  order?: number;
+}): Promise<Subtopic> {
+  if (data.order === undefined) {
+    const [maxRow] = await db
+      .select({ maxOrder: sql<number>`coalesce(max(${subtopics.order}), -1)` })
+      .from(subtopics)
+      .where(eq(subtopics.topicId, data.topicId));
+    data.order = (maxRow?.maxOrder ?? -1) + 1;
+  }
+  const [s] = await db.insert(subtopics).values(data).returning();
+  return s;
+}
+
+export async function adminUpdateSubtopic(
+  id: string,
+  data: Partial<{
+    topicId: string;
+    title: string;
+    description: string | null;
+    isPublished: boolean;
+    isPaid: boolean;
+    estimatedMinutes: number;
+    order: number;
+  }>,
+): Promise<Subtopic | undefined> {
+  const [s] = await db
+    .update(subtopics)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(subtopics.id, id))
+    .returning();
+  return s || undefined;
+}
+
+export async function adminDeleteSubtopic(id: string): Promise<void> {
+  await db.delete(subtopics).where(eq(subtopics.id, id));
+}
+
+export async function adminReorderSubtopics(
+  topicId: string,
   orderedIds: string[],
 ): Promise<void> {
   for (let i = 0; i < orderedIds.length; i++) {
     await db
-      .update(topics)
-      .set({ order: i })
+      .update(subtopics)
+      .set({ order: i, updatedAt: new Date() })
       .where(
-        and(eq(topics.id, orderedIds[i]), eq(topics.chapterId, chapterId)),
+        and(eq(subtopics.id, orderedIds[i]), eq(subtopics.topicId, topicId)),
       );
   }
 }
@@ -266,19 +376,37 @@ export async function adminGetContentBlocks(
     .orderBy(asc(contentBlocks.order));
 }
 
+export async function adminGetSubtopicContentBlocks(
+  subtopicId: string,
+): Promise<ContentBlock[]> {
+  return db
+    .select()
+    .from(contentBlocks)
+    .where(eq(contentBlocks.subtopicId, subtopicId))
+    .orderBy(asc(contentBlocks.order));
+}
+
 export async function adminCreateContentBlock(data: {
-  topicId: string;
+  topicId?: string | null;
+  subtopicId?: string | null;
   type: string;
   content: string;
   order?: number;
 }): Promise<ContentBlock> {
   if (data.order === undefined) {
-    const [maxRow] = await db
+    const condition = data.subtopicId
+      ? eq(contentBlocks.subtopicId, data.subtopicId)
+      : data.topicId
+        ? eq(contentBlocks.topicId, data.topicId)
+        : undefined;
+
+    const query = db
       .select({
         maxOrder: sql<number>`coalesce(max(${contentBlocks.order}), -1)`,
       })
-      .from(contentBlocks)
-      .where(eq(contentBlocks.topicId, data.topicId));
+      .from(contentBlocks);
+
+    const [maxRow] = condition ? await query.where(condition) : await query;
     data.order = (maxRow?.maxOrder ?? -1) + 1;
   }
   const [cb] = await db.insert(contentBlocks).values(data).returning();
@@ -287,7 +415,7 @@ export async function adminCreateContentBlock(data: {
 
 export async function adminUpdateContentBlock(
   id: string,
-  data: Partial<{ type: string; content: string; order: number }>,
+  data: Partial<{ type: string; content: string; order: number; subtopicId?: string | null }>,
 ): Promise<ContentBlock | undefined> {
   const [cb] = await db
     .update(contentBlocks)
@@ -313,6 +441,23 @@ export async function adminReorderContentBlocks(
         and(
           eq(contentBlocks.id, orderedIds[i]),
           eq(contentBlocks.topicId, topicId),
+        ),
+      );
+  }
+}
+
+export async function adminReorderSubtopicContentBlocks(
+  subtopicId: string,
+  orderedIds: string[],
+): Promise<void> {
+  for (let i = 0; i < orderedIds.length; i++) {
+    await db
+      .update(contentBlocks)
+      .set({ order: i })
+      .where(
+        and(
+          eq(contentBlocks.id, orderedIds[i]),
+          eq(contentBlocks.subtopicId, subtopicId),
         ),
       );
   }
@@ -1297,20 +1442,36 @@ export async function adminGetAllTopicsFlat(): Promise<
     bookTitle: string;
   }[]
 > {
-  return db
+  const rows = await db
     .select({
       id: topics.id,
       title: topics.title,
-      chapterId: chapters.id,
+      chapterId: topics.chapterId,
       chapterTitle: chapters.title,
       subjectId: subjects.id,
       subjectTitle: subjects.title,
+      directBookId: topics.bookId,
+      chapterBookId: chapters.bookId,
       bookId: books.id,
       bookTitle: books.title,
     })
     .from(topics)
-    .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-    .innerJoin(books, eq(chapters.bookId, books.id))
+    .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+    .leftJoin(
+      books,
+      or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+    )
     .leftJoin(subjects, eq(chapters.subjectId, subjects.id))
     .orderBy(asc(books.order), asc(chapters.order), asc(topics.order));
+
+  return rows.map((r: any) => ({
+    id: r.id,
+    title: r.title,
+    chapterId: r.chapterId || "",
+    chapterTitle: r.chapterTitle || r.bookTitle || "",
+    subjectId: r.subjectId || null,
+    subjectTitle: r.subjectTitle || null,
+    bookId: r.bookId || r.directBookId || r.chapterBookId || "",
+    bookTitle: r.bookTitle || "",
+  }));
 }

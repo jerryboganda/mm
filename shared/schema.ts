@@ -112,6 +112,7 @@ export const books = pgTable("books", {
 export const booksRelations = relations(books, ({ many }) => ({
   chapters: many(chapters),
   subjects: many(subjects),
+  topics: many(topics),
 }));
 
 // Subjects sit between books and chapters in the academic hierarchy:
@@ -189,9 +190,12 @@ export const topics = pgTable(
     id: varchar("id")
       .primaryKey()
       .default(sql`gen_random_uuid()`),
-    chapterId: varchar("chapter_id")
-      .notNull()
-      .references(() => chapters.id, { onDelete: "cascade" }),
+    bookId: varchar("book_id").references(() => books.id, {
+      onDelete: "cascade",
+    }),
+    chapterId: varchar("chapter_id").references(() => chapters.id, {
+      onDelete: "cascade",
+    }),
     title: text("title").notNull(),
     description: text("description"),
     order: integer("order").default(0),
@@ -205,6 +209,7 @@ export const topics = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
+    index("idx_topics_book_published").on(table.bookId, table.isPublished),
     index("idx_topics_chapter_published").on(
       table.chapterId,
       table.isPublished,
@@ -212,32 +217,85 @@ export const topics = pgTable(
   ],
 );
 
+export const subtopics = pgTable(
+  "subtopics",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    topicId: varchar("topic_id")
+      .notNull()
+      .references(() => topics.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    order: integer("order").default(0).notNull(),
+    isPublished: boolean("is_published").default(true).notNull(),
+    isPaid: boolean("is_paid").default(false).notNull(),
+    estimatedMinutes: integer("estimated_minutes").default(3),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_subtopics_topic_order").on(table.topicId, table.order),
+    index("idx_subtopics_published"). on(table.isPublished),
+  ],
+);
+
 export const topicsRelations = relations(topics, ({ one, many }) => ({
+  book: one(books, {
+    fields: [topics.bookId],
+    references: [books.id],
+  }),
   chapter: one(chapters, {
     fields: [topics.chapterId],
     references: [chapters.id],
   }),
+  subtopics: many(subtopics),
   contentBlocks: many(contentBlocks),
   mcqs: many(mcqs),
 }));
 
-export const contentBlocks = pgTable("content_blocks", {
-  id: varchar("id")
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  topicId: varchar("topic_id")
-    .notNull()
-    .references(() => topics.id, { onDelete: "cascade" }),
-  type: text("type").notNull(),
-  content: text("content").notNull(),
-  order: integer("order").default(0),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const subtopicsRelations = relations(subtopics, ({ one, many }) => ({
+  topic: one(topics, {
+    fields: [subtopics.topicId],
+    references: [topics.id],
+  }),
+  contentBlocks: many(contentBlocks),
+  userProgress: many(userProgress),
+  bookmarks: many(bookmarks),
+}));
+
+export const contentBlocks = pgTable(
+  "content_blocks",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    topicId: varchar("topic_id").references(() => topics.id, {
+      onDelete: "cascade",
+    }),
+    subtopicId: varchar("subtopic_id").references(() => subtopics.id, {
+      onDelete: "cascade",
+    }),
+    type: text("type").notNull(),
+    content: text("content").notNull(),
+    order: integer("order").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_content_blocks_topic").on(table.topicId),
+    index("idx_content_blocks_subtopic").on(table.subtopicId),
+  ],
+);
 
 export const contentBlocksRelations = relations(contentBlocks, ({ one }) => ({
   topic: one(topics, {
     fields: [contentBlocks.topicId],
     references: [topics.id],
+  }),
+  subtopic: one(subtopics, {
+    fields: [contentBlocks.subtopicId],
+    references: [subtopics.id],
   }),
 }));
 
@@ -355,15 +413,22 @@ export const userProgress = pgTable(
     userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: varchar("topic_id")
-      .notNull()
-      .references(() => topics.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").references(() => topics.id, {
+      onDelete: "cascade",
+    }),
+    subtopicId: varchar("subtopic_id").references(() => subtopics.id, {
+      onDelete: "cascade",
+    }),
     isCompleted: boolean("is_completed").default(false),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
     index("idx_user_progress_user_topic").on(table.userId, table.topicId),
+    index("idx_user_progress_user_subtopic").on(
+      table.userId,
+      table.subtopicId,
+    ),
     index("idx_user_progress_user_completed").on(
       table.userId,
       table.isCompleted,
@@ -380,6 +445,10 @@ export const userProgressRelations = relations(userProgress, ({ one }) => ({
     fields: [userProgress.topicId],
     references: [topics.id],
   }),
+  subtopic: one(subtopics, {
+    fields: [userProgress.subtopicId],
+    references: [subtopics.id],
+  }),
 }));
 
 export const bookmarks = pgTable(
@@ -391,13 +460,17 @@ export const bookmarks = pgTable(
     userId: varchar("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    topicId: varchar("topic_id")
-      .notNull()
-      .references(() => topics.id, { onDelete: "cascade" }),
+    topicId: varchar("topic_id").references(() => topics.id, {
+      onDelete: "cascade",
+    }),
+    subtopicId: varchar("subtopic_id").references(() => subtopics.id, {
+      onDelete: "cascade",
+    }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_bookmarks_user_topic").on(table.userId, table.topicId),
+    index("idx_bookmarks_user_topic").on(table.userId, table.topicId),
+    index("idx_bookmarks_user_subtopic").on(table.userId, table.subtopicId),
   ],
 );
 
@@ -409,6 +482,10 @@ export const bookmarksRelations = relations(bookmarks, ({ one }) => ({
   topic: one(topics, {
     fields: [bookmarks.topicId],
     references: [topics.id],
+  }),
+  subtopic: one(subtopics, {
+    fields: [bookmarks.subtopicId],
+    references: [subtopics.id],
   }),
 }));
 
@@ -1604,6 +1681,8 @@ export type Book = typeof books.$inferSelect;
 export type Subject = typeof subjects.$inferSelect;
 export type Chapter = typeof chapters.$inferSelect;
 export type Topic = typeof topics.$inferSelect;
+export type Subtopic = typeof subtopics.$inferSelect;
+export type InsertSubtopic = typeof subtopics.$inferInsert;
 export type ContentBlock = typeof contentBlocks.$inferSelect;
 export type MCQ = typeof mcqs.$inferSelect;
 export type McqSource = typeof sources.$inferSelect;

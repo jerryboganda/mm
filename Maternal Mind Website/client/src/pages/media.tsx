@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import {
-  Download, Palette, FileImage, Stethoscope,
+  Download, Palette, FileImage,
   Copy, CheckCircle2, ExternalLink
 } from "lucide-react";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import {
   SectionLabel, ScrollReveal, BackgroundOrbs
 } from "@/components/glass-components";
 import { SEO } from "@/components/seo";
+import { MaternalMindLogo } from "@/components/logo";
 
 const brandColors = [
   { name: "Primary Cyan", hex: "#11a4d4", desc: "Primary brand, glows, buttons" },
@@ -54,9 +55,9 @@ export default function Media() {
         <div className="max-w-4xl mx-auto">
           <ScrollReveal>
             <GlassCard className="p-8 mb-8" glow>
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-md bg-[#11a4d4]/20 border border-[#11a4d4]/30 flex items-center justify-center shrink-0">
-                  <Stethoscope className="w-8 h-8 text-[#11a4d4]" />
+              <div className="flex items-start gap-5">
+                <div className="w-16 h-16 rounded-xl bg-[#11a4d4]/10 border border-[#11a4d4]/30 flex items-center justify-center shrink-0 p-2 shadow-[0_0_20px_rgba(17,164,212,0.25)]">
+                  <MaternalMindLogo size={48} glowing />
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-white mb-2">Maternal Mind</h2>
@@ -88,29 +89,69 @@ export default function Media() {
           <ScrollReveal delay={0.1}>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               {[
-                { label: "Logo - Dark Background", bg: "#101d22" },
-                { label: "Logo - Light Background", bg: "#f0f4f5" },
-                { label: "Logo Mark Only", bg: "#152228" },
+                {
+                  label: "Logo - Dark Background",
+                  bg: "#101d22",
+                  file: "/logo-full-white.png",
+                  fileName: "maternal-mind-logo-dark.png",
+                  format: "PNG / SVG",
+                  isLight: false,
+                  showWordmark: true,
+                },
+                {
+                  label: "Logo - Light Background",
+                  bg: "#f0f4f5",
+                  file: "/logo-full.png",
+                  fileName: "maternal-mind-logo-light.png",
+                  format: "PNG / SVG",
+                  isLight: true,
+                  showWordmark: true,
+                },
+                {
+                  label: "Logo Mark Only",
+                  bg: "#152228",
+                  file: "/logo-mark.png",
+                  fileName: "maternal-mind-mark.png",
+                  format: "PNG (512px)",
+                  isLight: false,
+                  showWordmark: false,
+                },
               ].map((variant, i) => (
-                <GlassCard key={i} className="overflow-hidden">
+                <GlassCard key={i} className="overflow-hidden group">
                   <div
-                    className="h-32 flex items-center justify-center"
+                    className="h-32 flex items-center justify-center px-4"
                     style={{ backgroundColor: variant.bg }}
                   >
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-md bg-[#11a4d4]/20 border border-[#11a4d4]/30 flex items-center justify-center">
-                        <Stethoscope className="w-4 h-4 text-[#11a4d4]" />
-                      </div>
-                      {i < 2 && (
-                        <span className={`text-base font-semibold tracking-tight ${i === 1 ? "text-[#101d22]" : "text-white"}`}>
+                    <div className="flex items-center gap-3">
+                      <MaternalMindLogo
+                        size={variant.showWordmark ? 36 : 48}
+                        variant={variant.isLight ? "light" : "default"}
+                        glowing={!variant.isLight}
+                      />
+                      {variant.showWordmark && (
+                        <span
+                          className={`text-lg font-semibold tracking-tight ${
+                            variant.isLight ? "text-[#101d22]" : "text-white"
+                          }`}
+                        >
                           Maternal Mind
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="p-3 flex items-center justify-between gap-2">
-                    <span className="text-xs text-white/60">{variant.label}</span>
-                    <Download className="w-3.5 h-3.5 text-white/30" />
+                  <div className="p-3.5 flex items-center justify-between gap-2 border-t border-white/5">
+                    <div>
+                      <span className="text-xs font-medium text-white/80 block">{variant.label}</span>
+                      <span className="text-[10px] text-white/40">{variant.format}</span>
+                    </div>
+                    <a
+                      href={variant.file}
+                      download={variant.fileName}
+                      className="p-1.5 rounded-lg bg-white/5 hover:bg-[#11a4d4]/20 text-white/60 hover:text-[#11a4d4] transition-colors"
+                      title={`Download ${variant.label}`}
+                    >
+                      <Download className="w-4 h-4" />
+                    </a>
                   </div>
                 </GlassCard>
               ))}
@@ -206,11 +247,11 @@ export default function Media() {
               <div className="space-y-4">
                 {[
                   "Use the full 'Maternal Mind' name in first reference; 'MM' abbreviation is acceptable in subsequent references.",
-                  "Always maintain clear space around the logo equal to the height of the stethoscope icon.",
+                  "Always maintain clear space around the logo equal to the height of the central emblem.",
                   "The logo must appear on dark backgrounds (#101d22 or darker) or light backgrounds (#f0f4f5 or lighter).",
                   "Do not alter logo colours, proportions, or add effects not specified in these guidelines.",
                   "When describing Maternal Mind, use 'educational platform' — never 'medical advice tool' or similar.",
-                  "For press inquiries, contact press@maternalmind.app.",
+                  "For press inquiries, contact maternalmind.help@gmail.com.",
                 ].map((guideline, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle2 className="w-4 h-4 text-[#11a4d4] shrink-0 mt-0.5" />
@@ -229,9 +270,9 @@ export default function Media() {
             <GlassPanel className="p-5 flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <p className="text-sm font-medium text-white">Press Contact</p>
-                <p className="text-sm text-white/50">press@maternalmind.app</p>
+                <p className="text-sm text-white/50">maternalmind.help@gmail.com</p>
               </div>
-              <a href="mailto:press@maternalmind.app">
+              <a href="mailto:maternalmind.help@gmail.com">
                 <NeonButton size="sm" data-testid="button-press-contact">
                   Contact Press Team <ExternalLink className="w-4 h-4" />
                 </NeonButton>

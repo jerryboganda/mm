@@ -10,6 +10,7 @@ import {
   Globe,
   Truck,
 } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import {
   GlassCard,
   GlassPanel,
@@ -125,32 +126,36 @@ export default function Support() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
               {[
                 {
-                  icon: MessageSquare,
-                  title: "WhatsApp Helpline",
+                  icon: SiWhatsapp,
+                  title: "WhatsApp",
                   desc: "+923360830836",
                   sub: "Instant Chat Support",
                   href: "https://wa.me/923360830836",
+                  color: "text-[#25D366]",
                 },
                 {
                   icon: Globe,
-                  title: "Official Website",
-                  desc: "maternalmind.com.pk",
-                  sub: "Online Portal & Portal Access",
+                  title: "Web",
+                  desc: "https://maternalmind.com.pk/",
+                  sub: "Official Online Portal",
                   href: "https://maternalmind.com.pk/",
+                  color: "text-[#11a4d4]",
                 },
                 {
                   icon: Mail,
-                  title: "Email Support",
+                  title: "Email",
                   desc: "maternalmind.help@gmail.com",
                   sub: "24/7 Academic & App Help",
                   href: "mailto:maternalmind.help@gmail.com",
+                  color: "text-[#11a4d4]",
                 },
                 {
                   icon: Truck,
-                  title: "Book Delivery Orders",
+                  title: "For Book Delivery",
                   desc: "+923212066562",
                   sub: "Hardcopy Book Dispatch",
                   href: "https://wa.me/923212066562",
+                  color: "text-[#22c55e]",
                 },
               ].map((item, i) => (
                 <a
@@ -163,11 +168,11 @@ export default function Support() {
                   <GlassCard
                     className="p-5 text-center glass-hover transition-all duration-300 h-full"
                   >
-                    <item.icon className="w-6 h-6 text-[#11a4d4] mx-auto mb-3" />
+                    <item.icon className={`w-6 h-6 ${item.color || "text-[#11a4d4]"} mx-auto mb-3`} />
                     <h3 className="text-sm font-medium text-white mb-1">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-white/70 font-mono">{item.desc}</p>
+                    <p className="text-sm text-white/70 font-mono truncate">{item.desc}</p>
                     <p className="text-xs text-white/40 mt-1">{item.sub}</p>
                   </GlassCard>
                 </a>

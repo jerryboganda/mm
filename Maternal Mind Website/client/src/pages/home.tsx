@@ -12,7 +12,8 @@ import {
   SectionLabel, ScrollReveal, BackgroundOrbs
 } from "@/components/glass-components";
 import { SEO } from "@/components/seo";
-import { openAppDownload } from "@/lib/app-links";
+import { openAppDownload, PLAY_STORE_URL } from "@/lib/app-links";
+import { SiGoogleplay } from "react-icons/si";
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -325,6 +326,27 @@ export default function Home() {
                   </GhostButton>
                 </Link>
               </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-white/50 mb-6">
+                <a
+                  href={PLAY_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-[#11a4d4]/40 hover:text-white transition-all text-white/70"
+                  data-testid="badge-hero-googleplay"
+                >
+                  <SiGoogleplay className="w-3.5 h-3.5 text-[#3DDC84]" />
+                  <span>Google Play (Official)</span>
+                </a>
+                <Link
+                  href="/download"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-[#11a4d4]/40 hover:text-white transition-all text-white/70"
+                  data-testid="badge-hero-direct-download"
+                >
+                  <Zap className="w-3.5 h-3.5 text-[#11a4d4]" />
+                  <span>Direct APK &amp; iOS</span>
+                </Link>
+              </div>
               {showWaitlistForm && (
                 <form onSubmit={handleWaitlistSubmit} className="max-w-md mx-auto mb-6" data-testid="form-hero-waitlist">
                   <div className="flex gap-2">
@@ -605,6 +627,21 @@ export default function Home() {
                   <GhostButton size="lg" data-testid="button-cta-pricing">
                     View Pricing
                   </GhostButton>
+                </Link>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-white/50 mt-5">
+                <a
+                  href={PLAY_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-white/60 hover:text-white transition-colors"
+                >
+                  <SiGoogleplay className="w-3.5 h-3.5 text-[#3DDC84]" />
+                  <span>Google Play (Official)</span>
+                </a>
+                <span className="text-white/20">•</span>
+                <Link href="/download" className="text-white/60 hover:text-white transition-colors">
+                  Direct APK &amp; iOS Package
                 </Link>
               </div>
             </GlassCard>

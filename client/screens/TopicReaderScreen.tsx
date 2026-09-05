@@ -67,6 +67,17 @@ interface TopicDetail {
   blocks: ContentBlock[];
   nextTopicId?: string;
   previousTopicId?: string;
+  subtopicId?: string;
+  topicId?: string;
+  topicTitle?: string;
+  previousSubtopicId?: string;
+  nextSubtopicId?: string;
+  allSubtopics?: {
+    id: string;
+    title: string;
+    order: number;
+    isCompleted: boolean;
+  }[];
 }
 
 /**
@@ -126,7 +137,13 @@ export default function TopicReaderScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<TopicReaderNavigationProp>();
   const route = useRoute<TopicReaderRouteProp>();
-  const { topicId, topicTitle } = route.params;
+  const routeParams = (route.params || {}) as any;
+  const subtopicId = routeParams.subtopicId as string | undefined;
+  const subtopicTitle = routeParams.subtopicTitle as string | undefined;
+  const topicId = routeParams.topicId as string | undefined;
+  const topicTitle = routeParams.topicTitle as string | undefined;
+
+  const [subtopicsModalVisible, setSubtopicsModalVisible] = useState(false);
   const [viewerImage, setViewerImage] = useState<string | null>(null);
   const [reportVisible, setReportVisible] = useState(false);
   const [reportType, setReportType] = useState<string>("factual_error");
@@ -145,13 +162,29 @@ export default function TopicReaderScreen() {
     anchorSpacing: Spacing.lg,
   });
 
+  const queryKey = subtopicId
+    ? ["/api/subtopics", subtopicId]
+    : ["/api/topics", topicId || ""];
+
   const {
     data: topic,
     isLoading,
     error,
   } = useQuery<TopicDetail>({
-    queryKey: ["/api/topics", topicId],
+    queryKey,
+    enabled: Boolean(subtopicId || topicId),
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
   });
+
+  useEffect(() => {
+    if (topic?.title) {
+      navigation.setOptions({
+        headerTitle: topic.title,
+      });
+    }
+  }, [topic?.title, navigation]);
 
   useEffect(() => {
     if (error) {
@@ -394,9 +427,14 @@ export default function TopicReaderScreen() {
     [tableWebViewCss],
   );
 
+  const currentSubtopicId = subtopicId || topic?.subtopicId;
+  const currentTopicId = topicId || topic?.topicId || topic?.id;
+
   const bookmarkMutation = useMutation({
     mutationFn: async () => {
-      const route = `/api/topics/${topicId}/bookmark`;
+      const route = currentSubtopicId
+        ? `/api/subtopics/${currentSubtopicId}/bookmark`
+        : `/api/topics/${currentTopicId}/bookmark`;
       const queued = await enqueueMutationIfOffline("POST", route);
       if (!queued) {
         await apiRequest("POST", route);
@@ -404,16 +442,13 @@ export default function TopicReaderScreen() {
     },
     onMutate: async () => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
+      await queryClient.cancelQueries({ queryKey });
       // Snapshot previous value
-      const previous = queryClient.getQueryData<TopicDetail>([
-        "/api/topics",
-        topicId,
-      ]);
+      const previous = queryClient.getQueryData<TopicDetail>(queryKey);
       const wasBookmarked = previous?.isBookmarked ?? false;
       // Optimistic toggle
       if (previous) {
-        queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
+        queryClient.setQueryData<TopicDetail>(queryKey, {
           ...previous,
           isBookmarked: !previous.isBookmarked,
         });
@@ -423,12 +458,17 @@ export default function TopicReaderScreen() {
     onError: (_err, _vars, context) => {
       // Rollback
       if (context?.previous) {
-        queryClient.setQueryData(["/api/topics", topicId], context.previous);
+        queryClient.setQueryData(queryKey, context.previous);
       }
     },
     onSettled: (_data, _error, _vars, context) => {
       if (!isOffline) {
-        queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+        queryClient.invalidateQueries({ queryKey });
+        if (currentTopicId) {
+          queryClient.invalidateQueries({
+            queryKey: ["/api/topics", currentTopicId],
+          });
+        }
       }
       // Adding bookmark → success haptic; removing → light tap
       if (context?.wasBookmarked) {
@@ -442,20 +482,19 @@ export default function TopicReaderScreen() {
 
   const markCompleteMutation = useMutation({
     mutationFn: async () => {
-      const route = `/api/topics/${topicId}/complete`;
+      const route = currentSubtopicId
+        ? `/api/subtopics/${currentSubtopicId}/complete`
+        : `/api/topics/${currentTopicId}/complete`;
       const queued = await enqueueMutationIfOffline("POST", route);
       if (!queued) {
         await apiRequest("POST", route);
       }
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
-      const previous = queryClient.getQueryData<TopicDetail>([
-        "/api/topics",
-        topicId,
-      ]);
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<TopicDetail>(queryKey);
       if (previous) {
-        queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
+        queryClient.setQueryData<TopicDetail>(queryKey, {
           ...previous,
           isCompleted: true,
         });
@@ -464,13 +503,18 @@ export default function TopicReaderScreen() {
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["/api/topics", topicId], context.previous);
+        queryClient.setQueryData(queryKey, context.previous);
       }
     },
     onSettled: () => {
       if (!isOffline) {
-        queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+        queryClient.invalidateQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+        if (currentTopicId) {
+          queryClient.invalidateQueries({
+            queryKey: ["/api/topics", currentTopicId],
+          });
+        }
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       feedback.playSound("success");
@@ -479,20 +523,19 @@ export default function TopicReaderScreen() {
 
   const markUncompleteMutation = useMutation({
     mutationFn: async () => {
-      const route = `/api/topics/${topicId}/uncomplete`;
+      const route = currentSubtopicId
+        ? `/api/subtopics/${currentSubtopicId}/uncomplete`
+        : `/api/topics/${currentTopicId}/uncomplete`;
       const queued = await enqueueMutationIfOffline("POST", route);
       if (!queued) {
         await apiRequest("POST", route);
       }
     },
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["/api/topics", topicId] });
-      const previous = queryClient.getQueryData<TopicDetail>([
-        "/api/topics",
-        topicId,
-      ]);
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<TopicDetail>(queryKey);
       if (previous) {
-        queryClient.setQueryData<TopicDetail>(["/api/topics", topicId], {
+        queryClient.setQueryData<TopicDetail>(queryKey, {
           ...previous,
           isCompleted: false,
         });
@@ -501,13 +544,18 @@ export default function TopicReaderScreen() {
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["/api/topics", topicId], context.previous);
+        queryClient.setQueryData(queryKey, context.previous);
       }
     },
     onSettled: () => {
       if (!isOffline) {
-        queryClient.invalidateQueries({ queryKey: ["/api/topics", topicId] });
+        queryClient.invalidateQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey: ["/api/progress"] });
+        if (currentTopicId) {
+          queryClient.invalidateQueries({
+            queryKey: ["/api/topics", currentTopicId],
+          });
+        }
       }
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       feedback.playSound("tap");
@@ -520,8 +568,8 @@ export default function TopicReaderScreen() {
         throw new Error("OFFLINE");
       }
       await apiRequest("POST", "/api/content-reports", {
-        contentType: "topic",
-        contentId: topicId,
+        contentType: currentSubtopicId ? "subtopic" : "topic",
+        contentId: currentSubtopicId || currentTopicId || "",
         reportType,
         description: reportDescription,
       });
@@ -561,7 +609,7 @@ export default function TopicReaderScreen() {
           <ResponsiveBookDocument
             key={block.id}
             content={block.content}
-            topicId={topicId}
+            topicId={currentTopicId || currentSubtopicId || ""}
           />
         );
       case "heading":
@@ -747,9 +795,41 @@ export default function TopicReaderScreen() {
         }}
       >
         <View style={styles.header}>
-          <ThemedText type="h2" style={styles.title} accessibilityRole="header">
-            {topic?.title || topicTitle}
-          </ThemedText>
+          <View style={{ flex: 1, marginRight: Spacing.sm }}>
+            {topic?.topicTitle ? (
+              <ThemedText
+                style={[styles.topicBreadcrumb, { color: theme.primary }]}
+              >
+                {topic.topicTitle}
+              </ThemedText>
+            ) : null}
+            <ThemedText type="h2" style={styles.title} accessibilityRole="header">
+              {topic?.title || subtopicTitle || topicTitle}
+            </ThemedText>
+            {topic?.allSubtopics && topic.allSubtopics.length > 1 ? (
+              <Pressable
+                onPress={() => setSubtopicsModalVisible(true)}
+                style={[
+                  styles.subtopicSelectorButton,
+                  {
+                    backgroundColor: theme.glassHover,
+                    borderColor: theme.glassBorder,
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel="View all subtopics"
+              >
+                <Feather name="list" size={13} color={theme.primary} />
+                <ThemedText
+                  style={[styles.subtopicSelectorText, { color: theme.text }]}
+                  numberOfLines={1}
+                >
+                  Subtopic {topic.allSubtopics.findIndex((s) => s.id === (currentSubtopicId || topic.id)) + 1} of {topic.allSubtopics.length}
+                </ThemedText>
+                <Feather name="chevron-down" size={13} color={theme.textSecondary} />
+              </Pressable>
+            ) : null}
+          </View>
           <Pressable
             onPress={() => bookmarkMutation.mutate()}
             style={styles.bookmarkButton}
@@ -943,7 +1023,29 @@ export default function TopicReaderScreen() {
           { bottom: bottomLayout.bottomAnchorOffset },
         ]}
       >
-        {topic?.previousTopicId ? (
+        {currentSubtopicId && topic?.previousSubtopicId ? (
+          <Pressable
+            style={[
+              styles.navButton,
+              { backgroundColor: theme.glass, borderColor: theme.glassBorder },
+            ]}
+            onPress={() =>
+              navigation.replace("TopicReader", {
+                subtopicId: topic.previousSubtopicId!,
+                subtopicTitle: "",
+                topicId: currentTopicId,
+                topicTitle: topic?.topicTitle || topicTitle,
+              })
+            }
+            accessibilityRole="button"
+            accessibilityLabel="Previous subtopic"
+          >
+            <Feather name="chevron-left" size={24} color={theme.text} />
+            <ThemedText style={[styles.navButtonText, { color: theme.text }]}>
+              Previous
+            </ThemedText>
+          </Pressable>
+        ) : !currentSubtopicId && topic?.previousTopicId ? (
           <Pressable
             style={[
               styles.navButton,
@@ -966,7 +1068,30 @@ export default function TopicReaderScreen() {
         ) : (
           <View style={styles.navButtonPlaceholder} />
         )}
-        {topic?.nextTopicId ? (
+        {currentSubtopicId && topic?.nextSubtopicId ? (
+          <Pressable
+            style={[
+              styles.navButton,
+              styles.navButtonPrimary,
+              { backgroundColor: theme.primary, borderColor: theme.primary },
+            ]}
+            onPress={() =>
+              navigation.replace("TopicReader", {
+                subtopicId: topic.nextSubtopicId!,
+                subtopicTitle: "",
+                topicId: currentTopicId,
+                topicTitle: topic?.topicTitle || topicTitle,
+              })
+            }
+            accessibilityRole="button"
+            accessibilityLabel="Next subtopic"
+          >
+            <ThemedText style={styles.navButtonTextPrimary}>
+              Next Subtopic
+            </ThemedText>
+            <Feather name="chevron-right" size={24} color="#fff" />
+          </Pressable>
+        ) : !currentSubtopicId && topic?.nextTopicId ? (
           <Pressable
             style={[
               styles.navButton,
@@ -995,6 +1120,91 @@ export default function TopicReaderScreen() {
         imageUri={viewerImage || ""}
         onClose={() => setViewerImage(null)}
       />
+
+      {/* Subtopics List Modal */}
+      <AppModalSurface
+        visible={subtopicsModalVisible}
+        variant="sheet"
+        onClose={() => setSubtopicsModalVisible(false)}
+        dismissible
+        scrollable
+        accessibilityLabel="All Subtopics"
+      >
+        <View style={styles.modalHeader}>
+          <ThemedText type="h3" accessibilityRole="header">
+            {topic?.topicTitle || topicTitle || "Subtopics"}
+          </ThemedText>
+        </View>
+        <View style={{ gap: Spacing.sm, marginTop: Spacing.md }}>
+          {(topic?.allSubtopics || []).map((sub, idx) => {
+            const isCurrent = sub.id === (currentSubtopicId || topic?.id);
+            return (
+              <Pressable
+                key={sub.id}
+                onPress={() => {
+                  setSubtopicsModalVisible(false);
+                  if (!isCurrent) {
+                    navigation.replace("TopicReader", {
+                      subtopicId: sub.id,
+                      subtopicTitle: sub.title,
+                      topicId: currentTopicId,
+                      topicTitle: topic?.topicTitle || topicTitle,
+                    });
+                  }
+                }}
+                style={[
+                  styles.modalSubtopicItem,
+                  {
+                    backgroundColor: isCurrent
+                      ? `${theme.primary}20`
+                      : theme.backgroundSecondary,
+                    borderColor: isCurrent ? theme.primary : theme.glassBorder,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.modalSubtopicNum,
+                    {
+                      backgroundColor: isCurrent
+                        ? theme.primary
+                        : `${theme.text}15`,
+                    },
+                  ]}
+                >
+                  <ThemedText
+                    style={{
+                      color: isCurrent ? "#fff" : theme.textSecondary,
+                      fontSize: 12,
+                      fontWeight: "700",
+                    }}
+                  >
+                    {idx + 1}
+                  </ThemedText>
+                </View>
+                <ThemedText
+                  style={{
+                    flex: 1,
+                    fontSize: 14,
+                    fontWeight: isCurrent ? "700" : "500",
+                    color: isCurrent ? theme.primary : theme.text,
+                  }}
+                  numberOfLines={2}
+                >
+                  {sub.title}
+                </ThemedText>
+                {sub.isCompleted ? (
+                  <Feather
+                    name="check-circle"
+                    size={16}
+                    color={theme.success}
+                  />
+                ) : null}
+              </Pressable>
+            );
+          })}
+        </View>
+      </AppModalSurface>
 
       {/* Report Error Modal */}
       <AppModalSurface
@@ -1313,5 +1523,43 @@ const styles = StyleSheet.create({
   },
   sourceText: {
     fontSize: 12,
+  },
+  topicBreadcrumb: {
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    marginBottom: Spacing.xs,
+  },
+  subtopicSelectorButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    borderWidth: 1,
+    marginTop: Spacing.xs,
+    alignSelf: "flex-start",
+  },
+  subtopicSelectorText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  modalSubtopicItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    marginBottom: Spacing.sm,
+    gap: Spacing.sm,
+  },
+  modalSubtopicNum: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

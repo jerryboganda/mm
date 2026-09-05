@@ -10,6 +10,7 @@ import { useScreenOptions } from "@/hooks/useScreenOptions";
 import LearnScreen from "@/screens/LearnScreen";
 import ChaptersScreen from "@/screens/ChaptersScreen";
 import TopicsScreen from "@/screens/TopicsScreen";
+import SubtopicsScreen from "@/screens/SubtopicsScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import SearchScreen from "@/screens/SearchScreen";
 import { HeaderTitle } from "@/components/HeaderTitle";
@@ -20,8 +21,23 @@ import { useMobileContent } from "@/lib/mobile-content";
 export type LearnStackParamList = {
   LearnHome: undefined;
   Chapters: { bookId: string; bookTitle: string };
-  Topics: { chapterId: string; chapterTitle: string; bookId: string };
-  TopicReader: { topicId: string; topicTitle: string };
+  Topics: {
+    bookId: string;
+    bookTitle: string;
+    chapterId?: string;
+    chapterTitle?: string;
+  };
+  Subtopics: {
+    topicId: string;
+    topicTitle: string;
+    bookId?: string;
+  };
+  TopicReader: {
+    subtopicId?: string;
+    subtopicTitle?: string;
+    topicId?: string;
+    topicTitle?: string;
+  };
   Search: undefined;
 };
 
@@ -67,21 +83,28 @@ export default function LearnStackNavigator() {
         name="Chapters"
         component={ChaptersScreen}
         options={({ route }) => ({
-          headerTitle: route.params.bookTitle,
+          headerTitle: route.params?.bookTitle || "Chapters",
         })}
       />
       <Stack.Screen
         name="Topics"
         component={TopicsScreen}
         options={({ route }) => ({
-          headerTitle: route.params.chapterTitle,
+          headerTitle: route.params.bookTitle || route.params.chapterTitle || "Topics",
+        })}
+      />
+      <Stack.Screen
+        name="Subtopics"
+        component={SubtopicsScreen}
+        options={({ route }) => ({
+          headerTitle: route.params.topicTitle || "Subtopics",
         })}
       />
       <Stack.Screen
         name="TopicReader"
         component={TopicReaderScreen}
         options={({ route }) => ({
-          headerTitle: route.params.topicTitle,
+          headerTitle: route.params.subtopicTitle || route.params.topicTitle || "Reader",
         })}
       />
       <Stack.Screen

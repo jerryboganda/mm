@@ -176,11 +176,11 @@ export default function SearchScreen() {
 
     switch (item.type) {
       case "book":
-        // Navigate to the Library tab's Chapters screen
+        // Navigate to the Library tab's Topics screen (Book > Topic)
         navigation.navigate("Main", {
           screen: "LibraryTab",
           params: {
-            screen: "Chapters",
+            screen: "Topics",
             params: {
               bookId: item.id,
               bookTitle: item.title,
@@ -203,9 +203,11 @@ export default function SearchScreen() {
         } as any);
         break;
       case "topic":
-        navigation.navigate("TopicReader", {
+        // Navigate to Subtopics (Topic > Subtopics)
+        navigation.navigate("Subtopics", {
           topicId: item.id,
           topicTitle: item.title,
+          bookId: item.bookId || "",
         });
         break;
     }

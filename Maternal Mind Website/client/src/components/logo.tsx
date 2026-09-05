@@ -4,10 +4,18 @@ interface LogoProps {
   size?: number;
   className?: string;
   glowing?: boolean;
+  variant?: "default" | "light";
 }
 
-export function MaternalMindLogo({ size = 32, className, glowing = false }: LogoProps) {
-  const id = glowing ? "lg" : "sm";
+export function MaternalMindLogo({
+  size = 32,
+  className,
+  glowing = false,
+  variant = "default",
+}: LogoProps) {
+  const id = glowing ? "glow" : variant === "light" ? "light" : "def";
+  const isLight = variant === "light";
+
   return (
     <svg
       width={size}
@@ -15,24 +23,41 @@ export function MaternalMindLogo({ size = 32, className, glowing = false }: Logo
       viewBox="0 0 120 120"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn(glowing && "drop-shadow-[0_0_20px_rgba(17,164,212,0.5)]", className)}
+      className={cn(
+        glowing && "drop-shadow-[0_0_24px_rgba(0,229,255,0.6)]",
+        className
+      )}
       data-testid="logo-mark"
     >
       <defs>
-        <radialGradient id={`logoGlow-${id}`} cx="50%" cy="35%" r="55%">
-          <stop offset="0%" stopColor="#11a4d4" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#11a4d4" stopOpacity="0" />
+        <radialGradient id={`neuralGlow-${id}`} cx="50%" cy="45%" r="42%">
+          <stop
+            offset="0%"
+            stopColor={isLight ? "#00b4d8" : "#00e5ff"}
+            stopOpacity={isLight ? 0.35 : glowing ? 0.6 : 0.45}
+          />
+          <stop
+            offset="100%"
+            stopColor={isLight ? "#00b4d8" : "#00e5ff"}
+            stopOpacity="0"
+          />
         </radialGradient>
-        <linearGradient id={`grad-${id}`} x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#11a4d4" />
-          <stop offset="100%" stopColor="#0c7fa6" />
+        <linearGradient id={`bodyGrad-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          {isLight ? (
+            <>
+              <stop offset="0%" stopColor="#192e4a" />
+              <stop offset="100%" stopColor="#13243a" />
+            </>
+          ) : (
+            <>
+              <stop offset="0%" stopColor="#22476e" />
+              <stop offset="50%" stopColor="#173454" />
+              <stop offset="100%" stopColor="#0f2238" />
+            </>
+          )}
         </linearGradient>
-        <linearGradient id={`fill-${id}`} x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#11a4d4" stopOpacity="0.12" />
-          <stop offset="100%" stopColor="#0c7fa6" stopOpacity="0.04" />
-        </linearGradient>
-        <filter id={`glow-${id}`}>
-          <feGaussianBlur stdDeviation="2" result="blur" />
+        <filter id={`nodeGlow-${id}`}>
+          <feGaussianBlur stdDeviation={glowing ? "2.5" : "1.8"} result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -40,86 +65,90 @@ export function MaternalMindLogo({ size = 32, className, glowing = false }: Logo
         </filter>
       </defs>
 
-      {glowing && <circle cx="60" cy="40" r="55" fill={`url(#logoGlow-${id})`} />}
-
+      {/* Anatomical Uterus Arch Body */}
       <path
-        d="M 60 6
-           C 78 6, 94 14, 100 28
-           C 106 42, 102 52, 96 56
-           L 24 56
-           C 18 52, 14 42, 20 28
-           C 26 14, 42 6, 60 6 Z"
-        fill={`url(#fill-${id})`}
-        stroke={`url(#grad-${id})`}
-        strokeWidth="2"
+        d="M 55.14 17.73 C 53.27 17.98, 49.15 18.47, 46.16 19.22 C 43.17 19.97, 40.17 20.84, 37.18 22.22 C 34.19 23.59, 31.19 25.33, 28.20 27.45 C 25.21 29.57, 21.78 32.19, 19.22 34.94 C 16.67 37.68, 14.48 40.92, 12.86 43.91 C 11.24 46.91, 10.24 49.90, 9.50 52.89 C 8.75 55.88, 8.44 58.88, 8.37 61.87 C 8.31 64.86, 8.50 67.86, 9.12 70.85 C 9.75 73.84, 10.62 76.83, 12.12 79.83 C 13.61 82.82, 15.61 86.37, 18.10 88.81 C 20.59 91.24, 24.15 93.67, 27.08 94.42 C 30.01 95.17, 34.19 94.98, 35.68 93.29 C 37.18 91.61, 37.24 87.12, 36.06 84.32 C 34.87 81.51, 31.32 78.39, 28.58 76.46 C 25.83 74.53, 21.41 74.84, 19.60 72.72 C 17.79 70.60, 17.66 66.73, 17.73 63.74 C 17.79 60.75, 18.35 57.44, 19.97 54.76 C 21.59 52.08, 24.83 48.22, 27.45 47.65 C 30.07 47.09, 34.00 49.28, 35.68 51.40 C 37.37 53.52, 36.93 57.38, 37.55 60.37 C 38.18 63.37, 38.43 66.36, 39.42 69.35 C 40.42 72.35, 41.79 75.34, 43.54 78.33 C 45.29 81.32, 48.40 84.32, 49.90 87.31 C 51.40 90.30, 51.02 93.92, 52.52 96.29 C 54.01 98.66, 56.45 101.21, 58.88 101.53 C 61.31 101.84, 65.42 100.22, 67.11 98.16 C 68.79 96.10, 67.67 92.17, 68.98 89.18 C 70.29 86.19, 73.22 83.19, 74.96 80.20 C 76.71 77.21, 78.33 74.22, 79.45 71.22 C 80.58 68.23, 81.07 65.24, 81.70 62.24 C 82.32 59.25, 81.76 55.76, 83.19 53.27 C 84.63 50.77, 87.75 47.34, 90.30 47.28 C 92.86 47.22, 96.60 50.46, 98.53 52.89 C 100.47 55.32, 101.46 58.88, 101.90 61.87 C 102.34 64.86, 102.65 68.54, 101.15 70.85 C 99.65 73.16, 95.66 73.78, 92.92 75.71 C 90.18 77.65, 86.37 79.83, 84.69 82.45 C 83.01 85.06, 81.82 89.37, 82.82 91.42 C 83.82 93.48, 87.87 94.92, 90.68 94.79 C 93.48 94.67, 97.04 92.86, 99.65 90.68 C 102.27 88.49, 104.64 84.69, 106.39 81.70 C 108.13 78.71, 109.32 75.71, 110.13 72.72 C 110.94 69.73, 111.19 66.73, 111.25 63.74 C 111.31 60.75, 111.13 57.76, 110.50 54.76 C 109.88 51.77, 108.94 48.78, 107.51 45.78 C 106.08 42.79, 104.27 39.67, 101.90 36.81 C 99.53 33.94, 96.23 30.82, 93.29 28.58 C 90.36 26.33, 87.31 24.83, 84.32 23.34 C 81.32 21.84, 78.33 20.47, 75.34 19.60 C 72.35 18.72, 69.35 18.41, 66.36 18.10 C 63.37 17.79, 59.25 17.79, 57.38 17.73 C 55.51 17.66, 57.01 17.48, 55.14 17.73 Z"
+        fill={`url(#bodyGrad-${id})`}
+        stroke={isLight ? "none" : "#38bdf8"}
+        strokeWidth={isLight ? 0 : 1.2}
         strokeLinejoin="round"
       />
 
-      <path
-        d="M 22 42
-           C 16 48, 8 58, 6 68
-           C 4 78, 10 84, 18 82
-           C 24 80, 28 74, 30 68
-           C 34 58, 38 50, 40 44
-           C 36 40, 28 38, 22 42 Z"
-        fill={`url(#fill-${id})`}
-        stroke={`url(#grad-${id})`}
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
+      {/* Radial Glow behind Neural Core */}
+      <circle cx="60" cy="52" r="26" fill={`url(#neuralGlow-${id})`} />
 
-      <path
-        d="M 98 42
-           C 104 48, 112 58, 114 68
-           C 116 78, 110 84, 102 82
-           C 96 80, 92 74, 90 68
-           C 86 58, 82 50, 80 44
-           C 84 40, 92 38, 98 42 Z"
-        fill={`url(#fill-${id})`}
-        stroke={`url(#grad-${id})`}
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-
-      <path
-        d="M 42 50
-           C 44 58, 48 68, 52 78
-           C 55 86, 58 96, 60 106
-           C 62 96, 65 86, 68 78
-           C 72 68, 76 58, 78 50 Z"
-        fill={`url(#fill-${id})`}
-        stroke={`url(#grad-${id})`}
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-
-      <g filter={`url(#glow-${id})`} opacity="0.7">
-        <line x1="60" y1="14" x2="74" y2="22" stroke="#11a4d4" strokeWidth="1" opacity="0.6" />
-        <line x1="74" y1="22" x2="74" y2="40" stroke="#11a4d4" strokeWidth="1" opacity="0.6" />
-        <line x1="74" y1="40" x2="60" y2="48" stroke="#11a4d4" strokeWidth="1" opacity="0.6" />
-        <line x1="60" y1="48" x2="46" y2="40" stroke="#11a4d4" strokeWidth="1" opacity="0.6" />
-        <line x1="46" y1="40" x2="46" y2="22" stroke="#11a4d4" strokeWidth="1" opacity="0.6" />
-        <line x1="46" y1="22" x2="60" y2="14" stroke="#11a4d4" strokeWidth="1" opacity="0.6" />
-        <line x1="60" y1="14" x2="60" y2="48" stroke="#11a4d4" strokeWidth="0.8" opacity="0.4" />
-        <line x1="46" y1="22" x2="74" y2="40" stroke="#11a4d4" strokeWidth="0.8" opacity="0.4" />
-        <line x1="74" y1="22" x2="46" y2="40" stroke="#11a4d4" strokeWidth="0.8" opacity="0.4" />
-        <line x1="60" y1="31" x2="46" y2="22" stroke="#11a4d4" strokeWidth="0.8" opacity="0.3" />
-        <line x1="60" y1="31" x2="74" y2="22" stroke="#11a4d4" strokeWidth="0.8" opacity="0.3" />
-        <line x1="60" y1="31" x2="46" y2="40" stroke="#11a4d4" strokeWidth="0.8" opacity="0.3" />
-        <line x1="60" y1="31" x2="74" y2="40" stroke="#11a4d4" strokeWidth="0.8" opacity="0.3" />
-        <line x1="60" y1="31" x2="60" y2="14" stroke="#11a4d4" strokeWidth="0.8" opacity="0.3" />
-        <line x1="60" y1="31" x2="60" y2="48" stroke="#11a4d4" strokeWidth="0.8" opacity="0.3" />
+      {/* Neural Synapse Connections */}
+      <g
+        stroke={isLight ? "#00b4d8" : "#38bdf8"}
+        strokeWidth={isLight ? 1.4 : 1.2}
+        opacity={isLight ? 0.95 : 0.9}
+        filter={`url(#nodeGlow-${id})`}
+      >
+        <line x1="60.19" y1="38.82" x2="51.11" y2="46.01" />
+        <line x1="60.19" y1="38.82" x2="70.4" y2="44.12" />
+        <line x1="60.19" y1="38.82" x2="60.19" y2="53.19" />
+        <line x1="51.11" y1="46.01" x2="45.06" y2="53.95" />
+        <line x1="51.11" y1="46.01" x2="54.14" y2="53.57" />
+        <line x1="51.11" y1="46.01" x2="60.19" y2="53.19" />
+        <line x1="70.4" y1="44.12" x2="66.24" y2="52.44" />
+        <line x1="70.4" y1="44.12" x2="74.94" y2="53.57" />
+        <line x1="70.4" y1="44.12" x2="60.19" y2="53.19" />
+        <line x1="45.06" y1="53.95" x2="54.14" y2="53.57" />
+        <line x1="45.06" y1="53.95" x2="49.98" y2="65.29" />
+        <line x1="54.14" y1="53.57" x2="60.19" y2="53.19" />
+        <line x1="54.14" y1="53.57" x2="52.63" y2="57.73" />
+        <line x1="60.19" y1="53.19" x2="66.24" y2="52.44" />
+        <line x1="60.19" y1="53.19" x2="52.63" y2="57.73" />
+        <line x1="60.19" y1="53.19" x2="63.97" y2="59.24" />
+        <line x1="60.19" y1="53.19" x2="60.19" y2="69.08" />
+        <line x1="66.24" y1="52.44" x2="74.94" y2="53.57" />
+        <line x1="66.24" y1="52.44" x2="63.97" y2="59.24" />
+        <line x1="74.94" y1="53.57" x2="67.0" y2="62.65" />
+        <line x1="52.63" y1="57.73" x2="49.98" y2="65.29" />
+        <line x1="52.63" y1="57.73" x2="60.19" y2="69.08" />
+        <line x1="63.97" y1="59.24" x2="67.0" y2="62.65" />
+        <line x1="63.97" y1="59.24" x2="60.19" y2="69.08" />
+        <line x1="49.98" y1="65.29" x2="60.19" y2="69.08" />
+        <line x1="67.0" y1="62.65" x2="60.19" y2="69.08" />
       </g>
 
-      <g filter={`url(#glow-${id})`}>
-        <circle cx="60" cy="31" r="3.5" fill="#11a4d4" />
-        <circle cx="60" cy="31" r="5.5" fill="#11a4d4" opacity="0.15" />
-        <circle cx="60" cy="14" r="2.5" fill="#11a4d4" opacity="0.9" />
-        <circle cx="74" cy="22" r="2.5" fill="#11a4d4" opacity="0.9" />
-        <circle cx="74" cy="40" r="2.5" fill="#11a4d4" opacity="0.9" />
-        <circle cx="60" cy="48" r="2.5" fill="#11a4d4" opacity="0.9" />
-        <circle cx="46" cy="40" r="2.5" fill="#11a4d4" opacity="0.9" />
-        <circle cx="46" cy="22" r="2.5" fill="#11a4d4" opacity="0.9" />
+      {/* Constellation Nodes */}
+      <g filter={`url(#nodeGlow-${id})`}>
+        {/* Central Luminous Nucleus */}
+        <circle cx="60.19" cy="53.19" r="4.2" fill="#ffffff" />
+        <circle
+          cx="60.19"
+          cy="53.19"
+          r="7.2"
+          fill={isLight ? "#00b4d8" : "#00e5ff"}
+          opacity="0.45"
+        />
+
+        {/* Outer 12 Constellation Nodes */}
+        <circle cx="60.19" cy="38.82" r="2.5" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="60.19" cy="38.82" r="1.3" fill="#ffffff" />
+        <circle cx="51.11" cy="46.01" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="51.11" cy="46.01" r="1.4" fill="#ffffff" />
+        <circle cx="70.4" cy="44.12" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="70.4" cy="44.12" r="1.4" fill="#ffffff" />
+        <circle cx="45.06" cy="53.95" r="2.5" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="45.06" cy="53.95" r="1.3" fill="#ffffff" />
+        <circle cx="54.14" cy="53.57" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="54.14" cy="53.57" r="1.4" fill="#ffffff" />
+        <circle cx="66.24" cy="52.44" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="66.24" cy="52.44" r="1.4" fill="#ffffff" />
+        <circle cx="74.94" cy="53.57" r="2.5" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="74.94" cy="53.57" r="1.3" fill="#ffffff" />
+        <circle cx="52.63" cy="57.73" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="52.63" cy="57.73" r="1.4" fill="#ffffff" />
+        <circle cx="63.97" cy="59.24" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="63.97" cy="59.24" r="1.4" fill="#ffffff" />
+        <circle cx="49.98" cy="65.29" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="49.98" cy="65.29" r="1.4" fill="#ffffff" />
+        <circle cx="67.0" cy="62.65" r="2.8" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="67.0" cy="62.65" r="1.4" fill="#ffffff" />
+        <circle cx="60.19" cy="69.08" r="2.5" fill={isLight ? "#00b4d8" : "#00e5ff"} />
+        <circle cx="60.19" cy="69.08" r="1.3" fill="#ffffff" />
       </g>
     </svg>
   );

@@ -7,6 +7,7 @@ import BooksPage from "./pages/BooksPage";
 import SubjectsPage from "./pages/SubjectsPage";
 import ChaptersPage from "./pages/ChaptersPage";
 import TopicsPage from "./pages/TopicsPage";
+import SubtopicsPage from "./pages/SubtopicsPage";
 import TopicEditorPage from "./pages/TopicEditorPage";
 import McqsPage from "./pages/McqsPage";
 import MetadataPage from "./pages/MetadataPage";
@@ -60,11 +61,23 @@ export default function App() {
                   element={<ChaptersPage />}
                 />
                 <Route
+                  path="/books/:bookId/topics"
+                  element={<TopicsPage />}
+                />
+                <Route
                   path="/chapters/:chapterId/topics"
                   element={<TopicsPage />}
                 />
                 <Route
+                  path="/topics/:topicId/subtopics"
+                  element={<SubtopicsPage />}
+                />
+                <Route
                   path="/topics/:topicId/edit"
+                  element={<TopicEditorPage />}
+                />
+                <Route
+                  path="/subtopics/:subtopicId/edit"
                   element={<TopicEditorPage />}
                 />
                 <Route path="/mcqs" element={<McqsPage />} />
