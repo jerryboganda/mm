@@ -27,6 +27,7 @@ interface Book {
   title: string;
   description: string;
   chaptersCount: number;
+  topicsCount?: number;
   progress: number;
   imageUrl?: string;
   isPremium?: boolean;
@@ -60,16 +61,17 @@ export default function LearnScreen() {
 
   const renderBook = ({ item, index }: { item: Book; index: number }) => {
     const isPaid = Boolean(item.isPaid || item.isPremium);
+    const count = item.topicsCount ?? item.chaptersCount;
 
     return (
       <GlassCard
         title={item.title}
-        subtitle={`${item.chaptersCount} Chapters`}
+        subtitle={`${count} ${count === 1 ? "Topic" : "Topics"}`}
         density="compact"
         titleNumberOfLines={2}
         subtitleNumberOfLines={1}
         onPress={() =>
-          navigation.navigate("Chapters", {
+          navigation.navigate("Topics", {
             bookId: item.id,
             bookTitle: item.title,
           })

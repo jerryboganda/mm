@@ -1,6 +1,6 @@
 import { Link } from "wouter";
-import { Mail, ArrowRight } from "lucide-react";
-import { SiLinkedin, SiX } from "react-icons/si";
+import { Mail, ArrowRight, Globe, Truck } from "lucide-react";
+import { SiLinkedin, SiX, SiWhatsapp } from "react-icons/si";
 import { GlowLink, NeonButton } from "./glass-components";
 import { useState } from "react";
 import { MaternalMindLogo } from "./logo";
@@ -11,6 +11,7 @@ const footerLinks = {
     { label: "How It Works", href: "/how-it-works" },
     { label: "Pricing", href: "/pricing" },
     { label: "For Institutions", href: "/institutions" },
+    { label: "Download App", href: "/download" },
   ],
   Resources: [
     { label: "MRCOG Part 1", href: "/resources/mrcog-part-1" },
@@ -131,6 +132,16 @@ export function Footer() {
 
             <div className="flex items-center gap-3">
               <a
+                href="https://wa.me/923360830836"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-[#25D366] hover:border-[#25D366]/30 transition-all"
+                data-testid="link-whatsapp"
+                aria-label="WhatsApp"
+              >
+                <SiWhatsapp className="w-4 h-4" />
+              </a>
+              <a
                 href="mailto:maternalmind.help@gmail.com"
                 className="w-9 h-9 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-[#11a4d4] hover:border-[#11a4d4]/30 transition-all"
                 data-testid="link-email"
@@ -183,6 +194,72 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/5">
+          <div className="mb-8">
+            <h3 className="text-xs font-medium uppercase tracking-widest text-white/40 mb-4">
+              Direct Contact &amp; Inquiries
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <a
+                href="https://wa.me/923360830836"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#25D366]/40 hover:bg-white/[0.06] transition-all group"
+                data-testid="link-footer-contact-whatsapp"
+              >
+                <div className="w-9 h-9 rounded-lg bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center text-[#25D366] shrink-0 group-hover:scale-105 transition-transform">
+                  <SiWhatsapp className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/40">WhatsApp</p>
+                  <p className="text-sm font-mono text-white/90 group-hover:text-[#25D366] transition-colors truncate">+923360830836</p>
+                </div>
+              </a>
+
+              <a
+                href="https://maternalmind.com.pk/"
+                className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#11a4d4]/40 hover:bg-white/[0.06] transition-all group"
+                data-testid="link-footer-contact-web"
+              >
+                <div className="w-9 h-9 rounded-lg bg-[#11a4d4]/10 border border-[#11a4d4]/20 flex items-center justify-center text-[#11a4d4] shrink-0 group-hover:scale-105 transition-transform">
+                  <Globe className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/40">Web</p>
+                  <p className="text-sm font-mono text-white/90 group-hover:text-[#11a4d4] transition-colors truncate">https://maternalmind.com.pk/</p>
+                </div>
+              </a>
+
+              <a
+                href="mailto:maternalmind.help@gmail.com"
+                className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#11a4d4]/40 hover:bg-white/[0.06] transition-all group"
+                data-testid="link-footer-contact-email"
+              >
+                <div className="w-9 h-9 rounded-lg bg-[#11a4d4]/10 border border-[#11a4d4]/20 flex items-center justify-center text-[#11a4d4] shrink-0 group-hover:scale-105 transition-transform">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/40">Email</p>
+                  <p className="text-sm font-mono text-white/90 group-hover:text-[#11a4d4] transition-colors truncate">maternalmind.help@gmail.com</p>
+                </div>
+              </a>
+
+              <a
+                href="https://wa.me/923212066562"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#22c55e]/40 hover:bg-white/[0.06] transition-all group"
+                data-testid="link-footer-contact-book-delivery"
+              >
+                <div className="w-9 h-9 rounded-lg bg-[#22c55e]/10 border border-[#22c55e]/20 flex items-center justify-center text-[#22c55e] shrink-0 group-hover:scale-105 transition-transform">
+                  <Truck className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/40">For Book Delivery</p>
+                  <p className="text-sm font-mono text-white/90 group-hover:text-[#22c55e] transition-colors truncate">+923212066562</p>
+                </div>
+              </a>
+            </div>
+          </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs text-white/30">
               &copy; {new Date().getFullYear()} Maternal Mind. All rights

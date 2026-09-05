@@ -51,13 +51,18 @@ router.get("/", authMiddleware, async (req: AuthRequest, res) => {
         storage.getRecentActivity(req.userId!, 365),
       ]);
 
-    // Total topics from chapter LEFT JOIN counts
-    const totalTopics = allChapters.reduce(
-      (sum, ch) => sum + Number(ch.topicCount),
-      0,
-    );
+    const allPublishedTopics = await storage.getAllTopicIdsGroupedByBook();
+    const totalTopics =
+      allPublishedTopics.length > 0
+        ? allPublishedTopics.length
+        : allChapters.reduce(
+            (sum, ch) => sum + Number(ch.topicCount),
+            0,
+          );
     const completedTopicIds = new Set(
-      userProgressData.filter((p) => p.isCompleted).map((p) => p.topicId),
+      userProgressData
+        .filter((p) => p.isCompleted && !p.subtopicId)
+        .map((p) => p.topicId),
     );
     const topicsCompleted = completedTopicIds.size;
 
@@ -142,7 +147,9 @@ router.get("/topic/:topicId", authMiddleware, async (req: AuthRequest, res) => {
       return res.status(404).json({ message: "Topic not found" });
     }
 
-    const chapter = await storage.getChapter(topic.chapterId);
+    const chapter = topic.chapterId
+      ? await storage.getChapter(topic.chapterId)
+      : null;
     const attempts = await storage.getQuizAttempts(req.userId!);
     const topicAttempts = attempts.filter((a) => a.topicId === topicId);
 

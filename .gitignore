@@ -116,3 +116,9 @@ Maternal Mind Education Content/
 dist-fresh/
 webdeploy/
 dist/
+.agents/
+.serena/
+.superpowers/
+*.docx
+ORIGINAL_REQUEST.md
+PROJECT.md

@@ -24,6 +24,9 @@ interface Topic {
   id: string;
   title: string;
   description: string;
+  subtopicsCount?: number;
+  completedSubtopicsCount?: number;
+  progress?: number;
   isCompleted: boolean;
   isBookmarked: boolean;
   isLocked?: boolean;
@@ -36,18 +39,24 @@ export default function TopicsScreen() {
   const headerHeight = useHeaderHeight();
   const navigation = useNavigation<TopicsScreenNavigationProp>();
   const route = useRoute<TopicsScreenRouteProp>();
-  const { chapterId, chapterTitle } = route.params;
+  const { bookId, bookTitle, chapterId, chapterTitle } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const { theme } = useTheme();
   const { user } = useAuth();
   const bottomLayout = useBottomLayout({ extraContentPadding: Spacing.xl });
+
+  const queryUrl = bookId
+    ? `/api/books/${bookId}/topics`
+    : `/api/chapters/${chapterId}/topics`;
 
   const {
     data: topics,
     isLoading,
     refetch,
   } = useQuery<Topic[]>({
-    queryKey: ["/api/chapters", chapterId, "topics"],
+    queryKey: bookId
+      ? ["/api/books", bookId, "topics"]
+      : ["/api/chapters", chapterId, "topics"],
     staleTime: 0,
     refetchOnMount: "always",
     refetchOnReconnect: true,
@@ -61,11 +70,15 @@ export default function TopicsScreen() {
 
   const renderTopic = ({ item, index }: { item: Topic; index: number }) => {
     const isPaid = Boolean(item.isPaid || item.isPremium);
+    const subtopicSubtitle =
+      typeof item.subtopicsCount === "number" && item.subtopicsCount > 0
+        ? `${item.subtopicsCount} Subtopics${typeof item.progress === "number" && item.progress > 0 ? ` · ${item.progress}% complete` : ""}`
+        : item.description;
 
     return (
       <GlassCard
         title={item.title}
-        subtitle={item.description}
+        subtitle={subtopicSubtitle}
         density="compact"
         titleNumberOfLines={2}
         subtitleNumberOfLines={1}
@@ -74,9 +87,10 @@ export default function TopicsScreen() {
           if (isPaid && !hasActiveSubscription) {
             navigation.navigate("Paywall");
           } else {
-            navigation.navigate("TopicReader", {
+            navigation.navigate("Subtopics", {
               topicId: item.id,
               topicTitle: item.title,
+              bookId: bookId || "",
             });
           }
         }}
@@ -166,7 +180,7 @@ export default function TopicsScreen() {
               type="small"
               style={[styles.chapterTitle, { color: theme.textSecondary }]}
             >
-              {chapterTitle}
+              {bookTitle || chapterTitle}
             </ThemedText>
           </View>
         }

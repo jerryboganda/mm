@@ -120,6 +120,7 @@ const linking: LinkingOptions<RootStackParamList> = {
         },
       },
       TopicReader: "topic/:topicId",
+      Subtopics: "topic/:topicId/subtopics",
       QuizPlayer: "quiz/play/:mode",
       QuizResults: "quiz/results/:resultId",
       ResetPassword: "reset-password",

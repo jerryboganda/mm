@@ -25,16 +25,25 @@ import {
   adminDeleteChapter,
   adminReorderChapters,
   adminGetTopics,
+  adminGetTopicsByBook,
   adminGetTopic,
   adminCreateTopic,
   adminUpdateTopic,
   adminDeleteTopic,
   adminReorderTopics,
+  adminGetSubtopics,
+  adminGetSubtopic,
+  adminCreateSubtopic,
+  adminUpdateSubtopic,
+  adminDeleteSubtopic,
+  adminReorderSubtopics,
   adminGetContentBlocks,
+  adminGetSubtopicContentBlocks,
   adminCreateContentBlock,
   adminUpdateContentBlock,
   adminDeleteContentBlock,
   adminReorderContentBlocks,
+  adminReorderSubtopicContentBlocks,
   adminGetMcqs,
   adminGetMcq,
   adminCreateMcq,
@@ -86,8 +95,9 @@ const chapterSchema = z.object({
   order: z.number().int().optional(),
 });
 
-const topicSchema = z.object({
-  chapterId: z.string().min(1, "Chapter ID is required"),
+const topicBaseSchema = z.object({
+  chapterId: z.string().optional().nullable(),
+  bookId: z.string().optional().nullable(),
   title: z.string().min(1, "Title is required").max(300),
   description: z.string().max(5000).optional().nullable(),
   isPublished: z.boolean().optional(),
@@ -98,11 +108,30 @@ const topicSchema = z.object({
   references: z.string().max(5000).optional().nullable(),
 });
 
-const contentBlockSchema = z.object({
+const topicSchema = topicBaseSchema.refine((data) => data.chapterId || data.bookId, {
+  message: "Either chapterId or bookId is required",
+});
+
+const subtopicSchema = z.object({
   topicId: z.string().min(1, "Topic ID is required"),
+  title: z.string().min(1, "Title is required").max(300),
+  description: z.string().max(5000).optional().nullable(),
+  isPublished: z.boolean().optional(),
+  isPaid: z.boolean().optional(),
+  estimatedMinutes: z.number().int().min(1).max(120).optional(),
+  order: z.number().int().optional(),
+});
+
+const contentBlockBaseSchema = z.object({
+  topicId: z.string().optional().nullable(),
+  subtopicId: z.string().optional().nullable(),
   type: z.enum(["text", "heading", "image", "note", "html", "code", "diagram"]),
   content: z.string().default(""),
   order: z.number().int().optional(),
+});
+
+const contentBlockSchema = contentBlockBaseSchema.refine((data) => data.topicId || data.subtopicId, {
+  message: "Either topicId or subtopicId is required",
 });
 
 const mcqOptionSchema = z.object({
@@ -586,6 +615,18 @@ router.get("/chapters/:chapterId/topics", async (req: AuthRequest, res) => {
   }
 });
 
+router.get("/books/:bookId/topics", async (req: AuthRequest, res) => {
+  try {
+    const bookId = getParamValue(req.params.bookId);
+    const data = await adminGetTopicsByBook(bookId);
+    res.json(data);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
 router.get("/topics/all", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetAllTopicsFlat();
@@ -633,7 +674,7 @@ router.post("/topics", async (req: AuthRequest, res) => {
 router.put("/topics/:id", async (req: AuthRequest, res) => {
   try {
     const topicId = getParamValue(req.params.id);
-    const data = validateBody(topicSchema.partial(), req.body, res);
+    const data = validateBody(topicBaseSchema.partial(), req.body, res);
     if (!data) return;
     const t = await adminUpdateTopic(topicId, data);
     if (!t) return res.status(404).json({ message: "Topic not found" });
@@ -672,8 +713,113 @@ router.delete("/topics/:id", async (req: AuthRequest, res) => {
 
 router.post("/topics/reorder", async (req: AuthRequest, res) => {
   try {
-    await adminReorderTopics(req.body.chapterId, req.body.orderedIds);
+    const { chapterId, bookId, orderedIds } = req.body;
+    if (bookId) {
+      await adminReorderTopics(bookId, orderedIds, true);
+    } else {
+      await adminReorderTopics(chapterId, orderedIds, false);
+    }
     res.json({ message: "Topics reordered" });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// SUBTOPICS
+// ═══════════════════════════════════════════════════════════════
+
+router.get("/topics/:topicId/subtopics", async (req: AuthRequest, res) => {
+  try {
+    const topicId = getParamValue(req.params.topicId);
+    const data = await adminGetSubtopics(topicId);
+    res.json(data);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.get("/subtopics/:id", async (req: AuthRequest, res) => {
+  try {
+    const subtopicId = getParamValue(req.params.id);
+    const s = await adminGetSubtopic(subtopicId);
+    if (!s) return res.status(404).json({ message: "Subtopic not found" });
+    res.json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/subtopics", async (req: AuthRequest, res) => {
+  try {
+    const data = validateBody(subtopicSchema, req.body, res);
+    if (!data) return;
+    const s = await adminCreateSubtopic(data);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "create",
+      entityType: "subtopic",
+      entityId: s.id,
+      details: { title: s.title },
+    });
+    res.status(201).json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.put("/subtopics/:id", async (req: AuthRequest, res) => {
+  try {
+    const subtopicId = getParamValue(req.params.id);
+    const data = validateBody(subtopicSchema.partial(), req.body, res);
+    if (!data) return;
+    const s = await adminUpdateSubtopic(subtopicId, data);
+    if (!s) return res.status(404).json({ message: "Subtopic not found" });
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "update",
+      entityType: "subtopic",
+      entityId: s.id,
+      details: data,
+    });
+    res.json(s);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.delete("/subtopics/:id", async (req: AuthRequest, res) => {
+  try {
+    const subtopicId = getParamValue(req.params.id);
+    await adminDeleteSubtopic(subtopicId);
+    await createAuditLog({
+      adminUserId: req.userId!,
+      action: "delete",
+      entityType: "subtopic",
+      entityId: subtopicId,
+    });
+    res.json({ message: "Subtopic deleted" });
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.post("/subtopics/reorder", async (req: AuthRequest, res) => {
+  try {
+    await adminReorderSubtopics(req.body.topicId, req.body.orderedIds);
+    res.json({ message: "Subtopics reordered" });
   } catch (err: unknown) {
     res
       .status(500)
@@ -689,6 +835,18 @@ router.get("/topics/:topicId/blocks", async (req: AuthRequest, res) => {
   try {
     const topicId = getParamValue(req.params.topicId);
     const data = await adminGetContentBlocks(topicId);
+    res.json(data);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+router.get("/subtopics/:subtopicId/blocks", async (req: AuthRequest, res) => {
+  try {
+    const subtopicId = getParamValue(req.params.subtopicId);
+    const data = await adminGetSubtopicContentBlocks(subtopicId);
     res.json(data);
   } catch (err: unknown) {
     res
@@ -722,7 +880,7 @@ router.post("/blocks", async (req: AuthRequest, res) => {
 router.put("/blocks/:id", async (req: AuthRequest, res) => {
   try {
     const blockId = getParamValue(req.params.id);
-    const data = validateBody(contentBlockSchema.partial(), req.body, res);
+    const data = validateBody(contentBlockBaseSchema.partial(), req.body, res);
     if (!data) return;
     const cb = await adminUpdateContentBlock(blockId, data);
     if (!cb)
@@ -761,7 +919,12 @@ router.delete("/blocks/:id", async (req: AuthRequest, res) => {
 
 router.post("/blocks/reorder", async (req: AuthRequest, res) => {
   try {
-    await adminReorderContentBlocks(req.body.topicId, req.body.orderedIds);
+    const { topicId, subtopicId, orderedIds } = req.body;
+    if (subtopicId) {
+      await adminReorderSubtopicContentBlocks(subtopicId, orderedIds);
+    } else if (topicId) {
+      await adminReorderContentBlocks(topicId, orderedIds);
+    }
     res.json({ message: "Blocks reordered" });
   } catch (err: unknown) {
     res
@@ -773,19 +936,23 @@ router.post("/blocks/reorder", async (req: AuthRequest, res) => {
 // Batch update multiple blocks + reorder in a single request
 router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
   try {
-    const { blocks, topicId, orderedIds } = req.body as {
+    const { blocks, topicId, subtopicId, orderedIds } = req.body as {
       blocks: { id: string; content: string; type: string }[];
-      topicId: string;
+      topicId?: string;
+      subtopicId?: string;
       orderedIds: string[];
     };
 
-    if (!topicId || !Array.isArray(orderedIds)) {
+    if ((!topicId && !subtopicId) || !Array.isArray(orderedIds)) {
       return res
         .status(400)
-        .json({ message: "topicId and orderedIds are required" });
+        .json({ message: "topicId or subtopicId, and orderedIds are required" });
     }
 
-    const existingBlocks = await adminGetContentBlocks(topicId);
+    const existingBlocks = subtopicId
+      ? await adminGetSubtopicContentBlocks(subtopicId)
+      : await adminGetContentBlocks(topicId!);
+
     if (existingBlocks.some((b) => b.type === "document_html")) {
       return res.status(403).json({
         message:
@@ -805,13 +972,17 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
     }
 
     // Reorder
-    await adminReorderContentBlocks(topicId, orderedIds);
+    if (subtopicId) {
+      await adminReorderSubtopicContentBlocks(subtopicId, orderedIds);
+    } else if (topicId) {
+      await adminReorderContentBlocks(topicId, orderedIds);
+    }
 
     await createAuditLog({
       adminUserId: req.userId!,
       action: "update",
       entityType: "content_block",
-      entityId: topicId,
+      entityId: subtopicId || topicId!,
       details: `Batch saved ${results.length} blocks`,
     });
 

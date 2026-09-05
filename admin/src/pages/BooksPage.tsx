@@ -68,7 +68,7 @@ export default function BooksPage() {
   };
 
   const handleDelete = async (book: Book) => {
-    if (!confirm(`Delete "${book.title}"? This will delete all chapters, topics, and content within it.`)) return;
+    if (!confirm(`Delete "${book.title}"? This will delete all topics and content within it.`)) return;
     try {
       await api.delete(`/admin/content/books/${book.id}`);
       loadBooks();
@@ -162,7 +162,7 @@ export default function BooksPage() {
                   <Link to={`/books/${book.id}/subjects`} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Manage subjects">
                     <Layers className="w-4 h-4" />
                   </Link>
-                  <Link to={`/books/${book.id}/chapters`} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Manage topics">
+                  <Link to={`/books/${book.id}/topics`} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors" title="Manage topics">
                     <ChevronRight className="w-5 h-5" />
                   </Link>
                   <button onClick={() => togglePublish(book)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title={book.isPublished ? 'Unpublish' : 'Publish'}>

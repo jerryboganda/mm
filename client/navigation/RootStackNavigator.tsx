@@ -16,6 +16,7 @@ import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
 import ResetPasswordScreen from "@/screens/ResetPasswordScreen";
 import VerifyEmailScreen from "@/screens/VerifyEmailScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
+import SubtopicsScreen from "@/screens/SubtopicsScreen";
 import QuizTopicSelectScreen from "@/screens/QuizTopicSelectScreen";
 import QuizPlayerScreen from "@/screens/QuizPlayerScreen";
 import QuizResultsScreen from "@/screens/QuizResultsScreen";
@@ -55,7 +56,13 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   ResetPassword: { email: string; code: string };
   VerifyEmail: { email: string };
-  TopicReader: { topicId: string; topicTitle: string };
+  TopicReader: {
+    topicId?: string;
+    topicTitle?: string;
+    subtopicId?: string;
+    subtopicTitle?: string;
+  };
+  Subtopics: { topicId: string; topicTitle: string; bookId?: string };
   QuizTopicSelect: undefined;
   QuizPlayer: {
     mode: "topic" | "mixed" | "wrong" | "exam";
@@ -158,7 +165,18 @@ export default function RootStackNavigator() {
               name="TopicReader"
               component={TopicReaderScreen}
               options={({ route }) => ({
-                headerTitle: route.params.topicTitle,
+                headerTitle:
+                  route.params.subtopicTitle ||
+                  route.params.topicTitle ||
+                  "Reader",
+                presentation: "card",
+              })}
+            />
+            <Stack.Screen
+              name="Subtopics"
+              component={SubtopicsScreen}
+              options={({ route }) => ({
+                headerTitle: route.params?.topicTitle || "Subtopics",
                 presentation: "card",
               })}
             />

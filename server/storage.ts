@@ -4,6 +4,7 @@ import {
   subjects,
   chapters,
   topics,
+  subtopics,
   contentBlocks,
   mcqs,
   sources,
@@ -26,6 +27,8 @@ import {
   type Book,
   type Chapter,
   type Topic,
+  type Subtopic,
+  type InsertSubtopic,
   type ContentBlock,
   type MCQ,
   type UserProgress,
@@ -42,7 +45,7 @@ import {
   type NewsletterEntry,
 } from "../shared/schema";
 import { db, isMysql } from "./db";
-import { eq, and, asc, desc, sql, count, gt, lte, inArray } from "drizzle-orm";
+import { eq, and, or, asc, desc, sql, count, gt, lte, inArray, isNull, isNotNull } from "drizzle-orm";
 import crypto from "crypto";
 
 /**
@@ -118,6 +121,66 @@ export interface IStorage {
    * @returns An array of content blocks
    */
   getContentBlocksByTopic(topicId: string): Promise<ContentBlock[]>;
+
+  /**
+   * Retrieve all published subtopics for a topic, ordered by display order,
+   * optionally decorated with user completion and bookmark status.
+   */
+  getSubtopicsByTopic(
+    topicId: string,
+    userId?: string,
+  ): Promise<(Subtopic & { isCompleted: boolean; isBookmarked: boolean })[]>;
+
+  /**
+   * Retrieve a single subtopic by its ID.
+   */
+  getSubtopic(id: string): Promise<Subtopic | undefined>;
+
+  /**
+   * Retrieve all content blocks for a subtopic, ordered by display order.
+   */
+  getContentBlocksBySubtopic(subtopicId: string): Promise<ContentBlock[]>;
+
+  /**
+   * Mark a subtopic as completed for a user.
+   */
+  markSubtopicComplete(userId: string, subtopicId: string): Promise<void>;
+
+  /**
+   * Mark a subtopic as incomplete for a user.
+   */
+  markSubtopicUncomplete(userId: string, subtopicId: string): Promise<void>;
+
+  /**
+   * Toggle bookmark for a subtopic.
+   */
+  toggleSubtopicBookmark(userId: string, subtopicId: string): Promise<boolean>;
+
+  /**
+   * Check if a subtopic is bookmarked by a user.
+   */
+  isSubtopicBookmarked(userId: string, subtopicId: string): Promise<boolean>;
+
+  /**
+   * Get progress record for a user on a subtopic.
+   */
+  getSubtopicProgress(
+    userId: string,
+    subtopicId: string,
+  ): Promise<UserProgress | undefined>;
+
+  /**
+   * Get aggregated subtopic progress for a topic.
+   */
+  getTopicAggregatedProgress(
+    userId: string,
+    topicId: string,
+  ): Promise<{
+    totalSubtopics: number;
+    completedSubtopics: number;
+    progress: number;
+    isCompleted: boolean;
+  }>;
 
   /**
    * Retrieve all published MCQs belonging to a specific topic, in stable
@@ -530,11 +593,268 @@ export class DatabaseStorage implements IStorage {
 
   /** @inheritdoc */
   async getContentBlocksByTopic(topicId: string): Promise<ContentBlock[]> {
+    const rows = await db
+      .select({ block: contentBlocks })
+      .from(contentBlocks)
+      .leftJoin(subtopics, eq(contentBlocks.subtopicId, subtopics.id))
+      .where(
+        or(
+          eq(contentBlocks.topicId, topicId),
+          eq(subtopics.topicId, topicId),
+        ),
+      )
+      .orderBy(contentBlocks.order);
+    return rows.map((r: any) => r.block);
+  }
+
+  /** @inheritdoc */
+  async getSubtopicsByTopic(
+    topicId: string,
+    userId?: string,
+  ): Promise<(Subtopic & { isCompleted: boolean; isBookmarked: boolean })[]> {
+    const subs = await db
+      .select()
+      .from(subtopics)
+      .where(and(eq(subtopics.topicId, topicId), eq(subtopics.isPublished, true)))
+      .orderBy(subtopics.order);
+
+    if (!userId || subs.length === 0) {
+      return subs.map((s: Subtopic) => ({
+        ...s,
+        isCompleted: false,
+        isBookmarked: false,
+      }));
+    }
+
+    const subIds = subs.map((s: Subtopic) => s.id);
+    const [progressRows, bookmarkRows] = await Promise.all([
+      db
+        .select({ subtopicId: userProgress.subtopicId })
+        .from(userProgress)
+        .where(
+          and(
+            eq(userProgress.userId, userId),
+            eq(userProgress.isCompleted, true),
+            inArray(userProgress.subtopicId, subIds),
+          ),
+        ),
+      db
+        .select({ subtopicId: bookmarks.subtopicId })
+        .from(bookmarks)
+        .where(
+          and(
+            eq(bookmarks.userId, userId),
+            inArray(bookmarks.subtopicId, subIds),
+          ),
+        ),
+    ]);
+
+    const completedSet = new Set(
+      progressRows.map((r: { subtopicId: string | null }) => r.subtopicId).filter(Boolean),
+    );
+    const bookmarkedSet = new Set(
+      bookmarkRows.map((r: { subtopicId: string | null }) => r.subtopicId).filter(Boolean),
+    );
+
+    return subs.map((s: Subtopic) => ({
+      ...s,
+      isCompleted: completedSet.has(s.id),
+      isBookmarked: bookmarkedSet.has(s.id),
+    }));
+  }
+
+  /** @inheritdoc */
+  async getSubtopic(id: string): Promise<Subtopic | undefined> {
+    const [sub] = await db
+      .select()
+      .from(subtopics)
+      .where(eq(subtopics.id, id));
+    return sub || undefined;
+  }
+
+  /** @inheritdoc */
+  async getContentBlocksBySubtopic(subtopicId: string): Promise<ContentBlock[]> {
     return await db
       .select()
       .from(contentBlocks)
-      .where(eq(contentBlocks.topicId, topicId))
+      .where(eq(contentBlocks.subtopicId, subtopicId))
       .orderBy(contentBlocks.order);
+  }
+
+  /** @inheritdoc */
+  async getSubtopicProgress(
+    userId: string,
+    subtopicId: string,
+  ): Promise<UserProgress | undefined> {
+    const [progress] = await db
+      .select()
+      .from(userProgress)
+      .where(
+        and(
+          eq(userProgress.userId, userId),
+          eq(userProgress.subtopicId, subtopicId),
+        ),
+      );
+    return progress || undefined;
+  }
+
+  /** @inheritdoc */
+  async markSubtopicComplete(userId: string, subtopicId: string): Promise<void> {
+    const sub = await this.getSubtopic(subtopicId);
+    const existing = await this.getSubtopicProgress(userId, subtopicId);
+
+    if (existing) {
+      await db
+        .update(userProgress)
+        .set({ isCompleted: true, completedAt: new Date() })
+        .where(eq(userProgress.id, existing.id));
+    } else {
+      await db.insert(userProgress).values({
+        userId,
+        topicId: sub?.topicId ?? null,
+        subtopicId,
+        isCompleted: true,
+        completedAt: new Date(),
+      });
+    }
+
+    if (sub?.topicId) {
+      const topicSubtopics = await db
+        .select({ id: subtopics.id })
+        .from(subtopics)
+        .where(
+          and(
+            eq(subtopics.topicId, sub.topicId),
+            eq(subtopics.isPublished, true),
+          ),
+        );
+
+      if (topicSubtopics.length > 0) {
+        const completedCount = await db
+          .select({ count: count() })
+          .from(userProgress)
+          .where(
+            and(
+              eq(userProgress.userId, userId),
+              eq(userProgress.isCompleted, true),
+              inArray(
+                userProgress.subtopicId,
+                topicSubtopics.map((s: Subtopic) => s.id),
+              ),
+            ),
+          );
+        if (Number(completedCount[0]?.count ?? 0) >= topicSubtopics.length) {
+          await this.markTopicComplete(userId, sub.topicId);
+        }
+      }
+    }
+  }
+
+  /** @inheritdoc */
+  async markSubtopicUncomplete(userId: string, subtopicId: string): Promise<void> {
+    const sub = await this.getSubtopic(subtopicId);
+    const existing = await this.getSubtopicProgress(userId, subtopicId);
+    if (existing) {
+      await db
+        .update(userProgress)
+        .set({ isCompleted: false, completedAt: null })
+        .where(eq(userProgress.id, existing.id));
+    }
+    if (sub?.topicId) {
+      await this.markTopicUncomplete(userId, sub.topicId);
+    }
+  }
+
+  /** @inheritdoc */
+  async toggleSubtopicBookmark(userId: string, subtopicId: string): Promise<boolean> {
+    const sub = await this.getSubtopic(subtopicId);
+    const [existing] = await db
+      .select()
+      .from(bookmarks)
+      .where(
+        and(
+          eq(bookmarks.userId, userId),
+          eq(bookmarks.subtopicId, subtopicId),
+        ),
+      );
+
+    if (existing) {
+      await db.delete(bookmarks).where(eq(bookmarks.id, existing.id));
+      return false;
+    } else {
+      await db.insert(bookmarks).values({
+        userId,
+        topicId: sub?.topicId ?? null,
+        subtopicId,
+      });
+      return true;
+    }
+  }
+
+  /** @inheritdoc */
+  async isSubtopicBookmarked(userId: string, subtopicId: string): Promise<boolean> {
+    const [existing] = await db
+      .select()
+      .from(bookmarks)
+      .where(
+        and(
+          eq(bookmarks.userId, userId),
+          eq(bookmarks.subtopicId, subtopicId),
+        ),
+      );
+    return Boolean(existing);
+  }
+
+  /** @inheritdoc */
+  async getTopicAggregatedProgress(
+    userId: string,
+    topicId: string,
+  ): Promise<{
+    totalSubtopics: number;
+    completedSubtopics: number;
+    progress: number;
+    isCompleted: boolean;
+  }> {
+    const subs = await db
+      .select({ id: subtopics.id })
+      .from(subtopics)
+      .where(and(eq(subtopics.topicId, topicId), eq(subtopics.isPublished, true)));
+
+    if (subs.length === 0) {
+      const topicProg = await this.getTopicProgress(userId, topicId);
+      const isCompleted = topicProg?.isCompleted ?? false;
+      return {
+        totalSubtopics: 0,
+        completedSubtopics: isCompleted ? 1 : 0,
+        progress: isCompleted ? 100 : 0,
+        isCompleted,
+      };
+    }
+
+    const completed = await db
+      .select({ count: count() })
+      .from(userProgress)
+      .where(
+        and(
+          eq(userProgress.userId, userId),
+          eq(userProgress.isCompleted, true),
+          inArray(
+            userProgress.subtopicId,
+            subs.map((s: Subtopic) => s.id),
+          ),
+        ),
+      );
+
+    const completedCount = Number(completed[0]?.count ?? 0);
+    const progress = Math.round((completedCount / subs.length) * 100);
+    const isCompleted = completedCount >= subs.length;
+
+    return {
+      totalSubtopics: subs.length,
+      completedSubtopics: completedCount,
+      progress,
+      isCompleted,
+    };
   }
 
   /** @inheritdoc */
@@ -691,7 +1011,11 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(userProgress)
       .where(
-        and(eq(userProgress.userId, userId), eq(userProgress.topicId, topicId)),
+        and(
+          eq(userProgress.userId, userId),
+          eq(userProgress.topicId, topicId),
+          isNull(userProgress.subtopicId),
+        ),
       );
     return progress || undefined;
   }
@@ -708,6 +1032,7 @@ export class DatabaseStorage implements IStorage {
       await db.insert(userProgress).values({
         userId,
         topicId,
+        subtopicId: null,
         isCompleted: true,
         completedAt: new Date(),
       });
@@ -743,13 +1068,19 @@ export class DatabaseStorage implements IStorage {
     const [existing] = await db
       .select()
       .from(bookmarks)
-      .where(and(eq(bookmarks.userId, userId), eq(bookmarks.topicId, topicId)));
+      .where(
+        and(
+          eq(bookmarks.userId, userId),
+          eq(bookmarks.topicId, topicId),
+          isNull(bookmarks.subtopicId),
+        ),
+      );
 
     if (existing) {
       await db.delete(bookmarks).where(eq(bookmarks.id, existing.id));
       return false;
     } else {
-      await db.insert(bookmarks).values({ userId, topicId });
+      await db.insert(bookmarks).values({ userId, topicId, subtopicId: null });
       return true;
     }
   }
@@ -759,7 +1090,13 @@ export class DatabaseStorage implements IStorage {
     const [existing] = await db
       .select()
       .from(bookmarks)
-      .where(and(eq(bookmarks.userId, userId), eq(bookmarks.topicId, topicId)));
+      .where(
+        and(
+          eq(bookmarks.userId, userId),
+          eq(bookmarks.topicId, topicId),
+          isNull(bookmarks.subtopicId),
+        ),
+      );
     return !!existing;
   }
 
@@ -1135,13 +1472,18 @@ export class DatabaseStorage implements IStorage {
    * @returns An array of topics ordered by chapter order then topic order
    */
   async getTopicsByBook(bookId: string): Promise<Topic[]> {
-    return await db
+    const rows = await db
       .select({ topic: topics })
       .from(topics)
-      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-      .where(and(eq(chapters.bookId, bookId), eq(topics.isPublished, true)))
-      .orderBy(chapters.order, topics.order)
-      .then((rows: any) => rows.map((r: any) => r.topic));
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .where(
+        and(
+          or(eq(topics.bookId, bookId), eq(chapters.bookId, bookId)),
+          eq(topics.isPublished, true),
+        ),
+      )
+      .orderBy(topics.order);
+    return rows.map((r: any) => r.topic);
   }
 
   /**
@@ -1152,14 +1494,30 @@ export class DatabaseStorage implements IStorage {
   async getAllTopicIdsGroupedByBook(): Promise<
     { bookId: string; topicId: string }[]
   > {
-    return await db
+    const rows = await db
       .select({
-        bookId: chapters.bookId,
+        directBookId: topics.bookId,
+        chapterBookId: chapters.bookId,
         topicId: topics.id,
       })
       .from(topics)
-      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-      .where(and(eq(topics.isPublished, true), eq(chapters.isPublished, true)));
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .where(
+        and(
+          eq(topics.isPublished, true),
+          or(
+            isNotNull(topics.bookId),
+            and(isNotNull(chapters.id), eq(chapters.isPublished, true)),
+          ),
+        ),
+      );
+
+    return rows
+      .map((r: any) => ({
+        bookId: r.directBookId || r.chapterBookId || "",
+        topicId: r.topicId,
+      }))
+      .filter((r: any) => Boolean(r.bookId));
   }
 
   /**
@@ -1260,8 +1618,11 @@ export class DatabaseStorage implements IStorage {
           bookTitle: books.title,
         })
         .from(topics)
-        .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-        .innerJoin(books, eq(chapters.bookId, books.id))
+        .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+        .leftJoin(
+          books,
+          or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+        )
         .where(
           and(
             eq(topics.isPublished, true),
@@ -1269,17 +1630,60 @@ export class DatabaseStorage implements IStorage {
           ),
         )
         .limit(limit);
+
       for (const t of topicResults) {
         results.push({
           id: t.topicId,
           type: "topic" as const,
           title: t.topicTitle,
-          subtitle: `${t.bookTitle} > ${t.chapterTitle}`,
-          bookId: t.bookId,
-          bookTitle: t.bookTitle,
-          chapterId: t.chapterId,
-          chapterTitle: t.chapterTitle,
+          subtitle: t.chapterTitle
+            ? `${t.bookTitle || "Book"} > ${t.chapterTitle}`
+            : (t.bookTitle || "Topic"),
+          bookId: t.bookId || undefined,
+          bookTitle: t.bookTitle || undefined,
+          chapterId: t.chapterId || undefined,
+          chapterTitle: t.chapterTitle || undefined,
         });
+      }
+
+      // Also search subtopics
+      const subtopicResults = await db
+        .select({
+          subtopicId: subtopics.id,
+          subtopicTitle: subtopics.title,
+          subtopicDescription: subtopics.description,
+          topicId: topics.id,
+          topicTitle: topics.title,
+          bookId: books.id,
+          bookTitle: books.title,
+        })
+        .from(subtopics)
+        .innerJoin(topics, eq(subtopics.topicId, topics.id))
+        .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+        .leftJoin(
+          books,
+          or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+        )
+        .where(
+          and(
+            eq(subtopics.isPublished, true),
+            eq(topics.isPublished, true),
+            sql`(${subtopics.title} ILIKE ${pattern} OR ${subtopics.description} ILIKE ${pattern})`,
+          ),
+        )
+        .limit(limit);
+
+      for (const s of subtopicResults) {
+        if (!results.some((r) => r.id === s.subtopicId)) {
+          results.push({
+            id: s.subtopicId,
+            type: "topic" as const,
+            title: s.subtopicTitle,
+            subtitle: `${s.bookTitle ? s.bookTitle + " > " : ""}${s.topicTitle}`,
+            bookId: s.bookId || undefined,
+            bookTitle: s.bookTitle || undefined,
+          });
+        }
       }
     }
 
@@ -1305,11 +1709,16 @@ export class DatabaseStorage implements IStorage {
         topicId: topics.id,
         topicTitle: topics.title,
         chapterTitle: chapters.title,
+        bookTitle: books.title,
         isPaid: topics.isPaid,
         questionCount: sql<number>`count(${mcqs.id})`.as("question_count"),
       })
       .from(topics)
-      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .leftJoin(
+        books,
+        or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+      )
       .innerJoin(mcqs, eq(mcqs.topicId, topics.id))
       .where(
         and(
@@ -1322,17 +1731,18 @@ export class DatabaseStorage implements IStorage {
         topics.id,
         topics.title,
         chapters.title,
+        books.title,
         topics.isPaid,
         chapters.order,
         topics.order,
       )
       .having(sql`count(${mcqs.id}) > 0`)
-      .orderBy(asc(chapters.order), asc(topics.order));
+      .orderBy(asc(topics.order));
 
     return rows.map((r: any) => ({
       id: r.topicId,
       title: r.topicTitle,
-      chapterTitle: r.chapterTitle,
+      chapterTitle: r.chapterTitle || r.bookTitle || "General",
       isPaid: Boolean(r.isPaid),
       questionCount: Number(r.questionCount),
     }));
@@ -1360,27 +1770,44 @@ export class DatabaseStorage implements IStorage {
     {
       id: string;
       topicId: string;
+      subtopicId?: string;
       topicTitle: string;
       chapterTitle: string;
       bookTitle: string;
       createdAt: Date;
     }[]
   > {
-    return await db
+    const rows = await db
       .select({
         id: bookmarks.id,
         topicId: topics.id,
         topicTitle: topics.title,
+        subtopicId: subtopics.id,
+        subtopicTitle: subtopics.title,
         chapterTitle: chapters.title,
         bookTitle: books.title,
         createdAt: bookmarks.createdAt,
       })
       .from(bookmarks)
       .innerJoin(topics, eq(bookmarks.topicId, topics.id))
-      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-      .innerJoin(books, eq(chapters.bookId, books.id))
+      .leftJoin(subtopics, eq(bookmarks.subtopicId, subtopics.id))
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .leftJoin(
+        books,
+        or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+      )
       .where(eq(bookmarks.userId, userId))
       .orderBy(desc(bookmarks.createdAt));
+
+    return rows.map((r: any) => ({
+      id: r.id,
+      topicId: r.topicId,
+      subtopicId: r.subtopicId || undefined,
+      topicTitle: r.subtopicTitle ? `${r.topicTitle}: ${r.subtopicTitle}` : r.topicTitle,
+      chapterTitle: r.chapterTitle || r.bookTitle || "",
+      bookTitle: r.bookTitle || "",
+      createdAt: r.createdAt,
+    }));
   }
 
   /**
@@ -1402,7 +1829,7 @@ export class DatabaseStorage implements IStorage {
       viewedAt: Date;
     }[]
   > {
-    return await db
+    const rows = await db
       .select({
         id: recentActivity.id,
         topicId: topics.id,
@@ -1413,11 +1840,23 @@ export class DatabaseStorage implements IStorage {
       })
       .from(recentActivity)
       .innerJoin(topics, eq(recentActivity.topicId, topics.id))
-      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-      .innerJoin(books, eq(chapters.bookId, books.id))
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .leftJoin(
+        books,
+        or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+      )
       .where(eq(recentActivity.userId, userId))
       .orderBy(desc(recentActivity.viewedAt))
       .limit(limit);
+
+    return rows.map((r: any) => ({
+      id: r.id,
+      topicId: r.topicId,
+      topicTitle: r.topicTitle,
+      chapterTitle: r.chapterTitle || r.bookTitle || "",
+      bookTitle: r.bookTitle || "",
+      viewedAt: r.viewedAt,
+    }));
   }
 
   /**
@@ -1709,16 +2148,21 @@ export class DatabaseStorage implements IStorage {
         isPaid: topics.isPaid,
       })
       .from(topics)
-      .innerJoin(chapters, eq(topics.chapterId, chapters.id))
-      .innerJoin(books, eq(chapters.bookId, books.id))
+      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .innerJoin(
+        books,
+        and(
+          or(eq(topics.bookId, books.id), eq(chapters.bookId, books.id)),
+          eq(books.isPublished, true),
+        ),
+      )
       .where(
         and(
           eq(topics.isPublished, true),
-          eq(chapters.isPublished, true),
-          eq(books.isPublished, true),
+          sql`(${topics.chapterId} IS NULL OR ${chapters.isPublished} = true)`,
           sql`${topics.id} NOT IN (
             SELECT ${userProgress.topicId} FROM ${userProgress}
-            WHERE ${userProgress.userId} = ${userId} AND ${userProgress.isCompleted} = true
+            WHERE ${userProgress.userId} = ${userId} AND ${userProgress.isCompleted} = true AND ${userProgress.subtopicId} IS NULL
           )`,
         ),
       )
@@ -1728,8 +2172,8 @@ export class DatabaseStorage implements IStorage {
     return result.map((r: any) => ({
       id: r.id,
       title: r.title,
-      chapterTitle: r.chapterTitle,
-      bookTitle: r.bookTitle,
+      chapterTitle: r.chapterTitle || r.bookTitle || "",
+      bookTitle: r.bookTitle || "",
       isPaid: Boolean(r.isPaid),
       progress: 0,
     }));
