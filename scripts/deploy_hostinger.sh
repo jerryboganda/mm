@@ -202,12 +202,12 @@ mkdir -p tmp
 
 echo "Verifying the Node entrypoint can start before Passenger reload..."
 rm -f passenger_error.log
+# Smoke-test on a scratch port: never fight Passenger (or drop live traffic)
+# for port 5000. The app honors $PORT (server/index.ts).
 fuser -k 5001/tcp 2>/dev/null || true
-pkill -9 -u "$USER" -f "server_dist/index.js" 2>/dev/null || true
-pkill -9 -u "$USER" -f "app.js" 2>/dev/null || true
 sleep 1
 set +e
-timeout 12 "$NODE_PATH" app.js > /tmp/maternal-mind-startup.log 2>&1
+PORT=5001 timeout 12 "$NODE_PATH" app.js > /tmp/maternal-mind-startup.log 2>&1
 STARTUP_STATUS=$?
 set -e
 cat /tmp/maternal-mind-startup.log
