@@ -91,18 +91,24 @@ async function getSmtpConfig(): Promise<SmtpConfig | null> {
  * Create a nodemailer transporter with the current SMTP settings.
  * Re-created on every call so admin changes take effect immediately.
  */
-async function createTransporter(): Promise<Transporter | null> {
-  const config = await getSmtpConfig();
-  if (!config) return null;
+async function createTransporter(
+  config?: SmtpConfig,
+): Promise<Transporter | null> {
+  const cfg = config ?? (await getSmtpConfig());
+  if (!cfg) return null;
 
   return nodemailer.createTransport({
-    host: config.host,
-    port: config.port,
-    secure: config.port === 465,
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.port === 465,
     auth: {
-      user: config.user,
-      pass: config.pass,
+      user: cfg.user,
+      pass: cfg.pass,
     },
+    // Don't hang the request forever on blocked/slow SMTP ports
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
@@ -131,20 +137,27 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
     return false;
   }
 
-  const transporter = await createTransporter();
+  const transporter = await createTransporter(config);
   if (!transporter) return false;
 
+  const toHeader = Array.isArray(options.to)
+    ? options.to.join(", ")
+    : options.to;
   try {
     await transporter.sendMail({
       from: `${config.fromName} <${config.fromEmail}>`,
-      to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
+      to: toHeader,
       subject: options.subject,
       html: options.html,
       text: options.text,
     });
     return true;
   } catch (error) {
-    logger.error("Email send failed", { error: String(error) });
+    logger.error("Email send failed", {
+      to: toHeader,
+      subject: options.subject,
+      error: String(error),
+    });
     return false;
   }
 }

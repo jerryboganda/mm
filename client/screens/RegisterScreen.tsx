@@ -82,6 +82,12 @@ export default function RegisterScreen() {
         "requiresEmailVerification" in result &&
         result.requiresEmailVerification
       ) {
+        if ("emailDeliveryFailed" in result && result.emailDeliveryFailed) {
+          Alert.alert(
+            "Check your inbox",
+            "Account created, but the verification email could not be sent. Tap Resend Code on the next screen — and check spam/junk.",
+          );
+        }
         navigation.navigate("VerifyEmail", { email });
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

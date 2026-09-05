@@ -242,6 +242,7 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
       to: user.email,
       subject: "Verify Your Email - Maternal Mind",
       html: verificationEmailHtml(emailOtp),
+      text: `Your Maternal Mind verification code is: ${emailOtp}. It expires in 15 minutes.`,
     });
 
     if (!emailSent && process.env.NODE_ENV !== "production") {
@@ -249,10 +250,15 @@ router.post("/register", rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
     }
 
     // Do NOT return access token yet. User must verify email first.
+    // Never claim the email was sent when it wasn't — the client warns
+    // the user to use Resend instead of waiting for a code that won't come.
     res.json({
       requiresEmailVerification: true,
       email: user.email,
-      message: "Please verify your email to continue",
+      emailDeliveryFailed: !emailSent,
+      message: emailSent
+        ? "Please verify your email to continue"
+        : "Account created, but the verification email could not be sent. Tap Resend Code — if it still doesn't arrive, contact support.",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -372,12 +378,25 @@ router.post(
         to: user.email,
         subject: "Verify Your Email - Maternal Mind",
         html: verificationEmailHtml(emailOtp),
+        text: `Your Maternal Mind verification code is: ${emailOtp}. It expires in 15 minutes.`,
       });
 
       if (!emailSent && process.env.NODE_ENV !== "production") {
         logger.debug("Resend OTP generated", {
           email: user.email,
           otp: emailOtp,
+        });
+      }
+
+      // Don't report success when nothing was sent — the app must show an
+      // error instead of "Verification code resent" for a mail that never left.
+      if (!emailSent) {
+        logger.warn("Resend verification email failed to send", {
+          email: user.email,
+        });
+        return res.status(502).json({
+          message:
+            "We couldn't send the verification email right now. Please try again in a moment — and check spam/junk. If it still doesn't arrive, contact support.",
         });
       }
 
