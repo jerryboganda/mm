@@ -93,6 +93,8 @@ export default function AttemptHistoryScreen() {
     switch (mode) {
       case "topic":
         return "Topic Quiz";
+      case "yearly":
+        return "Yearly Quiz";
       case "mixed":
         return "Mixed Quiz";
       case "wrong":
@@ -106,6 +108,8 @@ export default function AttemptHistoryScreen() {
     switch (mode) {
       case "topic":
         return theme.primary;
+      case "yearly":
+        return theme.purple;
       case "mixed":
         return theme.info;
       case "wrong":

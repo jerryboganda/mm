@@ -48,6 +48,16 @@ router.get(
   },
 );
 
+router.get("/years", authMiddleware, async (_req: AuthRequest, res) => {
+  try {
+    const years = await storage.getQuizYearsWithCounts();
+    res.json(years);
+  } catch (error) {
+    logger.error("Get quiz years error", { error: String(error) });
+    res.status(500).json({ message: "Failed to get quiz years" });
+  }
+});
+
 router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
   try {
     const { mode } = req.params;
@@ -88,6 +98,11 @@ router.get("/start/:mode", authMiddleware, async (req: AuthRequest, res) => {
       questions = await storage.getMCQsByTopic(topicId, metaOpts);
     } else if (mode === "wrong") {
       questions = await storage.getWrongQuestions(req.userId!);
+    } else if (mode === "yearly") {
+      if (!metaOpts.year) {
+        return res.status(400).json({ message: "Year is required" });
+      }
+      questions = await storage.getMCQs(questionCount, undefined, metaOpts);
     } else {
       questions = await storage.getMCQs(questionCount, undefined, metaOpts);
     }

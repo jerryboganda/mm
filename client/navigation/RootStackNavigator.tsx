@@ -18,6 +18,7 @@ import VerifyEmailScreen from "@/screens/VerifyEmailScreen";
 import TopicReaderScreen from "@/screens/TopicReaderScreen";
 import SubtopicsScreen from "@/screens/SubtopicsScreen";
 import QuizTopicSelectScreen from "@/screens/QuizTopicSelectScreen";
+import QuizYearSelectScreen from "@/screens/QuizYearSelectScreen";
 import QuizPlayerScreen from "@/screens/QuizPlayerScreen";
 import QuizResultsScreen from "@/screens/QuizResultsScreen";
 import QuizSettingsScreen from "@/screens/QuizSettingsScreen";
@@ -64,8 +65,9 @@ export type RootStackParamList = {
   };
   Subtopics: { topicId: string; topicTitle: string; bookId?: string };
   QuizTopicSelect: undefined;
+  QuizYearSelect: undefined;
   QuizPlayer: {
-    mode: "topic" | "mixed" | "wrong" | "exam";
+    mode: "topic" | "mixed" | "wrong" | "exam" | "yearly";
     topicId?: string;
     questionCount?: number;
     year?: number;
@@ -185,6 +187,14 @@ export default function RootStackNavigator() {
               component={QuizTopicSelectScreen}
               options={{
                 headerTitle: t("Select Topic"),
+                presentation: "card",
+              }}
+            />
+            <Stack.Screen
+              name="QuizYearSelect"
+              component={QuizYearSelectScreen}
+              options={{
+                headerTitle: t("Select Year"),
                 presentation: "card",
               }}
             />

@@ -43,6 +43,13 @@ export default function PracticeScreen() {
       color: theme.primary,
     },
     {
+      id: "yearly",
+      title: "Yearly Quiz",
+      description: "Practice questions from a specific year",
+      icon: "calendar" as const,
+      color: theme.purple,
+    },
+    {
       id: "mixed",
       title: "Mixed Quiz",
       description: "Random questions from all topics",
@@ -109,6 +116,8 @@ export default function PracticeScreen() {
               onPress={() => {
                 if (mode.id === "topic") {
                   navigation.navigate("QuizTopicSelect");
+                } else if (mode.id === "yearly") {
+                  navigation.navigate("QuizYearSelect");
                 } else if (mode.id === "exam") {
                   navigation.navigate("QuizPlayer", {
                     mode: "exam",
