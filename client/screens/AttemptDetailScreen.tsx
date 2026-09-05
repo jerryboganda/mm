@@ -86,6 +86,8 @@ export default function AttemptDetailScreen() {
     switch (mode) {
       case "topic":
         return "Topic Quiz";
+      case "yearly":
+        return "Yearly Quiz";
       case "mixed":
         return "Mixed Quiz";
       case "wrong":

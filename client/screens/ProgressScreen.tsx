@@ -237,7 +237,9 @@ export default function ProgressScreen() {
                       ? attempt.topicTitle
                       : attempt.mode === "mixed"
                         ? "Mixed Quiz"
-                        : "Wrong Questions"}
+                        : attempt.mode === "yearly"
+                          ? "Yearly Quiz"
+                          : "Wrong Questions"}
                   </ThemedText>
                   <ThemedText
                     style={[styles.attemptDate, { color: theme.textSecondary }]}

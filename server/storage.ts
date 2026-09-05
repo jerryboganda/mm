@@ -231,6 +231,11 @@ export interface IStorage {
   }>;
 
   /**
+   * Year list with published question counts for the Yearly Quiz picker.
+   */
+  getQuizYearsWithCounts(): Promise<{ year: number; questionCount: number }[]>;
+
+  /**
    * Increment per-MCQ attempt stats after a quiz submission.
    * @param results - Map of mcqId -> isCorrect
    */
@@ -967,6 +972,28 @@ export class DatabaseStorage implements IStorage {
         name: r.name,
       })),
     };
+  }
+
+  /** @inheritdoc */
+  async getQuizYearsWithCounts(): Promise<
+    { year: number; questionCount: number }[]
+  > {
+    const rows = await db
+      .select({ year: mcqs.year, questionCount: count() })
+      .from(mcqs)
+      .where(
+        and(
+          eq(mcqs.isPublished, true),
+          eq(mcqs.isArchived, false),
+          isNotNull(mcqs.year),
+        ),
+      )
+      .groupBy(mcqs.year)
+      .orderBy(desc(mcqs.year));
+    return rows.map((r: { year: number | null; questionCount: number }) => ({
+      year: r.year as number,
+      questionCount: Number(r.questionCount),
+    }));
   }
 
   /** @inheritdoc */
