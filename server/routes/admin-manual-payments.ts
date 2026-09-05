@@ -11,9 +11,12 @@ import { Router, Response } from "express";
 import crypto from "crypto";
 import { authMiddleware, requireRole, type AuthRequest } from "../middleware";
 import { subscriptionService } from "../services/subscription-service";
+import { couponService } from "../services/coupon-service";
 import {
   manualPaymentProofs,
+  packagePrices,
   subscriptionPackages,
+  subscriptions,
   users,
   announcements,
   coupons,
@@ -23,7 +26,7 @@ import {
   paymentInstructionsSchema,
 } from "../../shared/schema";
 import { db } from "../db";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { eq, and, ne, desc, count, sql, inArray } from "drizzle-orm";
 import {
   getPaymentInstructions,
   setPaymentInstructions,
@@ -33,10 +36,37 @@ import {
   sendSubscriptionRejectedEmail,
 } from "../services/subscription-emails";
 import { logger } from "../lib/logger";
+import { isSubscriptionActive } from "../lib/subscription-status";
 
 const router = Router();
 const getParamValue = (param: string | string[]) =>
   Array.isArray(param) ? param[0] : param;
+
+// Batch-enrich proof rows so the admin UI can warn proactively when the user
+// already holds an active subscription (approve will extend it, not fail).
+async function withActiveFlag<T extends { userId: string }>(
+  rows: T[],
+): Promise<(T & { hasActiveSubscription: boolean })[]> {
+  if (rows.length === 0) return [];
+  const ids = [...new Set(rows.map((r) => r.userId))];
+  const subs = await db
+    .select({
+      userId: subscriptions.userId,
+      status: subscriptions.status,
+      currentPeriodEnd: subscriptions.currentPeriodEnd,
+    })
+    .from(subscriptions)
+    .where(inArray(subscriptions.userId, ids));
+  const activeIds = new Set(
+    subs
+      .filter((s) => isSubscriptionActive(s.status, s.currentPeriodEnd))
+      .map((s) => s.userId),
+  );
+  return rows.map((r) => ({
+    ...r,
+    hasActiveSubscription: activeIds.has(r.userId),
+  }));
+}
 
 function formatDate(
   value: Date | string | null | undefined,
@@ -205,6 +235,9 @@ router.get("/", async (req: AuthRequest, res: Response) => {
         packageId: manualPaymentProofs.packageId,
         packageName: subscriptionPackages.name,
         priceId: manualPaymentProofs.priceId,
+        priceAmount: packagePrices.price,
+        priceCurrency: packagePrices.currency,
+        billingCycle: packagePrices.billingCycle,
         status: manualPaymentProofs.status,
         amountClaimed: manualPaymentProofs.amountClaimed,
         currency: manualPaymentProofs.currency,
@@ -222,6 +255,10 @@ router.get("/", async (req: AuthRequest, res: Response) => {
         subscriptionPackages,
         eq(manualPaymentProofs.packageId, subscriptionPackages.id),
       )
+      .leftJoin(
+        packagePrices,
+        eq(manualPaymentProofs.priceId, packagePrices.id),
+      )
       .where(whereClause)
       .orderBy(desc(manualPaymentProofs.createdAt))
       .limit(limit)
@@ -232,7 +269,12 @@ router.get("/", async (req: AuthRequest, res: Response) => {
       .from(manualPaymentProofs)
       .where(whereClause);
 
-    res.json({ proofs: rows, total: Number(total), page, limit });
+    res.json({
+      proofs: await withActiveFlag(rows),
+      total: Number(total),
+      page,
+      limit,
+    });
   } catch (error) {
     logger.error("admin manual-payments GET / error", { error: String(error) });
     res.status(500).json({ message: "Failed to load payment proofs" });
@@ -252,6 +294,9 @@ router.get("/:id", async (req: AuthRequest, res: Response) => {
         packageId: manualPaymentProofs.packageId,
         packageName: subscriptionPackages.name,
         priceId: manualPaymentProofs.priceId,
+        priceAmount: packagePrices.price,
+        priceCurrency: packagePrices.currency,
+        billingCycle: packagePrices.billingCycle,
         status: manualPaymentProofs.status,
         amountClaimed: manualPaymentProofs.amountClaimed,
         currency: manualPaymentProofs.currency,
@@ -269,10 +314,15 @@ router.get("/:id", async (req: AuthRequest, res: Response) => {
         subscriptionPackages,
         eq(manualPaymentProofs.packageId, subscriptionPackages.id),
       )
+      .leftJoin(
+        packagePrices,
+        eq(manualPaymentProofs.priceId, packagePrices.id),
+      )
       .where(eq(manualPaymentProofs.id, id));
 
     if (!row) return res.status(404).json({ message: "Proof not found" });
-    res.json({ proof: row });
+    const [enriched] = await withActiveFlag([row]);
+    res.json({ proof: enriched });
   } catch (error) {
     logger.error("admin manual-payments GET /:id error", {
       error: String(error),
@@ -302,15 +352,12 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
         .json({ message: "Proof has no price to subscribe to" });
     }
 
-    // Guard against double-provisioning
+    // Guard against double-provisioning: mirror /grant — an existing active
+    // subscription is extended, not a hard 409 that leaves the proof stuck
+    // in "pending" forever (the admin-panel discrepancy).
     const existing = await subscriptionService.getUserActiveSubscription(
       proof.userId,
     );
-    if (existing) {
-      return res.status(409).json({
-        message: "User already has an active subscription.",
-      });
-    }
 
     // Check if this is a promo / coupon code submission
     const isCouponMethod =
@@ -318,32 +365,63 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
       (proof.userNote && proof.userNote.toLowerCase().includes("promo/coupon"));
 
     let couponRecord: any = null;
-    if (isCouponMethod && proof.senderReference) {
+    if (isCouponMethod) {
+      if (!proof.senderReference?.trim()) {
+        return res
+          .status(400)
+          .json({ message: "Coupon submission has no promo code to verify" });
+      }
       const cleanRef = proof.senderReference.toUpperCase().trim();
+      // Full validation: expiry, usage limits, package compatibility.
+      // Previously any code (even bogus) still provisioned a subscription.
+      const validation = await couponService.validateCouponDetailed({
+        code: cleanRef,
+        userId: proof.userId,
+        packageId: proof.packageId,
+        priceId: proof.priceId ?? undefined,
+      });
+      if (!validation.valid) {
+        return res.status(400).json({
+          message: validation.message || "Invalid or expired coupon code",
+        });
+      }
       const [foundCoupon] = await db
         .select()
         .from(coupons)
         .where(eq(coupons.code, cleanRef));
-      if (foundCoupon) {
-        couponRecord = foundCoupon;
+      if (!foundCoupon) {
+        return res.status(400).json({ message: "Coupon code not found" });
       }
+      couponRecord = foundCoupon;
     }
 
-    const subscription = await subscriptionService.createSubscription(
-      proof.userId,
-      proof.packageId,
-      proof.priceId,
-      {
-        couponId: couponRecord?.id || undefined,
-        discountAmount: couponRecord
-          ? String(couponRecord.discountValue || "0")
-          : undefined,
-        paymentGateway: isCouponMethod ? "coupon" : "manual",
-        performedBy: req.userId!,
-        source: "admin",
-        durationDaysOverride: couponRecord?.durationDaysOverride || undefined,
-      },
-    );
+    // Same-package active sub → extend it; otherwise provision a new one
+    // (same semantics as POST /grant).
+    let subscription;
+    let extended = false;
+    if (existing && existing.packageId === proof.packageId) {
+      // ponytail: renew extends by the sub's own cycle, ignoring a coupon's
+      // durationDaysOverride. Per-coupon durations on top of an active sub
+      // need a custom extend-by-days path — add when that case matters.
+      subscription = await subscriptionService.renewSubscription(existing.id);
+      extended = true;
+    } else {
+      subscription = await subscriptionService.createSubscription(
+        proof.userId,
+        proof.packageId,
+        proof.priceId,
+        {
+          couponId: couponRecord?.id || undefined,
+          discountAmount: couponRecord
+            ? String(couponRecord.discountValue || "0")
+            : undefined,
+          paymentGateway: isCouponMethod ? "coupon" : "manual",
+          performedBy: req.userId!,
+          source: "admin",
+          durationDaysOverride: couponRecord?.durationDaysOverride || undefined,
+        },
+      );
+    }
 
     // Record coupon usage if coupon matched
     if (couponRecord) {
@@ -380,6 +458,32 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
       })
       .where(eq(manualPaymentProofs.id, id));
 
+    // Auto-resolve sibling pendings for the same user so the queue doesn't
+    // clog with stale requests that can never be approved afterwards.
+    try {
+      await db
+        .update(manualPaymentProofs)
+        .set({
+          status: "rejected",
+          rejectionReason:
+            "Superseded: another payment request for this user was approved.",
+          reviewedBy: req.userId!,
+          reviewedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(manualPaymentProofs.userId, proof.userId),
+            eq(manualPaymentProofs.status, "pending"),
+            ne(manualPaymentProofs.id, id),
+          ),
+        );
+    } catch (cleanupErr) {
+      logger.error("Failed to auto-resolve sibling pending proofs", {
+        error: String(cleanupErr),
+      });
+    }
+
     const [updated] = await db
       .select()
       .from(manualPaymentProofs)
@@ -408,7 +512,9 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
       await db.insert(announcements).values({
         id: crypto.randomUUID(),
         title: "Subscription Verified ✅",
-        message: `Your payment for ${pkg?.name || "your plan"} has been approved! All premium OB-GYN modules, MCQs, and notes are now fully unlocked.`,
+        message: extended
+          ? `Your payment for ${pkg?.name || "your plan"} has been approved and your existing subscription was extended! All premium OB-GYN modules, MCQs, and notes remain fully unlocked.`
+          : `Your payment for ${pkg?.name || "your plan"} has been approved! All premium OB-GYN modules, MCQs, and notes are now fully unlocked.`,
         type: "update",
         userId: proof.userId,
         isActive: true,
@@ -419,7 +525,7 @@ router.post("/:id/approve", async (req: AuthRequest, res: Response) => {
       });
     }
 
-    res.json({ proof: updated, subscription });
+    res.json({ proof: updated, subscription, extended });
   } catch (error) {
     logger.error("admin manual-payments POST /:id/approve error", {
       error: String(error),
