@@ -15,6 +15,7 @@ import { logger } from "./lib/logger";
 
 // Setting keys in app_settings table
 const SETTING_KEYS = {
+  API_KEY: "brevo_api_key",
   SMTP_HOST: "brevo_smtp_host",
   SMTP_PORT: "brevo_smtp_port",
   SMTP_USER: "brevo_smtp_user",
@@ -24,6 +25,7 @@ const SETTING_KEYS = {
 } as const;
 
 interface SmtpConfig {
+  apiKey: string;
   host: string;
   port: number;
   user: string;
@@ -44,6 +46,10 @@ async function getSmtpConfig(): Promise<SmtpConfig | null> {
 
     const settingsMap = new Map(settings.map((s: any) => [s.key, s.value]));
 
+    const apiKey =
+      settingsMap.get(SETTING_KEYS.API_KEY) ||
+      process.env.BREVO_API_KEY ||
+      "";
     const host =
       settingsMap.get(SETTING_KEYS.SMTP_HOST) ||
       process.env.BREVO_SMTP_HOST ||
@@ -69,11 +75,16 @@ async function getSmtpConfig(): Promise<SmtpConfig | null> {
       process.env.BREVO_FROM_NAME ||
       "Maternal Mind";
 
-    if (!host || !user || !pass || !fromEmail) {
+    if (!fromEmail) {
+      return null;
+    }
+    // Usable when the HTTP API key is set, or when full SMTP creds exist
+    if (!apiKey && (!host || !user || !pass)) {
       return null;
     }
 
     return {
+      apiKey,
       host,
       port: parseInt(port, 10),
       user,
@@ -120,6 +131,55 @@ export interface SendEmailOptions {
 }
 
 /**
+ * Send an email via the Brevo HTTPS API (api.brevo.com, port 443).
+ * Preferred transport: works where outbound SMTP ports are blocked and
+ * surfaces Brevo-side rejections with a clear message. Never logs the key.
+ */
+async function sendViaBrevoApi(args: {
+  apiKey: string;
+  fromEmail: string;
+  fromName: string;
+  to: string | string[];
+  subject: string;
+  html: string;
+  text?: string;
+}): Promise<boolean> {
+  const recipients = (Array.isArray(args.to) ? args.to : [args.to]).map(
+    (email) => ({ email }),
+  );
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": args.apiKey,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: args.fromName, email: args.fromEmail },
+        to: recipients,
+        subject: args.subject,
+        htmlContent: args.html,
+        ...(args.text ? { textContent: args.text } : {}),
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (res.ok) return true;
+    const body = await res.text().catch(() => "");
+    logger.error("Brevo API send failed", {
+      status: res.status,
+      to: recipients.map((r) => r.email).join(", "),
+      subject: args.subject,
+      error: body.slice(0, 300),
+    });
+    return false;
+  } catch (error) {
+    logger.error("Brevo API send failed", { error: String(error) });
+    return false;
+  }
+}
+
+/**
  * Send an email via Brevo SMTP.
  * Returns true if sent successfully, false otherwise.
  */
@@ -127,14 +187,31 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
   const config = await getSmtpConfig();
   if (!config) {
     if (process.env.NODE_ENV !== "production") {
-      logger.debug("Email not sent (no SMTP config)", {
+      logger.debug("Email not sent (no email config)", {
         to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
         subject: options.subject,
       });
     } else {
-      logger.warn("SMTP not configured, email not sent");
+      logger.warn("Email not configured, email not sent");
     }
     return false;
+  }
+
+  // Preferred: HTTPS API. Falls back to SMTP when the API fails and SMTP
+  // credentials are also configured.
+  if (config.apiKey) {
+    const ok = await sendViaBrevoApi({
+      apiKey: config.apiKey,
+      fromEmail: config.fromEmail,
+      fromName: config.fromName,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+    });
+    if (ok) return true;
+    if (!config.host || !config.user || !config.pass) return false;
+    logger.warn("Brevo API failed, falling back to SMTP");
   }
 
   const transporter = await createTransporter(config);
@@ -163,8 +240,69 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
 }
 
 /**
+ * Shared body for the admin-panel connection test email.
+ */
+function smtpTestHtml(args: {
+  host: string;
+  port: number | string;
+  fromEmail: string;
+  fromName: string;
+}): string {
+  return `
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #00d4ff; margin: 0;">Maternal Mind</h1>
+            <p style="color: #666; margin-top: 5px;">Email System Test</p>
+          </div>
+          <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 30px; border-radius: 16px; border: 1px solid #bae6fd;">
+            <h2 style="color: #0284c7; margin-top: 0;">🎉 Email Configuration Successful!</h2>
+            <p style="color: #334155; line-height: 1.6;">
+              Your Brevo email settings are working correctly.
+              All email notifications (verification, password reset, support) will now be delivered through this configuration.
+            </p>
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px;">
+              <p style="margin: 0; color: #64748b; font-size: 14px;"><strong>Host:</strong> ${args.host}</p>
+              <p style="margin: 5px 0 0; color: #64748b; font-size: 14px;"><strong>Port:</strong> ${args.port}</p>
+              <p style="margin: 5px 0 0; color: #64748b; font-size: 14px;"><strong>From:</strong> ${args.fromName} &lt;${args.fromEmail}&gt;</p>
+            </div>
+          </div>
+          <p style="color: #94a3b8; font-size: 12px; text-align: center; margin-top: 30px;">
+            This is an automated test email from Maternal Mind Admin Panel.
+          </p>
+        </div>
+      `;
+}
+
+/**
+ * Test Brevo HTTPS API delivery (used by admin panel "Test" button when an
+ * API key is provided). Does NOT read from DB — uses the provided values.
+ */
+export async function testBrevoApiConnection(config: {
+  apiKey: string;
+  fromEmail: string;
+  fromName: string;
+  testRecipient: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const ok = await sendViaBrevoApi({
+    apiKey: config.apiKey,
+    fromEmail: config.fromEmail,
+    fromName: config.fromName,
+    to: config.testRecipient,
+    subject: "✅ Maternal Mind — Email Test Successful",
+    html: smtpTestHtml({
+      host: "api.brevo.com (HTTPS API)",
+      port: 443,
+      fromEmail: config.fromEmail,
+      fromName: config.fromName,
+    }),
+  });
+  return ok
+    ? { success: true }
+    : { success: false, error: "Brevo API rejected the request (see server logs)" };
+}
+/**
  * Test the SMTP connection with given config (used by admin panel "Test" button).
- * Does NOT read from DB â€” uses the provided config directly.
+ * Does NOT read from DB — uses the provided config directly.
  */
 export async function testSmtpConnection(config: {
   host: string;
