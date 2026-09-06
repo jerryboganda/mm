@@ -32,6 +32,8 @@ async function getToken(): Promise<string | null> {
 }
 
 interface EmailSettings {
+  apiKey: string;
+  apiKeySet?: boolean;
   smtpHost: string;
   smtpPort: string;
   smtpUser: string;
@@ -46,6 +48,8 @@ export default function AdminEmailSettingsScreen() {
   const { theme } = useTheme();
 
   const [settings, setSettings] = useState<EmailSettings>({
+    apiKey: "",
+    apiKeySet: false,
     smtpHost: "",
     smtpPort: "587",
     smtpUser: "",
@@ -73,6 +77,8 @@ export default function AdminEmailSettingsScreen() {
 
       const data = await res.json();
       setSettings({
+        apiKey: "",
+        apiKeySet: data.apiKeySet === true,
         smtpHost: data.smtpHost || "",
         smtpPort: data.smtpPort || "587",
         smtpUser: data.smtpUser || "",
@@ -97,16 +103,21 @@ export default function AdminEmailSettingsScreen() {
     setHasChanges(true);
   };
 
+  const hasApiKey = settings.apiKey.trim() !== "" || settings.apiKeySet === true;
+  const hasSmtp =
+    settings.smtpHost !== "" &&
+    settings.smtpUser !== "" &&
+    settings.smtpPass !== "";
+
   const handleSave = async () => {
-    if (
-      !settings.smtpHost ||
-      !settings.smtpUser ||
-      !settings.smtpPass ||
-      !settings.fromEmail
-    ) {
+    if (!settings.fromEmail) {
+      Alert.alert("Validation Error", "From Email is required.");
+      return;
+    }
+    if (!hasApiKey && !hasSmtp) {
       Alert.alert(
         "Validation Error",
-        "SMTP Host, Login, Password, and From Email are required.",
+        "Provide either a Brevo API key or full SMTP credentials.",
       );
       return;
     }
@@ -144,15 +155,10 @@ export default function AdminEmailSettingsScreen() {
       return;
     }
 
-    if (
-      !settings.smtpHost ||
-      !settings.smtpUser ||
-      !settings.smtpPass ||
-      !settings.fromEmail
-    ) {
+    if (!settings.fromEmail || (!hasApiKey && !hasSmtp)) {
       Alert.alert(
         "Missing Config",
-        "Please fill in all SMTP fields before testing.",
+        "Enter the From Email plus a Brevo API key or full SMTP credentials before testing.",
       );
       return;
     }
@@ -289,6 +295,26 @@ export default function AdminEmailSettingsScreen() {
             value={settings.smtpPass}
             onChangeText={(v) => updateField("smtpPass", v)}
             placeholder="xsmtpsib-xxxxxxxxxxxx"
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        </View>
+
+        <ThemedText style={[styles.sectionLabel, { color: theme.textMuted }]}>
+          BREVO API KEY (RECOMMENDED)
+        </ThemedText>
+        <View style={styles.formSection}>
+          <GlassInput
+            label={
+              settings.apiKeySet
+                ? "API Key (configured ✓ — paste to replace)"
+                : "API Key (xkeysib-…)"
+            }
+            icon="key"
+            value={settings.apiKey}
+            onChangeText={(v) => updateField("apiKey", v)}
+            placeholder="Leave blank to keep the saved key"
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}

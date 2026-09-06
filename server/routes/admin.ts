@@ -7,7 +7,7 @@
 import { Router, Response } from "express";
 import { AuthRequest, authMiddleware, requireRole } from "../middleware";
 import { storage } from "../storage";
-import { testSmtpConnection } from "../email";
+import { testSmtpConnection, testBrevoApiConnection } from "../email";
 import {
   getSupportContactSettings,
   SUPPORT_CONTACT_KEYS,
@@ -203,6 +203,7 @@ router.get(
   async (_req: AuthRequest, res) => {
     try {
       const keys = [
+        "brevo_api_key",
         "brevo_smtp_host",
         "brevo_smtp_port",
         "brevo_smtp_user",
@@ -218,6 +219,8 @@ router.get(
       }
 
       res.json({
+        // Never return the key itself — only whether one is stored
+        apiKeySet: !!settingsMap["brevo_api_key"],
         smtpHost: settingsMap["brevo_smtp_host"] || "",
         smtpPort: settingsMap["brevo_smtp_port"] || "587",
         smtpUser: settingsMap["brevo_smtp_user"] || "",
@@ -239,23 +242,47 @@ router.put(
   requireRole("admin"),
   async (req: AuthRequest, res) => {
     try {
-      const { smtpHost, smtpPort, smtpUser, smtpPass, fromEmail, fromName } =
-        req.body;
+      const {
+        apiKey,
+        smtpHost,
+        smtpPort,
+        smtpUser,
+        smtpPass,
+        fromEmail,
+        fromName,
+      } = req.body;
 
-      if (!smtpHost || !smtpUser || !smtpPass || !fromEmail) {
+      if (!fromEmail) {
         return res.status(400).json({
-          message: "SMTP Host, Login, Password, and From Email are required",
+          message: "From Email is required",
+        });
+      }
+      // Either a Brevo API key (recommended, HTTPS) or full SMTP credentials.
+      const hasApiKey = typeof apiKey === "string" && apiKey.trim() !== "";
+      const hasSmtp = smtpHost && smtpUser && smtpPass;
+      if (!hasApiKey && !hasSmtp) {
+        return res.status(400).json({
+          message:
+            "Provide either a Brevo API key or full SMTP credentials (Host, Login, Password)",
         });
       }
 
-      await storage.setAppSettings([
-        { key: "brevo_smtp_host", value: smtpHost },
-        { key: "brevo_smtp_port", value: String(smtpPort || "587") },
-        { key: "brevo_smtp_user", value: smtpUser },
-        { key: "brevo_smtp_pass", value: smtpPass },
+      // Only non-empty values are stored, so a blank API key field keeps
+      // the existing key instead of wiping it.
+      const updates: { key: string; value: string }[] = [
         { key: "brevo_from_email", value: fromEmail },
         { key: "brevo_from_name", value: fromName || "Maternal Mind" },
-      ]);
+      ];
+      if (hasApiKey)
+        updates.push({ key: "brevo_api_key", value: apiKey.trim() });
+      if (smtpHost) updates.push({ key: "brevo_smtp_host", value: smtpHost });
+      if (smtpPort != null && String(smtpPort).trim() !== "") {
+        updates.push({ key: "brevo_smtp_port", value: String(smtpPort) });
+      }
+      if (smtpUser) updates.push({ key: "brevo_smtp_user", value: smtpUser });
+      if (smtpPass) updates.push({ key: "brevo_smtp_pass", value: smtpPass });
+
+      await storage.setAppSettings(updates);
 
       res.json({ message: "Email settings saved successfully" });
     } catch (error) {
@@ -273,6 +300,7 @@ router.post(
   async (req: AuthRequest, res) => {
     try {
       const {
+        apiKey,
         smtpHost,
         smtpPort,
         smtpUser,
@@ -282,10 +310,32 @@ router.post(
         testRecipient,
       } = req.body;
 
-      if (!smtpHost || !smtpUser || !smtpPass || !fromEmail || !testRecipient) {
+      if (!fromEmail || !testRecipient) {
+        return res.status(400).json({
+          message: "From Email and Test Recipient are required",
+        });
+      }
+
+      // Prefer the HTTPS API test when a key is supplied
+      if (typeof apiKey === "string" && apiKey.trim() !== "") {
+        const result = await testBrevoApiConnection({
+          apiKey: apiKey.trim(),
+          fromEmail,
+          fromName: fromName || "Maternal Mind",
+          testRecipient,
+        });
+        if (result.success) {
+          return res.json({ message: "Test email sent successfully via Brevo API!" });
+        }
+        return res.status(400).json({
+          message: `Brevo API test failed: ${result.error}`,
+        });
+      }
+
+      if (!smtpHost || !smtpUser || !smtpPass) {
         return res.status(400).json({
           message:
-            "SMTP Host, Login, Password, From Email, and Test Recipient are required",
+            "Provide a Brevo API key or full SMTP credentials (Host, Login, Password) to test",
         });
       }
 

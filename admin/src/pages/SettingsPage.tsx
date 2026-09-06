@@ -24,6 +24,8 @@ interface AuditLog {
 }
 
 interface EmailSettings {
+  apiKey: string;
+  apiKeySet?: boolean;
   smtpHost: string;
   smtpPort: number;
   smtpUser: string;
@@ -487,6 +489,8 @@ function DeviceLimitSettingsTab() {
 
 function EmailSettingsTab() {
   const [form, setForm] = useState<EmailSettings>({
+    apiKey: "",
+    apiKeySet: false,
     smtpHost: "",
     smtpPort: 587,
     smtpUser: "",
@@ -501,7 +505,7 @@ function EmailSettingsTab() {
   useEffect(() => {
     api
       .get<EmailSettings>("/admin/email-settings")
-      .then((s) => setForm(s))
+      .then((s) => setForm({ ...s, apiKey: "" }))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -554,6 +558,36 @@ function EmailSettingsTab() {
         </h2>
       </div>
       <div className="space-y-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Brevo API Key
+            </label>
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700">
+              Recommended
+            </span>
+            {form.apiKeySet && (
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-700">
+                Configured ✓
+              </span>
+            )}
+          </div>
+          <input
+            type="password"
+            value={form.apiKey}
+            onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
+            placeholder={
+              form.apiKeySet
+                ? "Leave blank to keep the saved key, or paste a new one"
+                : "xkeysib-… (Brevo → Settings → API Keys)"
+            }
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 outline-none"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Sends over HTTPS (port 443) — works where SMTP ports are blocked.
+            SMTP below is only a fallback.
+          </p>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           {field("SMTP Host", "smtpHost")}
           {field("SMTP Port", "smtpPort", "number")}
