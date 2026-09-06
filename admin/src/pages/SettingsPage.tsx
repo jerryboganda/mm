@@ -530,7 +530,17 @@ function EmailSettingsTab() {
       </div>
     );
 
-  const field = (label: string, key: keyof EmailSettings, type = "text") => (
+  const field = (
+    label: string,
+    key:
+      | "smtpHost"
+      | "smtpPort"
+      | "smtpUser"
+      | "smtpPass"
+      | "fromEmail"
+      | "fromName",
+    type = "text",
+  ) => (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
