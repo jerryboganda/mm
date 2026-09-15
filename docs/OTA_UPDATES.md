@@ -43,19 +43,19 @@ Installed app ◀── GET /updates/manifest ─┘   (signed manifest)
 Already generated (run `scripts/generate-code-signing-keys.ps1`/`.sh` to regenerate):
 
 - `client/certs/certificate.pem` — **public** cert, committed, bundled into the app.
-- `secrets/code-signing-private-key.pem` — **private** key, git-ignored, **Hostinger Server only**.
+- `secrets/code-signing-private-key.pem` — **private** key, git-ignored, **Production VPS only (`185.252.233.186`)**.
 
-Copy the private key to Hostinger (never commit it, never email it):
+Copy the private key to the Production VPS (never commit it, never email it):
 
 ```bash
-scp -P 6588 secrets/code-signing-private-key.pem u776151780@maternalmind.com.pk:~/domains/maternalmind.com.pk/public_html/secrets/code-signing-private-key.pem
+scp secrets/code-signing-private-key.pem root@185.252.233.186:/opt/docker/maternal-mind/secrets/code-signing-private-key.pem
 ```
 
-### 2. Hostinger Production Server
+### 2. Production VPS (`185.252.233.186`)
 
 ```bash
-ssh -p 6588 u776151780@maternalmind.com.pk
-cd ~/domains/maternalmind.com.pk/public_html
+ssh root@185.252.233.186
+cd /opt/docker/maternal-mind
 mkdir -p updates secrets                       # bind-mount targets
 chmod 600 secrets/code-signing-private-key.pem
 curl -s -H "expo-platform: android" -H "expo-runtime-version: test" \
@@ -71,10 +71,9 @@ Check the app logs say `Expo Updates: code signing ENABLED`.
 
 | Secret | Value |
 |---|---|
-| `HOSTINGER_SSH_KEY` | private SSH key of a user that can write to Hostinger |
-| `HOSTINGER_HOST` | `maternalmind.com.pk` |
-| `HOSTINGER_USER` | `u776151780` |
-| `HOSTINGER_PORT` | `6588` |
+| `VPS_SSH_KEY` | private SSH key of a user that can write to the VPS |
+| `VPS_HOST` | `185.252.233.186` |
+| `VPS_USER` | `root` |
 
 For `android-release.yml` also: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
 `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, and optionally `PLAY_SERVICE_ACCOUNT_JSON`.

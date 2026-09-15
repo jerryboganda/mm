@@ -309,10 +309,10 @@ This section is the canonical technical baseline for the marketing website at `M
 ### Production Deployment Record (Website)
 
 - Domain: `https://maternalmind.com.pk`
-- Hosting: Hostinger Business Hosting Plan
-- Runtime mode: Hostinger Web Application
+- Hosting: Production VPS (`185.252.233.186`)
+- Runtime mode: Production Docker Container (`maternal-mind-app-1` via Docker Compose + Nginx Proxy Manager)
 - Deployments:
-  1. **Landing Page Website**: Built from `Maternal Mind Website/` and hosted at `https://maternalmind.com.pk/`.
+  1. **Landing Page Website**: Built from `Maternal Mind Website/` and served at `https://maternalmind.com.pk/`.
   2. **Unified Web Application**: Node.js Express server + Admin Panel (`/admin`) + Expo Web App (`/app`).
 - Branding/title updates deployed:
   - Browser/tab title format standardized to `Maternal Mind | <Page Title>` (SEO component + base `index.html` title).
@@ -343,16 +343,19 @@ This section is the canonical technical baseline for the marketing website at `M
 ### Admin Panel Surface (Production State)
 
 - Application source: `admin/` (Vite React admin app) in root project.
-- Production hosting: Hostinger Business Hosting Plan.
-- Served at: `https://maternalmind.com.pk/admin` (integrated into unified Hostinger Web App deployment).
+- Production hosting: Production VPS (`185.252.233.186`).
+- Served at: `https://maternalmind.com.pk/admin` (integrated into unified single-slot Express deployment).
 
-### Hostinger Routing & Web Architecture
+### Production Routing & Web Architecture (VPS: 185.252.233.186)
 
-- **Landing Page Website**: Hosted separately on Hostinger at `https://maternalmind.com.pk/`.
-- **Unified Web App (API + Admin + App)**: Hosted separately on Hostinger using `.htaccess` routing rules:
-  - `/api` -> Express Node.js API server
-  - `/admin` -> Admin Panel SPA (`/admin/index.html`)
-  - `/app` -> User Expo Web App SPA (`/app/index.html`)
+- **Domain**: `https://maternalmind.com.pk` proxied via Nginx Proxy Manager (`proxy_host/11.conf`) to `maternal-mind-app-1:5000`.
+- **Unified Web App (API + Admin + App + Website)**: Handled by Express 5 routing in `server/index.ts`:
+  - `/` -> Marketing Website SPA (`website_dist/index.html`)
+  - `/api` -> Express Node.js API server routes
+  - `/admin` -> Admin Panel SPA (`admin_dist/index.html`)
+  - `/app` -> User Expo Web App SPA (`web_dist/index.html`)
+  - `/updates` -> Expo OTA updates handler
+  - `/uploads` -> Content images and payment proofs
 
 ### Website Risk Register (Prioritized)
 

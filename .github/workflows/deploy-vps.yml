@@ -1,0 +1,43 @@
+name: Deploy to Production VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Deployment action"
+        required: true
+        default: "rebuild_and_restart"
+        type: choice
+        options:
+          - rebuild_and_restart
+          - restart_only
+          - check_health
+
+jobs:
+  deploy:
+    name: Deploy to Production VPS (185.252.233.186)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Production VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST || '185.252.233.186' }}
+          username: ${{ secrets.VPS_USER || 'root' }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/docker/maternal-mind
+            if [ "${{ github.event.inputs.action }}" = "check_health" ]; then
+              curl -s http://127.0.0.1:5000/health
+              docker compose ps app
+            elif [ "${{ github.event.inputs.action }}" = "restart_only" ]; then
+              docker compose restart app
+              curl -s http://127.0.0.1:5000/health
+            else
+              git pull origin main
+              docker compose build app
+              docker compose up -d --force-recreate app
+              sleep 4
+              curl -s http://127.0.0.1:5000/health
+              docker compose ps app
+            fi
