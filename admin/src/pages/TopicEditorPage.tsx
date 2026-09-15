@@ -182,6 +182,10 @@ export default function TopicEditorPage() {
         ? `/chapters/${contentItem.chapterId}/topics`
         : "/books";
 
+  const hasImportedDocument = localBlocks.some(
+    (b) => (b.type as string) === "document_html",
+  );
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -228,20 +232,18 @@ export default function TopicEditorPage() {
             {contentItem.isPaid ? "Make Free" : "Make Paid"}
           </button>
         )}
-        {!localBlocks.some((b) => (b.type as string) === "document_html") && (
-          <button
-            onClick={saveAll}
-            disabled={saving}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-              saved
-                ? "bg-green-100 text-green-700"
-                : "bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
-            }`}
-          >
-            <Save className="w-4 h-4" />
-            {saving ? "Saving..." : saved ? "Saved" : "Save All"}
-          </button>
-        )}
+        <button
+          onClick={saveAll}
+          disabled={saving}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+            saved
+              ? "bg-green-100 text-green-700"
+              : "bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
+          }`}
+        >
+          <Save className="w-4 h-4" />
+          {saving ? "Saving..." : saved ? "Saved" : "Save All"}
+        </button>
       </div>
 
       {error && (
@@ -250,38 +252,47 @@ export default function TopicEditorPage() {
         </div>
       )}
 
+      {hasImportedDocument && (
+        <div className="flex items-start gap-2 p-3 bg-indigo-50 text-indigo-800 rounded-xl text-sm">
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span>
+            This topic contains the imported textbook document, which is
+            release-managed and read-only. Custom blocks you add are saved
+            alongside it and can be reordered around it. Note: publishing a new
+            book content release for this topic replaces its imported document
+            blocks.
+          </span>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* Content Blocks */}
         <div>
-          {localBlocks.some((b) => (b.type as string) === "document_html") ? (
-            <div className="space-y-4">
-              {localBlocks.map((block) => (
+          <BlockEditor
+            blocks={localBlocks}
+            onChange={setLocalBlocks}
+            uploadImage={uploadImage}
+            registerHtmlGetter={registerRichTextHtmlGetter}
+            renderReadOnlyBlock={(block) => (
+              <div className="p-2">
                 <ImportedDocumentBlock
-                  key={block.id}
                   block={block}
                   topicId={topicId || subtopicId || ""}
                 />
-              ))}
-            </div>
-          ) : (
-            <BlockEditor
-              blocks={localBlocks}
-              onChange={setLocalBlocks}
-              uploadImage={uploadImage}
-              registerHtmlGetter={registerRichTextHtmlGetter}
-              onAddBlockRemote={async (type, _insertIndex) =>
-                api.post("/admin/content/blocks", {
-                  topicId: subtopicId ? undefined : topicId,
-                  subtopicId: subtopicId || undefined,
-                  type,
-                  content: "",
-                })
-              }
-              onDeleteBlockRemote={async (id) =>
-                api.delete(`/admin/content/blocks/${id}`)
-              }
-            />
-          )}
+              </div>
+            )}
+            onAddBlockRemote={async (type, _insertIndex) =>
+              api.post("/admin/content/blocks", {
+                topicId: subtopicId ? undefined : topicId,
+                subtopicId: subtopicId || undefined,
+                type,
+                content: "",
+              })
+            }
+            onDeleteBlockRemote={async (id) =>
+              api.delete(`/admin/content/blocks/${id}`)
+            }
+          />
         </div>
         <div className="lg:sticky lg:top-6 lg:self-start">
           <MobileContentPreview

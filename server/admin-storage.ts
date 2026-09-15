@@ -386,6 +386,16 @@ export async function adminGetSubtopicContentBlocks(
     .orderBy(asc(contentBlocks.order));
 }
 
+export async function adminGetContentBlockById(
+  id: string,
+): Promise<ContentBlock | undefined> {
+  const [cb] = await db
+    .select()
+    .from(contentBlocks)
+    .where(eq(contentBlocks.id, id));
+  return cb || undefined;
+}
+
 export async function adminCreateContentBlock(data: {
   topicId?: string | null;
   subtopicId?: string | null;
