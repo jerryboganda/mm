@@ -38,6 +38,7 @@ import {
   adminDeleteSubtopic,
   adminReorderSubtopics,
   adminGetContentBlocks,
+  adminGetContentBlockById,
   adminGetSubtopicContentBlocks,
   adminCreateContentBlock,
   adminUpdateContentBlock,
@@ -880,6 +881,13 @@ router.post("/blocks", async (req: AuthRequest, res) => {
 router.put("/blocks/:id", async (req: AuthRequest, res) => {
   try {
     const blockId = getParamValue(req.params.id);
+    const existing = await adminGetContentBlockById(blockId);
+    if (existing?.type === "document_html") {
+      return res.status(403).json({
+        message:
+          "This imported textbook document block is locked against manual edits to maintain 100% textbook layout parity. Use the content compiler release pipeline to update it.",
+      });
+    }
     const data = validateBody(contentBlockBaseSchema.partial(), req.body, res);
     if (!data) return;
     const cb = await adminUpdateContentBlock(blockId, data);
@@ -902,6 +910,13 @@ router.put("/blocks/:id", async (req: AuthRequest, res) => {
 router.delete("/blocks/:id", async (req: AuthRequest, res) => {
   try {
     const blockId = getParamValue(req.params.id);
+    const existing = await adminGetContentBlockById(blockId);
+    if (existing?.type === "document_html") {
+      return res.status(403).json({
+        message:
+          "The imported textbook document block can only be replaced through the content compiler release pipeline.",
+      });
+    }
     await adminDeleteContentBlock(blockId);
     await createAuditLog({
       adminUserId: req.userId!,
@@ -953,10 +968,21 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
       ? await adminGetSubtopicContentBlocks(subtopicId)
       : await adminGetContentBlocks(topicId!);
 
-    if (existingBlocks.some((b) => b.type === "document_html")) {
+    // The imported textbook document block itself stays immutable (release
+    // pipeline manages it), but custom blocks around it may be edited and the
+    // list may be reordered for layout.
+    const documentBlockIds = new Set(
+      existingBlocks
+        .filter((b) => b.type === "document_html")
+        .map((b) => b.id),
+    );
+    const lockedEdits = (blocks || []).filter(
+      (b) => b.id && documentBlockIds.has(b.id),
+    );
+    if (lockedEdits.length > 0) {
       return res.status(403).json({
         message:
-          "This topic contains authoritative textbook content from the release pipeline and is locked against direct manual edits to maintain 100% textbook layout parity. Use the content compiler release pipeline to deploy updates.",
+          "The imported textbook document block is locked against manual edits to maintain 100% textbook layout parity. Use the content compiler release pipeline to update it. No changes were saved.",
       });
     }
 

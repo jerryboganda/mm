@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, type ReactNode } from "react";
 import TipTapEditor from "./TipTapEditor";
 import MermaidEditor from "./MermaidEditor";
 import {
@@ -209,6 +209,9 @@ export interface BlockEditorProps {
   registerHtmlGetter?: (id: string, getter: (() => string) | null) => void;
   onAddBlockRemote?: (type: BlockType, insertIndex: number) => Promise<any>;
   onDeleteBlockRemote?: (id: string) => Promise<void>;
+  /** Renders immutable blocks (e.g. imported document_html) inline while
+   * keeping add/reorder controls available for the editable blocks. */
+  renderReadOnlyBlock?: (block: ContentBlock) => ReactNode;
 }
 
 export default function BlockEditor({
@@ -218,6 +221,7 @@ export default function BlockEditor({
   registerHtmlGetter,
   onAddBlockRemote,
   onDeleteBlockRemote,
+  renderReadOnlyBlock,
 }: BlockEditorProps) {
   const [newBlockType, setNewBlockType] = useState<BlockType>("text");
 
@@ -318,18 +322,22 @@ export default function BlockEditor({
               >
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <button
-                type="button"
-                onClick={() => deleteBlock(block.id)}
-                className="p-1 text-gray-400 hover:text-red-600"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              {block.type !== "document_html" && (
+                <button
+                  type="button"
+                  onClick={() => deleteBlock(block.id)}
+                  className="p-1 text-gray-400 hover:text-red-600"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
             {/* Block content */}
             <div className="p-0">
-              {block.type === "text" || block.type === "html" ? (
+              {block.type === "document_html" && renderReadOnlyBlock ? (
+                renderReadOnlyBlock(block)
+              ) : block.type === "text" || block.type === "html" ? (
                 <TipTapEditor
                   content={block.content}
                   onChange={(html) => updateBlock(block.id, html)}
