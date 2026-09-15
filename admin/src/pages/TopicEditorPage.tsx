@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { useBreadcrumbTitles } from "../components/Layout";
 import BlockEditor, { ContentBlock, normalizeBlockOrder } from "../components/BlockEditor";
 import ImportedDocumentBlock from "../components/ImportedDocumentBlock";
 import MobileContentPreview from "../components/MobileContentPreview";
@@ -70,6 +71,12 @@ export default function TopicEditorPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useBreadcrumbTitles(
+    contentItem && (topicId || subtopicId)
+      ? { [(topicId || subtopicId) as string]: contentItem.title }
+      : null,
+  );
 
   const registerRichTextHtmlGetter = useCallback(
     (id: string, getter: (() => string) | null) => {
@@ -189,7 +196,7 @@ export default function TopicEditorPage() {
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <p className="text-sm text-gray-500">
-              {subtopicId ? "Subtopic Content Editor" : "Topic Content Editor"}
+              {subtopicId ? "Section Content Editor" : "Topic Content Editor"}
             </p>
             {contentItem && (
               <span

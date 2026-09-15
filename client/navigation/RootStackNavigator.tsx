@@ -178,7 +178,7 @@ export default function RootStackNavigator() {
               name="Subtopics"
               component={SubtopicsScreen}
               options={({ route }) => ({
-                headerTitle: route.params?.topicTitle || "Subtopics",
+                headerTitle: route.params?.topicTitle || "Sections",
                 presentation: "card",
               })}
             />

@@ -98,7 +98,7 @@ export default function SubjectsPage() {
   const handleDelete = async (s: Subject) => {
     if (
       !confirm(
-        `Delete subject "${s.title}"? Only allowed if no topics are assigned to it.`,
+        `Delete subject "${s.title}"? Only allowed if no chapters are assigned to it.`,
       )
     )
       return;
@@ -143,7 +143,7 @@ export default function SubjectsPage() {
           </p>
           <h1 className="text-2xl font-bold text-gray-900">Subjects</h1>
           <p className="text-sm text-gray-400 mt-0.5">
-            Hierarchy: Books › Subjects › Topics › Subtopics › MCQs
+            Hierarchy: Books › Subjects (optional) › Chapters › Topics › Sections › MCQs
           </p>
         </div>
         <button

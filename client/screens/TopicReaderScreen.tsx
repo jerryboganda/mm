@@ -817,14 +817,14 @@ export default function TopicReaderScreen() {
                   },
                 ]}
                 accessibilityRole="button"
-                accessibilityLabel="View all subtopics"
+                accessibilityLabel="View all sections"
               >
                 <Feather name="list" size={13} color={theme.primary} />
                 <ThemedText
                   style={[styles.subtopicSelectorText, { color: theme.text }]}
                   numberOfLines={1}
                 >
-                  Subtopic {topic.allSubtopics.findIndex((s) => s.id === (currentSubtopicId || topic.id)) + 1} of {topic.allSubtopics.length}
+                  Section {topic.allSubtopics.findIndex((s) => s.id === (currentSubtopicId || topic.id)) + 1} of {topic.allSubtopics.length}
                 </ThemedText>
                 <Feather name="chevron-down" size={13} color={theme.textSecondary} />
               </Pressable>
@@ -1038,7 +1038,7 @@ export default function TopicReaderScreen() {
               })
             }
             accessibilityRole="button"
-            accessibilityLabel="Previous subtopic"
+            accessibilityLabel="Previous section"
           >
             <Feather name="chevron-left" size={24} color={theme.text} />
             <ThemedText style={[styles.navButtonText, { color: theme.text }]}>
@@ -1084,10 +1084,10 @@ export default function TopicReaderScreen() {
               })
             }
             accessibilityRole="button"
-            accessibilityLabel="Next subtopic"
+            accessibilityLabel="Next section"
           >
             <ThemedText style={styles.navButtonTextPrimary}>
-              Next Subtopic
+              Next Section
             </ThemedText>
             <Feather name="chevron-right" size={24} color="#fff" />
           </Pressable>
@@ -1128,11 +1128,11 @@ export default function TopicReaderScreen() {
         onClose={() => setSubtopicsModalVisible(false)}
         dismissible
         scrollable
-        accessibilityLabel="All Subtopics"
+        accessibilityLabel="All Sections"
       >
         <View style={styles.modalHeader}>
           <ThemedText type="h3" accessibilityRole="header">
-            {topic?.topicTitle || topicTitle || "Subtopics"}
+            {topic?.topicTitle || topicTitle || "Sections"}
           </ThemedText>
         </View>
         <View style={{ gap: Spacing.sm, marginTop: Spacing.md }}>
@@ -1204,6 +1204,32 @@ export default function TopicReaderScreen() {
             );
           })}
         </View>
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            setSubtopicsModalVisible(false);
+            navigation.navigate("QuizPlayer", {
+              topicId: currentTopicId,
+              mode: "topic",
+            });
+          }}
+          style={[
+            styles.modalQuizButton,
+            {
+              backgroundColor: theme.glassHover,
+              borderColor: theme.primary,
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Practice Topic MCQs"
+        >
+          <Feather name="help-circle" size={16} color={theme.primary} />
+          <ThemedText
+            style={{ color: theme.primary, fontSize: 14, fontWeight: "600" }}
+          >
+            Practice Topic MCQs
+          </ThemedText>
+        </Pressable>
       </AppModalSurface>
 
       {/* Report Error Modal */}
@@ -1561,5 +1587,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+  },
+  modalQuizButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    marginTop: Spacing.md,
   },
 });

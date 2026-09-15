@@ -59,8 +59,11 @@ async function withActiveFlag<T extends { userId: string }>(
     .where(inArray(subscriptions.userId, ids));
   const activeIds = new Set(
     subs
-      .filter((s) => isSubscriptionActive(s.status, s.currentPeriodEnd))
-      .map((s) => s.userId),
+      .filter(
+        (s: (typeof subs)[number]) =>
+          isSubscriptionActive(s.status, s.currentPeriodEnd),
+      )
+      .map((s: (typeof subs)[number]) => s.userId),
   );
   return rows.map((r) => ({
     ...r,

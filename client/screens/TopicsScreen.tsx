@@ -70,15 +70,15 @@ export default function TopicsScreen() {
 
   const renderTopic = ({ item, index }: { item: Topic; index: number }) => {
     const isPaid = Boolean(item.isPaid || item.isPremium);
-    const subtopicSubtitle =
+    const topicSubtitle =
       typeof item.subtopicsCount === "number" && item.subtopicsCount > 0
-        ? `${item.subtopicsCount} Subtopics${typeof item.progress === "number" && item.progress > 0 ? ` · ${item.progress}% complete` : ""}`
+        ? `${item.subtopicsCount} Sections${typeof item.progress === "number" && item.progress > 0 ? ` · ${item.progress}% complete` : ""}`
         : item.description;
 
     return (
       <GlassCard
         title={item.title}
-        subtitle={subtopicSubtitle}
+        subtitle={topicSubtitle}
         density="compact"
         titleNumberOfLines={2}
         subtitleNumberOfLines={1}
@@ -87,10 +87,9 @@ export default function TopicsScreen() {
           if (isPaid && !hasActiveSubscription) {
             navigation.navigate("Paywall");
           } else {
-            navigation.navigate("Subtopics", {
+            navigation.navigate("TopicReader", {
               topicId: item.id,
               topicTitle: item.title,
-              bookId: bookId || "",
             });
           }
         }}

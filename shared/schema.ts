@@ -115,8 +115,9 @@ export const booksRelations = relations(books, ({ many }) => ({
   topics: many(topics),
 }));
 
-// Subjects sit between books and chapters in the academic hierarchy:
-// books > subjects > chapters (UI: "Topics") > topics (UI: "Subtopics") > mcqs.
+// Subjects sit between books and chapters as optional grouping:
+// books > subjects (optional) > chapters (UI: "Chapters") > topics (UI: "Topics")
+// > subtopics (UI: "Sections") > content_blocks / mcqs.
 // Nullable on chapters so existing content keeps working until assigned.
 export const subjects = pgTable(
   "subjects",

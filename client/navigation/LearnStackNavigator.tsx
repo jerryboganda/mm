@@ -97,7 +97,7 @@ export default function LearnStackNavigator() {
         name="Subtopics"
         component={SubtopicsScreen}
         options={({ route }) => ({
-          headerTitle: route.params.topicTitle || "Subtopics",
+          headerTitle: route.params.topicTitle || "Sections",
         })}
       />
       <Stack.Screen
