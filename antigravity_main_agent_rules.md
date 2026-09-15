@@ -1,5 +1,5 @@
 # CRITICAL MANDATORY BUILD & DEPLOYMENT GLOBAL RULES
-1. **WEB BUNDLES & DEPLOYMENT**: ALWAYS use **GitHub Actions** (`deploy-hostinger.yml` / `workflow_dispatch`). NEVER build web bundles locally for production deployment.
+1. **PRODUCTION SERVER DEPLOYMENT (VPS: 185.252.233.186)**: ALWAYS deploy to Production VPS (`185.252.233.186`) via SSH access saved in this PC (`ssh root@185.252.233.186` / `npm run deploy:vps`) or GitHub Actions (`deploy-vps.yml` / `workflow_dispatch`).
 2. **MOBILE APP BUILDS**: ALWAYS use **EAS ONLY** (`npx eas-cli build` / `npm run build:android:store`). NEVER attempt manual local native Android/iOS store packaging.
 
 ---

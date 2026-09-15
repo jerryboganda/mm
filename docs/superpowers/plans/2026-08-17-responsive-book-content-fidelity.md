@@ -6,7 +6,7 @@
 
 **Architecture:** Replace the heuristic extractor with a deterministic OOXML compiler. It maps the 13 books and 285 current topic IDs through TOC bookmarks, emits allowlisted semantic HTML plus versioned figure assets and an exact fidelity manifest, and produces deterministic `document_html` content blocks. A pure shared TypeScript contract builds the same isolated document shell for an admin iframe and the existing native WebView. A dedicated content-release command snapshots and transactionally replaces only the 285 target topics' content blocks; ordinary application deployment is prohibited from importing SQL.
 
-**Tech Stack:** Python 3.12 (`zipfile`, `lxml`, Pillow, `unittest`), OOXML/DrawingML, semantic HTML/CSS, TypeScript 5.9, React 19, React Native/Expo 54, `react-native-webview`, Node 20, Zod, Drizzle-backed PostgreSQL/MySQL, Playwright, GitHub Actions, Hostinger, self-hosted Expo Updates.
+**Tech Stack:** Python 3.12 (`zipfile`, `lxml`, Pillow, `unittest`), OOXML/DrawingML, semantic HTML/CSS, TypeScript 5.9, React 19, React Native/Expo 54, `react-native-webview`, Node 20, Zod, Drizzle-backed PostgreSQL/MySQL, Playwright, GitHub Actions, Production VPS (185.252.233.186), self-hosted Expo Updates.
 
 **Spec:** `docs/superpowers/specs/2026-08-17-responsive-book-content-fidelity-design.md`
 
@@ -816,8 +816,8 @@ git commit -m "feat: add transactional book content release"
 
 **Files:**
 
-- Modify: `scripts/deploy_hostinger.sh`
-- Modify: `.github/workflows/deploy-hostinger.yml`
+- Modify: `scripts/deploy_vps.sh`
+- Modify: `.github/workflows/deploy-vps.yml`
 - Modify: `.github/workflows/ota-publish.yml`
 - Create: `.github/workflows/release-book-content.yml`
 - Create: `scripts/verify-ota-release.mjs`
@@ -827,7 +827,7 @@ git commit -m "feat: add transactional book content release"
 
 Read workflow/shell sources as text and assert:
 
-- ordinary Hostinger deploy contains no SQL import and no book activation command;
+- ordinary VPS deploy contains no SQL import and no book activation command;
 - no hard-coded database URL/password remains in the deployment script;
 - release workflow requires a production environment approval and exact confirmation phrase;
 - OTA publication and manifest verification precede database activation;
@@ -841,7 +841,7 @@ Expected: FAIL against the current automatic SQL-import deploy script.
 
 **Step 2: Make ordinary application deployment database-neutral**
 
-Remove all automatic SQL-import behavior and embedded database connection values from `deploy_hostinger.sh`. The script may install production dependencies, place static artifacts, restart, and verify services; it must never mutate book content. Narrow `deploy-hostinger.yml` sources so it ships only intentional runtime/build artifacts, not arbitrary generated SQL or local backup files.
+Remove all automatic SQL-import behavior and embedded database connection values from `deploy_vps.sh`. The script may install production dependencies, place static artifacts, restart, and verify services; it must never mutate book content. Narrow `deploy-vps.yml` sources so it ships only intentional runtime/build artifacts, not arbitrary generated SQL or local backup files.
 
 **Step 3: Make OTA reusable and verifiable**
 
@@ -883,7 +883,7 @@ Expected: PASS.
 **Step 6: Commit**
 
 ```powershell
-git add scripts/deploy_hostinger.sh .github/workflows/deploy-hostinger.yml .github/workflows/ota-publish.yml .github/workflows/release-book-content.yml scripts/verify-ota-release.mjs tests/deployment-safety.test.ts
+git add scripts/deploy_vps.sh .github/workflows/deploy-vps.yml .github/workflows/ota-publish.yml .github/workflows/release-book-content.yml scripts/verify-ota-release.mjs tests/deployment-safety.test.ts
 git commit -m "ci: gate maternal mind book content releases"
 ```
 
