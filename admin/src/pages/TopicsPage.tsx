@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { useBreadcrumbTitles } from "../components/Layout";
 import {
   Plus,
   Pencil,
@@ -99,6 +100,17 @@ export default function TopicsPage() {
     load();
   }, [chapterId, bookId]);
 
+  useBreadcrumbTitles(
+    parentBook
+      ? {
+          ...(bookId ? { [bookId]: parentBook.title } : {}),
+          ...(chapter && chapterId
+            ? { [chapterId]: chapter.title, [chapter.bookId]: parentBook.title }
+            : {}),
+        }
+      : null,
+  );
+
   const openCreate = () => {
     setEditTopic(null);
     setForm({
@@ -154,7 +166,7 @@ export default function TopicsPage() {
   const handleDelete = async (t: Topic) => {
     if (
       !confirm(
-        `Delete "${t.title}"? All subtopics and content blocks within it will be deleted.`,
+        `Delete "${t.title}"? All sections and content blocks within it will be deleted.`,
       )
     )
       return;
@@ -353,10 +365,10 @@ export default function TopicsPage() {
                   <Link
                     to={`/topics/${t.id}/subtopics`}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
-                    title="Manage subtopics"
+                    title="Manage sections"
                   >
                     <Layers className="w-3.5 h-3.5" />
-                    <span>Subtopics</span>
+                    <span>Sections</span>
                   </Link>
                   <Link
                     to={`/topics/${t.id}/edit`}

@@ -187,7 +187,7 @@ export default function SubtopicsScreen() {
             { color: theme.textSecondary, marginTop: Spacing.lg },
           ]}
         >
-          SUBTOPICS ({subtopicsList.length})
+          SECTIONS ({subtopicsList.length})
         </ThemedText>
       </View>
     );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { useBreadcrumbTitles } from "../components/Layout";
 import {
   Plus,
   Pencil,
@@ -70,6 +71,8 @@ export default function SubtopicsPage() {
     load();
   }, [topicId]);
 
+  useBreadcrumbTitles(topic && topicId ? { [topicId]: topic.title } : null);
+
   const openCreate = () => {
     setEditSubtopic(null);
     setForm({
@@ -124,7 +127,7 @@ export default function SubtopicsPage() {
   const handleDelete = async (s: Subtopic) => {
     if (
       !confirm(
-        `Delete "${s.title}"? All content blocks within this subtopic will be permanently removed.`,
+        `Delete "${s.title}"? All content blocks within this section will be permanently removed.`,
       )
     )
       return;
@@ -174,13 +177,13 @@ export default function SubtopicsPage() {
           <p className="text-sm text-gray-500">
             Topic: {topic?.title || "Loading..."}
           </p>
-          <h1 className="text-2xl font-bold text-gray-900">Subtopics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Sections</h1>
         </div>
         <button
           onClick={openCreate}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium"
         >
-          <Plus className="w-4 h-4" /> Add Subtopic
+          <Plus className="w-4 h-4" /> Add Section
         </button>
       </div>
 
@@ -195,7 +198,7 @@ export default function SubtopicsPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-lg font-bold mb-4">
-              {editSubtopic ? "Edit Subtopic" : "Create Subtopic"}
+              {editSubtopic ? "Edit Section" : "Create Section"}
             </h2>
             {error && (
               <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl mb-4 text-sm">
@@ -225,7 +228,7 @@ export default function SubtopicsPage() {
                   }
                   rows={3}
                   className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-                  placeholder="Short summary of this subtopic section..."
+                  placeholder="Short summary of this section..."
                 />
               </div>
               <div>
@@ -298,9 +301,9 @@ export default function SubtopicsPage() {
       {subtopicsList.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">No subtopics yet</p>
+          <p className="text-gray-500 font-medium">No sections yet</p>
           <p className="text-gray-400 text-sm mt-1">
-            Create subtopics to break down this topic into bite-sized learning sections
+            Create sections to break down this topic into bite-sized learning chunks
           </p>
         </div>
       ) : (
@@ -352,7 +355,7 @@ export default function SubtopicsPage() {
                   <button
                     onClick={() => togglePublish(s)}
                     className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                    title={s.isPublished ? "Unpublish subtopic" : "Publish subtopic"}
+                    title={s.isPublished ? "Unpublish section" : "Publish section"}
                   >
                     {s.isPublished ? (
                       <Eye className="w-4 h-4" />
@@ -370,7 +373,7 @@ export default function SubtopicsPage() {
                   <button
                     onClick={() => handleDelete(s)}
                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Delete subtopic"
+                    title="Delete section"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

@@ -257,21 +257,21 @@ test("Static contract: RootStackNavigator registers SubtopicsScreen", async () =
   );
 });
 
-test("Static contract: SearchScreen navigates books to Topics and topics to Subtopics", async () => {
+test("Static contract: SearchScreen navigates books to Chapters and topics to the reader", async () => {
   const fs = await import("node:fs/promises");
   const path = await import("node:path");
   const searchScreenPath = path.resolve(__dirname, "../client/screens/SearchScreen.tsx");
-  const content = await fs.readFile(searchScreenPath, "utf-8");
+  const content = (await fs.readFile(searchScreenPath, "utf-8")).replace(/\r\n/g, "\n");
 
-  // Book case navigates to Topics screen
+  // Book case navigates to Chapters screen (Book > Chapters > Topics)
   assert.ok(
-    content.includes('screen: "Topics",\n            params: {\n              bookId: item.id'),
-    "SearchScreen must navigate book results to Topics screen",
+    content.includes('screen: "Chapters",\n            params: {\n              bookId: item.id'),
+    "SearchScreen must navigate book results to Chapters screen",
   );
 
-  // Topic case navigates to Subtopics screen
+  // Topic case opens the reader directly (Topic > Text/Content Blocks)
   assert.ok(
-    content.includes('navigation.navigate("Subtopics", {\n          topicId: item.id'),
-    "SearchScreen must navigate topic results to Subtopics screen",
+    content.includes('navigation.navigate("TopicReader", {\n          topicId: item.id'),
+    "SearchScreen must navigate topic results to TopicReader",
   );
 });

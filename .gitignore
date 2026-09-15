@@ -122,3 +122,4 @@ dist/
 *.docx
 ORIGINAL_REQUEST.md
 PROJECT.md
+.zcode/

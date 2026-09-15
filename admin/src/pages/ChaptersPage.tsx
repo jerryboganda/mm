@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { useBreadcrumbTitles } from "../components/Layout";
 import {
   Plus,
   Pencil,
@@ -74,6 +75,8 @@ export default function ChaptersPage() {
     load();
   }, [bookId]);
 
+  useBreadcrumbTitles(book && bookId ? { [bookId]: book.title } : null);
+
   const openCreate = () => {
     setEditChapter(null);
     setForm({ title: "", description: "", subjectId: "" });
@@ -121,7 +124,7 @@ export default function ChaptersPage() {
   const handleDelete = async (ch: Chapter) => {
     if (
       !confirm(
-        `Delete "${ch.title}"? All subtopics and content within it will be deleted.`,
+        `Delete "${ch.title}"? All topics and content within it will be deleted.`,
       )
     )
       return;
@@ -164,13 +167,13 @@ export default function ChaptersPage() {
           <p className="text-sm text-gray-500">
             Book: {book?.title || "Unknown"}
           </p>
-          <h1 className="text-2xl font-bold text-gray-900">Topics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Chapters</h1>
         </div>
         <button
           onClick={openCreate}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors font-medium"
         >
-          <Plus className="w-4 h-4" /> Add Topic
+          <Plus className="w-4 h-4" /> Add Chapter
         </button>
       </div>
 
@@ -185,7 +188,7 @@ export default function ChaptersPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-lg font-bold mb-4">
-              {editChapter ? "Edit Topic" : "Create Topic"}
+              {editChapter ? "Edit Chapter" : "Create Chapter"}
             </h2>
             {error && (
               <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl mb-4 text-sm">
@@ -261,9 +264,9 @@ export default function ChaptersPage() {
       {chapters.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
           <Layers className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">No topics yet</p>
+          <p className="text-gray-500 font-medium">No chapters yet</p>
           <p className="text-gray-400 text-sm mt-1">
-            Create the first topic for this book
+            Create the first chapter for this book
           </p>
         </div>
       ) : (
@@ -304,14 +307,14 @@ export default function ChaptersPage() {
                   <Link
                     to={`/chapters/${ch.id}/topics`}
                     className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    title="Manage subtopics"
+                    title="Manage topics"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </Link>
                   <button
                     onClick={() => togglePublish(ch)}
                     className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                    title={ch.isPublished ? "Unpublish topic" : "Publish topic"}
+                    title={ch.isPublished ? "Unpublish chapter" : "Publish chapter"}
                   >
                     {ch.isPublished ? (
                       <Eye className="w-4 h-4" />

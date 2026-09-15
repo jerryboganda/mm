@@ -285,7 +285,7 @@ const SORT_OPTIONS = [
   { value: "year_asc", label: "Year ↑" },
   { value: "year_desc", label: "Year ↓" },
   { value: "difficulty", label: "Difficulty" },
-  { value: "chapter_asc", label: "Topic (A–Z)" },
+  { value: "chapter_asc", label: "Chapter (A–Z)" },
   { value: "most_attempted", label: "Most attempted" },
   { value: "lowest_accuracy", label: "Lowest accuracy" },
 ];
@@ -601,13 +601,13 @@ export default function McqsPage() {
     if (fChapter)
       chips.push({
         key: "chapter",
-        label: `Topic: ${chapterOptions.find((c) => c.value === fChapter)?.label ?? fChapter}`,
+        label: `Chapter: ${chapterOptions.find((c) => c.value === fChapter)?.label ?? fChapter}`,
         clear: () => setFChapter(""),
       });
     fTopicIds.forEach((id) =>
       chips.push({
         key: `topic-${id}`,
-        label: `Subtopic: ${topicsList.find((t) => t.id === id)?.title ?? id}`,
+        label: `Topic: ${topicsList.find((t) => t.id === id)?.title ?? id}`,
         clear: () => setFTopicIds((v) => v.filter((x) => x !== id)),
       }),
     );
@@ -1231,7 +1231,7 @@ export default function McqsPage() {
             }}
             className="px-3 py-2 border rounded-xl text-sm bg-white focus:ring-2 focus:ring-primary-500 outline-none"
           >
-            <option value="">All Topics</option>
+            <option value="">All Chapters</option>
             {chapterOptions.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
@@ -1239,7 +1239,7 @@ export default function McqsPage() {
             ))}
           </select>
           <MultiSelect
-            label="Subtopics"
+            label="Topics"
             options={subtopicOptions}
             values={fTopicIds}
             onChange={(v) => {
@@ -1520,7 +1520,7 @@ export default function McqsPage() {
             <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subtopic *
+                  Topic *
                 </label>
                 <select
                   value={form.topicId}
@@ -1894,7 +1894,7 @@ export default function McqsPage() {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Target Subtopic *
+                    Target Topic *
                   </label>
                   <select
                     value={importTopicId}

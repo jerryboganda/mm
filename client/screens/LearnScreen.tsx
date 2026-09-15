@@ -61,17 +61,23 @@ export default function LearnScreen() {
 
   const renderBook = ({ item, index }: { item: Book; index: number }) => {
     const isPaid = Boolean(item.isPaid || item.isPremium);
-    const count = item.topicsCount ?? item.chaptersCount;
+    const count = item.chaptersCount ?? 0;
+    const subtitleParts = [`${count} ${count === 1 ? "Chapter" : "Chapters"}`];
+    if (typeof item.topicsCount === "number") {
+      subtitleParts.push(
+        `${item.topicsCount} ${item.topicsCount === 1 ? "Topic" : "Topics"}`,
+      );
+    }
 
     return (
       <GlassCard
         title={item.title}
-        subtitle={`${count} ${count === 1 ? "Topic" : "Topics"}`}
+        subtitle={subtitleParts.join(" · ")}
         density="compact"
         titleNumberOfLines={2}
         subtitleNumberOfLines={1}
         onPress={() =>
-          navigation.navigate("Topics", {
+          navigation.navigate("Chapters", {
             bookId: item.id,
             bookTitle: item.title,
           })

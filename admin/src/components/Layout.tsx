@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -39,26 +39,56 @@ const breadcrumbLabels: Record<string, string> = {
   mcqs: "MCQs",
   "mcq-metadata": "MCQ Metadata",
   subjects: "Subjects",
-  chapters: "Topics",
-  topics: "Subtopics",
+  chapters: "Chapters",
+  topics: "Topics",
+  subtopics: "Sections",
   books: "Books",
 };
+
+type BreadcrumbTitles = Record<string, string>;
+
+const SetBreadcrumbTitlesContext = createContext<
+  (titles: BreadcrumbTitles) => void
+>(() => {});
+
+/**
+ * Pages call this with `{ [entityId]: displayTitle }` for the book/chapter/
+ * topic they have loaded, so the header breadcrumbs show names instead of
+ * raw ids. Titles are cleared when the page unmounts.
+ */
+export function useBreadcrumbTitles(titles: BreadcrumbTitles | null) {
+  const setTitles = useContext(SetBreadcrumbTitlesContext);
+  const serialized = JSON.stringify(titles ?? {});
+  useEffect(() => {
+    setTitles(JSON.parse(serialized));
+    return () => setTitles({});
+  }, [setTitles, serialized]);
+}
+
+function titleCaseSegment(seg: string) {
+  return seg.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [breadcrumbTitles, setBreadcrumbTitles] =
+    useState<BreadcrumbTitles>({});
   const location = useLocation();
 
-  // Build breadcrumbs from path
+  // Build breadcrumbs from path; id segments resolve to entity titles
+  // registered by the current page via useBreadcrumbTitles().
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const breadcrumbs = pathSegments.map((seg, i) => ({
     label:
       breadcrumbLabels[seg] ??
-      seg.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase()),
+      breadcrumbTitles[seg] ??
+      titleCaseSegment(seg),
     path: "/" + pathSegments.slice(0, i + 1).join("/"),
   }));
 
   return (
+    <SetBreadcrumbTitlesContext.Provider value={setBreadcrumbTitles}>
     <div className="min-h-screen flex bg-gray-50">
       {/* Mobile overlay */}
       {sidebarOpen && (
@@ -175,5 +205,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-4 lg:p-8">{children}</main>
       </div>
     </div>
+    </SetBreadcrumbTitlesContext.Provider>
   );
 }
