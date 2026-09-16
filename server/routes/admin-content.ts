@@ -110,9 +110,12 @@ const topicBaseSchema = z.object({
   references: z.string().max(5000).optional().nullable(),
 });
 
-const topicSchema = topicBaseSchema.refine((data) => data.chapterId || data.bookId, {
-  message: "Either chapterId or bookId is required",
-});
+const topicSchema = topicBaseSchema.refine(
+  (data) => data.chapterId || data.bookId,
+  {
+    message: "Either chapterId or bookId is required",
+  },
+);
 
 const subtopicSchema = z.object({
   topicId: z.string().min(1, "Topic ID is required"),
@@ -132,9 +135,12 @@ const contentBlockBaseSchema = z.object({
   order: z.number().int().optional(),
 });
 
-const contentBlockSchema = contentBlockBaseSchema.refine((data) => data.topicId || data.subtopicId, {
-  message: "Either topicId or subtopicId is required",
-});
+const contentBlockSchema = contentBlockBaseSchema.refine(
+  (data) => data.topicId || data.subtopicId,
+  {
+    message: "Either topicId or subtopicId is required",
+  },
+);
 
 const mcqOptionSchema = z.object({
   label: z.string().min(1),
@@ -977,9 +983,9 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
     };
 
     if ((!topicId && !subtopicId) || !Array.isArray(orderedIds)) {
-      return res
-        .status(400)
-        .json({ message: "topicId or subtopicId, and orderedIds are required" });
+      return res.status(400).json({
+        message: "topicId or subtopicId, and orderedIds are required",
+      });
     }
 
     const existingBlocks = subtopicId
@@ -990,9 +996,7 @@ router.post("/blocks/batch-save", async (req: AuthRequest, res) => {
     // pipeline manages it), but custom blocks around it may be edited and the
     // list may be reordered for layout.
     const documentBlockIds = new Set(
-      existingBlocks
-        .filter((b) => b.type === "document_html")
-        .map((b) => b.id),
+      existingBlocks.filter((b) => b.type === "document_html").map((b) => b.id),
     );
     const lockedEdits = (blocks || []).filter(
       (b) => b.id && documentBlockIds.has(b.id),

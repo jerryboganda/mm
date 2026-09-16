@@ -238,7 +238,7 @@ export const subtopics = pgTable(
   },
   (table) => [
     index("idx_subtopics_topic_order").on(table.topicId, table.order),
-    index("idx_subtopics_published"). on(table.isPublished),
+    index("idx_subtopics_published").on(table.isPublished),
   ],
 );
 
@@ -436,10 +436,7 @@ export const userProgress = pgTable(
   },
   (table) => [
     index("idx_user_progress_user_topic").on(table.userId, table.topicId),
-    index("idx_user_progress_user_subtopic").on(
-      table.userId,
-      table.subtopicId,
-    ),
+    index("idx_user_progress_user_subtopic").on(table.userId, table.subtopicId),
     index("idx_user_progress_user_completed").on(
       table.userId,
       table.isCompleted,

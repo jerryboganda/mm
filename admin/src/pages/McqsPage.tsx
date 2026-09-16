@@ -205,7 +205,8 @@ function TopicGroupOptions({
   );
 }
 
-interface MCQRow {  id: string;
+interface MCQRow {
+  id: string;
   chapterId: string | null;
   topicId: string | null;
   question: string;
@@ -288,7 +289,52 @@ const QUESTION_TYPES = [
   { value: "assertion_reason", label: "Assertion–Reason" },
   { value: "image_based", label: "Image-Based" },
   { value: "clinical_vignette", label: "Clinical Vignette" },
+  { value: "extended_matching", label: "Extended Matching (EMQ)" },
 ];
+
+// Options run A–N (up to 14) to support Extended Matching Questions.
+const MCQ_MAX_OPTIONS = 14;
+const MCQ_OPTION_LETTERS = Array.from({ length: MCQ_MAX_OPTIONS }, (_, i) =>
+  String.fromCharCode(65 + i),
+);
+const MCQ_DEFAULT_OPTION_ROWS = 5;
+
+type OptionFormFields = Record<string, string>;
+
+function emptyOptionFields(): OptionFormFields {
+  const fields: OptionFormFields = {};
+  MCQ_OPTION_LETTERS.forEach((l) => {
+    fields[`opt${l}`] = "";
+    fields[`expl${l}`] = "";
+  });
+  return fields;
+}
+
+function optionFieldsFromMaps(
+  opts: Record<string, string>,
+  expls: Record<string, string>,
+): OptionFormFields {
+  const fields: OptionFormFields = {};
+  MCQ_OPTION_LETTERS.forEach((l) => {
+    fields[`opt${l}`] = opts[l] || "";
+    fields[`expl${l}`] = expls[l] || "";
+  });
+  return fields;
+}
+
+/** Resolve a stored correctAnswer (letter or legacy option text) to a letter. */
+function normalizeCorrectLetter(
+  raw: string,
+  opts: Record<string, string>,
+): string {
+  const value = String(raw || "").trim();
+  const upper = value.toUpperCase();
+  if (opts[upper]) return upper;
+  const byText = Object.entries(opts).find(
+    ([, text]) => text.trim().toLowerCase() === value.toLowerCase(),
+  );
+  return byText ? byText[0] : value;
+}
 
 const YEAR_OPTIONS = Array.from({ length: 2026 - 2017 + 1 }, (_, i) =>
   String(2026 - i),
@@ -367,19 +413,10 @@ export default function McqsPage() {
     chapterId: "",
     topicId: "",
     question: "",
-    optA: "",
-    optB: "",
-    optC: "",
-    optD: "",
-    optE: "",
+    ...emptyOptionFields(),
     correctAnswer: "A",
     explanation: "",
     explanationBlocks: [] as ContentBlock[],
-    explA: "",
-    explB: "",
-    explC: "",
-    explD: "",
-    explE: "",
     difficulty: "medium",
     references: "",
     tags: "",
@@ -392,6 +429,9 @@ export default function McqsPage() {
     isPublished: true,
     isArchived: false,
   });
+  // How many option rows (A, B, C, …) the form currently shows — grows via
+  // "Add option" up to MCQ_MAX_OPTIONS for Extended Matching Questions.
+  const [optionRows, setOptionRows] = useState(MCQ_DEFAULT_OPTION_ROWS);
   const [newSourceName, setNewSourceName] = useState("");
   const [newInstitutionName, setNewInstitutionName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -558,28 +598,35 @@ export default function McqsPage() {
         params.set(key, value);
       }
 
-      const [result, topics, chapters, sources, institutions, subjects, facetRes] =
-        await Promise.all([
-          api.get<{ data: MCQRow[]; total: number }>(
-            `/admin/content/mcqs?${params}`,
-          ),
-          cacheRef.current.topics
-            ? Promise.resolve(cacheRef.current.topics)
-            : api.get<TopicRef[]>("/admin/content/topics/all"),
-          cacheRef.current.chapters
-            ? Promise.resolve(cacheRef.current.chapters)
-            : api.get<ChapterRef[]>("/admin/content/chapters/all"),
-          cacheRef.current.sources
-            ? Promise.resolve(cacheRef.current.sources)
-            : api.get<SourceRef[]>("/admin/content/sources"),
-          cacheRef.current.institutions
-            ? Promise.resolve(cacheRef.current.institutions)
-            : api.get<InstitutionRef[]>("/admin/content/institutions"),
-          cacheRef.current.subjects
-            ? Promise.resolve(cacheRef.current.subjects)
-            : api.get<SubjectRef[]>("/admin/content/subjects"),
-          api.get<Facets>("/admin/content/mcqs/facets"),
-        ]);
+      const [
+        result,
+        topics,
+        chapters,
+        sources,
+        institutions,
+        subjects,
+        facetRes,
+      ] = await Promise.all([
+        api.get<{ data: MCQRow[]; total: number }>(
+          `/admin/content/mcqs?${params}`,
+        ),
+        cacheRef.current.topics
+          ? Promise.resolve(cacheRef.current.topics)
+          : api.get<TopicRef[]>("/admin/content/topics/all"),
+        cacheRef.current.chapters
+          ? Promise.resolve(cacheRef.current.chapters)
+          : api.get<ChapterRef[]>("/admin/content/chapters/all"),
+        cacheRef.current.sources
+          ? Promise.resolve(cacheRef.current.sources)
+          : api.get<SourceRef[]>("/admin/content/sources"),
+        cacheRef.current.institutions
+          ? Promise.resolve(cacheRef.current.institutions)
+          : api.get<InstitutionRef[]>("/admin/content/institutions"),
+        cacheRef.current.subjects
+          ? Promise.resolve(cacheRef.current.subjects)
+          : api.get<SubjectRef[]>("/admin/content/subjects"),
+        api.get<Facets>("/admin/content/mcqs/facets"),
+      ]);
       setMcqs(result.data);
       setTotal(result.total);
       if (Array.isArray(topics)) {
@@ -759,23 +806,15 @@ export default function McqsPage() {
 
   const openCreate = () => {
     setEditMcq(null);
+    setOptionRows(MCQ_DEFAULT_OPTION_ROWS);
     setForm({
       chapterId: fChapter || "",
       topicId: fTopicIds.length === 1 ? fTopicIds[0] : "",
       question: "",
-      optA: "",
-      optB: "",
-      optC: "",
-      optD: "",
-      optE: "",
+      ...emptyOptionFields(),
       correctAnswer: "A",
       explanation: "",
       explanationBlocks: parseExplanationToBlocks(""),
-      explA: "",
-      explB: "",
-      explC: "",
-      explD: "",
-      explE: "",
       difficulty: "medium",
       references: "",
       tags: "",
@@ -799,24 +838,26 @@ export default function McqsPage() {
     const optExpls = normalizeOptionExplanationsMap(
       (m as any).optionExplanations,
     );
+    // Show at least one empty row beyond the highest stored option.
+    const highestFilled = MCQ_OPTION_LETTERS.reduce(
+      (last, l, idx) => (opts[l]?.trim() ? idx : last),
+      -1,
+    );
+    setOptionRows(
+      Math.min(
+        MCQ_MAX_OPTIONS,
+        Math.max(MCQ_DEFAULT_OPTION_ROWS, highestFilled + 2),
+      ),
+    );
     setEditMcq(m);
     setForm({
       chapterId: m.chapterId || "",
       topicId: m.topicId || "",
       question: m.question,
-      optA: opts.A || "",
-      optB: opts.B || "",
-      optC: opts.C || "",
-      optD: opts.D || "",
-      optE: opts.E || "",
-      correctAnswer: m.correctAnswer,
+      ...optionFieldsFromMaps(opts, optExpls),
+      correctAnswer: normalizeCorrectLetter(m.correctAnswer, opts),
       explanation: m.explanation || "",
       explanationBlocks: parseExplanationToBlocks(m.explanation),
-      explA: optExpls.A || "",
-      explB: optExpls.B || "",
-      explC: optExpls.C || "",
-      explD: optExpls.D || "",
-      explE: optExpls.E || "",
       difficulty: m.difficulty,
       references: m.references || "",
       tags: Array.isArray(m.tags) ? m.tags.join(", ") : (m as any).tags || "",
@@ -837,18 +878,13 @@ export default function McqsPage() {
 
   const buildMcqPayload = () => {
     const options: Record<string, string> = {};
-    if (form.optA) options.A = form.optA;
-    if (form.optB) options.B = form.optB;
-    if (form.optC) options.C = form.optC;
-    if (form.optD) options.D = form.optD;
-    if (form.optE) options.E = form.optE;
-
     const optionExplanations: Record<string, string> = {};
-    if (form.explA) optionExplanations.A = form.explA;
-    if (form.explB) optionExplanations.B = form.explB;
-    if (form.explC) optionExplanations.C = form.explC;
-    if (form.explD) optionExplanations.D = form.explD;
-    if (form.explE) optionExplanations.E = form.explE;
+    MCQ_OPTION_LETTERS.forEach((l) => {
+      const text = ((form as any)[`opt${l}`] as string | undefined)?.trim();
+      if (text) options[l] = text;
+      const expl = ((form as any)[`expl${l}`] as string | undefined)?.trim();
+      if (expl) optionExplanations[l] = expl;
+    });
 
     return {
       chapterId: form.chapterId,
@@ -882,8 +918,17 @@ export default function McqsPage() {
   };
 
   const handleSave = async () => {
-    if (!form.chapterId || !form.question || !form.optA || !form.optB) {
+    const filledLetters = MCQ_OPTION_LETTERS.filter((l) =>
+      ((form as any)[`opt${l}`] as string | undefined)?.trim(),
+    );
+    if (!form.chapterId || !form.question.trim() || filledLetters.length < 2) {
       setError("Chapter, question, and at least 2 options required");
+      return;
+    }
+    if (!filledLetters.includes(form.correctAnswer)) {
+      setError(
+        `Correct answer must be one of the filled options (${filledLetters.join(", ")})`,
+      );
       return;
     }
     setSaving(true);
@@ -1642,7 +1687,7 @@ export default function McqsPage() {
                   </span>
                 </span>
               </label>
-              {["A", "B", "C", "D", "E"].map((opt) => (
+              {MCQ_OPTION_LETTERS.slice(0, optionRows).map((opt) => (
                 <div key={opt} className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-500 mb-1">
@@ -1671,6 +1716,18 @@ export default function McqsPage() {
                   </div>
                 </div>
               ))}
+              {optionRows < MCQ_MAX_OPTIONS && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOptionRows((n) => Math.min(MCQ_MAX_OPTIONS, n + 1))
+                  }
+                  className="flex items-center justify-center gap-1.5 w-full py-2 border border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4" /> Add option (up to{" "}
+                  {MCQ_OPTION_LETTERS[MCQ_MAX_OPTIONS - 1]}, e.g. for EMQs)
+                </button>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1683,7 +1740,7 @@ export default function McqsPage() {
                     }
                     className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   >
-                    {["A", "B", "C", "D", "E"].map((o) => (
+                    {MCQ_OPTION_LETTERS.slice(0, optionRows).map((o) => (
                       <option key={o} value={o}>
                         {o}
                       </option>
@@ -2220,58 +2277,60 @@ export default function McqsPage() {
                       Options & Explanations
                     </span>
                     <div className="space-y-2.5">
-                      {["A", "B", "C", "D", "E"].map((key) => {
-                        const optText = opts[key];
-                        if (!optText) return null;
-                        const isCorrect = previewMcq.correctAnswer === key;
-                        const expl = optExpls[key];
+                      {Object.keys(opts)
+                        .sort()
+                        .map((key) => {
+                          const optText = opts[key];
+                          if (!optText) return null;
+                          const isCorrect = previewMcq.correctAnswer === key;
+                          const expl = optExpls[key];
 
-                        return (
-                          <div
-                            key={key}
-                            className={`rounded-xl border p-3 transition-all ${
-                              isCorrect
-                                ? "bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-300/50"
-                                : "bg-white border-gray-200"
-                            }`}
-                          >
-                            <div className="flex items-start gap-3">
-                              <span
-                                className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                                  isCorrect
-                                    ? "bg-emerald-600 text-white"
-                                    : "bg-gray-100 text-gray-700"
-                                }`}
-                              >
-                                {key}
-                              </span>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <p
-                                    className={`text-sm ${isCorrect ? "font-semibold text-emerald-950" : "text-gray-800"}`}
-                                  >
-                                    {optText}
-                                  </p>
-                                  {isCorrect && (
-                                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                                      <Check className="w-3.5 h-3.5" /> Correct
-                                      Answer
-                                    </span>
+                          return (
+                            <div
+                              key={key}
+                              className={`rounded-xl border p-3 transition-all ${
+                                isCorrect
+                                  ? "bg-emerald-50/70 border-emerald-300 ring-1 ring-emerald-300/50"
+                                  : "bg-white border-gray-200"
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <span
+                                  className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                                    isCorrect
+                                      ? "bg-emerald-600 text-white"
+                                      : "bg-gray-100 text-gray-700"
+                                  }`}
+                                >
+                                  {key}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <p
+                                      className={`text-sm ${isCorrect ? "font-semibold text-emerald-950" : "text-gray-800"}`}
+                                    >
+                                      {optText}
+                                    </p>
+                                    {isCorrect && (
+                                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                                        <Check className="w-3.5 h-3.5" />{" "}
+                                        Correct Answer
+                                      </span>
+                                    )}
+                                  </div>
+                                  {expl && (
+                                    <div className="mt-2 text-xs text-gray-600 bg-gray-50/90 rounded-lg p-2 border border-gray-100">
+                                      <span className="font-semibold text-gray-700">
+                                        Option {key} Explanation:{" "}
+                                      </span>
+                                      {expl}
+                                    </div>
                                   )}
                                 </div>
-                                {expl && (
-                                  <div className="mt-2 text-xs text-gray-600 bg-gray-50/90 rounded-lg p-2 border border-gray-100">
-                                    <span className="font-semibold text-gray-700">
-                                      Option {key} Explanation:{" "}
-                                    </span>
-                                    {expl}
-                                  </div>
-                                )}
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
                     </div>
                   </div>
 
