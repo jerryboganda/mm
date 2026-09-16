@@ -71,6 +71,7 @@ import {
   adminInstitutionMcqCount,
   adminMergeInstitutions,
   adminGetAllTopicsFlat,
+  adminGetAllChaptersFlat,
   parseBoolFilter,
   parseListFilter,
   type AdminMcqFilters,
@@ -147,8 +148,8 @@ const mcqOptionsSchema = z.union([
       (obj) => Object.keys(obj).length >= 2,
       "At least 2 options required",
     ),
-  z.array(mcqOptionSchema).min(2, "At least 2 options required").max(10),
-  z.array(z.string().min(1)).min(2, "At least 2 options required").max(10),
+  z.array(mcqOptionSchema).min(2, "At least 2 options required").max(14),
+  z.array(z.string().min(1)).min(2, "At least 2 options required").max(14),
 ]);
 
 function normalizeMcqOptionsToRecord(
@@ -254,7 +255,10 @@ function normalizeMcqTags(raw: unknown): string[] | null | undefined {
 }
 
 const mcqSchema = z.object({
-  topicId: z.string().min(1, "Topic ID is required"),
+  // Chapter is the required classification anchor; topic is optional
+  // (chapter-only MCQs are valid, e.g. Extended Matching sets).
+  chapterId: z.string().min(1, "Chapter is required"),
+  topicId: z.string().optional().nullable(),
   question: z.string().min(1, "Question is required").max(5000),
   options: mcqOptionsSchema,
   correctAnswer: z.string().min(1, "Correct answer is required"),
@@ -291,6 +295,7 @@ const mcqSchema = z.object({
       "assertion_reason",
       "image_based",
       "clinical_vignette",
+      "extended_matching",
     ])
     .optional()
     .nullable(),
@@ -631,6 +636,19 @@ router.get("/books/:bookId/topics", async (req: AuthRequest, res) => {
 router.get("/topics/all", async (_req: AuthRequest, res) => {
   try {
     const data = await adminGetAllTopicsFlat();
+    res.json(data);
+  } catch (err: unknown) {
+    res
+      .status(500)
+      .json({ message: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// Flat chapter list (with book/subject titles) for MCQ classification —
+// chapters without topics are valid now that chapter-only MCQs exist.
+router.get("/chapters/all", async (_req: AuthRequest, res) => {
+  try {
+    const data = await adminGetAllChaptersFlat();
     res.json(data);
   } catch (err: unknown) {
     res
@@ -1094,6 +1112,7 @@ router.post("/mcqs", async (req: AuthRequest, res) => {
     if (!data) return;
     const m = await adminCreateMcq({
       ...data,
+      topicId: data.topicId || null,
       options: normalizeMcqOptionsToRecord(data.options),
       optionExplanations: normalizeMcqOptionExplanationsToRecord(
         data.optionExplanations,
@@ -1121,6 +1140,7 @@ router.put("/mcqs/:id", async (req: AuthRequest, res) => {
     if (!data) return;
     const payload = {
       ...data,
+      ...(data.topicId !== undefined ? { topicId: data.topicId || null } : {}),
       ...(data.options
         ? { options: normalizeMcqOptionsToRecord(data.options) }
         : {}),
@@ -1179,6 +1199,7 @@ router.post("/mcqs/bulk", async (req: AuthRequest, res) => {
     if (!data) return;
     const normalizedMcqs = data.mcqs.map((mcq) => ({
       ...mcq,
+      topicId: mcq.topicId || null,
       options: normalizeMcqOptionsToRecord(mcq.options),
       optionExplanations: normalizeMcqOptionExplanationsToRecord(
         mcq.optionExplanations,

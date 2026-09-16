@@ -105,7 +105,8 @@ const DDL_STATEMENTS = [
 
   `CREATE TABLE IF NOT EXISTS mcqs (
     id VARCHAR(191) PRIMARY KEY,
-    topic_id VARCHAR(191) NOT NULL,
+    chapter_id VARCHAR(191),
+    topic_id VARCHAR(191),
     question TEXT NOT NULL,
     options JSON NOT NULL,
     correct_answer VARCHAR(255) NOT NULL,
@@ -117,7 +118,8 @@ const DDL_STATEMENTS = [
     is_published BOOLEAN DEFAULT false,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_mcqs_topic_id (topic_id)
+    INDEX idx_mcqs_topic_id (topic_id),
+    INDEX idx_mcqs_chapter (chapter_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
   `CREATE TABLE IF NOT EXISTS user_progress (
@@ -360,6 +362,37 @@ async function init() {
       await conn.query(ddl);
     }
     console.log("[+] All MySQL schema tables verified/created successfully.");
+
+    // ── Idempotent upgrades for databases created before these columns ──
+    // MySQL has no ADD COLUMN IF NOT EXISTS, so guard via information_schema.
+    const [[mcqChapterCol]] = await conn.query(
+      `SELECT COUNT(*) AS cnt FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'mcqs' AND COLUMN_NAME = 'chapter_id'`,
+    );
+    if (!mcqChapterCol || mcqChapterCol.cnt === 0) {
+      console.log("[*] Patching mcqs: adding chapter_id column...");
+      await conn.query(
+        "ALTER TABLE mcqs ADD COLUMN chapter_id VARCHAR(191) NULL AFTER id",
+      );
+    }
+    // topic_id must be nullable (chapter-only MCQs); MODIFY is idempotent.
+    const [[mcqTopicCol]] = await conn.query(
+      `SELECT IS_NULLABLE AS nullable FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'mcqs' AND COLUMN_NAME = 'topic_id'`,
+    );
+    if (mcqTopicCol && mcqTopicCol.nullable !== "YES") {
+      console.log("[*] Patching mcqs: relaxing topic_id to nullable...");
+      await conn.query("ALTER TABLE mcqs MODIFY topic_id VARCHAR(191) NULL");
+    }
+    const [[mcqChapterIdx]] = await conn.query(
+      `SELECT COUNT(*) AS cnt FROM information_schema.STATISTICS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'mcqs' AND INDEX_NAME = 'idx_mcqs_chapter'`,
+    );
+    if (!mcqChapterIdx || mcqChapterIdx.cnt === 0) {
+      await conn.query("ALTER TABLE mcqs ADD INDEX idx_mcqs_chapter (chapter_id)");
+    }
+    console.log("[+] MySQL schema patches verified.");
+
 
     // Seed default admin if missing
     const [adminRows] = await conn.query(

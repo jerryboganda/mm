@@ -60,7 +60,8 @@ export function resolveCorrectLabel(
   correctAnswer: string,
   rawOptions: unknown,
 ): string {
-  if (/^[A-F]$/i.test(correctAnswer)) return correctAnswer.toUpperCase();
+  // Single-letter answers A–N (EMQs allow up to 14 options).
+  if (/^[A-N]$/i.test(correctAnswer)) return correctAnswer.toUpperCase();
 
   const normalized = normalizeOptions(rawOptions);
   const normalizedAnswer = String(correctAnswer || "").trim();

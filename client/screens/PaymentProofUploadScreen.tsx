@@ -16,6 +16,7 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import * as Haptics from "@/lib/haptics-wrapper";
 
 import { BackgroundGradient } from "@/components/BackgroundGradient";
@@ -143,8 +144,13 @@ export default function PaymentProofUploadScreen() {
         const blob = await resp.blob();
         formData.append("proof", blob, image.fileName);
       } else {
+        // Expo's fetch (global since SDK 57) rejects RN's { uri } FormData
+        // parts with "Unsupported FormDataPart implementation", so read the
+        // bytes and append the converter-compatible { bytes, name, type } shape.
+        const file = new FileSystem.File(image.uri);
+        const buffer = await file.arrayBuffer();
         formData.append("proof", {
-          uri: image.uri,
+          bytes: () => new Uint8Array(buffer),
           name: image.fileName,
           type: image.mimeType,
         } as any);
