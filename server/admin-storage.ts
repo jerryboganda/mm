@@ -314,12 +314,12 @@ export async function adminReorderTopics(
   for (let i = 0; i < orderedIds.length; i++) {
     const condition = isBookId
       ? and(eq(topics.id, orderedIds[i]), eq(topics.bookId, chapterOrBookId))
-      : and(eq(topics.id, orderedIds[i]), eq(topics.chapterId, chapterOrBookId));
+      : and(
+          eq(topics.id, orderedIds[i]),
+          eq(topics.chapterId, chapterOrBookId),
+        );
 
-    await db
-      .update(topics)
-      .set({ order: i })
-      .where(condition);
+    await db.update(topics).set({ order: i }).where(condition);
   }
 }
 
@@ -459,7 +459,12 @@ export async function adminCreateContentBlock(data: {
 
 export async function adminUpdateContentBlock(
   id: string,
-  data: Partial<{ type: string; content: string; order: number; subtopicId?: string | null }>,
+  data: Partial<{
+    type: string;
+    content: string;
+    order: number;
+    subtopicId?: string | null;
+  }>,
 ): Promise<ContentBlock | undefined> {
   const [cb] = await db
     .update(contentBlocks)

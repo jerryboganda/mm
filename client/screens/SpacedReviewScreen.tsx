@@ -1,5 +1,11 @@
 import React, { useState, useCallback, useRef } from "react";
-import { StyleSheet, View, Pressable, Animated } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Animated,
+  ScrollView,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -343,94 +349,102 @@ export default function SpacedReviewScreen() {
             },
           ]}
         >
-          {currentQuestion?.difficulty && (
-            <View
-              style={[
-                styles.difficultyBadge,
-                { backgroundColor: `${theme.purple}26` },
-              ]}
-            >
-              <ThemedText
-                style={[styles.difficultyText, { color: theme.purple }]}
+          {/* Scrollable so Extended Matching questions (up to 14 options)
+              never clip; flexGrow keeps actions visible when content is short. */}
+          <ScrollView
+            style={styles.cardScroll}
+            contentContainerStyle={styles.cardScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {currentQuestion?.difficulty && (
+              <View
+                style={[
+                  styles.difficultyBadge,
+                  { backgroundColor: `${theme.purple}26` },
+                ]}
               >
-                {currentQuestion.difficulty}
-              </ThemedText>
-            </View>
-          )}
-
-          <MetaPillRow
-            year={currentQuestion?.year}
-            subjectName={currentQuestion?.subjectName}
-            sourceName={currentQuestion?.sourceName}
-            style={{ marginBottom: Spacing.sm }}
-          />
-          <ThemedText type="h3" style={styles.questionText}>
-            {currentQuestion?.question}
-          </ThemedText>
-
-          <View style={styles.optionsContainer}>
-            {currentQuestion?.options.map((option) => (
-              <OptionButton
-                key={option.label}
-                label={option.label}
-                text={option.text}
-                selected={selectedOption === option.label}
-                onPress={() => handleOptionSelect(option.label)}
-                disabled={showAnswer}
-              />
-            ))}
-          </View>
-
-          {!showAnswer ? (
-            <PrimaryButton
-              title="Check Answer"
-              onPress={handleCheckAnswer}
-              disabled={!selectedOption}
-              icon="eye"
-              style={{ marginTop: Spacing.lg }}
-            />
-          ) : (
-            <View
-              style={[
-                styles.qualityContainer,
-                { borderTopColor: theme.glassBorder },
-              ]}
-            >
-              <ThemedText
-                style={[styles.qualityLabel, { color: theme.textSecondary }]}
-              >
-                How well did you know this?
-              </ThemedText>
-              <View style={styles.qualityButtons}>
-                {QUALITY_OPTIONS.map((opt) => (
-                  <Pressable
-                    key={opt.value}
-                    style={[
-                      styles.qualityButton,
-                      {
-                        borderColor: opt.color,
-                        backgroundColor: theme.glass,
-                      },
-                    ]}
-                    onPress={() => handleQualityRating(opt.value)}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Rate as ${opt.label}`}
-                  >
-                    <Feather
-                      name={opt.icon as any}
-                      size={20}
-                      color={opt.color}
-                    />
-                    <ThemedText
-                      style={[styles.qualityButtonText, { color: opt.color }]}
-                    >
-                      {opt.label}
-                    </ThemedText>
-                  </Pressable>
-                ))}
+                <ThemedText
+                  style={[styles.difficultyText, { color: theme.purple }]}
+                >
+                  {currentQuestion.difficulty}
+                </ThemedText>
               </View>
+            )}
+
+            <MetaPillRow
+              year={currentQuestion?.year}
+              subjectName={currentQuestion?.subjectName}
+              sourceName={currentQuestion?.sourceName}
+              style={{ marginBottom: Spacing.sm }}
+            />
+            <ThemedText type="h3" style={styles.questionText}>
+              {currentQuestion?.question}
+            </ThemedText>
+
+            <View style={styles.optionsContainer}>
+              {currentQuestion?.options.map((option) => (
+                <OptionButton
+                  key={option.label}
+                  label={option.label}
+                  text={option.text}
+                  selected={selectedOption === option.label}
+                  onPress={() => handleOptionSelect(option.label)}
+                  disabled={showAnswer}
+                />
+              ))}
             </View>
-          )}
+
+            {!showAnswer ? (
+              <PrimaryButton
+                title="Check Answer"
+                onPress={handleCheckAnswer}
+                disabled={!selectedOption}
+                icon="eye"
+                style={{ marginTop: Spacing.lg }}
+              />
+            ) : (
+              <View
+                style={[
+                  styles.qualityContainer,
+                  { borderTopColor: theme.glassBorder },
+                ]}
+              >
+                <ThemedText
+                  style={[styles.qualityLabel, { color: theme.textSecondary }]}
+                >
+                  How well did you know this?
+                </ThemedText>
+                <View style={styles.qualityButtons}>
+                  {QUALITY_OPTIONS.map((opt) => (
+                    <Pressable
+                      key={opt.value}
+                      style={[
+                        styles.qualityButton,
+                        {
+                          borderColor: opt.color,
+                          backgroundColor: theme.glass,
+                        },
+                      ]}
+                      onPress={() => handleQualityRating(opt.value)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Rate as ${opt.label}`}
+                    >
+                      <Feather
+                        name={opt.icon as any}
+                        size={20}
+                        color={opt.color}
+                      />
+                      <ThemedText
+                        style={[styles.qualityButtonText, { color: opt.color }]}
+                      >
+                        {opt.label}
+                      </ThemedText>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            )}
+          </ScrollView>
         </Animated.View>
 
         {/* Review info */}
@@ -494,9 +508,16 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   card: {
+    flex: 1,
     borderRadius: BorderRadius["2xl"],
     padding: Spacing.xl,
     borderWidth: 1,
+  },
+  cardScroll: {
+    flex: 1,
+  },
+  cardScrollContent: {
+    flexGrow: 1,
   },
   difficultyBadge: {
     alignSelf: "flex-start",

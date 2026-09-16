@@ -460,41 +460,55 @@ export default function QuizPlayerScreen() {
           style={styles.progressBar}
         />
 
-        <View style={styles.questionContainer}>
-          <View style={styles.difficultyRow}>
-            <View
-              style={[styles.difficultyBadge, { backgroundColor: theme.glass }]}
-            >
-              <ThemedText
-                style={[styles.difficultyText, { color: theme.textSecondary }]}
+        {/* Scrollable so Extended Matching questions (up to 14 options)
+            never clip; flexGrow keeps the footer pinned when content is short. */}
+        <ScrollView
+          style={styles.bodyScroll}
+          contentContainerStyle={styles.bodyScrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.questionContainer}>
+            <View style={styles.difficultyRow}>
+              <View
+                style={[
+                  styles.difficultyBadge,
+                  { backgroundColor: theme.glass },
+                ]}
               >
-                {currentQuestion?.difficulty.toUpperCase()}
-              </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.difficultyText,
+                    { color: theme.textSecondary },
+                  ]}
+                >
+                  {currentQuestion?.difficulty.toUpperCase()}
+                </ThemedText>
+              </View>
+              <MetaPillRow
+                year={currentQuestion?.year}
+                subjectName={currentQuestion?.subjectName}
+                sourceName={currentQuestion?.sourceName}
+                style={{ flex: 1 }}
+              />
             </View>
-            <MetaPillRow
-              year={currentQuestion?.year}
-              subjectName={currentQuestion?.subjectName}
-              sourceName={currentQuestion?.sourceName}
-              style={{ flex: 1 }}
-            />
+            <ThemedText type="h3" style={styles.questionText}>
+              {currentQuestion?.question}
+            </ThemedText>
           </View>
-          <ThemedText type="h3" style={styles.questionText}>
-            {currentQuestion?.question}
-          </ThemedText>
-        </View>
 
-        <View style={styles.optionsContainer}>
-          {currentQuestion?.options.map((option) => (
-            <OptionButton
-              key={option.label}
-              label={option.label}
-              text={option.text}
-              selected={selectedOption === option.label}
-              onPress={() => handleSelectOption(option.label)}
-              testID={`option-${option.label}`}
-            />
-          ))}
-        </View>
+          <View style={styles.optionsContainer}>
+            {currentQuestion?.options.map((option) => (
+              <OptionButton
+                key={option.label}
+                label={option.label}
+                text={option.text}
+                selected={selectedOption === option.label}
+                onPress={() => handleSelectOption(option.label)}
+                testID={`option-${option.label}`}
+              />
+            ))}
+          </View>
+        </ScrollView>
 
         <View
           style={[
@@ -799,6 +813,12 @@ const styles = StyleSheet.create({
   progressBar: {
     marginBottom: Spacing["2xl"],
   },
+  bodyScroll: {
+    flex: 1,
+  },
+  bodyScrollContent: {
+    flexGrow: 1,
+  },
   questionContainer: {
     marginBottom: Spacing["2xl"],
   },
@@ -823,8 +843,10 @@ const styles = StyleSheet.create({
   questionText: {
     lineHeight: 32,
   },
+  // flexGrow (not flex:1) inside the scroll content: fills space when options
+  // are few, grows past the viewport (scrolls) with up to 14 EMQ options.
   optionsContainer: {
-    flex: 1,
+    flexGrow: 1,
     marginTop: Spacing.lg,
   },
   footer: {
