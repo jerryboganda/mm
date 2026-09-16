@@ -335,9 +335,14 @@ export const mcqs = pgTable(
     id: varchar("id")
       .primaryKey()
       .default(sql`gen_random_uuid()`),
-    topicId: varchar("topic_id")
-      .notNull()
-      .references(() => topics.id, { onDelete: "cascade" }),
+    // Classification: chapter is the required anchor; topic is optional
+    // (chapter-only MCQs are valid, e.g. Extended Matching sets).
+    chapterId: varchar("chapter_id").references(() => chapters.id, {
+      onDelete: "set null",
+    }),
+    topicId: varchar("topic_id").references(() => topics.id, {
+      onDelete: "cascade",
+    }),
     question: text("question").notNull(),
     options: jsonb("options").notNull(),
     correctAnswer: text("correct_answer").notNull(),
@@ -372,6 +377,7 @@ export const mcqs = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
+    index("idx_mcqs_chapter").on(table.chapterId),
     index("idx_mcqs_year").on(table.year),
     index("idx_mcqs_source").on(table.sourceId),
     index("idx_mcqs_institution").on(table.institutionId),
@@ -381,6 +387,10 @@ export const mcqs = pgTable(
 );
 
 export const mcqsRelations = relations(mcqs, ({ one }) => ({
+  chapter: one(chapters, {
+    fields: [mcqs.chapterId],
+    references: [chapters.id],
+  }),
   topic: one(topics, {
     fields: [mcqs.topicId],
     references: [topics.id],

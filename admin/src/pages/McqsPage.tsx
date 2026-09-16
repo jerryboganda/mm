@@ -175,7 +175,12 @@ function TopicGroupOptions({
   groups,
   showBook,
 }: {
-  groups: { chapterTitle: string; bookTitle: string; topics: TopicRef[] }[];
+  groups: {
+    chapterId: string | null;
+    chapterTitle: string;
+    bookTitle: string;
+    topics: TopicRef[];
+  }[];
   showBook: boolean;
 }) {
   return (
@@ -201,7 +206,8 @@ function TopicGroupOptions({
 }
 
 interface MCQRow {  id: string;
-  topicId: string;
+  chapterId: string | null;
+  topicId: string | null;
   question: string;
   options: any;
   correctAnswer: string;
@@ -225,6 +231,15 @@ interface MCQRow {  id: string;
   topicTitle: string | null;
   attempts: number;
   correct: number;
+}
+
+interface ChapterRef {
+  id: string;
+  title: string;
+  bookId: string;
+  bookTitle: string;
+  subjectId: string | null;
+  subjectTitle: string | null;
 }
 
 interface TopicRef {
@@ -308,6 +323,7 @@ export default function McqsPage() {
   const [mcqs, setMcqs] = useState<MCQRow[]>([]);
   const [total, setTotal] = useState(0);
   const [topicsList, setTopics] = useState<TopicRef[]>([]);
+  const [chaptersList, setChapters] = useState<ChapterRef[]>([]);
   const [sourcesList, setSources] = useState<SourceRef[]>([]);
   const [institutionsList, setInstitutions] = useState<InstitutionRef[]>([]);
   const [subjectsList, setSubjects] = useState<SubjectRef[]>([]);
@@ -348,6 +364,7 @@ export default function McqsPage() {
   const [editMcq, setEditMcq] = useState<MCQRow | null>(null);
   const [previewMcq, setPreviewMcq] = useState<MCQRow | null>(null);
   const [form, setForm] = useState({
+    chapterId: "",
     topicId: "",
     question: "",
     optA: "",
@@ -383,6 +400,7 @@ export default function McqsPage() {
   // Bulk import
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState("");
+  const [importChapterId, setImportChapterId] = useState("");
   const [importTopicId, setImportTopicId] = useState("");
   const [importYear, setImportYear] = useState("");
   const [importSourceId, setImportSourceId] = useState("");
@@ -394,6 +412,7 @@ export default function McqsPage() {
   );
   const cacheRef = useRef<{
     topics?: TopicRef[];
+    chapters?: ChapterRef[];
     sources?: SourceRef[];
     institutions?: InstitutionRef[];
     subjects?: SubjectRef[];
@@ -415,15 +434,24 @@ export default function McqsPage() {
 
   const chapterOptions = useMemo(() => {
     const map = new Map<string, string>();
+    chaptersList
+      .filter(
+        (c) =>
+          (!fBook || c.bookId === fBook) &&
+          (!fSubject || c.subjectId === fSubject),
+      )
+      .forEach((c) => map.set(c.id, c.title));
     topicsList
       .filter(
         (t) =>
           (!fBook || t.bookId === fBook) &&
           (!fSubject || t.subjectId === fSubject),
       )
-      .forEach((t) => map.set(t.chapterId, t.chapterTitle));
+      .forEach((t) => {
+        if (!map.has(t.chapterId)) map.set(t.chapterId, t.chapterTitle);
+      });
     return Array.from(map, ([value, label]) => ({ value, label }));
-  }, [topicsList, fBook, fSubject]);
+  }, [chaptersList, topicsList, fBook, fSubject]);
 
   const subtopicOptions = useMemo(
     () =>
@@ -439,13 +467,19 @@ export default function McqsPage() {
   const topicsByChapter = useMemo(() => {
     const map = new Map<
       string,
-      { chapterTitle: string; bookTitle: string; topics: TopicRef[] }
+      {
+        chapterId: string | null;
+        chapterTitle: string;
+        bookTitle: string;
+        topics: TopicRef[];
+      }
     >();
     topicsList.forEach((t) => {
       const key = t.chapterId || "__none";
       let g = map.get(key);
       if (!g) {
         g = {
+          chapterId: t.chapterId || null,
           chapterTitle: t.chapterTitle || "Other",
           bookTitle: t.bookTitle || "",
           topics: [],
@@ -456,6 +490,16 @@ export default function McqsPage() {
     });
     return Array.from(map.values());
   }, [topicsList]);
+
+  // Topic dropdown for the MCQ form: when a chapter is selected, only that
+  // chapter's topics are offered (chapter is the required anchor).
+  const formTopicGroups = useMemo(
+    () =>
+      form.chapterId
+        ? topicsByChapter.filter((g) => g.chapterId === form.chapterId)
+        : topicsByChapter,
+    [topicsByChapter, form.chapterId],
+  );
 
   const yearOptions = useMemo(() => {
     const set = new Set<string>([...facets.years.map(String), ...YEAR_OPTIONS]);
@@ -514,7 +558,7 @@ export default function McqsPage() {
         params.set(key, value);
       }
 
-      const [result, topics, sources, institutions, subjects, facetRes] =
+      const [result, topics, chapters, sources, institutions, subjects, facetRes] =
         await Promise.all([
           api.get<{ data: MCQRow[]; total: number }>(
             `/admin/content/mcqs?${params}`,
@@ -522,6 +566,9 @@ export default function McqsPage() {
           cacheRef.current.topics
             ? Promise.resolve(cacheRef.current.topics)
             : api.get<TopicRef[]>("/admin/content/topics/all"),
+          cacheRef.current.chapters
+            ? Promise.resolve(cacheRef.current.chapters)
+            : api.get<ChapterRef[]>("/admin/content/chapters/all"),
           cacheRef.current.sources
             ? Promise.resolve(cacheRef.current.sources)
             : api.get<SourceRef[]>("/admin/content/sources"),
@@ -538,6 +585,10 @@ export default function McqsPage() {
       if (Array.isArray(topics)) {
         cacheRef.current.topics = topics;
         setTopics(topics);
+      }
+      if (Array.isArray(chapters)) {
+        cacheRef.current.chapters = chapters;
+        setChapters(chapters);
       }
       if (Array.isArray(sources)) {
         cacheRef.current.sources = sources;
@@ -709,6 +760,7 @@ export default function McqsPage() {
   const openCreate = () => {
     setEditMcq(null);
     setForm({
+      chapterId: fChapter || "",
       topicId: fTopicIds.length === 1 ? fTopicIds[0] : "",
       question: "",
       optA: "",
@@ -749,7 +801,8 @@ export default function McqsPage() {
     );
     setEditMcq(m);
     setForm({
-      topicId: m.topicId,
+      chapterId: m.chapterId || "",
+      topicId: m.topicId || "",
       question: m.question,
       optA: opts.A || "",
       optB: opts.B || "",
@@ -798,7 +851,8 @@ export default function McqsPage() {
     if (form.explE) optionExplanations.E = form.explE;
 
     return {
-      topicId: form.topicId,
+      chapterId: form.chapterId,
+      topicId: form.topicId || null,
       question: form.question,
       options,
       correctAnswer: form.correctAnswer,
@@ -828,8 +882,8 @@ export default function McqsPage() {
   };
 
   const handleSave = async () => {
-    if (!form.topicId || !form.question || !form.optA || !form.optB) {
-      setError("Topic, question, and at least 2 options required");
+    if (!form.chapterId || !form.question || !form.optA || !form.optB) {
+      setError("Chapter, question, and at least 2 options required");
       return;
     }
     setSaving(true);
@@ -979,8 +1033,8 @@ export default function McqsPage() {
   };
 
   const handleBulkImport = async () => {
-    if (!importTopicId) {
-      setImportResult("❌ Select a topic first");
+    if (!importChapterId) {
+      setImportResult("❌ Select a chapter first");
       return;
     }
     setImporting(true);
@@ -1064,7 +1118,8 @@ export default function McqsPage() {
 
         normalized.push({
           ...m,
-          topicId: importTopicId,
+          chapterId: importChapterId,
+          topicId: importTopicId || null,
           options: normalizedOpts,
           optionExplanations:
             Object.keys(normalizedOptExpls).length > 0
@@ -1520,7 +1575,26 @@ export default function McqsPage() {
             <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Topic *
+                  Chapter *
+                </label>
+                <select
+                  value={form.chapterId}
+                  onChange={(e) =>
+                    setForm({ ...form, chapterId: e.target.value, topicId: "" })
+                  }
+                  className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                >
+                  <option value="">Select chapter…</option>
+                  {chaptersList.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.bookTitle ? `${c.bookTitle} › ${c.title}` : c.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Topic (optional)
                 </label>
                 <select
                   value={form.topicId}
@@ -1529,9 +1603,9 @@ export default function McqsPage() {
                   }
                   className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                 >
-                  <option value="">Select topic…</option>
+                  <option value="">None (chapter-only MCQ)</option>
                   <TopicGroupOptions
-                    groups={topicsByChapter}
+                    groups={formTopicGroups}
                     showBook={books.length > 1}
                   />
                 </select>
@@ -1894,16 +1968,42 @@ export default function McqsPage() {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Target Topic *
+                    Target Chapter *
+                  </label>
+                  <select
+                    value={importChapterId}
+                    onChange={(e) => {
+                      setImportChapterId(e.target.value);
+                      setImportTopicId("");
+                    }}
+                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
+                  >
+                    <option value="">Select chapter…</option>
+                    {chaptersList.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.bookTitle ? `${c.bookTitle} › ${c.title}` : c.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Target Topic (optional)
                   </label>
                   <select
                     value={importTopicId}
                     onChange={(e) => setImportTopicId(e.target.value)}
                     className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none"
                   >
-                    <option value="">Select topic…</option>
+                    <option value="">None (chapter-only MCQs)</option>
                     <TopicGroupOptions
-                      groups={topicsByChapter}
+                      groups={
+                        importChapterId
+                          ? topicsByChapter.filter(
+                              (g) => g.chapterId === importChapterId,
+                            )
+                          : topicsByChapter
+                      }
                       showBook={books.length > 1}
                     />
                   </select>

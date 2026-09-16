@@ -125,6 +125,40 @@ export async function adminGetChapter(
   return ch || undefined;
 }
 
+export interface ChapterRef {
+  id: string;
+  title: string;
+  bookId: string;
+  bookTitle: string;
+  subjectId: string | null;
+  subjectTitle: string | null;
+}
+
+/** Flat chapter refs with book/subject titles, for MCQ classification UIs. */
+export async function adminGetAllChaptersFlat(): Promise<ChapterRef[]> {
+  const rows = await db
+    .select({
+      id: chapters.id,
+      title: chapters.title,
+      bookId: chapters.bookId,
+      bookTitle: books.title,
+      subjectId: chapters.subjectId,
+      subjectTitle: subjects.title,
+    })
+    .from(chapters)
+    .leftJoin(books, eq(chapters.bookId, books.id))
+    .leftJoin(subjects, eq(chapters.subjectId, subjects.id))
+    .orderBy(asc(books.title), asc(chapters.order), asc(chapters.title));
+  return rows.map((r: (typeof rows)[number]) => ({
+    id: r.id,
+    title: r.title,
+    bookId: r.bookId,
+    bookTitle: r.bookTitle ?? "",
+    subjectId: r.subjectId ?? null,
+    subjectTitle: r.subjectTitle ?? null,
+  }));
+}
+
 export async function adminCreateChapter(data: {
   bookId: string;
   subjectId?: string | null;
@@ -540,8 +574,11 @@ export async function adminGetMcqs(
   if (filters?.topicId) conditions.push(eq(mcqs.topicId, filters.topicId));
   if (filters?.topicIds?.length)
     conditions.push(inArray(mcqs.topicId, filters.topicIds));
+  // Match either the MCQ's own chapter or its topic's chapter.
   if (filters?.chapterId)
-    conditions.push(eq(topics.chapterId, filters.chapterId));
+    conditions.push(
+      sql`coalesce(${mcqs.chapterId}, ${topics.chapterId}) = ${filters.chapterId}`,
+    );
   if (filters?.subjectId)
     conditions.push(eq(chapters.subjectId, filters.subjectId));
   if (filters?.bookId) conditions.push(eq(chapters.bookId, filters.bookId));
@@ -623,7 +660,10 @@ export async function adminGetMcqs(
     query
       .leftJoin(sources, eq(mcqs.sourceId, sources.id))
       .leftJoin(topics, eq(mcqs.topicId, topics.id))
-      .leftJoin(chapters, eq(topics.chapterId, chapters.id))
+      .leftJoin(
+        chapters,
+        sql`coalesce(${mcqs.chapterId}, ${topics.chapterId}) = ${chapters.id}`,
+      )
       .leftJoin(subjects, eq(chapters.subjectId, subjects.id))
       .leftJoin(mcqStats, eq(mcqStats.mcqId, mcqs.id));
 
@@ -759,7 +799,8 @@ export async function adminGetMcq(id: string): Promise<MCQ | undefined> {
 }
 
 export async function adminCreateMcq(data: {
-  topicId: string;
+  chapterId?: string | null;
+  topicId?: string | null;
   question: string;
   options: unknown;
   correctAnswer: string;
@@ -800,7 +841,8 @@ export async function adminUpdateMcq(
     images: unknown | null;
     isPublished: boolean;
     isPaid: boolean;
-    topicId: string;
+    chapterId: string | null;
+    topicId: string | null;
     year: number | null;
     sourceId: string | null;
     institutionId: string | null;
@@ -883,7 +925,8 @@ export async function adminDeleteMcq(id: string): Promise<void> {
 
 export async function adminBulkCreateMcqs(
   mcqList: {
-    topicId: string;
+    chapterId?: string | null;
+    topicId?: string | null;
     question: string;
     options: unknown;
     correctAnswer: string;
