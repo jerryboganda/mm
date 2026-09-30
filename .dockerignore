@@ -21,14 +21,9 @@ updates
 *.log
 *.md
 !README.md
-AUDIT_REPORT.md
 attached_assets
 output
 .playwright-cli
-design_guidelines.md
-memory.md
-linux vps memory file.md
-Maternal_Mind_Master_Mega_Revised_Plan.md
 .env
 .env.*
 !.env.example
