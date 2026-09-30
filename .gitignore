@@ -3,11 +3,8 @@
 # APK build artifacts
 *.apk
 
-# Local dev state
+# Local state
 .local/
-
-# Local tooling skills
-.agent/
 
 # Server build output
 server_dist/
@@ -63,7 +60,6 @@ app-example
 
 # Playwright generated files
 .playwright-cli/
-.playwright-mcp/
 
 # Temp build output
 server_dist_check/
@@ -95,15 +91,12 @@ website_dist/
 /updates/
 /secrets/
 
-# Isolated implementation worktrees
-/.worktrees/
-
 # ...but the PUBLIC code-signing certificate MUST be committed (app bundles it to
 # verify OTA manifests). This negation overrides the global `*.pem` ignore above.
 !client/certs/
 !client/certs/certificate.pem
 
-# Local machine artifacts � never commit (deploy tarballs, DB dumps, raw book sources)
+# Local machine artifacts — never commit (deploy tarballs, DB dumps, raw book sources)
 *.tar.gz
 backups/
 temp_media/
@@ -116,10 +109,6 @@ Maternal Mind Education Content/
 dist-fresh/
 webdeploy/
 dist/
-.agents/
-.serena/
-.tooling/
 *.docx
 ORIGINAL_REQUEST.md
 PROJECT.md
-.zcode/

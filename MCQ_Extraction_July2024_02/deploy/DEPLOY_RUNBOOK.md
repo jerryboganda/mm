@@ -28,7 +28,7 @@ Nothing existing is modified destructively; the `images` column is nullable and 
 ## PART A — content + figures into production (run on the VPS)
 
 **1. Get the code + content onto the VPS.**
-From your PC , commit & push, then on the VPS pull:
+From your PC, commit & push, then on the VPS pull:
 ```bash
 # on the VPS, in the repo root:
 git pull --rebase        # or wait for auto-sync (SYNC_POLICY.md)
