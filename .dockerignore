@@ -23,6 +23,8 @@ updates
 !README.md
 AUDIT_REPORT.md
 attached_assets
+output
+.playwright-cli
 design_guidelines.md
 memory.md
 linux vps memory file.md
